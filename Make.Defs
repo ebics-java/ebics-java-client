@@ -1,0 +1,194 @@
+##
+## Copyright (c) 1990-2012 kopiRight Managed Solutions GmbH
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License version 2
+## as published by the Free Software Foundation.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## $Id$
+##
+
+## ----------------------------------------------------------------------
+## CHECK THAT CLASSROOT IS SET
+
+ifdef CLASSROOT
+CLASSROOT_CHECK =	classroot-good
+else
+CLASSROOT_CHECK =	classroot-bad
+endif
+
+check-classroot:	$(CLASSROOT_CHECK)
+
+classroot-good:
+
+classroot-bad:
+			@echo "*** Error: No CLASSROOT defined, exiting. ***"
+			@exit 1
+
+## ----------------------------------------------------------------------
+## DEFINITIONS
+
+ifndef RELEASE
+RELEASE =		"Version 1.0 released 20 February 2012"
+endif
+
+ifndef JAVA
+JAVA =			java -Djava.ext.dirs=$(TOPDIR)/lib
+endif
+
+ifndef JAVAC
+JAVAC = 		javac -encoding utf-8
+endif
+
+ifndef SCOMP
+SCOMP =			$(JAVA) org.apache.xmlbeans.impl.tool.SchemaCompiler -d $(CLASSROOT) -srconly
+endif
+
+## ----------------------------------------------------------------------
+## BUILD
+
+ifdef SUBDIRS
+
+build:
+			@for dir in $(SUBDIRS); do					\
+		    	    if [ -d $$dir ]; then					\
+				$(MAKE) -C $$dir JAVAC='$(JAVAC)' build || exit 1;	\
+		    	    fi;								\
+			done
+
+else
+
+ifndef NONSTANDARDBUILD
+
+build:			classes properties
+
+endif
+
+endif
+
+## ----------------------------------------------------------------------
+## BUILD CLASSFILES
+
+classes:		check-classroot classes.stamp
+
+ifndef NONSTANDARDCOMPILER
+
+classes.stamp:		
+ifdef JAVAFILES
+			$(JAVAC) -extdirs $(TOPDIR)/lib -d $(CLASSROOT) $(JAVAFILES:%=%.java)
+			touch classes.stamp
+endif
+
+endif
+
+## ----------------------------------------------------------------------
+## CLEAN SOURCE DIRECTORY
+
+ifdef SUBDIRS
+
+clean:
+			rm -f *~
+			@for dir in $(SUBDIRS); do					\
+		    	    if [ -d $$dir ]; then					\
+				$(MAKE) -C $$dir clean;					\
+		    	    fi;								\
+			done
+
+else
+
+clean:
+			rm -f TAGS classes.stamp *~
+endif
+
+## ----------------------------------------------------------------------
+## CLEAN CLASSFILES
+
+ifdef SUBDIRS
+
+clean-classes:
+			@for dir in $(SUBDIRS); do					\
+		    	    if [ -d $$dir ]; then					\
+				$(MAKE) -C $$dir clean-classes;				\
+		    	    fi;								\
+			done
+
+else
+
+clean-classes:
+ifdef PACKAGE
+			rm -f $(CLASSROOT)/$(PACKAGE)/*.class
+			rm -f $(CLASSROOT)/$(PACKAGE)/*.properties
+			rm -f classes.stamp
+endif
+
+endif
+
+## ----------------------------------------------------------------------
+## MAKE JAVADOC DIRECTORIES
+
+ifdef SUBDIRS
+
+javadocsrcs:
+			@for dir in $(SUBDIRS); do					\
+		    	    if [ -d $$dir ]; then					\
+				$(MAKE) -C $$dir JAVADOCROOT='$(JAVADOCROOT)'		\
+				javadocsrcs;						\
+		    	    fi;								\
+			done
+
+else
+
+javadocsrcs:
+ifdef PACKAGE
+			mkdir -p $(JAVADOCROOT)/source/$(PACKAGE)
+			cp $(JAVAFILES:%=%.java) $(JAVADOCROOT)/source/$(PACKAGE)
+			touch $(JAVADOCROOT)/packages/`echo $(PACKAGE) | sed 's/\//./g'`
+endif
+endif
+
+
+## ----------------------------------------------------------------------
+## COPY PROPERTIES
+
+properties:
+ifdef PROPERTIES
+			@[ -d $(CLASSROOT)/$(PACKAGE) ] || mkdir -p $(CLASSROOT)/$(PACKAGE)
+			cp $(PROPERTIES:%=%.properties) $(CLASSROOT)/$(PACKAGE)
+endif
+
+
+## ----------------------------------------------------------------------
+## COMPILE AN XML SCHEMA --> JAVA FILES
+
+XSD_FILES =   	$(XSDFILES:%=%.xsd)		\
+	      	$(XSDCONFIG:%=%.xsdconfig)
+
+scomp:		scomp.stamp
+
+scomp.stamp:	$(XSD_FILES)
+ifdef XSDFILES
+		($(SCOMP) -src $(TOPDIR)/src $?);	\
+		touch scomp.stamp;
+endif
+
+## ----------------------------------------------------------------------
+## DIRECTORIES TO CLEAN
+
+dirsclean:
+		rm -rf $(DTOCLEAN)
+
+
+## ----------------------------------------------------------------------
+## FILES TO CLEAN
+
+filesclean:
+		rm -rf $(FTOCLEAN)

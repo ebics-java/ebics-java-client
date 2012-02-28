@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<!--
+  Copyright (c) 1990-2012 kopiRight Managed Solutions GmbH
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License version 2
+  as published by the Free Software Foundation.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License for more details.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+  $Id$
+-->
+  	
+<!--==================================================================
+    package: org.kopi.ebics
+    ==================================================================-->
+<project default="build" basedir=".">
+  
+  <property name="topdir" value="../../../.." />
+  <property name="node" value="yes"/>
+  
+  <!--==============================================================
+      Default target:	builds messages, options and java sources 
+      ==============================================================-->
+  <target name="node.build"  depends="init"
+		description="--> Runs subbuild files ">
+    <ant dir="messages"          inheritAll="false" target="${target}" />
+    <ant dir="exception"         inheritAll="false" target="${target}" />
+    <ant dir="utils"             inheritAll="false" target="${target}" />
+    <ant dir="interfaces"        inheritAll="false" target="${target}" />
+    <ant dir="security"          inheritAll="false" target="${target}" />
+    <ant dir="schema"            inheritAll="false" target="${target}" />
+    <ant dir="io"                inheritAll="false" target="${target}" />
+    <ant dir="letter"            inheritAll="false" target="${target}" />
+    <ant dir="session"           inheritAll="false" target="${target}" />
+    <ant dir="xml"               inheritAll="false" target="${target}" />
+    <ant dir="format"            inheritAll="false" target="${target}" />
+    <ant dir="certificate"       inheritAll="false" target="${target}" />
+    <ant dir="client"            inheritAll="false" target="${target}" />
+  </target>
+  
+  <!--==============================================================
+      buildtools target: builds java sources only
+      ==============================================================-->
+  <target name="buildtools" depends="init" 
+	  description=" Runs subbuild files ">
+    <ant dir="messages"          inheritAll="false" target="${target}" />
+    <ant dir="exception"         inheritAll="false" target="${target}" />
+    <ant dir="utils"             inheritAll="false" target="${target}" />
+    <ant dir="interfaces"        inheritAll="false" target="${target}" />
+    <ant dir="security"          inheritAll="false" target="${target}" />
+    <ant dir="schema"            inheritAll="false" target="${target}" />
+    <ant dir="io"                inheritAll="false" target="${target}" />
+    <ant dir="letter"            inheritAll="false" target="${target}" />
+    <ant dir="session"           inheritAll="false" target="${target}" />
+    <ant dir="xml"               inheritAll="false" target="${target}" />
+    <ant dir="format"            inheritAll="false" target="${target}" />
+    <ant dir="certificate"       inheritAll="false" target="${target}" />
+    <ant dir="client"            inheritAll="false" target="${target}" />
+  </target> 
+  
+  <import file="${topdir}/defs.xml" />
+  
+</project>
