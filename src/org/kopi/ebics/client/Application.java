@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiRight Managed Solutions GmbH
+ * Copyright (c) 1990-2012 kopiLeft Development SARL
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -478,7 +478,7 @@ public class Application {
    * @param args program arguments
    */
   public static void main(String[] args) throws Exception {
-    DefaultConfiguration			configuration;
+    DefaultConfiguration		configuration;
     PasswordCallback			pwdHandler;
     Application				appli;
     String				userId;
@@ -488,21 +488,22 @@ public class Application {
     pwdHandler = new UserPasswordHandler(userId, "2012");
     appli = new Application(configuration);
     appli.init();
-//    appli.createUser(new URL("https://server-ebics.webank.fr:28103/WbkPortalFileTransfert/EbicsProtocol"), 
-//                     "VALERIAN",
-//	             "EBIXQUAL", 
-//	             "EBICS", 
-//	             userId, 
-//	             "pebics", 
-//	             "pebics@domaine.fr", 
-//	             "org", 
-//	             "Euro-Information", 
-//	             true,
-//	             pwdHandler);
+
+    appli.createUser(new URL("https://server-ebics.webank.fr:28103/WbkPortalFileTransfert/EbicsProtocol"), 
+                     "VALERIAN",
+	             "EBIXQUAL", 
+	             "EBICS", 
+	             userId, 
+	             "pebics", 
+	             "pebics@domaine.fr", 
+	             "org", 
+	             "Euro-Information", 
+	             true,
+	             pwdHandler);
     Product product = new Product("kopiLeft Dev 1.0", Locale.FRANCE, null);
     appli.loadUser("EBIXQUAL", "EBICS", userId, pwdHandler);
-//    appli.sendHPBRequest(userId, product);
-//    appli.sendFile(System.getProperty("user.home") + File.separator + "test.txt", userId, product);
+    appli.sendHPBRequest(userId, product);
+    appli.sendFile(System.getProperty("user.home") + File.separator + "test.txt", userId, product);
     appli.fetchFile(System.getProperty("user.home") + File.separator + "download.txt", 
 	            userId, 
 	            product, 

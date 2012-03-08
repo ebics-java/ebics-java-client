@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiRight Managed Solutions GmbH
+ * Copyright (c) 1990-2012 kopiLeft Development SARL
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -38,7 +38,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 /*
- * Copyright (c) 1990-2012 kopiRight Managed Solutions GmbH
+ * Copyright (c) 1990-2012 kopiLeft Development SARL
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

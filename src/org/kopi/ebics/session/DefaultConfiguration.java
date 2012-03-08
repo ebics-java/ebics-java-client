@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiRight Managed Solutions GmbH
+ * Copyright (c) 1990-2012 kopiLeft Development SARL
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -150,6 +150,10 @@ public class DefaultConfiguration implements Configuration {
 
   @Override
   public String getProperty(String key) {
+    if (!isConfigFileLoad) {
+      return null;
+    }
+    
     if (key == null) {
       return null;
     }

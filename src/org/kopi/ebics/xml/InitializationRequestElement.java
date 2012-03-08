@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiRight Managed Solutions GmbH
+ * Copyright (c) 1990-2012 kopiLeft Development SARL
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -117,6 +117,10 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
    * @throws EbicsException
    */
   protected byte[] decodeHex(byte[] hex) throws EbicsException {
+    if (hex == null) {
+      throw new EbicsException("Bank digest is empty, HBB request must be performed before");
+    }
+    
     try {
       return Hex.decodeHex((new String(hex)).toCharArray());
     } catch (DecoderException e) {

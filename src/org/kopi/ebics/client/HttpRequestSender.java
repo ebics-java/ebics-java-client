@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiRight Managed Solutions GmbH
+ * Copyright (c) 1990-2012 kopiLeft Development SARL
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -63,9 +63,12 @@ public class HttpRequestSender {
    */
   public final int send(ContentFactory request) throws IOException {
     HttpClient			httpClient;
+    String                      proxyConfiguration;
     
     httpClient = new HttpClient();
-    if (!session.getConfiguration().getProperty("http.proxyHost").equals("")) {
+    proxyConfiguration = session.getConfiguration().getProperty("http.proxyHost");
+
+    if (proxyConfiguration != null && !proxyConfiguration.equals("")) {
       HostConfiguration		hostConfig;
       String			proxyHost;
       int			proxyPort;
