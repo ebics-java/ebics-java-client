@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!--
-  Copyright (c) 1990-2012 kopiLeft Development SARL
+  Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License version 2
   as published by the Free Software Foundation.
@@ -35,7 +35,7 @@
   	                           ${topdir}/schema/ebics.xsd
   	                           ${topdir}/schema/xmldsig-core-schema.xsd" />
   <property name="xsdconfig" value="${topdir}/schema/config.xsdconfig" />
-  
+
   <property name="javafiles" value="h000/EbicsHEVRequestDocument.java
   				    h000/EbicsHEVResponseDocument.java
   				    h000/HEVRequestDataType.java
@@ -526,7 +526,7 @@
   				    xmldsig/impl/X509DataDocumentImpl.java
   				    xmldsig/impl/X509DataTypeImpl.java
   				    xmldsig/impl/X509IssuerSerialTypeImpl.java" />
-  
+
   <import file="${topdir}/defs.xml" />
-  
+
 </project>

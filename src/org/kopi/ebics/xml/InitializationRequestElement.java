@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,9 +36,9 @@ import org.kopi.ebics.utils.Utils;
 
 /**
  * The <code>InitializationRequestElement</code> is the root element for
- * ebics uploads and downloads requests. The response of this element is 
+ * ebics uploads and downloads requests. The response of this element is
  * then used either to upload or download files from the ebics server.
- * 
+ *
  * @author Hachani
  *
  */
@@ -49,23 +49,23 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
    * @param session the current ebics session.
    * @param type the initialization type (UPLOAD, DOWNLOAD).
    * @param name the element name.
-   * @throws EbicsException 
+   * @throws EbicsException
    */
   public InitializationRequestElement(EbicsSession session,
                                       OrderType type,
-                                      String name) 
-    throws EbicsException 
+                                      String name)
+    throws EbicsException
   {
     super(session);
     this.type = type;
     this.name = name;
     nonce = Utils.generateNonce();
   }
-  
+
   @Override
   public void build() throws EbicsException {
     SignedInfo			signedInfo;
-    
+
     buildInitialization();
     signedInfo = new SignedInfo(session.getUser(), getDigest());
     signedInfo.build();
@@ -77,14 +77,14 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
   public String getName() {
     return name + ".xml";
   }
-  
+
   @Override
   public byte[] toByteArray() {
     setSaveSuggestedPrefixes("http://www.ebics.org/H003", "");
-    
+
     return super.toByteArray();
   }
-  
+
   /**
    * Returns the digest value of the authenticated XML portions.
    * @return  the digest value.
@@ -92,7 +92,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
    */
   public byte[] getDigest() throws EbicsException {
     addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
-    
+
     try {
       return MessageDigest.getInstance("SHA-256", "BC").digest(Utils.canonize(toByteArray()));
     } catch (NoSuchAlgorithmException e) {
@@ -101,7 +101,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   /**
    * Returns the element type.
    * @return the element type.
@@ -109,7 +109,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
   public String getType() {
     return type.getOrderType();
   }
-  
+
   /**
    * Decodes an hexadecimal input.
    * @param hex the hexadecimal input
@@ -120,14 +120,14 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
     if (hex == null) {
       throw new EbicsException("Bank digest is empty, HBB request must be performed before");
     }
-    
+
     try {
       return Hex.decodeHex((new String(hex)).toCharArray());
     } catch (DecoderException e) {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   /**
    * Generates the upload transaction key
    * @return the transaction key
@@ -135,27 +135,27 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
   protected byte[] generateTransactionKey() throws EbicsException {
     try {
       Cipher			cipher;
-      
+
       cipher = Cipher.getInstance("RSA/NONE/PKCS1Padding", "BC");
       cipher.init(Cipher.ENCRYPT_MODE, session.getBankX002Key());
-      
-      return cipher.doFinal(nonce); 
+
+      return cipher.doFinal(nonce);
     } catch (Exception e) {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   /**
    * Builds the initialization request according to the
    * element type.
    * @throws EbicsException build fails
    */
   public abstract void buildInitialization() throws EbicsException;
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private String			name;
   protected OrderType			type;
   protected byte[]			nonce;

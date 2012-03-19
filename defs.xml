@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!--
-  Copyright (c) 1990-2012 kopiLeft Development SARL
+  Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License version 2
   as published by the Free Software Foundation.
@@ -19,46 +19,46 @@
 	==================================================================-->
 
 <project default="init">
-  
-  
-  <!-- ================================= 
-       DEFINITIONS              
+
+
+  <!-- =================================
+       DEFINITIONS
        ================================= -->
   <property name="release" value="&quot;Version 1.0 released 20 February 2012&quot;" />
-  
+
   <property environment="env" />
   <property name="classroot" value="${env.CLASSROOT}" />
   <property name="extdirs" value="${topdir}/lib" />
-  
+
   <path id="classpath">
     <pathelement path="${env.CLASSPATH}" />
   </path>
-  
+
   <presetdef name="java.def">
     <java classpath="classpath" fork="yes">
       <jvmarg line="-Djava.ext.dirs=${extdirs}" />
     </java>
   </presetdef>
-  
+
   <presetdef name="javac.def">
     <javac srcdir="${src}" destdir="${classroot}" classpathref="classpath" includes="${javafiles}" includeAntRuntime="no" extdirs="${extdirs}">
       <compilerarg line="-encoding utf-8" />
     </javac>
   </presetdef>
-  
+
   <presetdef name="scomp.def">
     <java.def classname="org.apache.xmlbeans.impl.tool.SchemaCompiler">
       <arg line="-d ${classroot}"/>
       <arg line="-srconly"/>
     </java.def>
   </presetdef>
-  
+
   <target name="init" description="  Inisialize the building ">
     <tstamp />
   </target>
-  
-  <!-- ================================= 
-       BUILD              
+
+  <!-- =================================
+       BUILD
        ================================= -->
   <target name="build" depends="scomp.build, dir.build, leaf.build, copy.properties" />
   <target name="dir.build" if="node">
@@ -75,15 +75,15 @@
   <target name="scomp.build" unless="node" if="xsdfiles" >
     <antcall target="scomp" />
   </target>
-  
-  <!-- ================================= 
+
+  <!-- =================================
        BUILD CLASSFILES
        ================================= -->
   <target name="classes">
     <javac.def />
   </target>
-  
-  <!-- ================================= 
+
+  <!-- =================================
        COPY PROPERTIES
        ================================= -->
   <target name="properties">
@@ -91,8 +91,8 @@
       <fileset dir="." includes="${properties}" />
     </copy>
   </target>
-  
-  <!-- ================================= 
+
+  <!-- =================================
        XSD ==> JAVA
        ================================= -->
   <target name="scomp">
@@ -100,8 +100,8 @@
       <arg line="-src ${topdir}/src ${xsdfiles} ${xsdconfig}"/>
     </scomp.def>
   </target>
-  
-  <!-- ================================= 
+
+  <!-- =================================
        CLEAN SOURCE DIRECTORY
        ================================= -->
   <target name="clean">
@@ -109,8 +109,8 @@
       <fileset dir="." includes="**/*~,**/TAGS" />
     </delete>
   </target>
-  
-  <!-- ================================= 
+
+  <!-- =================================
        CLEAN CLASSFILES
        ================================= -->
   <target name="clean-classes" depends="node-clean-classes, leaf-clean-classes" />
@@ -124,8 +124,8 @@
       <fileset dir="${classroot}/${package}" includes="*.class *.properties *.xsl" />
     </delete>
   </target>
-  
-  <!-- ================================= 
+
+  <!-- =================================
        MAKE JAVADOC DIRECTORIES
        ================================= -->
   <target name="javadocsrcs" depends="node-javadocsrcs, leaf-javadocsrcs" />
@@ -142,5 +142,5 @@
       <fileset dir="${javadocroot}/packages" includes="${package.name}" />
     </touch>
   </target>
-  
+
 </project>

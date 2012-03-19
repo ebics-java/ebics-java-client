@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -46,14 +46,14 @@ import org.kopi.ebics.xml.UTransferRequestElement;
 
 
 /**
- * Handling of file transfers. 
- * Files can be transferred to and fetched from the bank. 
- * Every transfer may be performed in a recoverable way. 
- * For convenience and performance reasons there are also 
+ * Handling of file transfers.
+ * Files can be transferred to and fetched from the bank.
+ * Every transfer may be performed in a recoverable way.
+ * For convenience and performance reasons there are also
  * methods that do the whole transfer in one method call.
- * To use the recoverable transfer mode, you may set a working 
+ * To use the recoverable transfer mode, you may set a working
  * directory for temporarily created files.
- * 
+ *
  * @author Hachani
  *
  */
@@ -66,7 +66,7 @@ public class FileTransfer {
   public FileTransfer(EbicsSession session) {
     this.session = session;
   }
-  
+
   /**
    * Initiates a file transfer to the bank.
    * @param content The bytes you want to send.
@@ -82,10 +82,10 @@ public class FileTransfer {
     InitializationResponseElement	response;
     int					httpCode;
     TransferState			state;
-    
+
     sender = new HttpRequestSender(session);
-    initializer = new UInitializationRequestElement(session, 
-	                                            orderType, 
+    initializer = new UInitializationRequestElement(session,
+	                                            orderType,
 	                                            content);
     initializer.build();
     initializer.validate();
@@ -93,26 +93,26 @@ public class FileTransfer {
     session.getConfiguration().getTraceManager().trace(initializer);
     httpCode = sender.send(new ByteArrayContentFactory(initializer.prettyPrint()));
     Utils.checkHttpCode(httpCode);
-    response = new InitializationResponseElement(sender.getResponseBody(), 
+    response = new InitializationResponseElement(sender.getResponseBody(),
 	                                         orderType,
 	                                         DefaultEbicsRootElement.generateName(orderType));
     response.build();
     session.getConfiguration().getTraceManager().trace(response);
     response.report();
     state = new TransferState(initializer.getSegmentNumber(), response.getTransactionId());
-    
+
     while(state.hasNext()) {
       int		segmentNumber;
-      
+
       segmentNumber = state.next();
-      sendFile(initializer.getContent(segmentNumber), 
-	                              segmentNumber, 
-	                              state.isLastSegment(), 
-	                              state.getTransactionId(), 
+      sendFile(initializer.getContent(segmentNumber),
+	                              segmentNumber,
+	                              state.isLastSegment(),
+	                              state.getTransactionId(),
 	                              orderType);
     }
   }
-  
+
   /**
    * Sends a segment to the ebics bank server.
    * @param factory the content factory that contain the segment data.
@@ -136,13 +136,13 @@ public class FileTransfer {
     int					httpCode;
 
     session.getConfiguration().getLogger().info(Messages.getString("upload.segment",
-						                   Constants.APPLICATION_BUNDLE_NAME, 
+						                   Constants.APPLICATION_BUNDLE_NAME,
 	                                                           segmentNumber));
     uploader = new UTransferRequestElement(session,
 	                                   orderType,
-	                                   segmentNumber, 
-	                                   lastSegment, 
-	                                   transactionId, 
+	                                   segmentNumber,
+	                                   lastSegment,
+	                                   transactionId,
 	                                   factory);
     sender = new HttpRequestSender(session);
     uploader.build();
@@ -150,23 +150,23 @@ public class FileTransfer {
     session.getConfiguration().getTraceManager().trace(uploader);
     httpCode = sender.send(new ByteArrayContentFactory(uploader.prettyPrint()));
     Utils.checkHttpCode(httpCode);
-    response = new TransferResponseElement(sender.getResponseBody(), 
+    response = new TransferResponseElement(sender.getResponseBody(),
 	                                   DefaultEbicsRootElement.generateName(orderType));
     response.build();
     session.getConfiguration().getTraceManager().trace(response);
     response.report();
   }
-  
+
   /**
-   * Fetches a file of the given order type from the bank. 
-   * You may give an optional start and end date. 
-   * This type of transfer will run until everything is processed. 
-   * No transaction recovery is possible. 
+   * Fetches a file of the given order type from the bank.
+   * You may give an optional start and end date.
+   * This type of transfer will run until everything is processed.
+   * No transaction recovery is possible.
    * @param orderType type of file to fetch
    * @param start optional begin of fetch term
    * @param end optional end of fetch term
-   * @param dest where to put the data 
-   * @throws IOException communication error 
+   * @param dest where to put the data
+   * @throws IOException communication error
    * @throws EbicsException server generated error
    */
   public void fetchFile(OrderType orderType,
@@ -183,9 +183,9 @@ public class FileTransfer {
     int					httpCode;
     TransferState			state;
     Joiner				joiner;
-    
+
     sender = new HttpRequestSender(session);
-    initializer = new DInitializationRequestElement(session, 
+    initializer = new DInitializationRequestElement(session,
 	                                            orderType,
 	                                            start,
 	                                            end);
@@ -194,7 +194,7 @@ public class FileTransfer {
     session.getConfiguration().getTraceManager().trace(initializer);
     httpCode = sender.send(new ByteArrayContentFactory(initializer.prettyPrint()));
     Utils.checkHttpCode(httpCode);
-    response = new DInitializationResponseElement(sender.getResponseBody(), 
+    response = new DInitializationResponseElement(sender.getResponseBody(),
 	                                          orderType,
 	                                          DefaultEbicsRootElement.generateName(orderType));
     response.build();
@@ -206,31 +206,31 @@ public class FileTransfer {
     joiner.append(response.getOrderData());
     while(state.hasNext()) {
       int		segmentNumber;
-      
+
       segmentNumber = state.next();
-      fetchFile(orderType, 
-	        segmentNumber, 
-	        state.isLastSegment(), 
-	        state.getTransactionId(), 
+      fetchFile(orderType,
+	        segmentNumber,
+	        state.isLastSegment(),
+	        state.getTransactionId(),
 	        joiner);
     }
-    
+
     joiner.writeTo(dest, response.getTransactionKey());
-    receipt = new ReceiptRequestElement(session, 
-	                                state.getTransactionId(), 
+    receipt = new ReceiptRequestElement(session,
+	                                state.getTransactionId(),
 	                                DefaultEbicsRootElement.generateName(orderType));
     receipt.build();
     receipt.validate();
     session.getConfiguration().getTraceManager().trace(receipt);
     httpCode = sender.send(new ByteArrayContentFactory(receipt.prettyPrint()));
     Utils.checkHttpCode(httpCode);
-    receiptResponse = new ReceiptResponseElement(sender.getResponseBody(), 
+    receiptResponse = new ReceiptResponseElement(sender.getResponseBody(),
 	                                         DefaultEbicsRootElement.generateName(orderType));
     receiptResponse.build();
     session.getConfiguration().getTraceManager().trace(receiptResponse);
     receiptResponse.report();
   }
-  
+
   /**
    * Fetches a given portion of a file.
    * @param orderType the order type
@@ -238,7 +238,7 @@ public class FileTransfer {
    * @param lastSegment is it the last segment?
    * @param transactionId the transaction ID
    * @param joiner the portions joiner
-   * @throws IOException communication error 
+   * @throws IOException communication error
    * @throws EbicsException server generated error
    */
   public void fetchFile(OrderType orderType,
@@ -252,30 +252,30 @@ public class FileTransfer {
     HttpRequestSender			sender;
     DTransferResponseElement		response;
     int					httpCode;
-    
+
     sender = new HttpRequestSender(session);
-    downloader = new DTransferRequestElement(session, 
-	                                     orderType, 
-	                                     segmentNumber, 
-	                                     lastSegment, 
+    downloader = new DTransferRequestElement(session,
+	                                     orderType,
+	                                     segmentNumber,
+	                                     lastSegment,
 	                                     transactionId);
     downloader.build();
     downloader.validate();
     session.getConfiguration().getTraceManager().trace(downloader);
     httpCode = sender.send(new ByteArrayContentFactory(downloader.prettyPrint()));
     Utils.checkHttpCode(httpCode);
-    response = new DTransferResponseElement(sender.getResponseBody(), 
-	                                    orderType, 
+    response = new DTransferResponseElement(sender.getResponseBody(),
+	                                    orderType,
 	                                    DefaultEbicsRootElement.generateName(orderType));
     response.build();
     session.getConfiguration().getTraceManager().trace(response);
     response.report();
     joiner.append(response.getOrderData());
   }
-                       
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private EbicsSession			session;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,32 +36,32 @@ import org.kopi.ebics.io.IOUtils;
  * A simple implementation of the <code>SerializationManager</code>.
  * The serialization process aims to save object on the user disk
  * using a separated file for each object to serialize.
- * 
+ *
  * @author hachani
  *
  */
 public class DefaultSerializationManager implements SerializationManager {
 
   /**
-   * Constructs a new <code>SerializationManage</code> 
+   * Constructs a new <code>SerializationManage</code>
    * @param serializationDir the serialization directory
    */
   public DefaultSerializationManager(File serializationDir) {
     this.serializationDir = serializationDir;
   }
-  
+
   /**
    * Constructs a new <code>SerializationManage</code>
    */
   public DefaultSerializationManager() {
     this(null);
   }
-  
+
   @Override
   public void serialize(Savable object) throws EbicsException {
     try {
       ObjectOutputStream	out;
-      
+
       out = new ObjectOutputStream(new FileOutputStream(IOUtils.createFile(serializationDir, object.getSaveName())));
       object.save(out);
     } catch (IOException e) {
@@ -73,14 +73,14 @@ public class DefaultSerializationManager implements SerializationManager {
   public ObjectInputStream deserialize(String name) throws EbicsException {
     try {
       ObjectInputStream		input;
-      
+
       input = new ObjectInputStream(new FileInputStream(IOUtils.createFile(serializationDir, name + ".cer")));
       return input;
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   @Override
   public void setSerializationDirectory(String serializationDir) {
     this.serializationDir = new File(serializationDir);
@@ -89,6 +89,6 @@ public class DefaultSerializationManager implements SerializationManager {
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private File 					serializationDir;
 }

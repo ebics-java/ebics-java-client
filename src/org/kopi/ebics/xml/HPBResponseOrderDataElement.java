@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@ import org.kopi.ebics.schema.h003.HPBResponseOrderDataType;
  * The <code>HPBResponseOrderDataElement</code> contains the public bank
  * keys in encrypted mode. The user should decrypt with his encryption
  * key to have the bank public keys.
- * 
+ *
  * @author hachani
  *
  */
@@ -42,7 +42,7 @@ public class HPBResponseOrderDataElement extends DefaultResponseElement {
   public HPBResponseOrderDataElement(ContentFactory factory) {
     super(factory, "HPBData");
   }
-  
+
   /**
    * Returns the authentication bank certificate.
    * @return the authentication bank certificate.
@@ -50,7 +50,7 @@ public class HPBResponseOrderDataElement extends DefaultResponseElement {
   public byte[] getBankX002Certificate() {
     return response.getAuthenticationPubKeyInfo().getX509Data().getX509CertificateArray(0);
   }
-  
+
   /**
    * Returns the encryption bank certificate.
    * @return the encryption bank certificate.
@@ -58,7 +58,7 @@ public class HPBResponseOrderDataElement extends DefaultResponseElement {
   public byte[] getBankE002Certificate() {
     return response.getEncryptionPubKeyInfo().getX509Data().getX509CertificateArray(0);
   }
-  
+
   @Override
   public void build() throws EbicsException {
     parse(factory);
@@ -69,11 +69,11 @@ public class HPBResponseOrderDataElement extends DefaultResponseElement {
   public String getName() {
     return "HPBData.xml";
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private HPBResponseOrderDataType	response;
   private static final long 		serialVersionUID = -1305363936881364049L;
 }

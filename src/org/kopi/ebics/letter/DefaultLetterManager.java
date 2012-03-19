@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ import org.kopi.ebics.interfaces.LetterManager;
 /**
  * The <code>DefaultLetterManager</code> is a simple way
  * to manage initialization letters.
- * 
+ *
  * @author Hachani
  *
  */
@@ -45,35 +45,35 @@ public class DefaultLetterManager implements LetterManager {
   public DefaultLetterManager(Locale locale) {
     this.locale = locale;
   }
-  
+
   @Override
-  public InitLetter createA005Letter(EbicsUser user) 
-    throws GeneralSecurityException, IOException, EbicsException 
+  public InitLetter createA005Letter(EbicsUser user)
+    throws GeneralSecurityException, IOException, EbicsException
   {
     A005Letter			letter;
-    
+
     letter = new A005Letter(locale);
     letter.create(user);
     return letter;
   }
 
   @Override
-  public InitLetter createE002Letter(EbicsUser user) 
-    throws GeneralSecurityException, IOException, EbicsException 
+  public InitLetter createE002Letter(EbicsUser user)
+    throws GeneralSecurityException, IOException, EbicsException
   {
     E002Letter			letter;
-    
+
     letter = new E002Letter(locale);
     letter.create(user);
     return letter;
   }
 
   @Override
-  public InitLetter createX002Letter(EbicsUser user) 
-    throws GeneralSecurityException, IOException, EbicsException 
+  public InitLetter createX002Letter(EbicsUser user)
+    throws GeneralSecurityException, IOException, EbicsException
   {
     X002Letter			letter;
-    
+
     letter = new X002Letter(locale);
     letter.create(user);
     return letter;
@@ -82,6 +82,6 @@ public class DefaultLetterManager implements LetterManager {
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private Locale				locale;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -54,7 +54,7 @@ import org.kopi.ebics.utils.Utils;
 /**
  * The <code>UInitializationRequestElement</code> is the common initialization
  * element for all ebics file uploads.
- * 
+ *
  * @author Hachani
  *
  */
@@ -65,12 +65,12 @@ public class UInitializationRequestElement extends InitializationRequestElement 
    * @param session the current ebics session.
    * @param orderType the upload order type
    * @param userData the user data to be uploaded
-   * @throws EbicsException 
+   * @throws EbicsException
    */
   public UInitializationRequestElement(EbicsSession session,
                                        org.kopi.ebics.session.OrderType orderType,
-                                       byte[] userData) 
-    throws EbicsException 
+                                       byte[] userData)
+    throws EbicsException
   {
     super(session, orderType, generateName(orderType));
     this.userData = userData;
@@ -105,83 +105,83 @@ public class UInitializationRequestElement extends InitializationRequestElement 
 	                              userData);
     userSignature.build();
     userSignature.validate();
-    
+
     splitter.readInput(session.getConfiguration().isCompressionEnabled(), keySpec);
-    
+
     mutable = EbicsXmlFactory.createMutableHeaderType("Initialisation", null);
     product = EbicsXmlFactory.createProduct(session.getProduct().getLanguage(), session.getProduct().getName());
-    authentication = EbicsXmlFactory.createAuthentication(session.getConfiguration().getAuthenticationVersion(), 
-	                                                  "http://www.w3.org/2001/04/xmlenc#sha256", 
+    authentication = EbicsXmlFactory.createAuthentication(session.getConfiguration().getAuthenticationVersion(),
+	                                                  "http://www.w3.org/2001/04/xmlenc#sha256",
 	                                                  decodeHex(session.getUser().getPartner().getBank().getX002Digest()));
-    encryption = EbicsXmlFactory.createEncryption(session.getConfiguration().getEncryptionVersion(), 
-	                                          "http://www.w3.org/2001/04/xmlenc#sha256", 
+    encryption = EbicsXmlFactory.createEncryption(session.getConfiguration().getEncryptionVersion(),
+	                                          "http://www.w3.org/2001/04/xmlenc#sha256",
 	                                          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
     orderType = EbicsXmlFactory.createOrderType(type.getOrderType());
-    fileFormat = EbicsXmlFactory.createFileFormatType(session.getConfiguration().getLocale().getCountry().toUpperCase(), 
+    fileFormat = EbicsXmlFactory.createFileFormatType(session.getConfiguration().getLocale().getCountry().toUpperCase(),
 	                                              session.getSessionParam("FORMAT"));
     fULOrderParams = EbicsXmlFactory.createFULOrderParamsType(fileFormat);
     parameters = new ArrayList<Parameter>();
     if (Boolean.getBoolean(session.getSessionParam("TEST"))) {
       Parameter 		parameter;
       Value			value;
-      
+
       value = EbicsXmlFactory.createValue("String", "1");
       parameter = EbicsXmlFactory.createParameter("TEST", value);
       parameters.add(parameter);
     }
-    
+
     if (Boolean.getBoolean(session.getSessionParam("EBCDIC"))) {
       Parameter 		parameter;
       Value			value;
-      
+
       value = EbicsXmlFactory.createValue("String", "1");
       parameter = EbicsXmlFactory.createParameter("EBCDIC", value);
       parameters.add(parameter);
     }
-    
+
     if (parameters.size() > 0) {
       fULOrderParams.setParameterArray(parameters.toArray(new Parameter[parameters.size()]));
     }
-    
-    orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(session.getUser().getPartner().nextOrderId(), 
-	                                                              "DZHNN", 
-	                                                              orderType, 
+
+    orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(session.getUser().getPartner().nextOrderId(),
+	                                                              "DZHNN",
+	                                                              orderType,
 	                                                              fULOrderParams);
-    xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(), 
-	                                             nonce, 
-	                                             splitter.getSegmentNumber(), 
-	                                             session.getUser().getPartner().getPartnerId(), 
-	                                             product, 
-	                                             session.getUser().getSecurityMedium(), 
-	                                             session.getUser().getUserId(), 
+    xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(),
+	                                             nonce,
+	                                             splitter.getSegmentNumber(),
+	                                             session.getUser().getPartner().getPartnerId(),
+	                                             product,
+	                                             session.getUser().getSecurityMedium(),
+	                                             session.getUser().getUserId(),
 	                                             Calendar.getInstance(),
 	                                             orderDetails,
 	                                             bankPubKeyDigests);
     header = EbicsXmlFactory.createEbicsRequestHeader(true, mutable, xstatic);
-    encryptionPubKeyDigest = EbicsXmlFactory.createEncryptionPubKeyDigest(session.getConfiguration().getEncryptionVersion(), 
-								          "http://www.w3.org/2001/04/xmlenc#sha256", 
+    encryptionPubKeyDigest = EbicsXmlFactory.createEncryptionPubKeyDigest(session.getConfiguration().getEncryptionVersion(),
+								          "http://www.w3.org/2001/04/xmlenc#sha256",
 								          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
     signatureData = EbicsXmlFactory.createSignatureData(true, Utils.encrypt(Utils.zip(userSignature.prettyPrint()), keySpec));
-    dataEncryptionInfo = EbicsXmlFactory.createDataEncryptionInfo(true, 
-	                                                          encryptionPubKeyDigest, 
+    dataEncryptionInfo = EbicsXmlFactory.createDataEncryptionInfo(true,
+	                                                          encryptionPubKeyDigest,
 	                                                          generateTransactionKey());
     dataTransfer = EbicsXmlFactory.createDataTransferRequestType(dataEncryptionInfo, signatureData);
     body = EbicsXmlFactory.createEbicsRequestBody(dataTransfer);
-    request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(), 
-	                                         session.getConfiguration().getVersion(), 
-	                                         header, 
+    request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(),
+	                                         session.getConfiguration().getVersion(),
+	                                         header,
 	                                         body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
   }
-  
+
   @Override
   public byte[] toByteArray() {
     setSaveSuggestedPrefixes("http://www.ebics.org/H003", "");
-    
+
     return super.toByteArray();
   }
-  
+
   /**
    * Returns the user signature data.
    * @return the user signature data.
@@ -189,7 +189,7 @@ public class UInitializationRequestElement extends InitializationRequestElement 
   public UserSignature getUserSignature() {
     return userSignature;
   }
-  
+
   /**
    * Returns the content of a given segment.
    * @param segment the segment number
@@ -198,7 +198,7 @@ public class UInitializationRequestElement extends InitializationRequestElement 
   public ContentFactory getContent(int segment) {
     return splitter.getContent(segment);
   }
-  
+
   /**
    * Returns the total segment number.
    * @return the total segment number.
@@ -206,11 +206,11 @@ public class UInitializationRequestElement extends InitializationRequestElement 
   public int getSegmentNumber() {
     return splitter.getSegmentNumber();
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private byte[]			userData;
   private UserSignature			userSignature;
   private SecretKeySpec			keySpec;

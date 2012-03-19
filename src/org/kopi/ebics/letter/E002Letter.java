@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import org.kopi.ebics.interfaces.EbicsUser;
 /**
  * The <code>E002Letter</code> is the initialization letter
  * for the encryption certificate.
- * 
+ *
  * @author Hachani
  *
  */
@@ -47,15 +47,15 @@ public class E002Letter extends AbstractInitLetter {
 
   @Override
   public void create(EbicsUser user) throws GeneralSecurityException, IOException, EbicsException {
-    build(user.getPartner().getBank().getHostId(), 
-	  user.getPartner().getBank().getName(), 
-	  user.getUserId(), 
-	  user.getName(), 
-	  user.getPartner().getPartnerId(), 
-	  getString("HIALetter.e002.version", BUNDLE_NAME, locale), 
-	  getString("HIALetter.e002.certificate", BUNDLE_NAME, locale), 
-	  Base64.encodeBase64(user.getE002Certificate(), true), 
-	  getString("HIALetter.e002.digest", BUNDLE_NAME, locale), 
+    build(user.getPartner().getBank().getHostId(),
+	  user.getPartner().getBank().getName(),
+	  user.getUserId(),
+	  user.getName(),
+	  user.getPartner().getPartnerId(),
+	  getString("HIALetter.e002.version", BUNDLE_NAME, locale),
+	  getString("HIALetter.e002.certificate", BUNDLE_NAME, locale),
+	  Base64.encodeBase64(user.getE002Certificate(), true),
+	  getString("HIALetter.e002.digest", BUNDLE_NAME, locale),
 	  getHash(user.getE002Certificate()));
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,7 @@ import org.kopi.ebics.session.OrderType;
 /**
  * The <code>UnsecuredRequestElement</code> is the common element
  * used for key management requests.
- * 
+ *
  * @author hachani
  *
  */
@@ -50,7 +50,7 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
   public UnsecuredRequestElement(EbicsSession session,
                                  OrderType orderType,
                                  String orderId,
-                                 byte[] orderData) 
+                                 byte[] orderData)
   {
     super(session);
     this.orderType = orderType;
@@ -62,44 +62,44 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
   public void build() throws EbicsException {
     Header 					header;
     Body 					body;
-    EmptyMutableHeaderType 			mutable; 
+    EmptyMutableHeaderType 			mutable;
     UnsecuredRequestStaticHeaderType 		xstatic;
     ProductElementType 				productType;
     OrderDetailsType 				orderDetails;
     DataTransfer 				dataTransfer;
     OrderData 					orderData;
     EbicsUnsecuredRequest			request;
-    
-    orderDetails = EbicsXmlFactory.createOrderDetailsType("DZNNN", 
-						          orderId == null ? session.getUser().getPartner().nextOrderId() : orderId, 
+
+    orderDetails = EbicsXmlFactory.createOrderDetailsType("DZNNN",
+						          orderId == null ? session.getUser().getPartner().nextOrderId() : orderId,
 	                                                  orderType.getOrderType());
-    
-    productType = EbicsXmlFactory.creatProductElementType(session.getProduct().getLanguage(), 
+
+    productType = EbicsXmlFactory.creatProductElementType(session.getProduct().getLanguage(),
 	                                                  session.getProduct().getName());
-    
+
     xstatic = EbicsXmlFactory.createUnsecuredRequestStaticHeaderType(session.getBankID(),
-								     session.getUser().getPartner().getPartnerId(), 
-								     session.getUser().getUserId(), 
-	                                                             productType, 
-	                                                             orderDetails, 
+								     session.getUser().getPartner().getPartnerId(),
+								     session.getUser().getUserId(),
+	                                                             productType,
+	                                                             orderDetails,
 	                                                             session.getUser().getSecurityMedium());
     mutable = EbicsXmlFactory.createEmptyMutableHeaderType();
-    
-    header = EbicsXmlFactory.createHeader(true, 
-	                                  mutable, 
+
+    header = EbicsXmlFactory.createHeader(true,
+	                                  mutable,
 	                                  xstatic);
-    
+
     orderData = EbicsXmlFactory.createOrderData(this.orderData);
     dataTransfer = EbicsXmlFactory.createDataTransfer(orderData);
     body = EbicsXmlFactory.createBody(dataTransfer);
-    request = EbicsXmlFactory.createEbicsUnsecuredRequest(header, 
-	                                                  body, 
-	                                                  session.getConfiguration().getRevision(), 
+    request = EbicsXmlFactory.createEbicsUnsecuredRequest(header,
+	                                                  body,
+	                                                  session.getConfiguration().getRevision(),
 	                                                  session.getConfiguration().getVersion());
-    
+
     document = EbicsXmlFactory.createEbicsUnsecuredRequestDocument(request);
   }
-  
+
   @Override
   public String getName() {
     return "UnsecuredRequest.xml";
@@ -108,7 +108,7 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private OrderType			orderType;
   private String			orderId;
   private byte[]			orderData;

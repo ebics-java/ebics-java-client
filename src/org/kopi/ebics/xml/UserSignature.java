@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,10 +28,10 @@ import org.kopi.ebics.schema.s001.UserSignatureDataSigBookType;
 
 
 /**
- * A root EBICS element representing the user signature 
+ * A root EBICS element representing the user signature
  * element. The user data is signed with the user signature
  * key sent in the INI request to the EBICS bank server
- * 
+ *
  * @author hachani
  *
  */
@@ -46,7 +46,7 @@ public class UserSignature extends DefaultEbicsRootElement {
    */
   public UserSignature(EbicsUser user,
                        String name,
-                       String signatureVersion, 
+                       String signatureVersion,
                        byte[] toSign)
   {
     this.user = user;
@@ -54,43 +54,43 @@ public class UserSignature extends DefaultEbicsRootElement {
     this.name = name;
     this.signatureVersion = signatureVersion;
   }
-  
+
   @Override
   public void build() throws EbicsException {
     UserSignatureDataSigBookType 	userSignatureData;
     OrderSignatureDataType		orderSignatureData;
     byte[]				signature;
-    
+
     try {
       signature = user.sign(toSign);
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
     }
-    
-    orderSignatureData = EbicsXmlFactory.createOrderSignatureDataType(signatureVersion, 
+
+    orderSignatureData = EbicsXmlFactory.createOrderSignatureDataType(signatureVersion,
                                                                       user.getPartner().getPartnerId(),
                                                                       user.getUserId(),
                                                                       signature);
     userSignatureData = EbicsXmlFactory.createUserSignatureDataSigBookType(new OrderSignatureDataType[] {orderSignatureData});
     document = EbicsXmlFactory.createUserSignatureDataDocument(userSignatureData);
   }
-  
+
   @Override
   public String getName() {
     return name + ".xml";
   }
-  
+
   @Override
   public byte[] toByteArray() {
     setSaveSuggestedPrefixes("http://www.ebics.org/S001", "");
-    
+
     return super.toByteArray();
   }
 
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private EbicsUser 			user;
   private String 			signatureVersion;
   private byte[]			toSign;

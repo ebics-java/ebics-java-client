@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@ package org.kopi.ebics.certificate;
 
 /**
  * X509 certificate constants
- * 
+ *
  * @author hachani
  *
  */
@@ -33,17 +33,17 @@ public interface X509Constants {
   int			SIGNATURE_KEY_USAGE			= 1;
   int			AUTHENTICATION_KEY_USAGE		= 2;
   int			ENCRYPTION_KEY_USAGE			= 3;
-  
+
   /**
-   * Certificate signature algorithm 
+   * Certificate signature algorithm
    */
   String		SIGNATURE_ALGORITHM			= "SHA256WithRSAEncryption";
-  
+
   /**
    * Default days validity of a certificate
    */
   int			DEFAULT_DURATION			= 365;
-  
+
   /**
    * EBICS key size
    */

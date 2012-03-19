@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -44,7 +44,7 @@ import org.w3c.dom.Node;
 /**
  * A representation of the SignedInfo element
  * performing signature for signed ebics requests
- * 
+ *
  * @author hachani
  *
  */
@@ -58,37 +58,37 @@ public class SignedInfo extends DefaultEbicsRootElement {
     this.user = user;
     this.digest = digest;
   }
-  
+
   @Override
   public void build() throws EbicsException {
-    CanonicalizationMethodType 	canonicalizationMethod; 
+    CanonicalizationMethodType 	canonicalizationMethod;
     SignatureMethodType 	signatureMethod;
     ReferenceType 		reference;
     TransformsType 		transforms;
     DigestMethodType 		digestMethod;
     TransformType 		transform;
     SignedInfoType		signedInfo;
-    
+
     if (digest == null) {
       throw new EbicsException("digest value cannot be null");
     }
-    
+
     transform = EbicsXmlFactory.createTransformType(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
     digestMethod = EbicsXmlFactory.createDigestMethodType("http://www.w3.org/2001/04/xmlenc#sha256");
     transforms = EbicsXmlFactory.createTransformsType(new TransformType[] {transform});
-    reference = EbicsXmlFactory.createReferenceType("#xpointer(//*[@authenticate='true'])", 
-	                                            transforms, 
-	                                            digestMethod, 
+    reference = EbicsXmlFactory.createReferenceType("#xpointer(//*[@authenticate='true'])",
+	                                            transforms,
+	                                            digestMethod,
 	                                            digest);
     signatureMethod = EbicsXmlFactory.createSignatureMethodType("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
     canonicalizationMethod = EbicsXmlFactory.createCanonicalizationMethodType(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
-    signedInfo = EbicsXmlFactory.createSignedInfoType(canonicalizationMethod, 
-	                                              signatureMethod, 
+    signedInfo = EbicsXmlFactory.createSignedInfoType(canonicalizationMethod,
+	                                              signatureMethod,
 	                                              new ReferenceType[] {reference});
-    
+
     document = EbicsXmlFactory.createSignatureType(signedInfo);
   }
-  
+
   /**
    * Returns the digest value.
    * @return the digest value.
@@ -96,7 +96,7 @@ public class SignedInfo extends DefaultEbicsRootElement {
   public byte[] getDigest() {
     return digest;
   }
-  
+
   /**
    * Returns the signed info element as an <code>XmlObject</code>
    * @return he signed info element
@@ -105,7 +105,7 @@ public class SignedInfo extends DefaultEbicsRootElement {
   public SignatureType getSignatureType() {
     return ((SignatureType)document);
   }
-  
+
   /**
    * Signs a given input with the authentication private key
    * of the ebics user
@@ -120,7 +120,7 @@ public class SignedInfo extends DefaultEbicsRootElement {
       Document				document;
       Node 				node;
       Canonicalizer 			canonicalizer;
-      
+
       factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
       factory.setValidating(true);
@@ -134,12 +134,12 @@ public class SignedInfo extends DefaultEbicsRootElement {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   @Override
   public byte[] toByteArray() {
     addNamespaceDecl("", "http://www.ebics.org/H003");
     setSaveSuggestedPrefixes("http://www.w3.org/2000/09/xmldsig#", "ds");
-    
+
     return super.toByteArray();
   }
 
@@ -147,11 +147,11 @@ public class SignedInfo extends DefaultEbicsRootElement {
   public String getName() {
     return "SignedInfo.xml";
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private byte[]			digest;
   private EbicsUser 			user;
   private static final long 		serialVersionUID = 4194924578678778580L;

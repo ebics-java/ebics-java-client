@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,9 +26,9 @@ import org.kopi.ebics.exception.EbicsException;
 
 
 /**
- * Initialization letters manager. 
+ * Initialization letters manager.
  * Manages the INI, HIA and the HPB letters.
- * 
+ *
  * @author Hachani
  *
  */
@@ -40,36 +40,36 @@ public interface LetterManager {
    * of the given user.
    * @param user the ebics user.
    * @return the INI letter.
-   * @throws EbicsException 
-   * @throws IOException 
-   * @throws GeneralSecurityException 
+   * @throws EbicsException
+   * @throws IOException
+   * @throws GeneralSecurityException
    */
-  public InitLetter createA005Letter(EbicsUser user) 
+  public InitLetter createA005Letter(EbicsUser user)
     throws GeneralSecurityException, IOException, EbicsException;
-  
+
   /**
    * Creates the initialization letter for the HIA request.
    * This letter contains information about the encryption
    * certificates of the given user.
    * @param user the ebics user
    * @return the HIA letter
-   * @throws EbicsException 
-   * @throws IOException 
-   * @throws GeneralSecurityException 
+   * @throws EbicsException
+   * @throws IOException
+   * @throws GeneralSecurityException
    */
-  public InitLetter createE002Letter(EbicsUser user) 
+  public InitLetter createE002Letter(EbicsUser user)
     throws GeneralSecurityException, IOException, EbicsException;
-  
+
   /**
    * Creates the initialization letter for the HIA request.
    * This letter contains information about the authentication
    * certificates of the given user.
    * @param user the ebics user
    * @return the HIA letter
-   * @throws EbicsException 
-   * @throws IOException 
-   * @throws GeneralSecurityException 
+   * @throws EbicsException
+   * @throws IOException
+   * @throws GeneralSecurityException
    */
-  public InitLetter createX002Letter(EbicsUser user) 
+  public InitLetter createX002Letter(EbicsUser user)
     throws GeneralSecurityException, IOException, EbicsException;
 }

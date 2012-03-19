@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,7 @@ import org.kopi.ebics.messages.Messages;
 
 
 public abstract class AbstractInitLetter implements InitLetter {
-  
+
   /**
    * Constructs a new initialization letter.
    * @param locale the application locale
@@ -51,7 +51,7 @@ public abstract class AbstractInitLetter implements InitLetter {
     output.flush();
     output.close();
   }
-  
+
   /**
    * Builds an initialization letter.
    * @param hostId the host ID
@@ -66,30 +66,30 @@ public abstract class AbstractInitLetter implements InitLetter {
    * @param hash the hash value
    * @throws IOException
    */
-  protected void build(String hostId, 
-                       String bankName, 
+  protected void build(String hostId,
+                       String bankName,
                        String userId,
                        String username,
-                       String partnerId, 
+                       String partnerId,
                        String version,
-                       String certTitle, 
-                       byte[] certificate, 
-                       String hashTitle, 
-                       byte[] hash) 
-    throws IOException 
+                       String certTitle,
+                       byte[] certificate,
+                       String hashTitle,
+                       byte[] hash)
+    throws IOException
   {
-    letter = new Letter(getTitle(), 
-	                hostId, 
-	                bankName, 
-	                userId, 
-	                username, 
-	                partnerId, 
+    letter = new Letter(getTitle(),
+	                hostId,
+	                bankName,
+	                userId,
+	                username,
+	                partnerId,
 	                version);
     letter.build(certTitle, certificate, hashTitle, hash);
   }
-  
+
   /**
-   * Returns the value of the property key. 
+   * Returns the value of the property key.
    * @param key the property key
    * @param bundleName the bundle name
    * @param locale the bundle locale
@@ -98,20 +98,20 @@ public abstract class AbstractInitLetter implements InitLetter {
   protected String getString(String key, String bundleName, Locale locale) {
     return Messages.getString(key, bundleName, locale);
   }
-  
+
   /**
    * Returns the certificate hash
    * @param certificate the certificate
    * @return the certificate hash
-   * @throws GeneralSecurityException 
+   * @throws GeneralSecurityException
    */
   protected byte[] getHash(byte[] certificate) throws GeneralSecurityException {
     String			hash256;
-    
+
     hash256 = new String(Hex.encodeHex(MessageDigest.getInstance("SHA-256").digest(certificate), false));
     return format(hash256).getBytes();
   }
-  
+
   /**
    * Formats a hash 256 input.
    * @param hash256 the hash input
@@ -120,31 +120,31 @@ public abstract class AbstractInitLetter implements InitLetter {
   private String format(String hash256) {
     StringBuffer	buffer;
     String		formatted;
-    
+
     buffer = new StringBuffer();
     for (int i = 0; i < hash256.length(); i += 2) {
       buffer.append(hash256.charAt(i));
       buffer.append(hash256.charAt(i + 1));
       buffer.append(' ');
     }
-    
+
     formatted = buffer.substring(0, 48) + LINE_SEPARATOR + buffer.substring(48) + LINE_SEPARATOR;
     return formatted;
   }
-  
+
   // --------------------------------------------------------------------
   // INNER CLASS
   // --------------------------------------------------------------------
-  
+
   /**
    * The <code>Letter</code> object is the common template
    * for all initialization letter.
-   * 
+   *
    * @author Hachani
    *
    */
   private class Letter {
-    
+
     /**
      * Constructs new <code>Letter</code> template
      * @param title the letter title
@@ -155,12 +155,12 @@ public abstract class AbstractInitLetter implements InitLetter {
      * @param version the signature version
      */
     public Letter(String title,
-                  String hostId, 
-                  String bankName, 
+                  String hostId,
+                  String bankName,
                   String userId,
                   String username,
-                  String partnerId, 
-                  String version) 
+                  String partnerId,
+                  String version)
     {
       this.title = title;
       this.hostId = hostId;
@@ -170,7 +170,7 @@ public abstract class AbstractInitLetter implements InitLetter {
       this.partnerId = partnerId;
       this.version = version;
     }
-    
+
     /**
      * Builds the letter content.
      * @param certTitle the certificate title
@@ -179,11 +179,11 @@ public abstract class AbstractInitLetter implements InitLetter {
      * @param hash the hash content
      * @throws IOException
      */
-    public void build(String certTitle, 
-                      byte[] certificate, 
-                      String hashTitle, 
-                      byte[] hash) 
-      throws IOException 
+    public void build(String certTitle,
+                      byte[] certificate,
+                      String hashTitle,
+                      byte[] hash)
+      throws IOException
     {
       out = new ByteArrayOutputStream();
       writer = new PrintWriter(out, true);
@@ -196,10 +196,10 @@ public abstract class AbstractInitLetter implements InitLetter {
       out.flush();
       out.close();
     }
-    
+
     /**
      * Builds the letter title.
-     * @throws IOException 
+     * @throws IOException
      */
     public void buildTitle() throws IOException {
       emit(title);
@@ -207,7 +207,7 @@ public abstract class AbstractInitLetter implements InitLetter {
       emit(LINE_SEPARATOR);
       emit(LINE_SEPARATOR);
     }
-    
+
     /**
      * Builds the letter header
      * @throws IOException
@@ -248,15 +248,15 @@ public abstract class AbstractInitLetter implements InitLetter {
       emit(LINE_SEPARATOR);
       emit(LINE_SEPARATOR);
     }
-    
+
     /**
      * Writes the certificate core.
      * @param title the title
      * @param cert the certificate core
      * @throws IOException
      */
-    public void buildCertificate(String title, byte[] cert) 
-      throws IOException 
+    public void buildCertificate(String title, byte[] cert)
+      throws IOException
     {
       emit(title);
       emit(LINE_SEPARATOR);
@@ -267,15 +267,15 @@ public abstract class AbstractInitLetter implements InitLetter {
       emit(LINE_SEPARATOR);
       emit(LINE_SEPARATOR);
     }
-    
+
     /**
      * Builds the hash section.
      * @param title the title
      * @param hash the hash value
      * @throws IOException
      */
-    public void buildHash(String title, byte[] hash) 
-      throws IOException 
+    public void buildHash(String title, byte[] hash)
+      throws IOException
     {
       emit(title);
       emit(LINE_SEPARATOR);
@@ -289,7 +289,7 @@ public abstract class AbstractInitLetter implements InitLetter {
       emit(LINE_SEPARATOR);
       emit(LINE_SEPARATOR);
     }
-    
+
     /**
      * Builds the footer section
      * @throws IOException
@@ -299,15 +299,15 @@ public abstract class AbstractInitLetter implements InitLetter {
       emit("                                  ");
       emit(Messages.getString("Letter.signature", BUNDLE_NAME, locale));
     }
-    
+
     /**
      * Appends a spacer
-     * @throws IOException 
+     * @throws IOException
      */
     public void appendSpacer() throws IOException {
       emit("        ");
     }
-    
+
     /**
      * Emits a text to the writer
      * @param text the text to print
@@ -316,7 +316,7 @@ public abstract class AbstractInitLetter implements InitLetter {
     public void emit(String text) throws IOException {
       writer.write(text);
     }
-    
+
     /**
      * Formats the input date
      * @param date the input date
@@ -324,11 +324,11 @@ public abstract class AbstractInitLetter implements InitLetter {
      */
     public String formatDate(Date date) {
       SimpleDateFormat		formatter;
-      
+
       formatter = new SimpleDateFormat(Messages.getString("Letter.dateFormat", BUNDLE_NAME, locale), locale);
       return formatter.format(date);
     }
-    
+
     /**
      * Formats the input time
      * @param time the input time
@@ -336,11 +336,11 @@ public abstract class AbstractInitLetter implements InitLetter {
      */
     public String formatTime(Date time) {
       SimpleDateFormat		formatter;
-      
+
       formatter = new SimpleDateFormat(Messages.getString("Letter.timeFormat", BUNDLE_NAME, locale), locale);
       return formatter.format(time);
     }
-    
+
     /**
      * Returns the letter content
      * @return
@@ -348,11 +348,11 @@ public abstract class AbstractInitLetter implements InitLetter {
     public byte[] getLetter() {
       return out.toByteArray();
     }
-    
+
     // --------------------------------------------------------------------
     // DATA MEMBERS
     // --------------------------------------------------------------------
-    
+
     private ByteArrayOutputStream	out;
     private Writer			writer;
     private final String		title;
@@ -363,14 +363,14 @@ public abstract class AbstractInitLetter implements InitLetter {
     private final String		partnerId;
     private final String		version;
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private Letter				letter;
   protected Locale				locale;
-  
+
   protected static final String			BUNDLE_NAME = "org.kopi.ebics.letter.messages";
   private static final String			LINE_SEPARATOR = System.getProperty("line.separator");
 }

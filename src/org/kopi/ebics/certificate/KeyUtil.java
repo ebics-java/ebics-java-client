@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,7 @@ import org.kopi.ebics.exception.EbicsException;
 
 /**
  * Some key utilities
- * 
+ *
  * @author hachani
  *
  */
@@ -43,14 +43,14 @@ public class KeyUtil {
 
   /**
    * Generates a <code>KeyPair</code> in RSA format.
-   * 
+   *
    * @param keyLen - key size
    * @return KeyPair the key pair
-   * @throws NoSuchAlgorithmException 
+   * @throws NoSuchAlgorithmException
    */
   public static KeyPair makeKeyPair(int keyLen) throws NoSuchAlgorithmException{
     KeyPairGenerator 		keyGen;
-    
+
     keyGen = KeyPairGenerator.getInstance("RSA");
     keyGen.initialize(keyLen, new SecureRandom());
 
@@ -62,12 +62,12 @@ public class KeyUtil {
 
   /**
    * Generates a random password
-   * 
+   *
    * @return the password
    */
   public static String generatePassword() {
     SecureRandom 		random;
-    
+
     try {
       random = SecureRandom.getInstance("SHA1PRNG");
       String pwd = Base64.encodeBase64String(random.generateSeed(5));
@@ -77,7 +77,7 @@ public class KeyUtil {
       return "changeit";
     }
   }
-  
+
   /**
    * Returns the digest value of a given public key
    * @param publicKey the public key
@@ -89,11 +89,11 @@ public class KeyUtil {
     String			exponent;
     String			hash;
     byte[]			digest;
-    
+
     exponent = Hex.encodeHexString(publicKey.getPublicExponent().toByteArray());
     modulus =  Hex.encodeHexString(publicKey.getModulus().toByteArray());
     hash = clean(exponent) + " " + clean(modulus);
-    
+
     try {
       digest = MessageDigest.getInstance("SHA-256", "BC").digest(hash.getBytes("US-ASCII"));
     } catch (GeneralSecurityException e) {
@@ -101,7 +101,7 @@ public class KeyUtil {
     } catch (UnsupportedEncodingException e) {
       throw new EbicsException(e.getMessage());
     }
-    
+
     return new String(Hex.encodeHex(digest, false)).getBytes();
   }
 
@@ -112,9 +112,9 @@ public class KeyUtil {
    */
   private static String clean(String hex) {
     int			i;
-    
+
     i = 0;
     while (hex.charAt(i++) == '0');
-    return hex.substring(i - 1); 
+    return hex.substring(i - 1);
   }
 }

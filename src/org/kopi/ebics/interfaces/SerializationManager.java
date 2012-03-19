@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@ import org.kopi.ebics.exception.EbicsException;
  * A mean to serialize and deserialize <code>Object</code>.
  * The manager should ensure serialization and deserialization
  * operations
- * 
+ *
  * @author hachani
  *
  */
@@ -40,7 +40,7 @@ public interface SerializationManager {
    * @throws EbicsException serialization fails
    */
   public void serialize(Savable object) throws EbicsException;
-  
+
   /**
    * Deserializes the given object input stream.
    * @param name the name of the serialized object
@@ -48,7 +48,7 @@ public interface SerializationManager {
    * @throws EbicsException deserialization fails
    */
   public ObjectInputStream deserialize(String name) throws EbicsException;
-  
+
   /**
    * Sets the serialization directory
    * @param serializationDir the serialization directory

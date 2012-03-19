@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,16 +20,16 @@
 package org.kopi.ebics.interfaces;
 
 /**
- * A way to obtain a password. 
- * 
+ * A way to obtain a password.
+ *
  * @author Hachani
  *
  */
 public interface PasswordCallback {
 
   /**
-   * Returns the password. 
-   * This may be done via user interaction or by passing a stored password. 
+   * Returns the password.
+   * This may be done via user interaction or by passing a stored password.
    * @return the password
    */
   public char[] getPassword();

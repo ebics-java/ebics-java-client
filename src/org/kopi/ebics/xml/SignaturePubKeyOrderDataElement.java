@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ import org.kopi.ebics.session.EbicsSession;
 /**
  * The <code>SignaturePubKeyOrderDataElement</code> is the order data
  * component for the INI request.
- * 
+ *
  * @author hachani
  *
  */
@@ -54,34 +54,34 @@ public class SignaturePubKeyOrderDataElement extends DefaultEbicsRootElement {
     RSAKeyValueType 			rsaKeyValue;
     PubKeyValueType 			pubKeyValue;
     SignaturePubKeyOrderDataType	signaturePubKeyOrderData;
-    
-    x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(), 
+
+    x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
 	                                          session.getUser().getA005Certificate());
-    rsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getA005PublicKey().getPublicExponent().toByteArray(), 
+    rsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getA005PublicKey().getPublicExponent().toByteArray(),
 	                                                session.getUser().getA005PublicKey().getModulus().toByteArray());
     pubKeyValue = EbicsXmlFactory.createPubKeyValueType(rsaKeyValue, Calendar.getInstance());
-    signaturePubKeyInfo = EbicsXmlFactory.createSignaturePubKeyInfoType(x509Data, 
-	                                                                pubKeyValue, 
+    signaturePubKeyInfo = EbicsXmlFactory.createSignaturePubKeyInfoType(x509Data,
+	                                                                pubKeyValue,
 	                                                                session.getConfiguration().getSignatureVersion());
     signaturePubKeyOrderData = EbicsXmlFactory.createSignaturePubKeyOrderData(signaturePubKeyInfo,
-									      session.getUser().getPartner().getPartnerId(), 
+									      session.getUser().getPartner().getPartnerId(),
 									      session.getUser().getUserId());
     document = EbicsXmlFactory.createSignaturePubKeyOrderDataDocument(signaturePubKeyOrderData);
   }
-  
+
   @Override
   public String getName() {
     return "SignaturePubKeyOrderData.xml";
   }
-  
+
   @Override
   public byte[] toByteArray() {
     addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
     setSaveSuggestedPrefixes("http://www.ebics.org/S001", "");
-    
+
     return super.toByteArray();
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,7 @@ import org.kopi.ebics.session.OrderType;
 /**
  * The <code>UTransferRequestElement</code> is the root element
  * for all ebics upload transfers.
- * 
+ *
  * @author Hachani
  *
  */
@@ -56,7 +56,7 @@ public class UTransferRequestElement extends TransferRequestElement {
                                  int segmentNumber,
                                  boolean lastSegment,
                                  byte[] transactionId,
-                                 ContentFactory content) 
+                                 ContentFactory content)
   {
     super(session, generateName(orderType), orderType, segmentNumber, lastSegment, transactionId);
     this.content = content;
@@ -72,7 +72,7 @@ public class UTransferRequestElement extends TransferRequestElement {
     StaticHeaderType 			xstatic;
     OrderData 				orderData;
     DataTransferRequestType 		dataTransfer;
-    
+
     segmentNumber = EbicsXmlFactory.createSegmentNumber(this.segmentNumber, lastSegment);
     mutable = EbicsXmlFactory.createMutableHeaderType("Transfer", segmentNumber);
     xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(), transactionId);
@@ -80,17 +80,17 @@ public class UTransferRequestElement extends TransferRequestElement {
     orderData = EbicsXmlFactory.createEbicsRequestOrderData(IOUtils.getFactoryContent(content));
     dataTransfer = EbicsXmlFactory.createDataTransferRequestType(orderData);
     body = EbicsXmlFactory.createEbicsRequestBody(dataTransfer);
-    request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(), 
-	                                         session.getConfiguration().getVersion(), 
-	                                         header, 
+    request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(),
+	                                         session.getConfiguration().getVersion(),
+	                                         header,
 	                                         body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private ContentFactory		content;
   private static final long 		serialVersionUID = 8465397978597444978L;
 }

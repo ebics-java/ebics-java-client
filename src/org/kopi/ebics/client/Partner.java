@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,10 +29,10 @@ import org.kopi.ebics.interfaces.Savable;
 
 
 /**
- * Simple implementation of an EBICS customer. 
- * This object is not serializable, but it should be persisted every time it needs to be saved. 
+ * Simple implementation of an EBICS customer.
+ * This object is not serializable, but it should be persisted every time it needs to be saved.
  * Persistence is achieved via <code>save(ObjectOutputStream)</code> and the matching constructor.
- * 
+ *
  * @author Hachani
  *
  */
@@ -42,7 +42,7 @@ public class Partner implements EbicsPartner, Savable {
    * Reconstructs a persisted EBICS customer.
    * @param bank the bank
    * @param ois the stream object
-   * @throws IOException 
+   * @throws IOException
    */
   public Partner(EbicsBank bank, ObjectInputStream ois) throws IOException {
     this.bank = bank;
@@ -50,9 +50,9 @@ public class Partner implements EbicsPartner, Savable {
     this.orderId = ois.readInt();
     ois.close();
   }
-  
+
   /**
-   * First time constructor. 
+   * First time constructor.
    * @param bank the bank
    * @param partnerId the partner ID
    */
@@ -61,7 +61,7 @@ public class Partner implements EbicsPartner, Savable {
     this.partnerId = partnerId;
     needSave = true;
   }
-  
+
   /**
    * Returns the next order available ID
    * @return the next order ID
@@ -69,7 +69,7 @@ public class Partner implements EbicsPartner, Savable {
   public Integer getNextOrderId() {
     return new Integer(orderId);
   }
-  
+
   /**
    * Sets the order ID
    * @param orderId the order ID
@@ -78,7 +78,7 @@ public class Partner implements EbicsPartner, Savable {
     this.orderId = orderId.intValue();
     needSave = true;
   }
-  
+
   @Override
   public void save(ObjectOutputStream oos) throws IOException {
     oos.writeUTF(partnerId);
@@ -87,7 +87,7 @@ public class Partner implements EbicsPartner, Savable {
     oos.close();
     needSave = false;
   }
-  
+
   /**
    * Did any persistable attribute change since last load/save operation.
    * @return True if the object needs to be saved.
@@ -95,7 +95,7 @@ public class Partner implements EbicsPartner, Savable {
   public boolean needsSave() {
     return needSave;
   }
-  
+
   @Override
   public EbicsBank getBank() {
     return bank;
@@ -110,7 +110,7 @@ public class Partner implements EbicsPartner, Savable {
   public String nextOrderId() {
     int 		index;
     String		order;
-    
+
     needSave = true;
     orderId ++;
     if (orderId >= 46656) {
@@ -120,24 +120,24 @@ public class Partner implements EbicsPartner, Savable {
 	orderId = 513216;
       }
     }
-    
+
     index = orderId - 1;
     if (index < 0) {
       index = 1679615;
     }
     order = Integer.toString(index, 36).toUpperCase();
-    
+
     if (order.length() < 4) {
       while (order.length() < 3) {
 	order = "0" + order;
       }
-      
+
       return "A" + order;
     }
-    
+
     return order;
   }
-  
+
   @Override
   public String getSaveName() {
     return partnerId + ".cer";
@@ -146,7 +146,7 @@ public class Partner implements EbicsPartner, Savable {
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private EbicsBank			bank;
   private int				orderId;
   private String			partnerId;

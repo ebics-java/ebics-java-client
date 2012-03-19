@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@ import org.kopi.ebics.session.OrderType;
 /**
  * The <code>DTransferResponseElement</code> is the response element
  * for all ebics downloads transfers.
- * 
+ *
  * @author Hachani
  *
  */
@@ -40,7 +40,7 @@ public class DTransferResponseElement extends TransferResponseElement {
    */
   public DTransferResponseElement(ContentFactory factory,
                                   OrderType orderType,
-                                  String name) 
+                                  String name)
   {
     super(factory, name);
   }
@@ -51,7 +51,7 @@ public class DTransferResponseElement extends TransferResponseElement {
 
     orderData = response.getBody().getDataTransfer().getOrderData().getByteArrayValue();
   }
-  
+
   /**
    * Returns the order data.
    * @return the order data.
@@ -59,11 +59,11 @@ public class DTransferResponseElement extends TransferResponseElement {
   public byte[] getOrderData() {
     return orderData;
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private byte[]			orderData;
   private static final long 		serialVersionUID = -3317833033395561745L;
 }

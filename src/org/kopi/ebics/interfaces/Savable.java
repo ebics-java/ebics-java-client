@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,19 +26,19 @@ import java.io.ObjectOutputStream;
  * The <code>Savable</code> is an element that can be stored in a disk support,
  * files or databases. The save process can be launched via the method
  * {@linkplain Savable#save(ObjectOutputStream)}
- * 
+ *
  * @author hachani
- * 
+ *
  */
 public interface Savable {
 
   /**
-   * Writes all persistable attributes to the given stream. 
+   * Writes all persistable attributes to the given stream.
    * @param oos the given stream.
    * @throws IOException save process failed
    */
   public void save(ObjectOutputStream oos) throws IOException;
-  
+
   /**
    * Returns the save name of this savable object.
    * @return the save name

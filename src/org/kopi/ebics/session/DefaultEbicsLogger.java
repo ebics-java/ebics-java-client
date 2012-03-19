@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ import org.kopi.ebics.io.IOUtils;
 
 /**
  * A simple EBICS transfers logger base on log4j framework.
- * 
+ *
  * @author hacheni
  *
  */
@@ -45,7 +45,7 @@ public class DefaultEbicsLogger implements EbicsLogger {
   public DefaultEbicsLogger() {
     this(null);
   }
-  
+
   /**
    * Constructs a new ebics logger with a given file
    * @param logFile the log file
@@ -56,7 +56,7 @@ public class DefaultEbicsLogger implements EbicsLogger {
     consoleAppender = new ConsoleAppender();
     fileAppender = new RollingFileAppender();
   }
-  
+
   /**
    * Enables or disable the console log
    * @param enabled the console log state
@@ -70,7 +70,7 @@ public class DefaultEbicsLogger implements EbicsLogger {
       removeConsoleAppender();
     }
   }
-  
+
   /**
    * Enables or disable the file logging
    * @param enabled the file log state
@@ -86,13 +86,13 @@ public class DefaultEbicsLogger implements EbicsLogger {
       removeFileAppender();
     }
   }
-  
+
   /**
    * Adds the console appender to the current logger.
    */
   private void addConsoleAppender() {
     PatternLayout		layout;
-    
+
     layout = new PatternLayout();
     layout.setConversionPattern("%d %5p - %m%n");
     consoleAppender.setLayout(layout);
@@ -100,7 +100,7 @@ public class DefaultEbicsLogger implements EbicsLogger {
     consoleAppender.activateOptions();
     logger.addAppender(consoleAppender);
   }
-  
+
   /**
    * Removes the console appender from the current logger.
    */
@@ -109,13 +109,13 @@ public class DefaultEbicsLogger implements EbicsLogger {
       logger.removeAppender(consoleAppender);
     }
   }
-  
+
   /**
    * Adds the file appender to the current logger.
    */
   private void addFileAppender() {
     PatternLayout		layout;
-    
+
     layout = new PatternLayout();
     layout.setConversionPattern("%d %5p - %m%n");
     fileAppender.setLayout(layout);
@@ -127,7 +127,7 @@ public class DefaultEbicsLogger implements EbicsLogger {
     fileAppender.activateOptions();
     logger.addAppender(fileAppender);
   }
-  
+
   /**
    * Removes the file appender from the current logger.
    */
@@ -136,7 +136,7 @@ public class DefaultEbicsLogger implements EbicsLogger {
       logger.removeAppender(fileAppender);
     }
   }
-  
+
   /**
    * Disables the log process
    */
@@ -144,7 +144,7 @@ public class DefaultEbicsLogger implements EbicsLogger {
   public void disable() {
     Logger.shutdown();
   }
-  
+
   /**
    * Sets the logger level.
    * @param level the level to set
@@ -152,7 +152,7 @@ public class DefaultEbicsLogger implements EbicsLogger {
   public void setLevel(int level) {
     logger.setLevel(Level.toLevel(level));
   }
-  
+
   @Override
   public void info(String message) {
     logger.info(message);
@@ -186,21 +186,21 @@ public class DefaultEbicsLogger implements EbicsLogger {
       error(returnCode.getText());
     }
   }
-  
+
   @Override
   public void setLogFile(String logFile) {
     this.logFile = IOUtils.createFile(logFile);
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private Logger 				logger;
   private ConsoleAppender			consoleAppender;
   private RollingFileAppender			fileAppender;
   private File					logFile;
-  
+
   public static final int			ALL_LEVEL = Level.ALL_INT;
   public static final int			INFO_LEVEL = Level.INFO_INT;
   public static final int			WARN_LEVEL = Level.WARN_INT;

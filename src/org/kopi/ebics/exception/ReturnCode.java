@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,9 +26,9 @@ import org.kopi.ebics.messages.Messages;
 
 /**
  * Representation of EBICS return codes.
- * The return codes are described in chapter 13 
- * of EBICS specification. 
- * 
+ * The return codes are described in chapter 13
+ * of EBICS specification.
+ *
  * @author hachani
  *
  */
@@ -46,7 +46,7 @@ public class ReturnCode implements Serializable {
     this.symbolicName = symbolicName;
     this.text = text;
   }
-  
+
   /**
    * Throws an equivalent <code>EbicsException</code>
    * @throws EbicsException
@@ -54,7 +54,7 @@ public class ReturnCode implements Serializable {
   public void throwException() throws EbicsException {
     throw new EbicsException(this, text);
   }
-  
+
   /**
    * Tells if the return code is an OK one.
    * @return True if the return code is OK one.
@@ -62,7 +62,7 @@ public class ReturnCode implements Serializable {
   public boolean isOk() {
     return equals(EBICS_OK);
   }
-  
+
   /**
    * Returns a slightly more human readable version of this return code.
    * @return a slightly more human readable version of this return code.
@@ -70,15 +70,15 @@ public class ReturnCode implements Serializable {
   public String getSymbolicName() {
     return symbolicName;
   }
-  
+
   /**
-   * Returns a display text for the default locale. 
+   * Returns a display text for the default locale.
    * @return a text that can be displayed.
    */
   public String getText() {
     return text;
   }
-  
+
   /**
    * Returns the code.
    * @return the code.
@@ -86,7 +86,7 @@ public class ReturnCode implements Serializable {
   public int getCode() {
     return Integer.parseInt(code);
   }
-  
+
   /**
    * Returns the equivalent <code>ReturnCode</code> of a given code
    * @param code the given code
@@ -146,25 +146,25 @@ public class ReturnCode implements Serializable {
       return new ReturnCode(code, text, text);
     }
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof ReturnCode) {
       return this.code.equals(((ReturnCode)obj).code);
     }
-    
+
     return false;
   }
-  
+
   @Override
   public int hashCode() {
     return Integer.parseInt(code);
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private String			code;
   private String			symbolicName;
   private String			text;
@@ -194,7 +194,7 @@ public class ReturnCode implements Serializable {
   public static final ReturnCode	EBICS_NO_DOWNLOAD_DATA_AVAILABLE;
   private static final String		BUNDLE_NAME = "org.kopi.ebics.exception.messages";
   private static final long 		serialVersionUID = -497883146384363199L;
-  
+
   static {
     EBICS_OK = new ReturnCode("000000", "EBICS_OK", Messages.getString("000000", BUNDLE_NAME));
     EBICS_DOWNLOAD_POSTPROCESS_DONE = new ReturnCode("011000", "EBICS_DOWNLOAD_POSTPROCESS_DONE", Messages.getString("011000", BUNDLE_NAME));

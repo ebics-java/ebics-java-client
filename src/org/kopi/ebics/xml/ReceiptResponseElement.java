@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@ import org.kopi.ebics.schema.h003.EbicsResponseDocument.EbicsResponse;
 /**
  * The <code>ReceiptResponseElement</code> is the response element
  * for ebics receipt request.
- * 
+ *
  * @author Hachani
  *
  */
@@ -42,27 +42,27 @@ public class ReceiptResponseElement extends DefaultResponseElement {
   public ReceiptResponseElement(ContentFactory factory, String name) {
     super(factory, name);
   }
-  
+
   @Override
   public void build() throws EbicsException {
     String			code;
     String			text;
     EbicsResponse		response;
-    
+
     parse(factory);
     response = ((EbicsResponseDocument)document).getEbicsResponse();
     code = response.getHeader().getMutable().getReturnCode();
     text = response.getHeader().getMutable().getReportText();
     returnCode = ReturnCode.toReturnCode(code, text);
   }
-  
+
   @Override
   public void report() throws EbicsException {
    if (!returnCode.equals(ReturnCode.EBICS_DOWNLOAD_POSTPROCESS_DONE)) {
      returnCode.throwException();
    }
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------

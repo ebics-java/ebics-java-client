@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ import org.kopi.ebics.session.EbicsSession;
 /**
  * The <code>HPBRequestElement</code> is the element to be sent when
  * a HPB request is needed to retrieve the bank public keys
- * 
+ *
  * @author hachani
  *
  */
@@ -38,7 +38,7 @@ public class HPBRequestElement extends DefaultEbicsRootElement {
   public HPBRequestElement(EbicsSession session) {
     super(session);
   }
-  
+
   @Override
   public String getName() {
     return "HPBRequest.xml";
@@ -47,8 +47,8 @@ public class HPBRequestElement extends DefaultEbicsRootElement {
   @Override
   public void build() throws EbicsException {
     SignedInfo			signedInfo;
-    byte[]			signature;	
-    
+    byte[]			signature;
+
     noPubKeyDigestsRequest = new NoPubKeyDigestsRequestElement(session);
     noPubKeyDigestsRequest.build();
     signedInfo = new SignedInfo(session.getUser(), noPubKeyDigestsRequest.getDigest());
@@ -57,21 +57,21 @@ public class HPBRequestElement extends DefaultEbicsRootElement {
     signature = signedInfo.sign(noPubKeyDigestsRequest.toByteArray());
     noPubKeyDigestsRequest.setSignatureValue(signature);
   }
-  
+
   @Override
   public byte[] toByteArray() {
     return noPubKeyDigestsRequest.toByteArray();
   }
-  
+
   @Override
   public void validate() throws EbicsException {
     noPubKeyDigestsRequest.validate();
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private NoPubKeyDigestsRequestElement		noPubKeyDigestsRequest;
   private static final long 			serialVersionUID = -5565390370996751973L;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -38,7 +38,7 @@ import org.kopi.ebics.utils.Utils;
 /**
  * The <code>ReceiptRequestElement</code> is the element containing the
  * receipt request to tell the server bank that all segments are received.
- * 
+ *
  * @author Hachani
  *
  */
@@ -51,7 +51,7 @@ public class ReceiptRequestElement extends DefaultEbicsRootElement {
    */
   public ReceiptRequestElement(EbicsSession session,
                                byte[] transactionId,
-                               String name) 
+                               String name)
   {
     super(session);
     this.transactionId = transactionId;
@@ -67,15 +67,15 @@ public class ReceiptRequestElement extends DefaultEbicsRootElement {
     StaticHeaderType 			xstatic;
     TransferReceipt			transferReceipt;
     SignedInfo				signedInfo;
-    
+
     mutable = EbicsXmlFactory.createMutableHeaderType("Receipt", null);
     xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(), transactionId);
     header = EbicsXmlFactory.createEbicsRequestHeader(true, mutable, xstatic);
     transferReceipt = EbicsXmlFactory.createTransferReceipt(true, 0);
     body = EbicsXmlFactory.createEbicsRequestBody(transferReceipt);
     request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(),
-	                                         session.getConfiguration().getVersion(), 
-	                                         header, 
+	                                         session.getConfiguration().getVersion(),
+	                                         header,
 	                                         body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
     signedInfo = new SignedInfo(session.getUser(), getDigest());
@@ -83,11 +83,11 @@ public class ReceiptRequestElement extends DefaultEbicsRootElement {
     ((EbicsRequestDocument)document).getEbicsRequest().setAuthSignature(signedInfo.getSignatureType());
     ((EbicsRequestDocument)document).getEbicsRequest().getAuthSignature().setSignatureValue(EbicsXmlFactory.createSignatureValueType(signedInfo.sign(toByteArray())));
   }
-  
+
   @Override
   public byte[] toByteArray() {
     setSaveSuggestedPrefixes("http://www.ebics.org/H003", "");
-    
+
     return super.toByteArray();
   }
 
@@ -95,7 +95,7 @@ public class ReceiptRequestElement extends DefaultEbicsRootElement {
   public String getName() {
     return name  + ".xml";
   }
-  
+
   /**
    * Returns the digest value of the authenticated XML portions.
    * @return  the digest value.
@@ -103,7 +103,7 @@ public class ReceiptRequestElement extends DefaultEbicsRootElement {
    */
   public byte[] getDigest() throws EbicsException {
     addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
-    
+
     try {
       return MessageDigest.getInstance("SHA-256", "BC").digest(Utils.canonize(toByteArray()));
     } catch (NoSuchAlgorithmException e) {
@@ -112,11 +112,11 @@ public class ReceiptRequestElement extends DefaultEbicsRootElement {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private byte[] 			transactionId;
   private String			name;
   private static final long 		serialVersionUID = -1969616441705744725L;

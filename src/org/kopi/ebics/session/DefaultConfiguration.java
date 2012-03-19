@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ import org.kopi.ebics.letter.DefaultLetterManager;
 
 /**
  * A simple client application configuration.
- * 
+ *
  * @author hachani
  *
  */
@@ -58,7 +58,7 @@ public class DefaultConfiguration implements Configuration {
     serializationManager = new DefaultSerializationManager();
     traceManager = new DefaultTraceManager();
   }
-  
+
   /**
    * Creates a new application configuration.
    * The root directory will be user.home/ebics/client
@@ -66,7 +66,7 @@ public class DefaultConfiguration implements Configuration {
   public DefaultConfiguration() {
     this(System.getProperty("user.home") + File.separator + "ebics" + File.separator + "client");
   }
-  
+
   /**
    * Returns the corresponding property of the given key
    * @param key the property key
@@ -79,7 +79,7 @@ public class DefaultConfiguration implements Configuration {
       return "!!" + key + "!!";
     }
   }
-  
+
   /**
    * Loads the configuration
    * @throws EbicsException
@@ -88,21 +88,21 @@ public class DefaultConfiguration implements Configuration {
     if (isConfigFileLoad) {
       return;
     }
-    
+
     try {
       properties.load(new FileInputStream(new File(configFile)));
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
     }
-    
+
     isConfigFileLoad = true;
   }
-  
+
   @Override
   public String getRootDirectory() {
     return rootDir;
   }
-  
+
   @Override
   public void init() {
     //Create the root directory
@@ -119,7 +119,7 @@ public class DefaultConfiguration implements Configuration {
     IOUtils.createDirectories(getSSLBankCertificates());
     //Create users directory
     IOUtils.createDirectories(getUsersDirectory());
-    
+
     logger.setLogFile(getLogDirectory() + File.separator + getLogFileName());
     ((DefaultEbicsLogger)logger).setFileLoggingEnabled(true);
     ((DefaultEbicsLogger)logger).setLevel(DefaultEbicsLogger.ALL_LEVEL);
@@ -127,7 +127,7 @@ public class DefaultConfiguration implements Configuration {
     traceManager.setTraceEnabled(isTraceEnabled());
     letterManager = new DefaultLetterManager(getLocale());
   }
-  
+
   @Override
   public Locale getLocale() {
     return Locale.FRANCE;
@@ -153,11 +153,11 @@ public class DefaultConfiguration implements Configuration {
     if (!isConfigFileLoad) {
       return null;
     }
-    
+
     if (key == null) {
       return null;
     }
-    
+
     return properties.getProperty(key);
   }
 
@@ -190,7 +190,7 @@ public class DefaultConfiguration implements Configuration {
   public String getSSLBankCertificates() {
     return rootDir + File.separator + getString("sslbankcert.dir.name");
   }
-  
+
   @Override
   public String getUsersDirectory() {
     return rootDir + File.separator + getString("users.dir.name");
@@ -260,11 +260,11 @@ public class DefaultConfiguration implements Configuration {
   public String getVersion() {
     return getString("ebics.version");
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private final String				rootDir;
   private ResourceBundle			bundle;
   private Properties				properties;
@@ -273,6 +273,6 @@ public class DefaultConfiguration implements Configuration {
   private TraceManager				traceManager;
   private LetterManager				letterManager;
   private boolean				isConfigFileLoad;
-  
+
   private static final String			RESOURCE_DIR = "org.kopi.ebics.client.config";
 }

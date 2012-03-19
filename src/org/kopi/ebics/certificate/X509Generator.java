@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -53,7 +53,7 @@ import org.bouncycastle.x509.X509V3CertificateGenerator;
 /**
  * An X509 certificate generator for EBICS protocol.
  * Generated certificates are self signed certificates.
- * 
+ *
  * @author hachani
  *
  */
@@ -70,22 +70,22 @@ public class X509Generator {
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  public X509Certificate generateA005Certificate(KeyPair keypair, 
-                                                 String issuer, 
-		                                 Date notBefore, 
-		                                 Date notAfter) 
-    throws GeneralSecurityException, IOException 
+  public X509Certificate generateA005Certificate(KeyPair keypair,
+                                                 String issuer,
+		                                 Date notBefore,
+		                                 Date notAfter)
+    throws GeneralSecurityException, IOException
   {
-    return generate(keypair, 
-	            issuer, 
-	            notBefore, 
-	            notAfter, 
+    return generate(keypair,
+	            issuer,
+	            notBefore,
+	            notAfter,
 	            X509Constants.SIGNATURE_KEY_USAGE);
   }
-  
+
   /**
    * Generates the authentication certificate for the EBICS protocol
-   * @param keypair the key pair 
+   * @param keypair the key pair
    * @param issuer the certificate issuer
    * @param notBefore the begin validity date
    * @param notAfter the end validity date
@@ -93,22 +93,22 @@ public class X509Generator {
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  public X509Certificate generateX002Certificate(KeyPair keypair, 
-                                                 String issuer, 
-		                                 Date notBefore, 
+  public X509Certificate generateX002Certificate(KeyPair keypair,
+                                                 String issuer,
+		                                 Date notBefore,
 		                                 Date notAfter)
     throws GeneralSecurityException, IOException
   {
-    return generate(keypair, 
-                    issuer, 
-                    notBefore, 
-                    notAfter, 
+    return generate(keypair,
+                    issuer,
+                    notBefore,
+                    notAfter,
                     X509Constants.AUTHENTICATION_KEY_USAGE);
   }
-  
+
   /**
    * Generates the encryption certificate for the EBICS protocol
-   * @param keypair the key pair 
+   * @param keypair the key pair
    * @param issuer the certificate issuer
    * @param notBefore the begin validity date
    * @param notAfter the end validity date
@@ -116,19 +116,19 @@ public class X509Generator {
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  public X509Certificate generateE002Certificate(KeyPair keypair, 
-                                                 String issuer, 
-		                                 Date notBefore, 
+  public X509Certificate generateE002Certificate(KeyPair keypair,
+                                                 String issuer,
+		                                 Date notBefore,
 		                                 Date notAfter)
     throws GeneralSecurityException, IOException
   {
-    return generate(keypair, 
-                    issuer, 
-                    notBefore, 
-                    notAfter, 
+    return generate(keypair,
+                    issuer,
+                    notBefore,
+                    notAfter,
                     X509Constants.ENCRYPTION_KEY_USAGE);
   }
-  
+
   /**
    * Returns an <code>X509Certificate</code> from a given
    * <code>KeyPair</code> and limit dates validations
@@ -141,10 +141,10 @@ public class X509Generator {
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  public X509Certificate generate(KeyPair keypair, 
-                                  String issuer, 
-      				  Date notBefore, 
-      				  Date notAfter, 
+  public X509Certificate generate(KeyPair keypair,
+                                  String issuer,
+      				  Date notBefore,
+      				  Date notAfter,
       				  int keyusage)
     throws GeneralSecurityException, IOException
   {
@@ -162,17 +162,17 @@ public class X509Generator {
     generator.setSubjectDN(new X509Principal(issuer));
     generator.setPublicKey(keypair.getPublic());
     generator.setSignatureAlgorithm(X509Constants.SIGNATURE_ALGORITHM);
-    generator.addExtension(X509Extensions.BasicConstraints, 
-	                   false, 
+    generator.addExtension(X509Extensions.BasicConstraints,
+	                   false,
 	                   new BasicConstraints(true));
-    generator.addExtension(X509Extensions.SubjectKeyIdentifier, 
-			  false, 
+    generator.addExtension(X509Extensions.SubjectKeyIdentifier,
+			  false,
 			  getSubjectKeyIdentifier(keypair.getPublic()));
-    generator.addExtension(X509Extensions.AuthorityKeyIdentifier, 
-	                   false, 
+    generator.addExtension(X509Extensions.AuthorityKeyIdentifier,
+	                   false,
 	                   getAuthorityKeyIdentifier(keypair.
-	                                             getPublic(), 
-	                                             issuer, 
+	                                             getPublic(),
+	                                             issuer,
 	                                             serial));
     vector = new ASN1EncodableVector();
     vector.add(KeyPurposeId.id_kp_emailProtection);
@@ -210,10 +210,10 @@ public class X509Generator {
    * @return the authority key identifier of the public key
    * @throws IOException
    */
-  private AuthorityKeyIdentifier getAuthorityKeyIdentifier(PublicKey publicKey, 
-                                                           String issuer, 
-                                                           BigInteger serial) 
-    throws IOException 
+  private AuthorityKeyIdentifier getAuthorityKeyIdentifier(PublicKey publicKey,
+                                                           String issuer,
+                                                           BigInteger serial)
+    throws IOException
   {
     InputStream			input;
     SubjectPublicKeyInfo	keyInfo;
@@ -223,49 +223,49 @@ public class X509Generator {
     keyInfo = new SubjectPublicKeyInfo((ASN1Sequence)new ASN1InputStream(input).readObject());
     vector = new ASN1EncodableVector();
     vector.add(new GeneralName(new X509Name(issuer)));
-    
+
     return new AuthorityKeyIdentifier(keyInfo, new GeneralNames(new DERSequence(vector)), serial);
   }
-  
+
   /**
-   * Returns the <code>SubjectKeyIdentifier</code> corresponding 
+   * Returns the <code>SubjectKeyIdentifier</code> corresponding
    * to a given <code>PublicKey</code>
    * @param publicKey the given public key
    * @return the subject key identifier
    * @throws IOException
    */
-  private SubjectKeyIdentifier getSubjectKeyIdentifier(PublicKey publicKey) 
-    throws IOException 
+  private SubjectKeyIdentifier getSubjectKeyIdentifier(PublicKey publicKey)
+    throws IOException
   {
     InputStream			input;
     SubjectPublicKeyInfo	keyInfo;
 
     input = new ByteArrayInputStream(publicKey.getEncoded());
     keyInfo = new SubjectPublicKeyInfo((ASN1Sequence)new ASN1InputStream(input).readObject());
-    
+
     return new SubjectKeyIdentifier(keyInfo);
   }
-  
+
   /**
    * Generates a random serial number
-   * 
+   *
    * @return the serial number
    */
   private long generateSerial() {
     Date		now;
-    
+
     now = new Date();
     String sNow = sdfSerial.format(now);
 
     return Long.valueOf(sNow).longValue();
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private static SimpleDateFormat 			sdfSerial;
-  
+
   static {
     sdfSerial = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     TimeZone tz = TimeZone.getTimeZone("UTC");

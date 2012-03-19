@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ import org.kopi.ebics.utils.Utils;
 /**
  * The <code>TransferRequestElement</code> is the common root element
  * for all ebics transfer for the bank server.
- * 
+ *
  * @author Hachani
  *
  */
@@ -53,7 +53,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
                                 OrderType type,
                                 int segmentNumber,
                                 boolean lastSegment,
-                                byte[] transactionId) 
+                                byte[] transactionId)
   {
     super(session);
     this.type = type;
@@ -62,23 +62,23 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
     this.lastSegment = lastSegment;
     this.transactionId = transactionId;
   }
-  
+
   @Override
   public void build() throws EbicsException {
     SignedInfo			signedInfo;
-    
+
     buildTransfer();
     signedInfo = new SignedInfo(session.getUser(), getDigest());
     signedInfo.build();
     ((EbicsRequestDocument)document).getEbicsRequest().setAuthSignature(signedInfo.getSignatureType());
     ((EbicsRequestDocument)document).getEbicsRequest().getAuthSignature().setSignatureValue(EbicsXmlFactory.createSignatureValueType(signedInfo.sign(toByteArray())));
   }
-  
+
   @Override
   public String getName() {
     return name + ".xml";
   }
-  
+
   /**
    * Returns the digest value of the authenticated XML portions.
    * @return  the digest value.
@@ -86,7 +86,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
    */
   public byte[] getDigest() throws EbicsException {
     addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
-    
+
     try {
       return MessageDigest.getInstance("SHA-256", "BC").digest(Utils.canonize(toByteArray()));
     } catch (NoSuchAlgorithmException e) {
@@ -95,7 +95,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   /**
    * Returns the order type of the element.
    * @return the order type element.
@@ -103,24 +103,24 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
   public String getOrderType() {
     return type.getOrderType();
   }
-  
+
   @Override
   public byte[] toByteArray() {
     setSaveSuggestedPrefixes("http://www.ebics.org/H003", "");
-    
+
     return super.toByteArray();
   }
-  
+
   /**
    * Builds the transfer request.
    * @throws EbicsException
    */
   public abstract void buildTransfer() throws EbicsException;
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   protected int				segmentNumber;
   protected boolean			lastSegment;
   protected byte[]			transactionId;

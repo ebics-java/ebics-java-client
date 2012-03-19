@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@ import org.kopi.ebics.session.OrderType;
 /**
  * The <code>DInitializationResponseElement</code> is the response element
  * for ebics downloads initializations.
- * 
+ *
  * @author Hachani
  *
  */
@@ -42,15 +42,15 @@ public class DInitializationResponseElement extends InitializationResponseElemen
    */
   public DInitializationResponseElement(ContentFactory factory,
                                         OrderType orderType,
-                                        String name) 
+                                        String name)
   {
     super(factory, orderType, name);
   }
-  
+
   @Override
   public void build() throws EbicsException {
     String			bodyRetCode;
-    
+
     super.build();
     bodyRetCode = response.getBody().getReturnCode().getStringValue();
     returnCode = ReturnCode.toReturnCode(bodyRetCode, "");
@@ -63,7 +63,7 @@ public class DInitializationResponseElement extends InitializationResponseElemen
     transactionKey = response.getBody().getDataTransfer().getDataEncryptionInfo().getTransactionKey();
     orderData = response.getBody().getDataTransfer().getOrderData().getByteArrayValue();
   }
-  
+
   /**
    * Returns the total segments number.
    * @return the total segments number.
@@ -71,7 +71,7 @@ public class DInitializationResponseElement extends InitializationResponseElemen
   public int getSegmentsNumber() {
     return numSegments;
   }
-  
+
   /**
    * Returns The current segment number.
    * @return the segment number.
@@ -79,7 +79,7 @@ public class DInitializationResponseElement extends InitializationResponseElemen
   public int getSegmentNumber() {
     return segmentNumber;
   }
-  
+
   /**
    * Checks if it is the last segment.
    * @return True is it is the last segment.
@@ -95,7 +95,7 @@ public class DInitializationResponseElement extends InitializationResponseElemen
   public byte[] getTransactionKey() {
     return transactionKey;
   }
-  
+
   /**
    * Returns the order data.
    * @return the order data.
@@ -107,7 +107,7 @@ public class DInitializationResponseElement extends InitializationResponseElemen
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private int				numSegments;
   private int				segmentNumber;
   private boolean			lastSegment;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,10 +30,10 @@ import org.kopi.ebics.interfaces.Savable;
 
 
 /**
- * Simple implementation of an EBICS bank. 
+ * Simple implementation of an EBICS bank.
  * This object is serializable to facilitate persisting of the values.
  * Save the the object whenever it needs to be saved.
- *  
+ *
  * @author Hachani
  *
  */
@@ -51,7 +51,7 @@ public class Bank implements EbicsBank, Savable {
     this.hostId = hostId;
     needSave = true;
   }
-  
+
   @Override
   public void save(ObjectOutputStream oos) throws IOException {
     oos.writeObject(this);
@@ -59,7 +59,7 @@ public class Bank implements EbicsBank, Savable {
     oos.close();
     needSave = false;
   }
-  
+
   /**
    * Did any persistable attribute change since last load/save operation.
    * @return True if the object needs to be saved.
@@ -67,7 +67,7 @@ public class Bank implements EbicsBank, Savable {
   public boolean needsSave() {
     return needSave;
   }
-  
+
   /**
    * readObject is called to restore the state of the URL from the
    * stream.
@@ -75,12 +75,12 @@ public class Bank implements EbicsBank, Savable {
    * @throws IOException
    * @throws ClassNotFoundException
    */
-  private void readObject(ObjectInputStream ois) 
+  private void readObject(ObjectInputStream ois)
     throws IOException, ClassNotFoundException
   {
     ois.defaultReadObject();  // read the fields
   }
-  
+
   /**
    * WriteObject is called to save the state of the EbicsBank to an
    * ObjectOutputStream.
@@ -91,7 +91,7 @@ public class Bank implements EbicsBank, Savable {
   private void writeObject(ObjectOutputStream oos) throws IOException {
     oos.defaultWriteObject(); // write the fields
   }
-  
+
   @Override
   public URL getURL() {
     return url;
@@ -121,7 +121,7 @@ public class Bank implements EbicsBank, Savable {
   public String getHostId() {
     return hostId;
   }
-  
+
   @Override
   public String getName() {
     return name;
@@ -155,44 +155,44 @@ public class Bank implements EbicsBank, Savable {
    * @serial
    */
   private URL			url;
-  
+
   /**
    * The bank host id
    * @serial
    */
   private String		hostId;
-  
+
   /**
    * The bank name
    * @serial
    */
   private String		name;
-  
+
   /**
    * The bank encryption digest
    * @serial
    */
   private byte[]		e002Digest;
-  
+
   /**
    * The bank authentication digest
    * @serial
    */
   private byte[]		x002Digest;
-  
+
   /**
    * The ban encryption key
    * @serial
    */
   private RSAPublicKey		e002Key;
-  
+
   /**
    * The ban encryption key
    * @serial
    */
   private RSAPublicKey		x002Key;
-  
+
   private transient boolean	needSave;
-  
+
   private static final long 	serialVersionUID = 2123071449956793284L;
 }

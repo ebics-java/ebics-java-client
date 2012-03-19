@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@ package org.kopi.ebics.interfaces;
 
 /**
  * Information about an EBICS customer.
- * 
+ *
  * @author Hachani
  *
  */
@@ -32,13 +32,13 @@ public interface EbicsPartner {
    * @return the bank we are customer of
    */
   public EbicsBank getBank();
-  
+
   /**
    * Returns the customers id at the bank.
    * @return the customers id at the bank.
    */
   public String getPartnerId();
-  
+
   /**
    * Creates the next order number.
    * @return the next order number.

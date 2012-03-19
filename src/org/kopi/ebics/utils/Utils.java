@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -48,20 +48,20 @@ import org.w3c.dom.traversal.NodeIterator;
 
 /**
  * Some utilities for EBICS request creation and reception
- * 
+ *
  * @author hachani
  *
  */
 public class Utils {
 
   /**
-   * Compresses an input of byte array 
+   * Compresses an input of byte array
    * @param toZip the input to be compressed
    * @return the compressed input data
    * @throws IOException compression failed
    */
   public static byte[] zip(byte[] toZip) throws EbicsException {
-    
+
     if (toZip == null) {
       throw new EbicsException("The input to be zipped cannot be null");
     }
@@ -80,17 +80,17 @@ public class Utils {
       int count = compressor.deflate(buffer);
       output.write(buffer, 0, count);
     }
-    
+
     try {
       output.close();
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
     }
     compressor.end();
-    
+
     return output.toByteArray();
   }
-  
+
   /**
    * Generates a random nonce.
    * @return a random nonce.
@@ -106,7 +106,7 @@ public class Utils {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   /**
    * Uncompresses a given byte array input.
    * @param zip the zipped input.
@@ -116,15 +116,15 @@ public class Utils {
     Inflater 			decompressor;
     ByteArrayOutputStream 	output;
     byte[] 			buf;
-    
+
     decompressor = new Inflater();
     output = new ByteArrayOutputStream(zip.length);
     decompressor.setInput(zip);
     buf = new byte[1024];
-    
+
     while (!decompressor.finished()) {
       int 		count;
-      
+
       try {
 	count = decompressor.inflate(buf);
       } catch (DataFormatException e) {
@@ -138,12 +138,12 @@ public class Utils {
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
     }
-    
+
     decompressor.end();
-    
+
     return output.toByteArray();
   }
-  
+
   /**
    * Canonizes an input with inclusive c14n without comments algorithm.
    * @param input the byte array XML input.
@@ -157,7 +157,7 @@ public class Utils {
     NodeIterator			iter;
     ByteArrayOutputStream		output;
     Node 				node;
-    
+
     try {
       factory = DocumentBuilderFactory.newInstance();
       factory.setNamespaceAware(true);
@@ -169,11 +169,11 @@ public class Utils {
       output = new ByteArrayOutputStream();
       while ((node = iter.nextNode()) != null) {
         Canonicalizer 		canonicalizer;
-        
+
         canonicalizer = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
         output.write(canonicalizer.canonicalizeSubtree(node));
       }
-      
+
       return output.toByteArray();
     } catch (Exception e) {
       throw new EbicsException(e.getMessage());
@@ -187,13 +187,13 @@ public class Utils {
    * @return the encrypted input
    * @throws EbicsException
    */
-  public static byte[] encrypt(byte[] input, SecretKeySpec keySpec) 
+  public static byte[] encrypt(byte[] input, SecretKeySpec keySpec)
     throws EbicsException
   {
     try {
       IvParameterSpec		iv;
       Cipher 			cipher;
-      
+
       iv = new IvParameterSpec(new byte[16]);
       cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "BC");
       cipher.init(Cipher.ENCRYPT_MODE, keySpec, iv);
@@ -202,7 +202,7 @@ public class Utils {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   /**
    * Parses a string date
    * @param date the given string date
@@ -215,7 +215,7 @@ public class Utils {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   /**
    * Checks for the returned http code
    * @param httpCode the http code
@@ -223,8 +223,8 @@ public class Utils {
    */
   public static void checkHttpCode(int httpCode) throws EbicsException {
     if (httpCode != 200) {
-      throw new EbicsException(Messages.getString("http.code.error", 
-	                                          Constants.APPLICATION_BUNDLE_NAME, 
+      throw new EbicsException(Messages.getString("http.code.error",
+	                                          Constants.APPLICATION_BUNDLE_NAME,
 	                                          httpCode));
     }
   }

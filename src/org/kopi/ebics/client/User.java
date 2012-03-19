@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -37,24 +37,6 @@ import java.util.Map;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-/*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License version 2.1 as published by the Free Software Foundation.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- *
- * $Id$
- */
 
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsPartner;
@@ -66,30 +48,30 @@ import org.kopi.ebics.certificate.CertificateManager;
 import gnu.crypto.sig.rsa.RSAPKCS1V1_5Signature;
 
 /**
- * Simple implementation of an EBICS user. 
+ * Simple implementation of an EBICS user.
  * This object is not serializable, but it should be persisted every time it needs to be saved.
  * Persistence is achieved via <code>save(ObjectOutputStream)</code> and the matching constructor.
- *  
+ *
  * @author Hachani
  *
  */
 public class User implements EbicsUser, Savable {
-  
+
   /**
-   * First time constructor. Use this constructor, 
-   * if you want to prepare the first communication with the bank. For further communications you should recover persisted objects. 
+   * First time constructor. Use this constructor,
+   * if you want to prepare the first communication with the bank. For further communications you should recover persisted objects.
    * All required signature keys will be generated now.
-   * 
+   *
    * @param partner customer in whose name we operate.
    * @param userId UserId as obtained from the bank.
    * @param name the user name,
    * @param email the user email
    * @param country the user country
    * @param organisation the user organization or company
-   * @param passwordCallback a callback-handler that supplies us with the password. 
+   * @param passwordCallback a callback-handler that supplies us with the password.
    *                         This parameter can be null, in this case no password is used.
-   * @throws IOException 
-   * @throws GeneralSecurityException 
+   * @throws IOException
+   * @throws GeneralSecurityException
    */
   public User(EbicsPartner partner,
               String userId,
@@ -97,7 +79,7 @@ public class User implements EbicsUser, Savable {
               String email,
               String country,
               String organization,
-              PasswordCallback passwordCallback) 
+              PasswordCallback passwordCallback)
     throws GeneralSecurityException, IOException
   {
     this.partner = partner;
@@ -108,16 +90,16 @@ public class User implements EbicsUser, Savable {
     createUserCertificates();
     needSave = true;
   }
-  
+
   /**
-   * Reconstructs a persisted EBICS user. 
-   * 
-   * @param partner the customer in whose name we operate. 
+   * Reconstructs a persisted EBICS user.
+   *
+   * @param partner the customer in whose name we operate.
    * @param ois the object stream
    * @param passwordCallback a callback-handler that supplies us with the password.
    * @throws IOException
-   * @throws GeneralSecurityException if the supplies password is wrong. 
-   * @throws ClassNotFoundException 
+   * @throws GeneralSecurityException if the supplies password is wrong.
+   * @throws ClassNotFoundException
    */
   public User(EbicsPartner partner,
               ObjectInputStream ois,
@@ -139,7 +121,7 @@ public class User implements EbicsUser, Savable {
     this.x002PrivateKey = (PrivateKey)ois.readObject();
     ois.close();
   }
-  
+
   /**
    * Reconstructs a an EBICS user by loading its certificate
    * from a given key store.
@@ -153,8 +135,8 @@ public class User implements EbicsUser, Savable {
   public User(EbicsPartner partner,
               String userId,
               String keystorePath,
-              PasswordCallback passwordCallback) 
-    throws GeneralSecurityException, IOException 
+              PasswordCallback passwordCallback)
+    throws GeneralSecurityException, IOException
   {
     this.partner = partner;
     this.userId = userId;
@@ -162,17 +144,17 @@ public class User implements EbicsUser, Savable {
     loadCertificates(keystorePath);
     needSave = true;
   }
-  
+
   /**
    * Creates new certificates for a user.
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  private void createUserCertificates() throws GeneralSecurityException, IOException { 
+  private void createUserCertificates() throws GeneralSecurityException, IOException {
     manager = new CertificateManager(this);
     manager.create();
   }
-  
+
   /**
    * Saves the user certificates in a given path
    * @param path the certificates path
@@ -183,25 +165,25 @@ public class User implements EbicsUser, Savable {
     if (manager == null) {
       throw new GeneralSecurityException("Cannot save user certificates");
     }
-    
+
     manager.save(path, passwordCallback);
   }
-  
+
   /**
    * Loads the user certificates from a key store
    * @param keyStorePath the key store path
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  private void loadCertificates(String keyStorePath) 
-    throws GeneralSecurityException, IOException 
+  private void loadCertificates(String keyStorePath)
+    throws GeneralSecurityException, IOException
   {
     CertificateManager			manager;
-    
+
     manager = new CertificateManager(this);
     manager.load(keyStorePath, passwordCallback);
   }
-  
+
   @Override
   public void save(ObjectOutputStream oos) throws IOException {
     oos.writeUTF(userId);
@@ -219,7 +201,7 @@ public class User implements EbicsUser, Savable {
     oos.close();
     needSave = false;
   }
-  
+
   /**
    * Has the users signature key been sent to the bank?
    * @return True if the users signature key been sent to the bank
@@ -227,7 +209,7 @@ public class User implements EbicsUser, Savable {
   public boolean isInitialized() {
     return isInitialized;
   }
-  
+
   /**
    * The users signature key has been sent to the bank.
    * @param isInitialized transfer successful?
@@ -236,15 +218,15 @@ public class User implements EbicsUser, Savable {
     this.isInitialized = isInitialized;
     needSave = true;
   }
-  
+
   /**
-   * Have the users authentication and encryption keys been sent to the bank? 
+   * Have the users authentication and encryption keys been sent to the bank?
    * @return True if the users authentication and encryption keys been sent to the bank.
    */
   public boolean isInitializedHIA() {
     return isInitializedHIA;
   }
-  
+
   /**
    * The users authentication and encryption keys have been sent to the bank.
    * @param isInitializedHIA transfer successful?
@@ -253,12 +235,12 @@ public class User implements EbicsUser, Savable {
     this.isInitializedHIA = isInitializedHIA;
     needSave = true;
   }
-  
+
   /**
    * Generates new keys for this user and sends them to the bank.
    * @param keymgmt the key management instance with the ebics session.
    * @param passwordCallback the password-callback for the new keys.
-   * @throws EbicsException Exception during server request 
+   * @throws EbicsException Exception during server request
    * @throws IOException Exception during server request
    */
   public void updateKeys(KeyManagement keymgmt, PasswordCallback passwordCallback)
@@ -266,7 +248,7 @@ public class User implements EbicsUser, Savable {
   {
     needSave = true;
   }
-  
+
   /**
    * Writes a byte buffer from offset to length
    * @param buf the given byte buffer
@@ -276,7 +258,7 @@ public class User implements EbicsUser, Savable {
    */
   public static byte[] write(byte[] buf, int offset, int length) {
     ByteArrayOutputStream		output;
-    
+
     output = new ByteArrayOutputStream();
     for (int i = 0; i < length; i++) {
       if ((buf[i] == 13) || (buf[i] == 10) || (buf[i] == 26)) {
@@ -284,10 +266,10 @@ public class User implements EbicsUser, Savable {
       }
       output.write(buf[i]);
     }
-    
+
     return output.toByteArray();
   }
-  
+
   /**
    * Makes the Distinguished Names for the user certificates.
    * @param name the user name
@@ -302,9 +284,9 @@ public class User implements EbicsUser, Savable {
                         String organization)
   {
     StringBuffer		buffer;
-    
+
     buffer = new StringBuffer();
-    
+
     buffer.append("CN=" + name);
     if (country != null) {
       buffer.append(", " + "C=" + country.toUpperCase());
@@ -315,10 +297,10 @@ public class User implements EbicsUser, Savable {
     if (email != null) {
       buffer.append(", " + "E=" + email);
     }
-    
-    return buffer.toString(); 
+
+    return buffer.toString();
   }
-  
+
   /**
    * Did any persistable attribute change since last load/save operation.
    * @return True if the object needs to be saved.
@@ -326,7 +308,7 @@ public class User implements EbicsUser, Savable {
   public boolean needsSave() {
     return needSave;
   }
-  
+
   @Override
   public byte[] getA005Certificate() throws EbicsException {
     try {
@@ -335,7 +317,7 @@ public class User implements EbicsUser, Savable {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   @Override
   public byte[] getE002Certificate() throws EbicsException {
     try {
@@ -344,7 +326,7 @@ public class User implements EbicsUser, Savable {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   @Override
   public byte[] getX002Certificate() throws EbicsException {
     try {
@@ -386,7 +368,7 @@ public class User implements EbicsUser, Savable {
   public RSAPublicKey getX002PublicKey() {
     return (RSAPublicKey) x002Certificate.getPublicKey();
   }
-  
+
   @Override
   public void setA005PrivateKey(PrivateKey a005PrivateKey) {
     this.a005PrivateKey = a005PrivateKey;
@@ -419,22 +401,22 @@ public class User implements EbicsUser, Savable {
   public String getUserId() {
     return userId;
   }
-  
+
   @Override
   public String getName() {
     return name;
   }
-  
+
   @Override
   public String getDN() {
     return dn;
   }
-  
+
   @Override
   public PasswordCallback getPasswordCallback() {
     return passwordCallback;
   }
-  
+
   @Override
   public String getSaveName() {
     return userId + ".cer";
@@ -456,29 +438,29 @@ public class User implements EbicsUser, Savable {
     Map<String, PrivateKey>	attributes;
     BufferedInputStream		input;
     byte[] 			bytes;
-    
+
     signature = new RSAPKCS1V1_5Signature("sha-256");
     attributes = new HashMap<String, PrivateKey>();
     attributes.put("gnu.crypto.sig.private.key", a005PrivateKey);
     signature.setupSign(attributes);
     input = new BufferedInputStream(new ByteArrayInputStream(digest));
     bytes = new byte[4096];
-    
+
     int 		count = 0;
     for (int i = input.read(bytes); count != -1; count = input.read(bytes)) {
       byte[]		buf;
-      
+
       buf = write(bytes, 0, i);
       signature.update(buf, 0, buf.length);
     }
-    
+
     input.close();
-    
+
     return (byte[]) signature.sign();
   }
 
   @Override
-  public byte[] decrypt(byte[] encryptedKey, byte[] transactionKey) 
+  public byte[] decrypt(byte[] encryptedKey, byte[] transactionKey)
     throws GeneralSecurityException, IOException
   {
     Cipher			cipher;
@@ -501,13 +483,13 @@ public class User implements EbicsUser, Savable {
 
     cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "BC");
     cipher.init(Cipher.DECRYPT_MODE, keySpec, iv);
-    return cipher.doFinal(encryptedKey); 
+    return cipher.doFinal(encryptedKey);
   }
 
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private EbicsPartner				partner;
   private String				userId;
   private String				name;
@@ -517,11 +499,11 @@ public class User implements EbicsUser, Savable {
   private PasswordCallback 			passwordCallback;
   private transient boolean			needSave;
   private CertificateManager			manager;
-  
+
   private PrivateKey				a005PrivateKey;
   private PrivateKey				e002PrivateKey;
   private PrivateKey				x002PrivateKey;
-  
+
   private X509Certificate			a005Certificate;
   private X509Certificate			e002Certificate;
   private X509Certificate			x002Certificate;

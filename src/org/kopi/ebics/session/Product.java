@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,14 +24,14 @@ import java.util.Locale;
 
 /**
  * Optional information about the client product.
- * 
+ *
  * @author Hachani
  *
  */
 public class Product implements Serializable {
 
   /**
-   * Creates a new product information element. 
+   * Creates a new product information element.
    * @param name this is the name of the product. It is a mandatory field.
    * @param language this is the language. If you use null, the language of the default locale is used.
    * @param instituteID the institute, this is an optional value, you can leave this parameter empty.
@@ -44,7 +44,7 @@ public class Product implements Serializable {
     this.language = language.getCountry().toLowerCase();
     this.instituteID = instituteID;
   }
-  
+
   /**
    * @return the name
    */
@@ -86,7 +86,7 @@ public class Product implements Serializable {
   public void setInstituteID(String instituteID) {
     this.instituteID = instituteID;
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
@@ -94,7 +94,7 @@ public class Product implements Serializable {
   private transient String	name;
   private String		language;
   private String		instituteID;
-  
+
   private static final long 	serialVersionUID = 6400195827756653241L;
 
 }

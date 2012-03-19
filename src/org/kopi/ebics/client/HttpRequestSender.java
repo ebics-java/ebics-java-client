@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -38,12 +38,12 @@ import org.kopi.ebics.session.EbicsSession;
  * A simple HTTP request sender and receiver.
  * The send returns a HTTP code that should be analyzed
  * before proceeding ebics request response parse.
- * 
+ *
  * @author hachani
  *
  */
 public class HttpRequestSender {
-  
+
   /**
    * Constructs a new <code>HttpRequestSender</code> with a
    * given ebics session.
@@ -52,19 +52,19 @@ public class HttpRequestSender {
   public HttpRequestSender(EbicsSession session) {
     this.session = session;
   }
-  
+
   /**
    * Sends the request contained in the <code>ContentFactory</code>.
    * The <code>ContentFactory</code> will deliver the request as
    * an <code>InputStream</code>.
-   * 
+   *
    * @param request the ebics request
    * @return the HTTP return code
    */
   public final int send(ContentFactory request) throws IOException {
     HttpClient			httpClient;
     String                      proxyConfiguration;
-    
+
     httpClient = new HttpClient();
     proxyConfiguration = session.getConfiguration().getProperty("http.proxyHost");
 
@@ -72,7 +72,7 @@ public class HttpRequestSender {
       HostConfiguration		hostConfig;
       String			proxyHost;
       int			proxyPort;
-      
+
       hostConfig = httpClient.getHostConfiguration();
       proxyHost = session.getConfiguration().getProperty("http.proxyHost").trim();
       proxyPort = Integer.parseInt(session.getConfiguration().getProperty("http.proxyPort").trim());
@@ -82,7 +82,7 @@ public class HttpRequestSender {
 	String				pwd;
 	UsernamePasswordCredentials	credentials;
 	AuthScope			authscope;
-	
+
 	user = session.getConfiguration().getProperty("http.proxyUser").trim();
 	pwd = session.getConfiguration().getProperty("http.proxyPassword").trim();
 	credentials = new UsernamePasswordCredentials(user, pwd);
@@ -90,12 +90,12 @@ public class HttpRequestSender {
 	httpClient.getState().setProxyCredentials(authscope, credentials);
       }
     }
-    
+
       PostMethod			method;
       RequestEntity			requestEntity;
       InputStream			input;
       int				retCode;
-      
+
       input = request.getContent();
       method = new PostMethod(session.getUser().getPartner().getBank().getURL().toString());
       method.getParams().setSoTimeout(30000);
@@ -105,10 +105,10 @@ public class HttpRequestSender {
       retCode = -1;
       retCode = httpClient.executeMethod(method);
       response = new InputStreamContentFactory(method.getResponseBodyAsStream());
-      
+
       return retCode;
   }
-  
+
   /**
    * Returns the content factory of the response body
    * @return the content factory of the response.
@@ -116,7 +116,7 @@ public class HttpRequestSender {
   public ContentFactory getResponseBody() {
     return response;
   }
-  
+
   //////////////////////////////////////////////////////////////////
   // DATA MEMBERS
   //////////////////////////////////////////////////////////////////

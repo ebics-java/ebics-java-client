@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,7 @@ import org.kopi.ebics.exception.ReturnCode;
  *   <li> error: report an error to the user with its details and causes</li>
  *   <li> report: reports an EBICS return code to the user</li>
  * </ol>
- * 
+ *
  * @author hachani
  *
  */
@@ -41,39 +41,39 @@ public interface EbicsLogger {
    * @param message the message to be informed.
    */
   public void info(String message);
-  
+
   /**
    * Warns a given message to the client application user.
    * @param message the given message.
    */
   public void warn(String message);
-  
+
   /**
    * Warns a given message and its causes to the client application user.
    * @param message the given message.
    * @param throwable message causes.
    */
   public void warn(String message, Throwable throwable);
-  
+
   /**
    * Reports an error to the client application user.
    * @param message the error message
    */
   public void error(String message);
-  
+
   /**
    * Reports an error and its causes to the client application user.
    * @param message the error message.
    * @param throwable the error causes.
    */
   public void error(String message, Throwable throwable);
-  
+
   /**
    * Reports an ebics return code to the client application user.
    * @param returnCode the return code to report.
    */
   public void report(ReturnCode returnCode);
-  
+
   /**
    * Sets the logger log file
    * @param logFile the log file

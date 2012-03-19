@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,9 +28,9 @@ import org.kopi.ebics.interfaces.ContentFactory;
 /**
  * Input stream content factory that delivers the its content
  * as an <code>InputStream</code>
- * This object is serializable in a way to recover interrupted 
+ * This object is serializable in a way to recover interrupted
  * file transfers.
- * 
+ *
  * @author hachani
  *
  */
@@ -43,16 +43,16 @@ public class InputStreamContentFactory implements ContentFactory {
   public InputStreamContentFactory(InputStream input) {
     this.input = input;
   }
-  
+
   @Override
   public InputStream getContent() throws IOException {
     return input;
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private InputStream			input;
   private static final long 		serialVersionUID = 2357104115203917168L;
 }

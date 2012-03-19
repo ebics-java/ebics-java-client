@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!--
-  Copyright (c) 1990-2012 kopiLeft Development SARL
+  Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License version 2
   as published by the Free Software Foundation.
@@ -13,32 +13,32 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
   $Id$
 -->
-  	
+
 <!--==================================================================
 	package: org
 	==================================================================-->
 <project default="build" basedir=".">
-  
+
   <property name="topdir" value="../.." />
   <property name="node" value="yes"/>
-  
-  
+
+
   <!--==============================================================
-      Default target:	builds messages, options and java sources 
+      Default target:	builds messages, options and java sources
       ==============================================================-->
   <target name="node.build"  depends="init"
 	  description="--> Runs subbuild files ">
     <ant dir="kopi"   inheritAll="false" target="${target}" />
   </target>
-  
+
   <!--==============================================================
       buildtools target: builds java sources only
       ==============================================================-->
-  <target name="buildtools" depends="init" 
+  <target name="buildtools" depends="init"
 	  description=" Runs subbuild files ">
     <ant dir="kopi"  inheritAll="false" />
-  </target> 
+  </target>
 
   <import file="${topdir}/defs.xml" />
-  
+
 </project>

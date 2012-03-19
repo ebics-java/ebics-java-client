@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ import org.kopi.ebics.session.OrderType;
 /**
  * The <code>DTransferRequestElement</code> is the common elements
  * for all ebics downloads.
- * 
+ *
  * @author Hachani
  *
  */
@@ -50,7 +50,7 @@ public class DTransferRequestElement extends TransferRequestElement {
                                  OrderType type,
                                  int segmentNumber,
                                  boolean lastSegment,
-                                 byte[] transactionId) 
+                                 byte[] transactionId)
   {
     super(session, generateName(type), type, segmentNumber, lastSegment, transactionId);
   }
@@ -63,22 +63,22 @@ public class DTransferRequestElement extends TransferRequestElement {
     MutableHeaderType 			mutable;
     SegmentNumber			segmentNumber;
     StaticHeaderType 			xstatic;
-    
+
     segmentNumber = EbicsXmlFactory.createSegmentNumber(this.segmentNumber, lastSegment);
     mutable = EbicsXmlFactory.createMutableHeaderType("Transfer", segmentNumber);
     xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(), transactionId);
     header = EbicsXmlFactory.createEbicsRequestHeader(true, mutable, xstatic);
     body = EbicsXmlFactory.createEbicsRequestBody();
-    request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(), 
+    request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(),
         				         session.getConfiguration().getVersion(),
-	                                         header, 
+	                                         header,
 	                                         body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private static final long serialVersionUID = -7765739964317408967L;
 }

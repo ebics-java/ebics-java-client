@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ import org.kopi.ebics.session.OrderType;
 /**
  * The <code>InitializationResponseElement</code> is the common
  * element for transfer initialization responses.
- * 
+ *
  * @author Hachani
  *
  */
@@ -41,19 +41,19 @@ public class InitializationResponseElement extends DefaultResponseElement {
    * @param orderType the order type
    * @param name the element name
    */
-  public InitializationResponseElement(ContentFactory factory, 
+  public InitializationResponseElement(ContentFactory factory,
                                        OrderType orderType,
-                                       String name) 
+                                       String name)
   {
     super(factory, name);
     this.orderType = orderType;
   }
-  
+
   @Override
   public void build() throws EbicsException {
     String			code;
     String			text;
-    
+
     parse(factory);
     response = ((EbicsResponseDocument)document).getEbicsResponse();
     code = response.getHeader().getMutable().getReturnCode();
@@ -61,7 +61,7 @@ public class InitializationResponseElement extends DefaultResponseElement {
     returnCode = ReturnCode.toReturnCode(code, text);
     transactionId = response.getHeader().getStatic().getTransactionID();
   }
-  
+
   /**
    * Returns the transaction ID.
    * @return the transaction ID.
@@ -69,7 +69,7 @@ public class InitializationResponseElement extends DefaultResponseElement {
   public byte[] getTransactionId() {
     return transactionId;
   }
-  
+
   /**
    * Returns the order type.
    * @return the order type.
@@ -77,11 +77,11 @@ public class InitializationResponseElement extends DefaultResponseElement {
   public String getOrderType() {
     return orderType.getOrderType();
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   protected EbicsResponse			response;
   private OrderType				orderType;
   private byte[]				transactionId;

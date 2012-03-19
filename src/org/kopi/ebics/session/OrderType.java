@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ import java.io.Serializable;
 
 /**
  * A BCS order type.
- * 
+ *
  * @author Hachani
  *
  */
@@ -36,7 +36,7 @@ public class OrderType implements Serializable {
   public OrderType(String orderType) {
     this.orderType = orderType;
   }
-  
+
   /**
    * @return the orderType
    */
@@ -50,7 +50,7 @@ public class OrderType implements Serializable {
   public void setOrderType(String orderType) {
     this.orderType = orderType;
   }
-  
+
   /**
    * Returns the corresponding <code>OrderType</code> to a given string order type.
    * @param orderType the given order type.
@@ -75,64 +75,64 @@ public class OrderType implements Serializable {
       throw new IllegalArgumentException("NOT SUPPORTED ORDER TYPE");
     }
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof OrderType) {
       return orderType.equals(((OrderType)obj).getOrderType());
     }
-    
+
     return false;
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
   private String 			orderType;
-  
+
   /**
-   * Send the users protocol keys. 
+   * Send the users protocol keys.
    */
   public static final OrderType 	HIA;
-  
+
   /**
    * Fetch the banks protocol keys.
    */
   public static final OrderType 	HPB;
-  
+
   /**
-   * Return bank parameters. 
+   * Return bank parameters.
    */
   public static final OrderType 	HPD;
-  
+
   /**
-   * Fetch user informations. 
+   * Fetch user informations.
    */
   public static final OrderType 	HTD;
-  
+
   /**
    * Send the first signature key.
    */
   public static final OrderType 	INI;
-  
+
   /**
    * File upload
    */
   public static final OrderType 	FUL;
-  
+
   /**
    * File download
    */
   public static final OrderType 	FDL;
-  
+
   /**
-   * Lock the channel. 
+   * Lock the channel.
    */
   public static final OrderType		SPR ;
-  
+
   private static final long 		serialVersionUID = 17180027494776243L;
-  
+
   static {
     HIA = new OrderType("HIA");
     HPB = new OrderType("HPB");

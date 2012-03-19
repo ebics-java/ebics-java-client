@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,9 +26,9 @@ import org.kopi.ebics.utils.Utils;
 
 /**
  * The <code>HIARequestElement</code> is the root element used
- * to send the authentication and encryption keys to the ebics 
+ * to send the authentication and encryption keys to the ebics
  * bank server
- * 
+ *
  * @author hachani
  *
  */
@@ -43,7 +43,7 @@ public class HIARequestElement extends DefaultEbicsRootElement {
     super(session);
     this.orderId = orderId;
   }
-  
+
   @Override
   public String getName() {
     return "HIARequest.xml";
@@ -52,32 +52,32 @@ public class HIARequestElement extends DefaultEbicsRootElement {
   @Override
   public void build() throws EbicsException {
     HIARequestOrderDataElement		requestOrderData;
-    
+
     requestOrderData = new HIARequestOrderDataElement(session);
     requestOrderData.build();
-    unsecuredRequest = new UnsecuredRequestElement(session, 
-	                                           OrderType.HIA, 
+    unsecuredRequest = new UnsecuredRequestElement(session,
+	                                           OrderType.HIA,
 	                                           orderId == null ? session.getUser().getPartner().nextOrderId() : orderId,
 	                                           Utils.zip(requestOrderData.prettyPrint()));
     unsecuredRequest.build();
   }
-  
+
   @Override
   public byte[] toByteArray() {
     setSaveSuggestedPrefixes("http://www.ebics.org/H003", "");
-    
+
     return unsecuredRequest.toByteArray();
   }
-  
+
   @Override
   public void validate() throws EbicsException {
     unsecuredRequest.validate();
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private String			orderId;
   private UnsecuredRequestElement	unsecuredRequest;
   private static final long 		serialVersionUID = 1130436605993828777L;

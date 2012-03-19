@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import org.kopi.ebics.utils.Utils;
 /**
  * A simple mean to join downloaded segments from the
  * bank ebics server.
- * 
+ *
  * @author Hachani
  *
  */
@@ -45,7 +45,7 @@ public class Joiner {
     this.user = user;
     buffer = new ByteArrayOutputStream();
   }
-  
+
   public void append(byte[] data) throws EbicsException {
     try {
       buffer.write(data);
@@ -54,19 +54,19 @@ public class Joiner {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   /**
    * Writes the joined part to an output stream.
    * @param output the output stream.
    * @param transactionKey the transaction key
    * @throws EbicsException
    */
-  public void writeTo(OutputStream output, byte[] transactionKey) 
-    throws EbicsException 
-  { 
+  public void writeTo(OutputStream output, byte[] transactionKey)
+    throws EbicsException
+  {
     try {
       byte[]		decrypted;
-      
+
       buffer.close();
       decrypted = user.decrypt(buffer.toByteArray(), transactionKey);
       output.write(Utils.unzip(decrypted));
@@ -77,11 +77,11 @@ public class Joiner {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private EbicsUser			user;
   private ByteArrayOutputStream		buffer;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -46,7 +46,7 @@ import org.kopi.ebics.session.EbicsSession;
 /**
  * The <code>DInitializationRequestElement</code> is the common initialization
  * for all ebics downloads.
- * 
+ *
  * @author Hachani
  *
  */
@@ -60,11 +60,11 @@ public class DInitializationRequestElement extends InitializationRequestElement 
    * @param endRange the end range download
    * @throws EbicsException
    */
-  public DInitializationRequestElement(EbicsSession session, 
+  public DInitializationRequestElement(EbicsSession session,
                                        org.kopi.ebics.session.OrderType type,
                                        Date startRange,
-                                       Date endRange) 
-    throws EbicsException 
+                                       Date endRange)
+    throws EbicsException
   {
     super(session, type, generateName(type));
     this.startRange = startRange;
@@ -84,32 +84,32 @@ public class DInitializationRequestElement extends InitializationRequestElement 
     Encryption 				encryption;
     OrderType 				orderType;
     StaticHeaderOrderDetailsType 	orderDetails;
-    
+
     mutable = EbicsXmlFactory.createMutableHeaderType("Initialisation", null);
     product = EbicsXmlFactory.createProduct(session.getProduct().getLanguage(), session.getProduct().getName());
-    authentication = EbicsXmlFactory.createAuthentication(session.getConfiguration().getAuthenticationVersion(), 
-	                                                  "http://www.w3.org/2001/04/xmlenc#sha256", 
+    authentication = EbicsXmlFactory.createAuthentication(session.getConfiguration().getAuthenticationVersion(),
+	                                                  "http://www.w3.org/2001/04/xmlenc#sha256",
 	                                                  decodeHex(session.getUser().getPartner().getBank().getX002Digest()));
-    encryption = EbicsXmlFactory.createEncryption(session.getConfiguration().getEncryptionVersion(), 
-	                                          "http://www.w3.org/2001/04/xmlenc#sha256", 
+    encryption = EbicsXmlFactory.createEncryption(session.getConfiguration().getEncryptionVersion(),
+	                                          "http://www.w3.org/2001/04/xmlenc#sha256",
 	                                          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
     orderType = EbicsXmlFactory.createOrderType(type.getOrderType());
     if (type.equals(org.kopi.ebics.session.OrderType.FDL)) {
       FDLOrderParamsType		fDLOrderParamsType;
       FileFormatType 			fileFormat;
-      
-      fileFormat = EbicsXmlFactory.createFileFormatType(session.getConfiguration().getLocale().getCountry().toUpperCase(), 
+
+      fileFormat = EbicsXmlFactory.createFileFormatType(session.getConfiguration().getLocale().getCountry().toUpperCase(),
 	                                                session.getSessionParam("FORMAT"));
       fDLOrderParamsType = EbicsXmlFactory.createFDLOrderParamsType(fileFormat);
-      
+
       if (startRange != null && endRange != null) {
 	DateRange		range;
-	
+
 	range = EbicsXmlFactory.createDateRange(startRange, endRange);
 	fDLOrderParamsType.setDateRange(range);
       }
-      
+
       if (Boolean.getBoolean(session.getSessionParam("TEST"))) {
 	Parameter 		parameter;
 	Value			value;
@@ -118,41 +118,41 @@ public class DInitializationRequestElement extends InitializationRequestElement 
 	parameter = EbicsXmlFactory.createParameter("TEST", value);
 	fDLOrderParamsType.setParameterArray(new Parameter[] {parameter});
       }
-      orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(session.getUser().getPartner().nextOrderId(), 
-                                                                        "DZHNN", 
-                                                                        orderType, 
+      orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(session.getUser().getPartner().nextOrderId(),
+                                                                        "DZHNN",
+                                                                        orderType,
                                                                         fDLOrderParamsType);
     } else {
       StandardOrderParamsType		standardOrderParamsType;
-      
+
       standardOrderParamsType = EbicsXmlFactory.createStandardOrderParamsType();
-      orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(session.getUser().getPartner().nextOrderId(), 
-	                                                                "DZHNN", 
-	                                                                orderType, 
+      orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(session.getUser().getPartner().nextOrderId(),
+	                                                                "DZHNN",
+	                                                                orderType,
 	                                                                standardOrderParamsType);
     }
-    xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(), 
+    xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(),
                                                      nonce,
-                                                     session.getUser().getPartner().getPartnerId(), 
-                                                     product, 
-                                                     session.getUser().getSecurityMedium(), 
-                                                     session.getUser().getUserId(), 
+                                                     session.getUser().getPartner().getPartnerId(),
+                                                     product,
+                                                     session.getUser().getSecurityMedium(),
+                                                     session.getUser().getUserId(),
                                                      Calendar.getInstance(),
                                                      orderDetails,
                                                      bankPubKeyDigests);
     header = EbicsXmlFactory.createEbicsRequestHeader(true, mutable, xstatic);
     body = EbicsXmlFactory.createEbicsRequestBody();
-    request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(), 
-                                                 session.getConfiguration().getVersion(), 
-                                                 header, 
+    request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(),
+                                                 session.getConfiguration().getVersion(),
+                                                 header,
                                                  body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private Date					startRange;
   private Date					endRange;
   private static final long 			serialVersionUID = 3776072549761880272L;

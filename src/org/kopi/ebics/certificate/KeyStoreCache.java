@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@ import java.security.cert.X509Certificate;
 /**
  * A simple key store cache.
  * Allows to save a loaded key store.
- * 
+ *
  * @author hachani
  *
  */
@@ -37,7 +37,7 @@ public class KeyStoreCache implements Comparable<KeyStoreCache> {
   public String getAlias() {
     return alias;
   }
-  
+
   /**
    * Sets the certificate alias
    * @param alias the certificate alias
@@ -49,7 +49,7 @@ public class KeyStoreCache implements Comparable<KeyStoreCache> {
       this.alias = "";
     }
   }
-  
+
   /**
    * Gets the certificate.
    * @return the certificate.
@@ -57,7 +57,7 @@ public class KeyStoreCache implements Comparable<KeyStoreCache> {
   public X509Certificate getCertificate() {
     return certificate;
   }
-  
+
   /**
    * Sets the certificate
    * @param certificate the certificate
@@ -65,7 +65,7 @@ public class KeyStoreCache implements Comparable<KeyStoreCache> {
   public void setCertificate(X509Certificate certificate) {
     this.certificate = certificate;
   }
-  
+
   /**
    * Tells if its an entry key
    * @return True if it is an entry key
@@ -73,7 +73,7 @@ public class KeyStoreCache implements Comparable<KeyStoreCache> {
   public boolean isKeyEntry() {
     return isKeyEntry;
   }
-  
+
   /**
    * Sets the entry key flag;
    * @param isKeyEntry the entry key flag
@@ -81,7 +81,7 @@ public class KeyStoreCache implements Comparable<KeyStoreCache> {
   public void setKeyEntry(boolean isKeyEntry) {
     this.isKeyEntry = isKeyEntry;
   }
-  
+
   @Override
   public int compareTo(KeyStoreCache cache) {
     return alias.toUpperCase().compareTo(cache.getAlias().toUpperCase());
@@ -90,7 +90,7 @@ public class KeyStoreCache implements Comparable<KeyStoreCache> {
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private String		alias;
   private X509Certificate	certificate;
   private boolean		isKeyEntry;

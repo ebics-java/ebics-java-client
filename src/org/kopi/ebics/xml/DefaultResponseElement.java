@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import org.kopi.ebics.interfaces.ContentFactory;
 /**
  * The <code>DefaultResponseElement</code> is the common element for
  * all ebics server responses.
- * 
+ *
  * @author Hachani
  *
  */
@@ -46,7 +46,7 @@ public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
     this.factory = factory;
     this.name = name;
   }
-  
+
   /**
    * Parses the content of a <code>ContentFactory</code>
    * @param factory the content factory
@@ -61,7 +61,7 @@ public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   /**
    * Reports the return code to the user.
    * @throws EbicsException request fails.
@@ -71,16 +71,16 @@ public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
       returnCode.throwException();
     }
   }
-  
+
   @Override
   public String getName() {
     return name + ".xml";
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private String 			name;
   protected ContentFactory		factory;
   protected ReturnCode			returnCode;

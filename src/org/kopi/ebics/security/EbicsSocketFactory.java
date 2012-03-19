@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 /**
  * A simple SSL socket factory for EBICS client.
- * 
+ *
  * @author hachani
  *
  */
@@ -48,7 +48,7 @@ public class EbicsSocketFactory extends SSLSocketFactory {
   public EbicsSocketFactory(SSLContext context) {
     this.context = context;
   }
-  
+
   /**
    * Constructs a new <code>EbicsSocketFactory</code> from
    * key store and trust store information
@@ -58,25 +58,25 @@ public class EbicsSocketFactory extends SSLSocketFactory {
    * @param truststore the trust store
    * @param truststoreType the trust store type
    * @param truststorePass the trust store password
-   * @throws GeneralSecurityException 
-   * @throws IOException 
+   * @throws GeneralSecurityException
+   * @throws IOException
    */
-  public EbicsSocketFactory(byte[] keystore, 
-                            String keystoreType, 
+  public EbicsSocketFactory(byte[] keystore,
+                            String keystoreType,
                             char[] keystrorePass,
                             byte[] truststore,
                             String truststoreType,
-                            char[] truststorePass) 
+                            char[] truststorePass)
     throws IOException, GeneralSecurityException
   {
-    this.context = getSSLContext(keystore, 
-	                         keystoreType, 
-	                         keystrorePass, 
-	                         truststore, 
-	                         truststoreType, 
+    this.context = getSSLContext(keystore,
+	                         keystoreType,
+	                         keystrorePass,
+	                         truststore,
+	                         truststoreType,
 	                         truststorePass);
   }
-  
+
   /**
    * Returns the <code>SSLContext</code> from key store information.
    * @param keystore the key store
@@ -86,15 +86,15 @@ public class EbicsSocketFactory extends SSLSocketFactory {
    * @param truststoreType the trust store type
    * @param truststorePass the trust store password
    * @return the <code>SSLContext</code>
-   * @throws IOException 
-   * @throws GeneralSecurityException 
+   * @throws IOException
+   * @throws GeneralSecurityException
    */
-  public SSLContext getSSLContext(byte[] keystore, 
-                                  String keystoreType, 
+  public SSLContext getSSLContext(byte[] keystore,
+                                  String keystoreType,
                                   char[] keystrorePass,
                                   byte[] truststore,
                                   String truststoreType,
-                                  char[] truststorePass) 
+                                  char[] truststorePass)
     throws IOException, GeneralSecurityException
   {
     KeyStore 			kstore;
@@ -102,20 +102,20 @@ public class EbicsSocketFactory extends SSLSocketFactory {
     KeyManagerFactory 		kmf;
     TrustManagerFactory 	tmf;
     SSLContext			context;
-    
+
     kstore = initKeyStore(keystore, keystrorePass, keystoreType);
     kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
     kmf.init(kstore, keystrorePass);
-    
+
     tstore = initKeyStore(truststore, truststorePass, truststoreType);
     tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
     tmf.init(tstore);
     context = SSLContext.getInstance("TLS");
     context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
-    
+
     return context;
   }
-  
+
   /**
    * Initializes a key store.
    * @param keystore the key store
@@ -123,8 +123,8 @@ public class EbicsSocketFactory extends SSLSocketFactory {
    * @return key store
    * @throws IOException
    */
-  protected KeyStore initKeyStore(byte[] keystore, char[] password, String type) 
-    throws IOException 
+  protected KeyStore initKeyStore(byte[] keystore, char[] password, String type)
+    throws IOException
   {
     try {
       KeyStore  kstore;
@@ -139,10 +139,10 @@ public class EbicsSocketFactory extends SSLSocketFactory {
       throw new IOException("Exception trying to load keystore " + type + ": " + e.toString());
     }
   }
-  
+
   @Override
-  public Socket createSocket(Socket s, String host, int port, boolean autoClose) 
-    throws IOException 
+  public Socket createSocket(Socket s, String host, int port, boolean autoClose)
+    throws IOException
   {
     return context.getSocketFactory().createSocket(s, host, port, autoClose);
   }
@@ -168,15 +168,15 @@ public class EbicsSocketFactory extends SSLSocketFactory {
   }
 
   @Override
-  public Socket createSocket(String host, int port, InetAddress localHost, int localPort) 
-    throws IOException, UnknownHostException 
+  public Socket createSocket(String host, int port, InetAddress localHost, int localPort)
+    throws IOException, UnknownHostException
   {
     return context.getSocketFactory().createSocket(host, port, localHost, localPort);
   }
 
   @Override
-  public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) 
-    throws IOException 
+  public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort)
+    throws IOException
   {
     return context.getSocketFactory().createSocket(address, port, localAddress, localPort);
   }

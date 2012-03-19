@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@ package org.kopi.ebics.exception;
 
 /**
  * Common exception for all EBICS errors.
- * 
+ *
  * @author hachani
  *
  */
@@ -31,7 +31,7 @@ public class EbicsException extends Exception {
    * A means to construct a server error.
    */
   public EbicsException() {}
-  
+
   /**
    * A means to construct a server error with an additional message.
    * @param message the exception message
@@ -56,7 +56,7 @@ public class EbicsException extends Exception {
     super(message);
     this.returnCode = returnCode;
   }
-  
+
   /**
    * Returns the standardized error code.
    * @return the standardized error code.
@@ -64,11 +64,11 @@ public class EbicsException extends Exception {
   public ReturnCode getReturnCode() {
     return returnCode;
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private ReturnCode 		returnCode;
   private static final long 	serialVersionUID = 2728820344946361669L;
 }

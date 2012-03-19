@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@ import org.kopi.ebics.utils.Utils;
 /**
  * The INI request XML element. This root element is to be sent
  * to the ebics server to initiate the signature certificate.
- * 
+ *
  * @author hachani
  *
  */
@@ -54,29 +54,29 @@ public class INIRequestElement extends DefaultEbicsRootElement {
 
     signaturePubKey = new SignaturePubKeyOrderDataElement(session);
     signaturePubKey.build();
-    unsecuredRequest = new UnsecuredRequestElement(session, 
-	                                           OrderType.INI, 
+    unsecuredRequest = new UnsecuredRequestElement(session,
+	                                           OrderType.INI,
 	                                           orderId == null ? session.getUser().getPartner().nextOrderId() : orderId,
 	                                           Utils.zip(signaturePubKey.prettyPrint()));
     unsecuredRequest.build();
   }
-  
+
   @Override
   public byte[] toByteArray() {
     setSaveSuggestedPrefixes("http://www.ebics.org/H003", "");
-    
+
     return unsecuredRequest.toByteArray();
   }
-  
+
   @Override
   public void validate() throws EbicsException {
     unsecuredRequest.validate();
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private String			orderId;
   private UnsecuredRequestElement	unsecuredRequest;
   private static final long 		serialVersionUID = -1966559247739923555L;

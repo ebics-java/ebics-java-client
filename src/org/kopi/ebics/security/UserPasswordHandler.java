@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@ import org.kopi.ebics.interfaces.PasswordCallback;
 /**
  * A simple user password handler that creates a password
  * from the user id and a simple suffix.
- * 
+ *
  * @author hachani
  *
  */
@@ -40,11 +40,11 @@ public class UserPasswordHandler implements PasswordCallback {
     this.userId = userId;
     this.suffix = suffix;
   }
-  
+
   @Override
   public char[] getPassword() {
     String		pwd;
-    
+
     pwd = userId + suffix;
     return pwd.toCharArray();
   }
@@ -52,7 +52,7 @@ public class UserPasswordHandler implements PasswordCallback {
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private String		userId;
   private String		suffix;
 }

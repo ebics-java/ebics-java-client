@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -56,14 +56,14 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
     this.session = session;
     suggestedPrefixes = new HashMap<String, String>();
   }
-  
+
   /**
    *  Constructs a new default <code>EbicsRootElement</code>
    */
   public DefaultEbicsRootElement() {
     this(null);
   }
-  
+
   /**
    * Saves the Suggested Prefixes when the XML is printed
    * @param uri the namespace URI
@@ -72,7 +72,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
   protected static void setSaveSuggestedPrefixes(String uri, String prefix) {
     suggestedPrefixes.put(uri, prefix);
   }
-  
+
   /**
    * Prints a pretty XML document using jdom framework.
    * @param input the XML input
@@ -84,11 +84,11 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
     XMLOutputter              	xmlOutputter;
     SAXBuilder                	sxb;
     ByteArrayOutputStream	output;
-    
+
     sxb = new SAXBuilder();
     output = new ByteArrayOutputStream();
     xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
-    
+
     try {
       document = sxb.build(new ByteArrayInputStream(toByteArray()));
       xmlOutputter.output(document, output);
@@ -97,10 +97,10 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
     }
-    
+
     return output.toByteArray();
   }
-  
+
   /**
    * Inserts a schema location to the current ebics root element.
    * @param namespaceURI the name space URI
@@ -108,13 +108,13 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
    * @param prefix the prefix
    * @param value the value
    */
-  public void insertSchemaLocation(String namespaceURI, 
-                                   String localPart, 
-                                   String prefix, 
-                                   String value) 
+  public void insertSchemaLocation(String namespaceURI,
+                                   String localPart,
+                                   String prefix,
+                                   String value)
   {
     XmlCursor 			cursor;
-    
+
     cursor = document.newCursor();
     while (cursor.hasNextToken()) {
       if (cursor.isStart()) {
@@ -126,7 +126,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
       }
     }
   }
-  
+
   /**
    * Generates a random file name with a prefix.
    * @param type the order type.
@@ -135,7 +135,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
   public static String generateName(OrderType type) {
     return type.getOrderType() + Long.toHexString(Double.doubleToLongBits(Math.random())) + index++;
   }
-  
+
   /**
    * Generates a random file name with a prefix.
    * @param type the prefix to use.
@@ -144,16 +144,16 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
   public static String generateName(String prefix) {
     return prefix + Long.toHexString(Double.doubleToLongBits(Math.random())) + index++;
   }
-  
+
   @Override
   public String toString() {
     return new String(toByteArray());
   }
-  
+
   @Override
   public byte[] toByteArray() {
     XmlOptions		options;
-    
+
     options = new XmlOptions();
     options.setSavePrettyPrint();
     options.setSaveSuggestedPrefixes(suggestedPrefixes);
@@ -163,7 +163,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
   @Override
   public void addNamespaceDecl(String prefix, String uri) {
     XmlCursor 			cursor;
-    
+
     cursor = document.newCursor();
     while (cursor.hasNextToken()) {
       if (cursor.isStart()) {
@@ -175,7 +175,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
       }
     }
   }
-  
+
   @Override
   public void validate() throws EbicsException {
     ArrayList<XmlError>		validationMessages;
@@ -183,11 +183,11 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 
     validationMessages = new ArrayList<XmlError>();
     isValid = document.validate(new XmlOptions().setErrorListener(validationMessages));
-    
+
     if (!isValid) {
       String			message;
       Iterator<XmlError>    	iter;
-      
+
       iter = validationMessages.iterator();
       message = "";
       while (iter.hasNext()) {
@@ -196,7 +196,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 	}
 	message += iter.next().getMessage();
       }
-      
+
       throw new EbicsException(message);
     }
   }
@@ -219,11 +219,11 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
   public void print(PrintStream stream) {
     stream.println(document.toString());
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   protected XmlObject			document;
   protected EbicsSession 		session;
   private static Map<String, String> 	suggestedPrefixes;

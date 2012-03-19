@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,9 +36,9 @@ import org.kopi.ebics.io.IOUtils;
  * transferable element in an instance of <code>java.io.File</code>
  * then saved to a trace directory.
  * The manager can delete all traces file if the configuration does
- * not offer tracing support. 
+ * not offer tracing support.
  * see {@link Configuration#isTraceEnabled() isTraceEnabled()}
- * 
+ *
  * @author hachani
  *
  */
@@ -53,7 +53,7 @@ public class DefaultTraceManager implements TraceManager {
     this.traceDir = traceDir;
     cache = new FileCache(isTraceEnabled);
   }
-  
+
   /**
    * Constructs a new <code>TraceManger</code> to manage transfer traces.
    * @param isTraceEnabled is trace enabled?
@@ -61,20 +61,20 @@ public class DefaultTraceManager implements TraceManager {
   public DefaultTraceManager(boolean isTraceEnabled) {
     this(null, isTraceEnabled);
   }
-  
+
   /**
    * Constructs a new <code>TraceManger</code> with trace option enabled.
    */
   public DefaultTraceManager() {
     this(null, true);
   }
-  
+
   @Override
   public void trace(EbicsRootElement element) throws EbicsException {
     try {
       FileOutputStream		out;
       File			file;
-      
+
       file = IOUtils.createFile(traceDir, element.getName());
       out = new FileOutputStream(file);
       element.save(out);
@@ -93,12 +93,12 @@ public class DefaultTraceManager implements TraceManager {
   public void clear() {
     cache.clear();
   }
-  
+
   @Override
   public void setTraceDirectory(String traceDir) {
     this.traceDir = IOUtils.createFile(traceDir);
   }
-  
+
   @Override
   public void setTraceEnabled(boolean enabled) {
     cache.setTraceEnabled(enabled);
@@ -107,7 +107,7 @@ public class DefaultTraceManager implements TraceManager {
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private File				traceDir;
   private FileCache			cache;
 }

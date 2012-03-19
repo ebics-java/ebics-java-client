@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,12 +26,12 @@ import java.util.ResourceBundle;
 
 /**
  * A mean to manage application messages.
- * 
+ *
  * @author Hachani
  *
  */
 public class Messages {
-  
+
   /**
    * Return the corresponding value of a given key and string parameter.
    * @param key the given key
@@ -42,14 +42,14 @@ public class Messages {
   public static String getString(String key, String bundleName, String param) {
     try {
       ResourceBundle		resourceBundle;
-      
+
       resourceBundle = ResourceBundle.getBundle(bundleName, locale);
       return MessageFormat.format(resourceBundle.getString(key), param);
     } catch (MissingResourceException e) {
       return "!!" + key + "!!";
     }
   }
-  
+
   /**
    * Return the corresponding value of a given key and integer parameter.
    * @param key the given key
@@ -60,14 +60,14 @@ public class Messages {
   public static String getString(String key, String bundleName, int param) {
     try {
       ResourceBundle		resourceBundle;
-      
+
       resourceBundle = ResourceBundle.getBundle(bundleName, locale);
       return MessageFormat.format(resourceBundle.getString(key), param);
     } catch (MissingResourceException e) {
       return "!!" + key + "!!";
     }
   }
-  
+
   /**
    * Return the corresponding value of a given key and parameters.
    * @param key the given key
@@ -77,14 +77,14 @@ public class Messages {
   public static String getString(String key, String bundleName) {
     try {
       ResourceBundle		resourceBundle;
-      
+
       resourceBundle = ResourceBundle.getBundle(bundleName, locale);
       return resourceBundle.getString(key);
     } catch (MissingResourceException e) {
       return "!!" + key + "!!";
     }
   }
-  
+
   /**
    * Return the corresponding value of a given key and string parameter.
    * @param key the given key
@@ -96,14 +96,14 @@ public class Messages {
   public static String getString(String key, String bundleName, Locale locale, String param) {
     try {
       ResourceBundle		resourceBundle;
-      
+
       resourceBundle = ResourceBundle.getBundle(bundleName, locale);
       return MessageFormat.format(resourceBundle.getString(key), param);
     } catch (MissingResourceException e) {
       return "!!" + key + "!!";
     }
   }
-  
+
   /**
    * Return the corresponding value of a given key and integer parameter.
    * @param key the given key
@@ -115,14 +115,14 @@ public class Messages {
   public static String getString(String key, String bundleName, Locale locale, int param) {
     try {
       ResourceBundle		resourceBundle;
-      
+
       resourceBundle = ResourceBundle.getBundle(bundleName, locale);
       return MessageFormat.format(resourceBundle.getString(key), param);
     } catch (MissingResourceException e) {
       return "!!" + key + "!!";
     }
   }
-  
+
   /**
    * Return the corresponding value of a given key and parameters.
    * @param key the given key
@@ -133,14 +133,14 @@ public class Messages {
   public static String getString(String key, String bundleName, Locale locale) {
     try {
       ResourceBundle		resourceBundle;
-      
+
       resourceBundle = ResourceBundle.getBundle(bundleName, locale);
       return resourceBundle.getString(key);
     } catch (MissingResourceException e) {
       return "!!" + key + "!!";
     }
   }
-  
+
   /**
    * Sets the default locale.
    * @param locale the locale
@@ -148,10 +148,10 @@ public class Messages {
   public static void setLocale(Locale locale) {
     Messages.locale = locale;
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private static Locale					locale;
 }

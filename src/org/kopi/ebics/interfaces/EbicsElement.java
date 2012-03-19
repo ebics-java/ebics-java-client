@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,19 +26,19 @@ import org.kopi.ebics.exception.EbicsException;
 
 
 public interface EbicsElement extends Serializable {
-  
+
   /**
    * Returns the name of this <code>EbicsElement</code>
    * @return the name of the element
    */
   public String getName();
-  
+
   /**
    * Builds the <code>EbicsElement</code> XML fragment
    * @throws EbicsException
    */
   public void build() throws EbicsException;
-  
+
   /**
    * Prints the <code>EbicsElement</code> into
    * the given stream.

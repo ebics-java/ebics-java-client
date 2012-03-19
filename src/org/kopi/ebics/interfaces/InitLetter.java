@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,7 @@ import org.kopi.ebics.exception.EbicsException;
  * The <code>InitLetter</code> is an abstract initialization
  * letter. The INI, HIA and HPB letters should be an implementation
  * of the <code>InitLetter</code>
- * 
+ *
  * @author Hachani
  *
  */
@@ -40,25 +40,25 @@ public interface InitLetter {
    * Creates an <code>InitLetter</code> for a given <code>EbicsUser</code>
    * @param user the ebics user.
    * @throws EbicsException
-   * @throws IOException 
-   * @throws GeneralSecurityException 
+   * @throws IOException
+   * @throws GeneralSecurityException
    */
-  public void create(EbicsUser user) 
+  public void create(EbicsUser user)
     throws GeneralSecurityException, IOException, EbicsException;
-  
+
   /**
    * Saves the <code>InitLetter</code> to the given output stream.
    * @param output the output stream.
    * @throws IOException Save error.
    */
   public void save(OutputStream output) throws IOException;
-  
+
   /**
    * Returns the initialization letter title.
    * @return the letter title.
    */
   public String getTitle();
-  
+
   /**
    * Returns the letter name.
    * @return the letter name.

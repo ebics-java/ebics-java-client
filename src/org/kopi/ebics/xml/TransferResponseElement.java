@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,12 +28,12 @@ import org.kopi.ebics.schema.h003.EbicsResponseDocument.EbicsResponse;
 /**
  * The <code>TransferResponseElement</code> is the common element
  * response for all ebics transfers.
- * 
+ *
  * @author Hachani
  *
  */
 public class TransferResponseElement extends DefaultResponseElement {
-  
+
   /**
    * Constructs a new <code>TransferResponseElement</code> element.
    * @param factory the content factory
@@ -43,19 +43,19 @@ public class TransferResponseElement extends DefaultResponseElement {
   public TransferResponseElement(ContentFactory factory, String name) {
     super(factory, name);
   }
-  
+
   @Override
   public void build() throws EbicsException {
     String			code;
     String			text;
-    
+
     parse(factory);
     response = ((EbicsResponseDocument)document).getEbicsResponse();
     code = response.getHeader().getMutable().getReturnCode();
     text = response.getHeader().getMutable().getReportText();
     returnCode = ReturnCode.toReturnCode(code, text);
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------

@@ -1,4 +1,4 @@
-/* Copyright (c) 1990-2012 kopiLeft Development SARL
+/* Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,7 +15,7 @@
  *
  * $Id$
  */
- 
+
 package org.kopi.ebics.xml;
 
 import java.util.Calendar;
@@ -34,7 +34,7 @@ import org.kopi.ebics.session.EbicsSession;
  * The <code>HIARequestOrderDataElement</code> is the element that contains
  * X002 and E002 keys information needed for a HIA request in order to send
  * the authentication and encryption user keys to the bank server.
- * 
+ *
  * @author hachani
  *
  */
@@ -51,7 +51,7 @@ public class HIARequestOrderDataElement extends DefaultEbicsRootElement {
   @Override
   public void build() throws EbicsException {
     HIARequestOrderDataType		request;
-    AuthenticationPubKeyInfoType 	authenticationPubKeyInfo; 
+    AuthenticationPubKeyInfoType 	authenticationPubKeyInfo;
     EncryptionPubKeyInfoType 		encryptionPubKeyInfo;
     PubKeyValueType		 	encryptionPubKeyValue;
     X509DataType 			encryptionX509Data;
@@ -60,45 +60,45 @@ public class HIARequestOrderDataElement extends DefaultEbicsRootElement {
     X509DataType 			authX509Data;
     RSAKeyValueType 			AuthRsaKeyValue;
 
-    encryptionX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(), 
+    encryptionX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
 	                                                    session.getUser().getE002Certificate());
-    encryptionRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getE002PublicKey().getPublicExponent().toByteArray(), 
+    encryptionRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getE002PublicKey().getPublicExponent().toByteArray(),
 	                                                          session.getUser().getE002PublicKey().getModulus().toByteArray());
     encryptionPubKeyValue = EbicsXmlFactory.createH003PubKeyValueType(encryptionRsaKeyValue, Calendar.getInstance());
-    encryptionPubKeyInfo = EbicsXmlFactory.createEncryptionPubKeyInfoType(session.getConfiguration().getEncryptionVersion(), 
-	                                                                  encryptionPubKeyValue, 
+    encryptionPubKeyInfo = EbicsXmlFactory.createEncryptionPubKeyInfoType(session.getConfiguration().getEncryptionVersion(),
+	                                                                  encryptionPubKeyValue,
 	                                                                  encryptionX509Data);
-    authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(), 
+    authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
 	                                              session.getUser().getX002Certificate());
-    AuthRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getX002PublicKey().getPublicExponent().toByteArray(), 
+    AuthRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getX002PublicKey().getPublicExponent().toByteArray(),
 							    session.getUser().getX002PublicKey().getModulus().toByteArray());
     authPubKeyValue = EbicsXmlFactory.createH003PubKeyValueType(AuthRsaKeyValue, Calendar.getInstance());
-    authenticationPubKeyInfo = EbicsXmlFactory.createAuthenticationPubKeyInfoType(session.getConfiguration().getAuthenticationVersion(), 
-	                                                                          authPubKeyValue, 
+    authenticationPubKeyInfo = EbicsXmlFactory.createAuthenticationPubKeyInfoType(session.getConfiguration().getAuthenticationVersion(),
+	                                                                          authPubKeyValue,
 	                                                                          authX509Data);
-    request = EbicsXmlFactory.createHIARequestOrderDataType(authenticationPubKeyInfo, 
-	                                                    encryptionPubKeyInfo, 
-	                                                    session.getUser().getPartner().getPartnerId(), 
+    request = EbicsXmlFactory.createHIARequestOrderDataType(authenticationPubKeyInfo,
+	                                                    encryptionPubKeyInfo,
+	                                                    session.getUser().getPartner().getPartnerId(),
 	                                                    session.getUser().getUserId());
     document = EbicsXmlFactory.createHIARequestOrderDataDocument(request);
   }
-  
+
   @Override
   public String getName() {
     return "HIARequestOrderData.xml";
   }
-  
+
   @Override
   public byte[] toByteArray() {
     addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
     setSaveSuggestedPrefixes("http://www.ebics.org/S001", "");
-    
+
     return super.toByteArray();
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private static final long 		serialVersionUID = -7333250823464659004L;
 }

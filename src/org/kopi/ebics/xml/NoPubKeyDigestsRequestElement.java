@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -41,7 +41,7 @@ import org.kopi.ebics.utils.Utils;
 /**
  * The <code>NoPubKeyDigestsRequestElement</code> is the root element
  * for a HPB ebics server request.
- * 
+ *
  * @author hachani
  *
  */
@@ -54,7 +54,7 @@ public class NoPubKeyDigestsRequestElement extends DefaultEbicsRootElement {
   public NoPubKeyDigestsRequestElement(EbicsSession session) {
     super(session);
   }
-  
+
   /**
    * Returns the digest value of the authenticated XML portions.
    * @return  the digest value.
@@ -62,7 +62,7 @@ public class NoPubKeyDigestsRequestElement extends DefaultEbicsRootElement {
    */
   public byte[] getDigest() throws EbicsException {
     addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
-    
+
     try {
       return MessageDigest.getInstance("SHA-256", "BC").digest(Utils.canonize(toByteArray()));
     } catch (NoSuchAlgorithmException e) {
@@ -71,7 +71,7 @@ public class NoPubKeyDigestsRequestElement extends DefaultEbicsRootElement {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   /**
    * Sets the authentication signature of the <code>NoPubKeyDigestsRequestElement</code>
    * @param authSignature the the authentication signature.
@@ -79,7 +79,7 @@ public class NoPubKeyDigestsRequestElement extends DefaultEbicsRootElement {
   public void setAuthSignature(SignatureType authSignature) {
     ((EbicsNoPubKeyDigestsRequestDocument)document).getEbicsNoPubKeyDigestsRequest().setAuthSignature(authSignature);
   }
-  
+
   /**
    * Sets the signature value of the request.
    * @param signature the signature value
@@ -95,45 +95,45 @@ public class NoPubKeyDigestsRequestElement extends DefaultEbicsRootElement {
     Header					header;
     EmptyMutableHeaderType 			mutable;
     NoPubKeyDigestsRequestStaticHeaderType 	xstatic;
-    ProductElementType 				product; 
+    ProductElementType 				product;
     OrderDetailsType 				orderDetails;
 
     product = EbicsXmlFactory.creatProductElementType(session.getProduct().getLanguage(), session.getProduct().getName());
     orderDetails = EbicsXmlFactory.createOrderDetailsType("DZHNN", null, OrderType.HPB.getOrderType());
-    xstatic = EbicsXmlFactory.createNoPubKeyDigestsRequestStaticHeaderType(session.getBankID(), 
-	                                                                   Utils.generateNonce(), 
-	                                                                   Calendar.getInstance(), 
-	                                                                   session.getUser().getPartner().getPartnerId(), 
-	                                                                   session.getUser().getUserId(), 
-	                                                                   product, 
+    xstatic = EbicsXmlFactory.createNoPubKeyDigestsRequestStaticHeaderType(session.getBankID(),
+	                                                                   Utils.generateNonce(),
+	                                                                   Calendar.getInstance(),
+	                                                                   session.getUser().getPartner().getPartnerId(),
+	                                                                   session.getUser().getUserId(),
+	                                                                   product,
 	                                                                   orderDetails,
 	                                                                   session.getUser().getSecurityMedium());
     mutable = EbicsXmlFactory.createEmptyMutableHeaderType();
     header = EbicsXmlFactory.createDigestsRequestHeader(true, mutable, xstatic);
     body = EbicsXmlFactory.createDigestsRequestBody();
-    request = EbicsXmlFactory.createEbicsNoPubKeyDigestsRequest(session.getConfiguration().getRevision(), 
-	                                                        session.getConfiguration().getVersion(), 
-	                                                        header, 
+    request = EbicsXmlFactory.createEbicsNoPubKeyDigestsRequest(session.getConfiguration().getRevision(),
+	                                                        session.getConfiguration().getVersion(),
+	                                                        header,
 	                                                        body);
     document = EbicsXmlFactory.createEbicsNoPubKeyDigestsRequestDocument(request);
   }
-  
+
   @Override
   public byte[] toByteArray() {
     setSaveSuggestedPrefixes("http://www.w3.org/2000/09/xmldsig#", "ds");
     setSaveSuggestedPrefixes("http://www.ebics.org/H003", "");
-    
+
     return super.toByteArray();
   }
-  
+
   @Override
   public String getName() {
     return "NoPubKeyDigestsRequest.xml";
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private static final long		serialVersionUID = 3177047145408329472L;
 }

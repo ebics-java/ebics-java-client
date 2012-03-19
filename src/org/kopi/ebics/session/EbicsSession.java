@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,14 +31,14 @@ import org.kopi.ebics.interfaces.EbicsUser;
 
 /**
  * Communication hub for EBICS.
- * 
+ *
  * @author Hachani
  *
  */
 public class EbicsSession {
 
   /**
-   * Constructs a new ebics session 
+   * Constructs a new ebics session
    * @param user the ebics user
    * @param the ebics client configuration
    */
@@ -47,10 +47,10 @@ public class EbicsSession {
     this.configuration = configuration;
     parameters = new HashMap<String, String>();
   }
-  
+
   /**
-   * Returns the banks encryption key. 
-   * The key will be fetched automatically form the bank if needed. 
+   * Returns the banks encryption key.
+   * The key will be fetched automatically form the bank if needed.
    * @return the banks encryption key.
    * @throws IOException Communication error during key retrieval.
    * @throws EbicsException Server error message generated during key retrieval.
@@ -58,10 +58,10 @@ public class EbicsSession {
   public RSAPublicKey getBankE002Key() throws IOException, EbicsException {
     return user.getPartner().getBank().getE002Key();
   }
-  
+
   /**
-   * Returns the banks authentication key. 
-   * The key will be fetched automatically form the bank if needed. 
+   * Returns the banks authentication key.
+   * The key will be fetched automatically form the bank if needed.
    * @return the banks authentication key.
    * @throws IOException Communication error during key retrieval.
    * @throws EbicsException Server error message generated during key retrieval.
@@ -69,7 +69,7 @@ public class EbicsSession {
   public RSAPublicKey getBankX002Key() throws IOException, EbicsException {
     return user.getPartner().getBank().getX002Key();
   }
-  
+
   /**
    * Returns the bank id.
    * @return the bank id.
@@ -78,7 +78,7 @@ public class EbicsSession {
   public String getBankID() throws EbicsException {
     return user.getPartner().getBank().getHostId();
   }
-  
+
   /**
    * Return the session user.
    * @return the session user.
@@ -86,7 +86,7 @@ public class EbicsSession {
   public EbicsUser getUser() {
     return user;
   }
-  
+
   /**
    * Returns the client application configuration.
    * @return the client application configuration.
@@ -94,7 +94,7 @@ public class EbicsSession {
   public Configuration getConfiguration() {
     return configuration;
   }
-  
+
   /**
    * Sets the optional product identification that will be sent to the bank during each request.
    * @param product Product description
@@ -102,14 +102,14 @@ public class EbicsSession {
   public void setProduct(Product product) {
     this.product = product;
   }
-  
+
   /**
    * @return the product
    */
   public Product getProduct() {
     return product;
   }
-  
+
   /**
    * Adds a session parameter to use it in the transfer process.
    * @param key the parameter key
@@ -118,7 +118,7 @@ public class EbicsSession {
   public void addSessionParam(String key, String value) {
     parameters.put(key, value);
   }
-  
+
   /**
    * Retrieves a session parameter using its key.
    * @param key the parameter key
@@ -128,10 +128,10 @@ public class EbicsSession {
     if (key == null) {
       return null;
     }
-    
+
     return parameters.get(key);
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------

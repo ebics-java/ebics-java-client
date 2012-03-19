@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  * A simple mean to cache created files.
- * 
+ *
  * @author hachani
  *
  */
@@ -39,7 +39,7 @@ public class FileCache {
     this.isTraceEnabled = isTraceEnabled;
     cache = new Hashtable<String, File>();
   }
-  
+
   /**
    * Cache a new <code>java.io.File</code> in the cache buffer
    * @param file the file to cache
@@ -49,12 +49,12 @@ public class FileCache {
     if (cache.containsKey(file.getName())) {
       return false;
     }
-    
+
     cache.put(file.getName(), file);
-    
+
     return true;
   }
-  
+
   /**
    * Removes the given <code>java.io.file</code> from the cache.
    * @param filename the file to remove
@@ -64,12 +64,12 @@ public class FileCache {
     if (!cache.containsKey(filename)) {
       return false;
     }
-    
+
     cache.remove(filename);
-    
+
     return true;
   }
-  
+
   /**
    * Clears the cache buffer
    */
@@ -77,12 +77,12 @@ public class FileCache {
     if (isTraceEnabled) {
       for (File file : cache.values()) {
 	file.delete();
-      } 
+      }
     }
-    
+
     cache.clear();
   }
-  
+
   /**
    * Sets the trace ability.
    * @param enabled is trace enabled?
@@ -90,11 +90,11 @@ public class FileCache {
   public void setTraceEnabled(boolean enabled) {
     this.isTraceEnabled = enabled;
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private Map<String, File>			cache;
   private boolean 				isTraceEnabled;
 }

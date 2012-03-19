@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,9 +28,9 @@ import org.kopi.ebics.interfaces.ContentFactory;
 
 /**
  * Byte array content factory that delivers the file content
- * as a <code>ByteArrayInputStream</code>. This object is 
+ * as a <code>ByteArrayInputStream</code>. This object is
  * serializable in a way to recover interrupted file transfers.
- *   
+ *
  * @author hachani
  *
  */
@@ -44,7 +44,7 @@ public class ByteArrayContentFactory implements ContentFactory {
   public ByteArrayContentFactory(byte[] content) {
     this.content = content;
   }
-  
+
   @Override
   public InputStream getContent() throws IOException {
     return new ByteArrayInputStream(content);
@@ -53,7 +53,7 @@ public class ByteArrayContentFactory implements ContentFactory {
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private byte[]		content;
   private static final long 	serialVersionUID = 4708928447888655116L;
 }

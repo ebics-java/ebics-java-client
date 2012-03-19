@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,17 +21,17 @@ package org.kopi.ebics.exception;
 
 /**
  * Download operation failed due to lack of data.
- * 
+ *
  * @author hachani
  *
  */
 public class NoDownloadDataAvailableException extends EbicsException {
-  
+
   @Override
   public ReturnCode getReturnCode() {
     return ReturnCode.EBICS_NO_DOWNLOAD_DATA_AVAILABLE;
   }
-  
+
   @Override
   public String getMessage() {
     return getReturnCode().getText();
@@ -39,6 +39,6 @@ public class NoDownloadDataAvailableException extends EbicsException {
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private static final long 			serialVersionUID = -5156261061322817326L;
 }

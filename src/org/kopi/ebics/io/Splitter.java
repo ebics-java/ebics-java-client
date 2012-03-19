@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990-2012 kopiLeft Development SARL
+ * Copyright (c) 1990-2012 kopiLeft Development SARL, Bizerte, Tunisia
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,7 @@ import org.kopi.ebics.utils.Utils;
  * A mean to split a given input file to
  * 1MB portions. this i useful to handle
  * big file uploading.
- * 
+ *
  * @author Hachani
  *
  */
@@ -50,7 +50,7 @@ public class Splitter {
    * @param keySpec the secret key spec
    * @throws EbicsException
    */
-  public final void readInput(boolean isCompressionEnabled, SecretKeySpec keySpec) 
+  public final void readInput(boolean isCompressionEnabled, SecretKeySpec keySpec)
     throws EbicsException
   {
     try {
@@ -63,29 +63,29 @@ public class Splitter {
       throw new EbicsException(e.getMessage());
     }
   }
-  
+
   /**
    * Slits the input into 1MB portions
    */
   private void segmentation() {
     int			size;
-    
+
     size = ((content.length + 2) / 3 << 2);
     numSegments = size / 1048576;
-    
+
     if (size % 1048576 != 0) {
       numSegments ++;
     }
-    
+
     segmentSize = size / numSegments;
-    
+
     while (segmentSize % 4 != 0) {
       segmentSize += 1;
     }
-    
+
     segmentSize = ((segmentSize + 3) / 4 * 3);
   }
-  
+
   /**
    * Returns the content of a sata segment
    * @param segmentNumber the segment number
@@ -101,11 +101,11 @@ public class Splitter {
     } else {
       segment = new byte[segmentSize];
     }
-    
+
     System.arraycopy(content, offset, segment, 0, segment.length);
     return new ByteArrayContentFactory(segment);
   }
-  
+
   /**
    * Returns the hole content.
    * @return the input content.
@@ -113,7 +113,7 @@ public class Splitter {
   public byte[] getContent() {
     return content;
   }
-  
+
   /**
    * Returns the total segment number.
    * @return the total segment number.
@@ -121,11 +121,11 @@ public class Splitter {
   public int getSegmentNumber() {
     return numSegments;
   }
-  
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  
+
   private byte[]				input;
   private byte[]				content;
   private int					segmentSize;
