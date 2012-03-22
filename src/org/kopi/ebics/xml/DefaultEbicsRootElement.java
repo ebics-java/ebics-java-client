@@ -24,6 +24,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -133,16 +135,16 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
    * @return the generated file name.
    */
   public static String generateName(OrderType type) {
-    return type.getOrderType() + Long.toHexString(Double.doubleToLongBits(Math.random())) + index++;
+    return type.getOrderType() + new BigInteger(130, new SecureRandom()).toString(32);
   }
-
+  
   /**
    * Generates a random file name with a prefix.
    * @param type the prefix to use.
    * @return the generated file name.
    */
   public static String generateName(String prefix) {
-    return prefix + Long.toHexString(Double.doubleToLongBits(Math.random())) + index++;
+    return prefix + new BigInteger(130, new SecureRandom()).toString(32);
   }
 
   @Override
@@ -227,6 +229,5 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
   protected XmlObject			document;
   protected EbicsSession 		session;
   private static Map<String, String> 	suggestedPrefixes;
-  private static int			index;
   private static final long 		serialVersionUID = -3928957097145095177L;
 }

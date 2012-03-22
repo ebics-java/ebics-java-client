@@ -105,7 +105,19 @@ public class Partner implements EbicsPartner, Savable {
   public String getPartnerId() {
     return partnerId;
   }
-
+  
+  /**
+   * In EBICS XSD schema - ebics_types.xsd, The order ID pattern
+   * is defined as following: <b>pattern value="[A-Z][A-Z0-9]{3}"</b>.
+   * <p>This means that the order ID should start with a letter
+   * followed by three alphanumeric characters.
+   *
+   *<p> The <code>nextOrderId()</code> aims to generate orders from
+   *<b>A000</b> to <b>ZZZZ</b>. The sequence cycle is performed infinitely.
+   *
+   *<p> The order index {@link Partner#orderId} is saved whenever it
+   * changes.
+   */
   @Override
   public String nextOrderId() {
     int 		index;

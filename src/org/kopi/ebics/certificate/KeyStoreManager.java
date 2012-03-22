@@ -19,7 +19,6 @@
 
 package org.kopi.ebics.certificate;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,8 +36,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
-
 import org.bouncycastle.openssl.PEMReader;
 
 /**
@@ -81,7 +78,7 @@ public class KeyStoreManager {
 
     key = (PrivateKey) keyStore.getKey(alias, password);
     if (key == null) {
-      throw new IllegalArgumentException("alias " + alias + " has no private key");
+      throw new IllegalArgumentException("private key not found for alias " + alias);
     }
 
     return key;
@@ -90,52 +87,30 @@ public class KeyStoreManager {
   /**
    * Loads a key store from a given path and password
    * @param path the key store path
-   * @param type the key store type (eg. PKCS12)
    * @param password the key store password
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  public final void load(String path, String type, char[] password)
+  public void load(String path, char[] password)
     throws GeneralSecurityException, IOException
   {
-    keyStore = type.equals("PKCS12") ? KeyStore.getInstance(type, "BC") : KeyStore.getInstance(KeyStore.getDefaultType());
+    keyStore = KeyStore.getInstance("PKCS12", "BC");
     this.password = password;
-    this.path = path;
-    load();
+    load(path);
   }
 
   /**
    * Loads a key store and cache the loaded one
+   * @param path the key store path.
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  private synchronized void load()
-    throws GeneralSecurityException, IOException
-  {
-    File				keyStore;
-    Map<String, X509Certificate>	certs;
-
-    keyStore = new File(path);
-    if (keyStore.exists()) {
-      FileInputStream		input;
-
-      input = new FileInputStream(keyStore);
-      this.keyStore.load(input, password);
-      input.close();
-    } else {
+  private void load(String path) throws GeneralSecurityException, IOException {
+    if (path.equals("")) {
       this.keyStore.load(null, null);
-    }
-
-    certs = read(this.keyStore);
-    cache = new Vector<KeyStoreCache>();
-    for (Map.Entry<String, X509Certificate> entry : certs.entrySet()) {
-      KeyStoreCache		cache;
-
-      cache = new KeyStoreCache();
-      cache.setAlias(entry.getKey());
-      cache.setCertificate(entry.getValue());
-      cache.setKeyEntry(this.keyStore.isKeyEntry(entry.getKey()));
-      this.cache.add(cache);
+    } else {
+      this.keyStore.load(new FileInputStream(path), password);
+      this.certs = read(this.keyStore);
     }
   }
 
@@ -152,11 +127,7 @@ public class KeyStoreManager {
   {
     X509Certificate		certificate;
 
-    if (provider != null) {
-      certificate = (X509Certificate) CertificateFactory.getInstance("X.509", provider).generateCertificate(input);
-    } else {
-      certificate = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(input);
-    }
+    certificate = (X509Certificate) CertificateFactory.getInstance("X.509", provider).generateCertificate(input);
 
     if (certificate == null) {
       certificate = (X509Certificate)(new PEMReader(new InputStreamReader(input))).readObject();
@@ -203,6 +174,14 @@ public class KeyStoreManager {
   {
     keyStore.store(output, password);
   }
+  
+  /**
+   * Returns the certificates contained in the key store.
+   * @return the certificates contained in the key store.
+   */
+  public Map<String, X509Certificate> getCertificates() {
+    return certs;
+  }
 
   /**
    * Reads all certificate existing in a given key store
@@ -235,6 +214,5 @@ public class KeyStoreManager {
 
   private KeyStore			keyStore;
   private char[]			password;
-  private String			path;
-  private Vector<KeyStoreCache>		cache;
+  private Map<String, X509Certificate>	certs;
 }

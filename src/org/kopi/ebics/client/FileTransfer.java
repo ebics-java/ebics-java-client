@@ -53,7 +53,25 @@ import org.kopi.ebics.xml.UTransferRequestElement;
  * methods that do the whole transfer in one method call.
  * To use the recoverable transfer mode, you may set a working
  * directory for temporarily created files.
- *
+ * 
+ * <p> EBICS specification 2.4.2 - 6.2 Encryption at application level
+ * 
+ * <p>In the event of an upload transaction, a random symmetrical key is generated in the
+ * customer system that is used exclusively within the framework of this transaction both for
+ * encryption of the ES’s and for encryption of the order data. This key is encrypted
+ * asymmetrically with the financial institution’s public encryption key and is transmitted by the
+ * customer system to the bank system during the initialization phase of the transaction.
+ * 
+ * <p>Analogously, in the case of a download transaction a random symmetrical key is generated
+ * in the bank system that is used for encryption of the order data that is to be downloaded and
+ * for encryption of the bank-technical signature that has been provided by the financial
+ * institution. This key is asymmetrically encrypted and is transmitted by the bank system to the
+ * customer system during the initialization phase of the transaction. The asymmetrical
+ * encryption takes place with the technical subscriber’s public encryption key if the
+ * transaction’s EBICS messages are sent by a technical subscriber. Otherwise the
+ * asymmetrical encryption takes place with the public encryption key of the non-technical
+ * subscriber, i.e. the submitter of the order.
+ * 
  * @author Hachani
  *
  */

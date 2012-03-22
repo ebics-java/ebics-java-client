@@ -156,7 +156,7 @@ public class CertificateManager {
 
     loader = new KeyStoreManager();
 
-    loader.load(path, "PKCS12", pwdCallBack.getPassword());
+    loader.load(path, pwdCallBack.getPassword());
     a005Certificate = loader.getCertificate(user.getUserId() + "-A005");
     x002Certificate = loader.getCertificate(user.getUserId() + "-X002");
     e002Certificate = loader.getCertificate(user.getUserId() + "-E002");

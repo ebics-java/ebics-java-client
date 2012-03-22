@@ -114,7 +114,7 @@ public class DInitializationRequestElement extends InitializationRequestElement 
 	Parameter 		parameter;
 	Value			value;
 
-	value = EbicsXmlFactory.createValue("String", "1");
+	value = EbicsXmlFactory.createValue("String", "TRUE");
 	parameter = EbicsXmlFactory.createParameter("TEST", value);
 	fDLOrderParamsType.setParameterArray(new Parameter[] {parameter});
       }

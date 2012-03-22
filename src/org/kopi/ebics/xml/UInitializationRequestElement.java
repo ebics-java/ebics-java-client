@@ -100,7 +100,7 @@ public class UInitializationRequestElement extends InitializationRequestElement 
     List<Parameter>			parameters;
 
     userSignature = new UserSignature(session.getUser(),
-				      generateName("SIG"),
+				      generateName("UserSignature"),
 	                              session.getConfiguration().getSignatureVersion(),
 	                              userData);
     userSignature.build();
@@ -126,7 +126,7 @@ public class UInitializationRequestElement extends InitializationRequestElement 
       Parameter 		parameter;
       Value			value;
 
-      value = EbicsXmlFactory.createValue("String", "1");
+      value = EbicsXmlFactory.createValue("String", "TRUE");
       parameter = EbicsXmlFactory.createParameter("TEST", value);
       parameters.add(parameter);
     }
@@ -135,7 +135,7 @@ public class UInitializationRequestElement extends InitializationRequestElement 
       Parameter 		parameter;
       Value			value;
 
-      value = EbicsXmlFactory.createValue("String", "1");
+      value = EbicsXmlFactory.createValue("String", "TRUE");
       parameter = EbicsXmlFactory.createParameter("EBCDIC", value);
       parameters.add(parameter);
     }

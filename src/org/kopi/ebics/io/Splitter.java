@@ -46,6 +46,23 @@ public class Splitter {
 
   /**
    * Reads the input stream and splits it to segments of 1MB size.
+   * 
+   * <p>EBICS Specification 2.4.2 - 7 Segmentation of the order data:
+   * 
+   * <p>The following procedure is to be followed with segmentation:
+   * <ol>
+   *   <li> The order data is ZIP compressed
+   *   <li> The compressed order data is encrypted in accordance with Chapter 6.2
+   *   <li> The compressed, encrypted order data is base64-coded.
+   *    <li> The result is to be verified with regard to the data volume:
+   *      <ol> 
+   *        <li> If the resulting data volume is below the threshold of 1 MB = 1,048,576 bytes,
+   *             the order data can be sent complete as a data segment within one transmission step
+   *        <li> If the resulting data volume exceeds 1,048,576 bytes the data is to be
+   *             separated sequentially and in a base64-conformant manner into segments
+   *             that each have a maximum of 1,048,576 bytes.
+   *     </ol>
+   * 
    * @param isCompressionEnabled enable compression?
    * @param keySpec the secret key spec
    * @throws EbicsException
@@ -65,29 +82,30 @@ public class Splitter {
   }
 
   /**
-   * Slits the input into 1MB portions
+   * Slits the input into 1MB portions.
+   * 
+   * <p> EBICS Specification 2.4.2 - 7 Segmentation of the order data:
+   * 
+   * <p>In Version H003 of the EBICS standard, order data that requires more than 1 MB of storage
+   * space in compressed, encrypted and base64-coded form MUST be segmented before
+   * transmission, irrespective of the transfer direction (upload/download).
+   * 
    */
   private void segmentation() {
-    int			size;
 
-    size = ((content.length + 2) / 3 << 2);
-    numSegments = size / 1048576;
-
-    if (size % 1048576 != 0) {
+    numSegments = content.length / 1048576; //(1024 * 1024)
+    
+    if (content.length % 1048576 != 0) {
       numSegments ++;
     }
 
-    segmentSize = size / numSegments;
-
-    while (segmentSize % 4 != 0) {
-      segmentSize += 1;
-    }
-
-    segmentSize = ((segmentSize + 3) / 4 * 3);
+    segmentSize = content.length / numSegments;
   }
 
   /**
-   * Returns the content of a sata segment
+   * Returns the content of a data segment according to
+   * a given segment number.
+   * 
    * @param segmentNumber the segment number
    * @return
    */

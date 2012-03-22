@@ -64,9 +64,13 @@ public class HttpRequestSender {
   public final int send(ContentFactory request) throws IOException {
     HttpClient			httpClient;
     String                      proxyConfiguration;
+    PostMethod			method;
+    RequestEntity		requestEntity;
+    InputStream			input;
+    int				retCode;
 
     httpClient = new HttpClient();
-    proxyConfiguration = session.getConfiguration().getProperty("http.proxyHost");
+    proxyConfiguration = session.getConfiguration().getProperty("http.proxy.host");
 
     if (proxyConfiguration != null && !proxyConfiguration.equals("")) {
       HostConfiguration		hostConfig;
@@ -74,39 +78,34 @@ public class HttpRequestSender {
       int			proxyPort;
 
       hostConfig = httpClient.getHostConfiguration();
-      proxyHost = session.getConfiguration().getProperty("http.proxyHost").trim();
-      proxyPort = Integer.parseInt(session.getConfiguration().getProperty("http.proxyPort").trim());
+      proxyHost = session.getConfiguration().getProperty("http.proxy.host").trim();
+      proxyPort = Integer.parseInt(session.getConfiguration().getProperty("http.proxy.port").trim());
       hostConfig.setProxy(proxyHost, proxyPort);
-      if (!session.getConfiguration().getProperty("http.proxyUser").equals("")) {
+      if (!session.getConfiguration().getProperty("http.proxy.user").equals("")) {
 	String				user;
 	String				pwd;
 	UsernamePasswordCredentials	credentials;
 	AuthScope			authscope;
 
-	user = session.getConfiguration().getProperty("http.proxyUser").trim();
-	pwd = session.getConfiguration().getProperty("http.proxyPassword").trim();
+	user = session.getConfiguration().getProperty("http.proxy.user").trim();
+	pwd = session.getConfiguration().getProperty("http.proxy.password").trim();
 	credentials = new UsernamePasswordCredentials(user, pwd);
 	authscope = new AuthScope(proxyHost, proxyPort);
 	httpClient.getState().setProxyCredentials(authscope, credentials);
       }
     }
 
-      PostMethod			method;
-      RequestEntity			requestEntity;
-      InputStream			input;
-      int				retCode;
+    input = request.getContent();
+    method = new PostMethod(session.getUser().getPartner().getBank().getURL().toString());
+    method.getParams().setSoTimeout(30000);
+    requestEntity = new InputStreamRequestEntity(input);
+    method.setRequestEntity(requestEntity);
+    method.setRequestHeader("Content-type", "text/xml; charset=ISO-8859-1");
+    retCode = -1;
+    retCode = httpClient.executeMethod(method);
+    response = new InputStreamContentFactory(method.getResponseBodyAsStream());
 
-      input = request.getContent();
-      method = new PostMethod(session.getUser().getPartner().getBank().getURL().toString());
-      method.getParams().setSoTimeout(30000);
-      requestEntity = new InputStreamRequestEntity(input);
-      method.setRequestEntity(requestEntity);
-      method.setRequestHeader("Content-type", "text/xml; charset=ISO-8859-1");
-      retCode = -1;
-      retCode = httpClient.executeMethod(method);
-      response = new InputStreamContentFactory(method.getResponseBodyAsStream());
-
-      return retCode;
+    return retCode;
   }
 
   /**

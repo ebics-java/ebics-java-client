@@ -151,7 +151,7 @@ public class KeyManagement {
     session.getConfiguration().getTraceManager().trace(orderData);
     keystoreManager = new KeyStoreManager();
     path = session.getConfiguration().getKeystoreDirectory(session.getUser());
-    keystoreManager.load("" , "PKCS12", session.getUser().getPasswordCallback().getPassword());
+    keystoreManager.load("" , session.getUser().getPasswordCallback().getPassword());
     e002PubKey = keystoreManager.getPublicKey(new ByteArrayInputStream(orderData.getBankE002Certificate()));
     x002PubKey = keystoreManager.getPublicKey(new ByteArrayInputStream(orderData.getBankX002Certificate()));
     session.getUser().getPartner().getBank().setBankKeys(e002PubKey, x002PubKey);

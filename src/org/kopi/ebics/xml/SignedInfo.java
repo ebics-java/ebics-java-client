@@ -25,6 +25,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.utils.IgnoreAllErrorHandler;
 import org.apache.xpath.XPathAPI;
 import org.kopi.ebics.exception.EbicsException;
@@ -107,8 +108,22 @@ public class SignedInfo extends DefaultEbicsRootElement {
   }
 
   /**
-   * Signs a given input with the authentication private key
-   * of the ebics user
+   * Canonizes and signs a given input with the authentication private key.
+   * of the EBICS user.
+   * 
+   * <p>The given input to be signed is first Canonized using the 
+   * http://www.w3.org/TR/2001/REC-xml-c14n-20010315 algorithm.
+   * 
+   * <p>The element to be canonized is only the SignedInfo element that should be
+   * contained in the request to be signed. Otherwise, a {@link TransformationException}
+   * is thrown.
+   * 
+   * <p> The namespace of the SignedInfo element should be named <b>ds</b> as specified in
+   * the EBICS specification for common namespaces nomination.
+   * 
+   * <p> The signature is ensured using the user X002 private key. This step is done in
+   * {@link EbicsUser#authenticate(byte[]) authenticate}.
+   * 
    * @param toSign the input to sign
    * @return the signed input
    * @throws EbicsException signature fails.
