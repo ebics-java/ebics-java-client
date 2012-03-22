@@ -120,34 +120,20 @@ public class Partner implements EbicsPartner, Savable {
    */
   @Override
   public String nextOrderId() {
-    int 		index;
-    String		order;
+    char[]      chars = new char[4];
 
+    orderId += 1;
+    if (orderId > 36*36*36*36 - 1) {
+      // ensure that orderId starts with a letter
+      orderId = 10*36*36*36;
+    }
+    chars[3] = ALPHA_NUM_CHARS.charAt(orderId % 36);
+    chars[2] = ALPHA_NUM_CHARS.charAt((orderId / 36) % 36);
+    chars[1] = ALPHA_NUM_CHARS.charAt((orderId / 36 / 36) % 36);
+    chars[0] = ALPHA_NUM_CHARS.charAt(orderId / 36 / 36 / 36);
     needSave = true;
-    orderId ++;
-    if (orderId >= 46656) {
-      if (orderId >= 1679616) {
-	orderId = 0;
-      } else if (orderId < 513216) {
-	orderId = 513216;
-      }
-    }
-
-    index = orderId - 1;
-    if (index < 0) {
-      index = 1679615;
-    }
-    order = Integer.toString(index, 36).toUpperCase();
-
-    if (order.length() < 4) {
-      while (order.length() < 3) {
-	order = "0" + order;
-      }
-
-      return "A" + order;
-    }
-
-    return order;
+    
+    return new String(chars);
   }
 
   @Override
@@ -160,7 +146,9 @@ public class Partner implements EbicsPartner, Savable {
   // --------------------------------------------------------------------
 
   private EbicsBank			bank;
-  private int				orderId;
+  private int				orderId = 10*36*36*36;
   private String			partnerId;
   private transient boolean		needSave;
+  
+  private static final String		ALPHA_NUM_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 }
