@@ -22,7 +22,11 @@ package org.kopi.ebics.utils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.text.ParseException;
 import java.util.Date;
@@ -30,7 +34,10 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.parsers.DocumentBuilder;
@@ -39,6 +46,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.utils.IgnoreAllErrorHandler;
 import org.apache.xpath.XPathAPI;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.messages.Messages;
 import org.w3c.dom.Document;
@@ -246,15 +254,43 @@ public class Utils {
   public static byte[] encrypt(byte[] input, SecretKeySpec keySpec)
     throws EbicsException
   {
-    try {
-      IvParameterSpec		iv;
-      Cipher 			cipher;
+    return encryptOrDecrypt(Cipher.ENCRYPT_MODE, input, keySpec);
+  }
+  
+  /**
+   * Decrypts the given input according to key spec.
+   * 
+   * @param input the input to decrypt
+   * @param keySpec the key spec
+   * @return the decrypted input
+   * @throws EbicsException
+   */
+  public static byte[] decrypt(byte[] input, SecretKeySpec keySpec)
+    throws EbicsException
+  {
+    return encryptOrDecrypt(Cipher.DECRYPT_MODE, input, keySpec);
+  }
+  
+  /**
+   * Encrypts or decrypts the given input according to key spec.
+   * @param mode the encryption-decryption mode.
+   * @param input the input to encrypt or decrypt.
+   * @param keySpec the key spec.
+   * @return the encrypted or decrypted data.
+   * @throws GeneralSecurityException
+   */
+  private static byte[] encryptOrDecrypt(int mode, byte[] input, SecretKeySpec keySpec)
+    throws EbicsException
+  {
+    IvParameterSpec		iv;
+    Cipher 			cipher;
 
-      iv = new IvParameterSpec(new byte[16]);
-      cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "BC");
-      cipher.init(Cipher.ENCRYPT_MODE, keySpec, iv);
+    iv = new IvParameterSpec(new byte[16]);
+    try {
+      cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", BouncyCastleProvider.PROVIDER_NAME);
+      cipher.init(mode, keySpec, iv);
       return cipher.doFinal(input);
-    } catch (Exception e) {
+    } catch (GeneralSecurityException e) {
       throw new EbicsException(e.getMessage());
     }
   }

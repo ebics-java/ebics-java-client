@@ -170,7 +170,8 @@ public interface EbicsUser {
    * @return the decrypted key;
    * @throws GeneralSecurityException
    * @throws IOException
+   * @throws EbicsException 
    */
   public byte[] decrypt(byte[] encryptedKey, byte[] transactionKey)
-    throws GeneralSecurityException, IOException;
+    throws GeneralSecurityException, IOException, EbicsException;
 }

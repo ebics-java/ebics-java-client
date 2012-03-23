@@ -19,13 +19,14 @@
 
 package org.kopi.ebics.client;
 
+import gnu.crypto.sig.rsa.RSAPKCS1V1_5Signature;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.Signature;
@@ -36,19 +37,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.crypto.dsig.SignedInfo;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.kopi.ebics.certificate.CertificateManager;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsPartner;
 import org.kopi.ebics.interfaces.EbicsUser;
 import org.kopi.ebics.interfaces.PasswordCallback;
 import org.kopi.ebics.interfaces.Savable;
 import org.kopi.ebics.utils.Utils;
-
-import org.kopi.ebics.certificate.CertificateManager;
-import gnu.crypto.sig.rsa.RSAPKCS1V1_5Signature;
+import org.kopi.ebics.xml.UserSignature;
 
 /**
  * Simple implementation of an EBICS user.
@@ -567,7 +567,7 @@ public class User implements EbicsUser, Savable {
    */
   @Override
   public byte[] decrypt(byte[] encryptedData, byte[] transactionKey)
-    throws GeneralSecurityException, IOException
+    throws EbicsException, GeneralSecurityException, IOException
   {
     Cipher			cipher;
     int				blockSize;
@@ -577,11 +577,11 @@ public class User implements EbicsUser, Savable {
     cipher.init(Cipher.DECRYPT_MODE, e002PrivateKey);
     blockSize = cipher.getBlockSize();
     outputStream = new ByteArrayOutputStream();
-    for (int j = 0; transactionKey.length - j * blockSize > 0; j++) {
+    for (int j = 0; j * blockSize < transactionKey.length; j++) {
       outputStream.write(cipher.doFinal(transactionKey, j * blockSize, blockSize));
     }
     
-    return decryptData(encryptedData, outputStream);
+    return decryptData(encryptedData, outputStream.toByteArray());
   }
   
   /**
@@ -599,26 +599,16 @@ public class User implements EbicsUser, Savable {
    * information from the decrypted message. The original message is then available in decrypted
    * form.
    * 
-   * @param encryptedKey The encrypted data
-   * @param out The stream containing the decoded transaction key with the E002 user
-   *             private key.
+   * @param input The encrypted data
+   * @param key The secret key.
    * @return The decrypted data sent from the EBICS bank.
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  private byte[] decryptData(byte[] encryptedData, ByteArrayOutputStream out) 
-    throws GeneralSecurityException, IOException
-  {
-    Cipher			cipher;
-    SecretKeySpec		keySpec;
-    IvParameterSpec		iv;
-    
-    keySpec = new SecretKeySpec(out.toByteArray(), "EAS");
-    iv = new IvParameterSpec(new byte[16]);
-
-    cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", BouncyCastleProvider.PROVIDER_NAME);
-    cipher.init(Cipher.DECRYPT_MODE, keySpec, iv);
-    return cipher.doFinal(encryptedData); 
+  private byte[] decryptData(byte[] input, byte[] key) 
+    throws EbicsException
+  { 
+    return Utils.decrypt(input, new SecretKeySpec(key, "EAS"));
   }
 
   // --------------------------------------------------------------------
