@@ -27,8 +27,8 @@ PACKAGE =	org/kopi/ebics/certificate
 ## ----------------------------------------------------------------------
 ## FILES
 
-JAVAFILES +=	CertificateManager KeyStoreCache KeyStoreManager 	\
-		KeyUtil X509Constants X509Generator
+JAVAFILES +=	CertificateManager KeyStoreManager KeyUtil	\
+		X509Constants X509Generator
 
 ## ----------------------------------------------------------------------
 ## GOALS

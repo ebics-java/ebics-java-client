@@ -26,7 +26,6 @@
   <property name="src" value="." />
 
   <property name="javafiles" value="CertificateManager.java
-  	                            KeyStoreCache.java
   	                            KeyStoreManager.java
   	                            KeyUtil.java
   	                            X509Constants.java
