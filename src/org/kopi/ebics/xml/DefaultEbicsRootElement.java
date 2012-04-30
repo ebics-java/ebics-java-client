@@ -22,6 +22,7 @@ package org.kopi.ebics.xml;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.math.BigInteger;
@@ -92,7 +93,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
     xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
 
     try {
-      document = sxb.build(new ByteArrayInputStream(toByteArray()));
+      document = sxb.build(new InputStreamReader(new ByteArrayInputStream(toByteArray()), "ISO-8859-16"));
       xmlOutputter.output(document, output);
     } catch (JDOMException e) {
       throw new EbicsException(e.getMessage());
