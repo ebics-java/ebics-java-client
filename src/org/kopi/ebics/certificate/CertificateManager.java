@@ -88,7 +88,7 @@ public class CertificateManager {
     KeyPair			keypair;
 
     keypair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE);
-    a005Certificate = generator.generateA005Certificate(Keypair,
+    a005Certificate = generator.generateA005Certificate(keypair,
 	                                                user.getDN(),
 	                                                new Date(),
 	                                                end);
