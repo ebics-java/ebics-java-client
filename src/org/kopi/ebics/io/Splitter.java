@@ -72,9 +72,9 @@ public class Splitter {
   {
     try {
       if (isCompressionEnabled) {
-	content = Utils.zip(input);
+	input = Utils.zip(input);
       }
-      content = Utils.encrypt(content, keySpec);
+      content = Utils.encrypt(input, keySpec);
       segmentation();
     } catch (Exception e) {
       throw new EbicsException(e.getMessage());

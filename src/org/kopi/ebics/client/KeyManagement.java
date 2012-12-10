@@ -183,7 +183,6 @@ public class KeyManagement {
     response = new SPRResponseElement(sender.getResponseBody());
     response.build();
     session.getConfiguration().getTraceManager().trace(response);
-    System.out.println(request);
     response.report();
   }
 

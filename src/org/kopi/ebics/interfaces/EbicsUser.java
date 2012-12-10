@@ -160,8 +160,9 @@ public interface EbicsUser {
    * @param digest
    * @return the signature
    * @throws IOException
+   * @throws GeneralSecurityException 
    */
-  public byte[] sign(byte[] digest) throws IOException;
+  public byte[] sign(byte[] digest) throws IOException, GeneralSecurityException;
 
   /**
    * Uses the E001 key to decrypt the given secret key.

@@ -19,10 +19,6 @@
 
 package org.kopi.ebics.client;
 
-import gnu.crypto.sig.rsa.RSAPKCS1V1_5Signature;
-
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -33,8 +29,6 @@ import java.security.Signature;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -265,16 +259,15 @@ public class User implements EbicsUser, Savable {
    * @param length the length
    * @return The byte buffer portion corresponding to the given length and offset
    */
-  public static byte[] removeWhiteSpace(byte[] buf) {
+  public static byte[] removeOSSpecificChars(byte[] buf) {
     ByteArrayOutputStream		output;
     
     output = new ByteArrayOutputStream();
     for (int i = 0; i < buf.length; i++) {
       switch (buf[i]) {
-      case ' ':
-      case '\t':
       case '\r':
       case '\n':
+      case 0x1A: // CTRL-Z / EOF
 	// ignore this character
 	break;
 
@@ -516,40 +509,21 @@ public class User implements EbicsUser, Savable {
    *        signature generation described in section 14.1.3.1 of the EBICS specification (V 2.4.2).
    * </ol>
    * 
-   * <p>The {@link RSAPKCS1V1_5Signature} is a digital signature scheme with
+   * <p>The {@link Signature} is a digital signature scheme with
    * appendix (SSA) combining the RSA algorithm with the EMSA-PKCS1-v1_5 encoding
    * method.
    * 
    * <p> The {@code digest} will be signed with the RSA user signature key using the
-   * {@link RSAPKCS1V1_5Signature} that will be instantiated with the <b>SHA-256</b>
+   * {@link Signature} that will be instantiated with the <b>SHA-256</b>
    * algorithm. This signature is then put in a {@link UserSignature} XML object that
    * will be sent to the EBICS server. 
    */
   @Override
-  public byte[] sign(byte[] digest) throws IOException {
-    RSAPKCS1V1_5Signature 	signature;
-    Map<String, PrivateKey>	attributes;
-    BufferedInputStream		input;
-    byte[] 			bytes;
-    
-    signature = new RSAPKCS1V1_5Signature("SHA-256");
-    attributes = new HashMap<String, PrivateKey>();
-    attributes.put(RSAPKCS1V1_5Signature.SIGNER_KEY, a005PrivateKey);
-    signature.setupSign(attributes);
-    input = new BufferedInputStream(new ByteArrayInputStream(digest));
-    bytes = new byte[4096];
-
-    int 		count = 0;
-    for (int i = input.read(bytes); count != -1; count = input.read(bytes)) {
-      byte[]		buf;
-      
-      buf = removeWhiteSpace(bytes);
-      signature.update(buf, 0, buf.length);
-    }
-
-    input.close();
-
-    return (byte[]) signature.sign();
+  public byte[] sign(byte[] digest) throws IOException, GeneralSecurityException {
+    Signature signature = Signature.getInstance("SHA256WithRSA", BouncyCastleProvider.PROVIDER_NAME);
+    signature.initSign(a005PrivateKey);
+    signature.update(removeOSSpecificChars(digest));
+    return signature.sign();
   }
 
   /**

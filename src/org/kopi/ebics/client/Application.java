@@ -258,6 +258,7 @@ public class Application {
     configuration.getLogger().info(Messages.getString("ini.request.send", Constants.APPLICATION_BUNDLE_NAME, userId));
 
     user = users.get(userId);
+    user.setInitialized(false);
 
     if (user.isInitialized()) {
       configuration.getLogger().info(Messages.getString("user.already.initialized", Constants.APPLICATION_BUNDLE_NAME, userId));
@@ -292,6 +293,7 @@ public class Application {
 
     configuration.getLogger().info(Messages.getString("hia.request.send", Constants.APPLICATION_BUNDLE_NAME, userId));
     user = users.get(userId);
+    user.setInitializedHIA(false);
     if (user.isInitializedHIA()) {
       configuration.getLogger().info(Messages.getString("user.already.hia.initialized", Constants.APPLICATION_BUNDLE_NAME, userId));
       return;
@@ -483,35 +485,40 @@ public class Application {
     Application				appli;
     String				userId;
 
-    userId = "HACHENI";
+    userId = "HEDI";
     configuration = new DefaultConfiguration();
     pwdHandler = new UserPasswordHandler(userId, "2012");
     appli = new Application(configuration);
     appli.init();
 
-    appli.createUser(new URL("https://server-ebics.webank.fr:28103/WbkPortalFileTransfert/EbicsProtocol"),
-                     "VALERIAN",
-	             "EBIXQUAL",
-	             "EBICS",
-	             userId,
-	             "pebics",
-	             "pebics@domaine.fr",
-	             "org",
-	             "Euro-Information",
-	             true,
-	             pwdHandler);
+//    appli.createUser(new URL("https://server-ebics.webank.fr:28103/WbkPortalFileTransfert/EbicsProtocol"),
+//                     "VALERIAN",
+//	             "EBIXQUAL",
+//	             "EBICS",
+//	             userId,
+//	             "pebics",
+//	             "pebics@domaine.fr",
+//	             "org",
+//	             "Euro-Information",
+//	             true,
+//	             pwdHandler);
     Product product = new Product("kopiLeft Dev 1.0", Locale.FRANCE, null);
-    appli.loadUser("EBIXQUAL", "EBICS", userId, pwdHandler);
-    appli.sendHPBRequest(userId, product);
+    appli.loadUser("EBIXQUAL", "EBIX", userId, pwdHandler);
+//    appli.sendINIRequest(userId, product);
+//    appli.sendHIARequest(userId, product);
+//    appli.sendHPBRequest(userId, product);
     appli.sendFile(System.getProperty("user.home") + File.separator + "test.txt", userId, product);
-    appli.fetchFile(System.getProperty("user.home") + File.separator + "download.txt",
-	            userId,
-	            product,
-	            OrderType.FDL,
-	            true,
-	            null,
-	            null);
+    //for (int i = 0; i < 10000; i++) {
+//    appli.fetchFile(System.getProperty("user.home") + File.separator + "download.txt",
+//	            userId,
+//	            product,
+//	            OrderType.FDL,
+//	            true,
+//	            null,
+//	            null);
+//    appli.revokeSubscriber(userId, product);
     appli.quit();
+    //}
   }
 
   // --------------------------------------------------------------------

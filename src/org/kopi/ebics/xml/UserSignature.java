@@ -20,7 +20,11 @@
 package org.kopi.ebics.xml;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
 
+import org.apache.commons.codec.binary.Hex;
+import org.kopi.ebics.client.SignatureVerifier;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsUser;
 import org.kopi.ebics.schema.s001.OrderSignatureDataType;
@@ -64,6 +68,8 @@ public class UserSignature extends DefaultEbicsRootElement {
     try {
       signature = user.sign(toSign);
     } catch (IOException e) {
+      throw new EbicsException(e.getMessage());
+    } catch (GeneralSecurityException e) {
       throw new EbicsException(e.getMessage());
     }
 
