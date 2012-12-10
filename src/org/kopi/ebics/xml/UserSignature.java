@@ -24,7 +24,6 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 
 import org.apache.commons.codec.binary.Hex;
-import org.kopi.ebics.client.SignatureVerifier;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsUser;
 import org.kopi.ebics.schema.s001.OrderSignatureDataType;
