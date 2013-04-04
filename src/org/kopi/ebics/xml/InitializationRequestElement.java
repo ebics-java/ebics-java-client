@@ -138,7 +138,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
       Cipher			cipher;
 
       cipher = Cipher.getInstance("RSA/NONE/PKCS1Padding", BouncyCastleProvider.PROVIDER_NAME);
-      cipher.init(Cipher.ENCRYPT_MODE, session.getBankX002Key());
+      cipher.init(Cipher.ENCRYPT_MODE, session.getBankE002Key());
 
       return cipher.doFinal(nonce);
     } catch (Exception e) {
