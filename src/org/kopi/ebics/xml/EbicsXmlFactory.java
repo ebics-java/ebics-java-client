@@ -936,7 +936,7 @@ public class EbicsXmlFactory {
     newStaticHeaderOrderDetailsType.setOrderAttribute(org.kopi.ebics.schema.h003.OrderAttributeType.Enum.forString(orderAttribute));
     newStaticHeaderOrderDetailsType.setOrderType(orderType);
     newStaticHeaderOrderDetailsType.setOrderParams(orderParams);
-    qualifySubstitutionGroup(newStaticHeaderOrderDetailsType.getOrderParams(), FDLOrderParamsType.type.getDocumentElementName(), null);
+    qualifySubstitutionGroup(newStaticHeaderOrderDetailsType.getOrderParams(), FDLOrderParamsDocument.type.getDocumentElementName(), null);
 
     return newStaticHeaderOrderDetailsType;
   }
@@ -959,7 +959,7 @@ public class EbicsXmlFactory {
     newStaticHeaderOrderDetailsType.setOrderAttribute(org.kopi.ebics.schema.h003.OrderAttributeType.Enum.forString(orderAttribute));
     newStaticHeaderOrderDetailsType.setOrderType(orderType);
     newStaticHeaderOrderDetailsType.setOrderParams(orderParams);
-    qualifySubstitutionGroup(newStaticHeaderOrderDetailsType.getOrderParams(), StandardOrderParamsType.type.getDocumentElementName(), null);
+    qualifySubstitutionGroup(newStaticHeaderOrderDetailsType.getOrderParams(), StandardOrderParamsDocument.type.getDocumentElementName(), null);
 
     return newStaticHeaderOrderDetailsType;
   }
@@ -1321,7 +1321,7 @@ public class EbicsXmlFactory {
    */
   public static XmlObject qualifySubstitutionGroup(XmlObject xobj, QName newInstance, SchemaType newType) {
     XmlObject	substitute = null;
-    
+
     if (newType != null) {
       substitute = xobj.substitute(newInstance, newType);
       if (substitute != null && substitute.schemaType() == newType
@@ -1330,18 +1330,18 @@ public class EbicsXmlFactory {
 	return substitute;
       }
     }
-    
-     XmlCursor cursor = xobj.newCursor();
-     cursor.setName(newInstance);
-     QName qName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type");
-     cursor.removeAttribute(qName);
-     cursor.toNextToken();
-     if (cursor.isNamespace()) {
-       cursor.removeXml();
-     }
-     
-     cursor.dispose();
-     
-     return null;
+
+    XmlCursor cursor = xobj.newCursor();
+    cursor.setName(newInstance);
+    QName qName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type");
+    cursor.removeAttribute(qName);
+    cursor.toNextToken();
+    if (cursor.isNamespace()) {
+      cursor.removeXml();
+    }
+
+    cursor.dispose();
+
+    return null;
   }
 }
