@@ -122,7 +122,7 @@ public class UInitializationRequestElement extends InitializationRequestElement 
 	                                              session.getSessionParam("FORMAT"));
     fULOrderParams = EbicsXmlFactory.createFULOrderParamsType(fileFormat);
     parameters = new ArrayList<Parameter>();
-    if (Boolean.getBoolean(session.getSessionParam("TEST"))) {
+    if (Boolean.parseBoolean(session.getSessionParam("TEST"))) {
       Parameter 		parameter;
       Value			value;
 
@@ -131,7 +131,7 @@ public class UInitializationRequestElement extends InitializationRequestElement 
       parameters.add(parameter);
     }
 
-    if (Boolean.getBoolean(session.getSessionParam("EBCDIC"))) {
+    if (Boolean.parseBoolean(session.getSessionParam("EBCDIC"))) {
       Parameter 		parameter;
       Value			value;
 
