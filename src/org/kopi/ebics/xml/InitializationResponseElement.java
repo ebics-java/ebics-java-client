@@ -59,6 +59,7 @@ public class InitializationResponseElement extends DefaultResponseElement {
     code = response.getHeader().getMutable().getReturnCode();
     text = response.getHeader().getMutable().getReportText();
     returnCode = ReturnCode.toReturnCode(code, text);
+    report();
     transactionId = response.getHeader().getStatic().getTransactionID();
   }
 
