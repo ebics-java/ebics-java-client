@@ -131,14 +131,17 @@ public class User implements EbicsUser, Savable {
    */
   public User(EbicsPartner partner,
               String userId,
+              String name,
               String keystorePath,
               PasswordCallback passwordCallback)
     throws GeneralSecurityException, IOException
   {
     this.partner = partner;
     this.userId = userId;
+    this.name = name;
     this.passwordCallback = passwordCallback;
     loadCertificates(keystorePath);
+    this.dn = a005Certificate.getSubjectDN().getName();
     needSave = true;
   }
 
@@ -175,8 +178,6 @@ public class User implements EbicsUser, Savable {
   private void loadCertificates(String keyStorePath)
     throws GeneralSecurityException, IOException
   {
-    CertificateManager			manager;
-
     manager = new CertificateManager(this);
     manager.load(keyStorePath, passwordCallback);
   }
