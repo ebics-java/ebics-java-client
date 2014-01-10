@@ -82,7 +82,7 @@ public class KeyManagement {
     session.getConfiguration().getTraceManager().trace(request);
     httpCode = sender.send(new ByteArrayContentFactory(request.prettyPrint()));
     Utils.checkHttpCode(httpCode);
-    response = new KeyManagementResponseElement(sender.getResponseBody(), "INIResponse.xml");
+    response = new KeyManagementResponseElement(sender.getResponseBody(), "INIResponse");
     response.build();
     session.getConfiguration().getTraceManager().trace(response);
     response.report();
@@ -107,7 +107,7 @@ public class KeyManagement {
     session.getConfiguration().getTraceManager().trace(request);
     httpCode = sender.send(new ByteArrayContentFactory(request.prettyPrint()));
     Utils.checkHttpCode(httpCode);
-    response = new KeyManagementResponseElement(sender.getResponseBody(), "HIAResponse.xml");
+    response = new KeyManagementResponseElement(sender.getResponseBody(), "HIAResponse");
     response.build();
     session.getConfiguration().getTraceManager().trace(response);
     response.report();
@@ -141,7 +141,7 @@ public class KeyManagement {
     session.getConfiguration().getTraceManager().trace(request);
     httpCode = sender.send(new ByteArrayContentFactory(request.prettyPrint()));
     Utils.checkHttpCode(httpCode);
-    response = new KeyManagementResponseElement(sender.getResponseBody(), "HBPResponse.xml");
+    response = new KeyManagementResponseElement(sender.getResponseBody(), "HBPResponse");
     response.build();
     session.getConfiguration().getTraceManager().trace(response);
     response.report();
