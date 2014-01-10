@@ -82,7 +82,7 @@ classes:		check-classroot classes.stamp
 
 ifndef NONSTANDARDCOMPILER
 
-classes.stamp:
+classes.stamp:		$(JAVAFILES:%=%.java)	
 ifdef JAVAFILES
 			$(JAVAC) -extdirs $(TOPDIR)/lib -d $(CLASSROOT) $(JAVAFILES:%=%.java)
 			touch classes.stamp
