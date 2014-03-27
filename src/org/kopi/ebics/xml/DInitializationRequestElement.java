@@ -126,7 +126,8 @@ public class DInitializationRequestElement extends InitializationRequestElement 
       StandardOrderParamsType		standardOrderParamsType;
 
       standardOrderParamsType = EbicsXmlFactory.createStandardOrderParamsType();
-      orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(session.getUser().getPartner().nextOrderId(),
+      //FIXME Some banks cannot handle OrderID element in download process. Add parameter in configuration!!!
+      orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(null,//session.getUser().getPartner().nextOrderId(),
 	                                                                "DZHNN",
 	                                                                orderType,
 	                                                                standardOrderParamsType);
