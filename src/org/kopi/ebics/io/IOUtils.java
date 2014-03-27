@@ -19,6 +19,7 @@
 
 package org.kopi.ebics.io;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -153,7 +154,7 @@ public class IOUtils {
       input = new FileInputStream(path);
       content = new byte[input.available()];
       input.read(content);
-
+      input.close();
       return content;
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
@@ -168,11 +169,20 @@ public class IOUtils {
    */
   public static byte[] getFactoryContent(ContentFactory content) throws EbicsException {
     try {
-      byte[]		orderData;
-
-      orderData = new byte[1024];
-      content.getContent().read(orderData);
-      return orderData;
+      byte[]			buffer;
+      ByteArrayOutputStream	out;
+      InputStream		in;
+      int			len = -1;
+      
+      out = new ByteArrayOutputStream();
+      in = content.getContent();
+      buffer = new byte[1024];
+      while ((len = in.read(buffer)) != -1) {
+	out.write(buffer, 0, len);
+      }
+      in.close();
+      out.close();
+      return out.toByteArray();
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
     }
