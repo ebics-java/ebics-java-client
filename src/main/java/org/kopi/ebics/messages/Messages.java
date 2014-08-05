@@ -47,6 +47,11 @@ public class Messages {
       return MessageFormat.format(resourceBundle.getString(key), param);
     } catch (MissingResourceException e) {
       return "!!" + key + "!!";
+    } catch (NullPointerException npe) {
+      if (param != null)
+        return "!!" + key + " with param " + param + "!!";
+      else
+        return "!!" + key + "!!";
     }
   }
 
@@ -65,6 +70,8 @@ public class Messages {
       return MessageFormat.format(resourceBundle.getString(key), param);
     } catch (MissingResourceException e) {
       return "!!" + key + "!!";
+    } catch (NullPointerException npe) {
+      return "!!" + key + "!!";
     }
   }
 
@@ -81,6 +88,8 @@ public class Messages {
       resourceBundle = ResourceBundle.getBundle(bundleName, locale);
       return resourceBundle.getString(key);
     } catch (MissingResourceException e) {
+      return "!!" + key + "!!";
+    } catch (NullPointerException npe) {
       return "!!" + key + "!!";
     }
   }
@@ -101,6 +110,11 @@ public class Messages {
       return MessageFormat.format(resourceBundle.getString(key), param);
     } catch (MissingResourceException e) {
       return "!!" + key + "!!";
+    } catch (NullPointerException npe) {
+      if (param != null)
+        return "!!" + key + " with param " + param + "!!";
+      else
+        return "!!" + key + "!!";
     }
   }
 
@@ -120,6 +134,8 @@ public class Messages {
       return MessageFormat.format(resourceBundle.getString(key), param);
     } catch (MissingResourceException e) {
       return "!!" + key + "!!";
+    } catch (NullPointerException npe) {
+      return "!!" + key + "!!";
     }
   }
 
@@ -137,6 +153,8 @@ public class Messages {
       resourceBundle = ResourceBundle.getBundle(bundleName, locale);
       return resourceBundle.getString(key);
     } catch (MissingResourceException e) {
+      return "!!" + key + "!!";
+    } catch (NullPointerException npe) {
       return "!!" + key + "!!";
     }
   }
