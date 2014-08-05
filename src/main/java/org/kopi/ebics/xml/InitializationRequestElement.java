@@ -108,7 +108,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
    * @return the element type.
    */
   public String getType() {
-    return type.getOrderType();
+    return type.toString();
   }
 
   /**

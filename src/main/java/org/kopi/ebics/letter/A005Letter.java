@@ -45,19 +45,32 @@ public class A005Letter extends AbstractInitLetter {
     super(locale);
   }
 
-  @Override
-  public void create(EbicsUser user) throws GeneralSecurityException, IOException, EbicsException {
-    build(user.getPartner().getBank().getHostId(),
-	  user.getPartner().getBank().getName(),
-	  user.getUserId(),
-	  user.getName(),
-	  user.getPartner().getPartnerId(),
-	  getString("INILetter.version", BUNDLE_NAME, locale),
-	  getString("INILetter.certificate", BUNDLE_NAME, locale),
-	  Base64.encodeBase64(user.getA005Certificate(), true),
-	  getString("INILetter.digest", BUNDLE_NAME, locale),
-	  getHash(user.getA005Certificate()));
-  }
+    @Override
+    public void create(EbicsUser user) throws GeneralSecurityException, IOException, EbicsException {
+        if (user.getPartner().getBank().useCertificate()) {
+            build(user.getPartner().getBank().getHostId(),
+                    user.getPartner().getBank().getName(),
+                    user.getUserId(),
+                    user.getName(),
+                    user.getPartner().getPartnerId(),
+                    getString("INILetter.version", BUNDLE_NAME, locale),
+                    getString("INILetter.certificate", BUNDLE_NAME, locale),
+                    Base64.encodeBase64(user.getA005Certificate(), true),
+                    getString("INILetter.digest", BUNDLE_NAME, locale),
+                    getHash(user.getA005Certificate()));
+        } else {
+            build(user.getPartner().getBank().getHostId(),
+                    user.getPartner().getBank().getName(),
+                    user.getUserId(),
+                    user.getName(),
+                    user.getPartner().getPartnerId(),
+                    getString("INILetter.version", BUNDLE_NAME, locale),
+                    getString("INILetter.certificate", BUNDLE_NAME, locale),
+                    null,
+                    getString("INILetter.digest", BUNDLE_NAME, locale),
+                    getHash(user.getA005PublicKey()));
+        }
+    }
 
   @Override
   public String getTitle() {

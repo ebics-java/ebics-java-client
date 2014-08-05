@@ -105,12 +105,13 @@ public class Application {
    * @param url the bank URL
    * @param url the bank name
    * @param hostId the bank host ID
+   * @param useCertificate does the bank use certificates ?
    * @return the created ebics bank
    */
-  public Bank createBank(URL url, String name, String hostId) {
+  public Bank createBank(URL url, String name, String hostId, boolean useCertificate) {
     Bank		bank;
 
-    bank = new Bank(url, name, hostId);
+    bank = new Bank(url, name, hostId, useCertificate);
     banks.put(hostId, bank);
     return bank;
   }
@@ -139,11 +140,11 @@ public class Application {
    * @param name the user name,
    * @param email the user email
    * @param country the user country
-   * @param organisation the user organization or company
-   * @param saveCetificates save generated certificates?
+   * @param organization the user organization or company
+   * @param useCertificates does the bank use certificates ?
+   * @param saveCertificates save generated certificates?
    * @param passwordCallback a callback-handler that supplies us with the password.
    *                         This parameter can be null, in this case no password is used.
-   * @param saveCertificates
    */
   public void createUser(URL url,
                          String bankName,
@@ -154,7 +155,8 @@ public class Application {
                          String email,
                          String country,
                          String organization,
-                         boolean saveCetificates,
+                         boolean useCertificates,
+                         boolean saveCertificates,
                          PasswordCallback passwordCallback)
   {
     Bank			bank;
@@ -166,12 +168,12 @@ public class Application {
 
     configuration.getLogger().info(Messages.getString("user.create.info", Constants.APPLICATION_BUNDLE_NAME, userId));
 
-    bank = createBank(url, bankName, hostId);
+    bank = createBank(url, bankName, hostId, useCertificates);
     partner = createPartner(bank, partnerId);
     try {
       user = new User(partner, userId, name, email, country, organization, passwordCallback);
       createUserDirectories(user);
-      if (saveCetificates) {
+      if (saveCertificates) {
 	user.saveUserCertificates(configuration.getKeystoreDirectory(user));
       }
       configuration.getSerializationManager().serialize(bank);

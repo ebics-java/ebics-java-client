@@ -333,7 +333,8 @@ public class EbicsXmlFactory {
                                                                       String signatureVersion)
   {
     SignaturePubKeyInfoType newSignaturePubKeyInfoType = SignaturePubKeyInfoType.Factory.newInstance();
-    newSignaturePubKeyInfoType.setX509Data(x509Data);
+    if (x509Data != null)
+        newSignaturePubKeyInfoType.setX509Data(x509Data);
     newSignaturePubKeyInfoType.setPubKeyValue(pubKeyValue);
     newSignaturePubKeyInfoType.setSignatureVersion(signatureVersion);
 
@@ -594,7 +595,8 @@ public class EbicsXmlFactory {
     AuthenticationPubKeyInfoType newAuthenticationPubKeyInfoType = AuthenticationPubKeyInfoType.Factory.newInstance();
     newAuthenticationPubKeyInfoType.setAuthenticationVersion(authenticationVersion);
     newAuthenticationPubKeyInfoType.setPubKeyValue(pubKeyValue);
-    newAuthenticationPubKeyInfoType.setX509Data(x509Data);
+    if (x509Data != null)
+        newAuthenticationPubKeyInfoType.setX509Data(x509Data);
 
     return newAuthenticationPubKeyInfoType;
   }
@@ -613,7 +615,8 @@ public class EbicsXmlFactory {
     EncryptionPubKeyInfoType newEncryptionPubKeyInfoType = EncryptionPubKeyInfoType.Factory.newInstance();
     newEncryptionPubKeyInfoType.setEncryptionVersion(encryptionVersion);
     newEncryptionPubKeyInfoType.setPubKeyValue(pubKeyValue);
-    newEncryptionPubKeyInfoType.setX509Data(x509Data);
+    if (x509Data != null)
+        newEncryptionPubKeyInfoType.setX509Data(x509Data);
 
     return newEncryptionPubKeyInfoType;
   }
@@ -915,7 +918,7 @@ public class EbicsXmlFactory {
     newStaticHeaderOrderDetailsType.setOrderType(orderType);
     newStaticHeaderOrderDetailsType.setOrderParams(orderParams);
     qualifySubstitutionGroup(newStaticHeaderOrderDetailsType.getOrderParams(), FULOrderParamsDocument.type.getDocumentElementName(), null);
-    
+
     return newStaticHeaderOrderDetailsType;
   }
 
@@ -934,7 +937,7 @@ public class EbicsXmlFactory {
                                                                                 FDLOrderParamsType orderParams)
   {
     StaticHeaderOrderDetailsType newStaticHeaderOrderDetailsType = StaticHeaderOrderDetailsType.Factory.newInstance();
-    
+
     if (orderId != null) {
       //newStaticHeaderOrderDetailsType.setOrderID(orderId);
     }
@@ -1300,7 +1303,7 @@ public class EbicsXmlFactory {
 
     return newTransferReceipt;
   }
-  
+
   /**
    * Qualifies a valid member of a substitution group. This method tries to use the
    * built-in {@link XmlObject#substitute(QName, SchemaType)} and if succesful returns
@@ -1308,13 +1311,13 @@ public class EbicsXmlFactory {
    * low-level {@link XmlCursor} manipulation to qualify the substitution group. Note
    * that if the latter is the case the resulting document is disconnected and should
    * no longer be manipulated. Thus, use it as a final step after all markup is included.
-   * 
+   *
    * If newType is null, this method will skip {@link XmlObject#substitute(QName, SchemaType)}
    * and directly use {@link XmlCursor}. This can be used, if you are sure that the substitute
    * is not in the list of (pre-compiled) valid substitutions (this is the case if a schema
    * uses another schema's type as a base for elements. E.g. om:Observation uses gml:_Feature
    * as the base type).
-   * 
+   *
    * @param xobj
    * 		the abstract element
    * @param newInstance

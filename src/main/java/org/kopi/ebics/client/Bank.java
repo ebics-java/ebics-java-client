@@ -44,11 +44,13 @@ public class Bank implements EbicsBank, Savable {
    * @param url the bank URL
    * @param name the bank name
    * @param hostId the bank host ID
+   * @param useCertificate does the bank use certificates for exchange ?
    */
-  public Bank(URL url, String name, String hostId) {
+  public Bank(URL url, String name, String hostId, boolean useCertificate) {
     this.url = url;
     this.name = name;
     this.hostId = hostId;
+    this.useCertificate = useCertificate;
     needSave = true;
   }
 
@@ -61,7 +63,7 @@ public class Bank implements EbicsBank, Savable {
   }
 
   /**
-   * Did any persistable attribute change since last load/save operation.
+   * Did any persistent attribute change since last load/save operation.
    * @return True if the object needs to be saved.
    */
   public boolean needsSave() {
@@ -127,6 +129,17 @@ public class Bank implements EbicsBank, Savable {
     return name;
   }
 
+    @Override
+    public boolean useCertificate() {
+        return useCertificate;
+    }
+
+    @Override
+    public void setUseCertificate(boolean useCertificate) {
+        this.useCertificate = useCertificate;
+        needSave = true;
+    }
+    
   @Override
   public void setBankKeys(RSAPublicKey e002Key, RSAPublicKey x002Key) {
     this.e002Key = e002Key;
@@ -161,6 +174,12 @@ public class Bank implements EbicsBank, Savable {
    * @serial
    */
   private String		hostId;
+  
+  /**
+   * Does the bank use certificates for signing/crypting ?
+   * @serial
+   */
+  private boolean               useCertificate;
 
   /**
    * The bank name
@@ -195,4 +214,5 @@ public class Bank implements EbicsBank, Savable {
   private transient boolean	needSave;
 
   private static final long 	serialVersionUID = 2123071449956793284L;
+
 }

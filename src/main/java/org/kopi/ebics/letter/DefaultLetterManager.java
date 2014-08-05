@@ -50,33 +50,33 @@ public class DefaultLetterManager implements LetterManager {
   public InitLetter createA005Letter(EbicsUser user)
     throws GeneralSecurityException, IOException, EbicsException
   {
-    A005Letter			letter;
+        A005Letter			letter;
 
-    letter = new A005Letter(locale);
-    letter.create(user);
-    return letter;
+        letter = new A005Letter(locale);
+        letter.create(user);
+        return letter;
   }
 
   @Override
   public InitLetter createE002Letter(EbicsUser user)
     throws GeneralSecurityException, IOException, EbicsException
   {
-    E002Letter			letter;
+        E002Letter			letter;
 
-    letter = new E002Letter(locale);
-    letter.create(user);
-    return letter;
+        letter = new E002Letter(locale);
+        letter.create(user);
+        return letter;
   }
 
   @Override
   public InitLetter createX002Letter(EbicsUser user)
     throws GeneralSecurityException, IOException, EbicsException
   {
-    X002Letter			letter;
+        X002Letter			letter;
 
-    letter = new X002Letter(locale);
-    letter.create(user);
-    return letter;
+        letter = new X002Letter(locale);
+        letter.create(user);
+        return letter;
   }
 
   // --------------------------------------------------------------------

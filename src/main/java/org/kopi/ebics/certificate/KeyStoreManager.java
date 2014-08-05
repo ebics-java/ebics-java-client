@@ -24,18 +24,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.security.GeneralSecurityException;
+import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPublicKeySpec;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.bouncycastle.openssl.PEMReader;
 
 /**
@@ -152,6 +159,16 @@ public class KeyStoreManager {
     return (RSAPublicKey) cert.getPublicKey();
   }
 
+  public RSAPublicKey getPublicKey(BigInteger publicExponent, BigInteger modulus)
+  {
+      try {
+            return (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(modulus, publicExponent));
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
+            Logger.getLogger(KeyStoreManager.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+      }
+  }
+  
   /**
    * Writes the given certificate into the key store.
    * @param alias the certificate alias

@@ -99,7 +99,7 @@ public class NoPubKeyDigestsRequestElement extends DefaultEbicsRootElement {
     OrderDetailsType 				orderDetails;
 
     product = EbicsXmlFactory.creatProductElementType(session.getProduct().getLanguage(), session.getProduct().getName());
-    orderDetails = EbicsXmlFactory.createOrderDetailsType("DZHNN", null, OrderType.HPB.getOrderType());
+    orderDetails = EbicsXmlFactory.createOrderDetailsType("DZHNN", null, OrderType.HPB.toString());
     xstatic = EbicsXmlFactory.createNoPubKeyDigestsRequestStaticHeaderType(session.getBankID(),
 	                                                                   Utils.generateNonce(),
 	                                                                   Calendar.getInstance(),

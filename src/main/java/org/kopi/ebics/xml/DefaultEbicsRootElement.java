@@ -136,7 +136,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
    * @return the generated file name.
    */
   public static String generateName(OrderType type) {
-    return type.getOrderType() + new BigInteger(130, new SecureRandom()).toString(32);
+    return type.toString() + new BigInteger(130, new SecureRandom()).toString(32);
   }
   
   /**

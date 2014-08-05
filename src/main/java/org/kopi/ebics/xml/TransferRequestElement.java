@@ -101,7 +101,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
    * @return the order type element.
    */
   public String getOrderType() {
-    return type.getOrderType();
+    return type.toString();
   }
 
   @Override

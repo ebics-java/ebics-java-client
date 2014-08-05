@@ -38,6 +38,16 @@ public interface EbicsBank extends Serializable {
   public URL getURL();
 
   /**
+   * 
+   */
+  public boolean useCertificate();
+  
+  /**
+   * 
+   */
+  public void setUseCertificate(boolean useCertificate);
+  
+  /**
    * Returns the encryption key digest you have obtained from the bank.
    * Ensure that nobody was able to modify the digest on its way from the bank to you.
    * @return the encryption key digest you have obtained from the bank.

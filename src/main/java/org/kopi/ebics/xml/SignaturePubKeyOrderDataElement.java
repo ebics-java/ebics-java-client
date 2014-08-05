@@ -55,7 +55,9 @@ public class SignaturePubKeyOrderDataElement extends DefaultEbicsRootElement {
     PubKeyValueType 			pubKeyValue;
     SignaturePubKeyOrderDataType	signaturePubKeyOrderData;
 
-    x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
+    x509Data = null;
+    if (session.getUser().getPartner().getBank().useCertificate())
+        x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
 	                                          session.getUser().getA005Certificate());
     rsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getA005PublicKey().getPublicExponent().toByteArray(),
 	                                                session.getUser().getA005PublicKey().getModulus().toByteArray());

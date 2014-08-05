@@ -45,19 +45,32 @@ public class E002Letter extends AbstractInitLetter {
     super(locale);
   }
 
-  @Override
-  public void create(EbicsUser user) throws GeneralSecurityException, IOException, EbicsException {
-    build(user.getPartner().getBank().getHostId(),
-	  user.getPartner().getBank().getName(),
-	  user.getUserId(),
-	  user.getName(),
-	  user.getPartner().getPartnerId(),
-	  getString("HIALetter.e002.version", BUNDLE_NAME, locale),
-	  getString("HIALetter.e002.certificate", BUNDLE_NAME, locale),
-	  Base64.encodeBase64(user.getE002Certificate(), true),
-	  getString("HIALetter.e002.digest", BUNDLE_NAME, locale),
-	  getHash(user.getE002Certificate()));
-  }
+    @Override
+    public void create(EbicsUser user) throws GeneralSecurityException, IOException, EbicsException {
+        if (user.getPartner().getBank().useCertificate()) {
+            build(user.getPartner().getBank().getHostId(),
+                    user.getPartner().getBank().getName(),
+                    user.getUserId(),
+                    user.getName(),
+                    user.getPartner().getPartnerId(),
+                    getString("HIALetter.e002.version", BUNDLE_NAME, locale),
+                    getString("HIALetter.e002.certificate", BUNDLE_NAME, locale),
+                    Base64.encodeBase64(user.getE002Certificate(), true),
+                    getString("HIALetter.e002.digest", BUNDLE_NAME, locale),
+                    getHash(user.getE002Certificate()));
+        } else {
+            build(user.getPartner().getBank().getHostId(),
+                    user.getPartner().getBank().getName(),
+                    user.getUserId(),
+                    user.getName(),
+                    user.getPartner().getPartnerId(),
+                    getString("HIALetter.e002.version", BUNDLE_NAME, locale),
+                    getString("HIALetter.e002.certificate", BUNDLE_NAME, locale),
+                    null,
+                    getString("HIALetter.e002.digest", BUNDLE_NAME, locale),
+                    getHash(user.getE002PublicKey()));
+        }
+    }
 
   @Override
   public String getTitle() {

@@ -94,7 +94,7 @@ public class DInitializationRequestElement extends InitializationRequestElement 
 	                                          "http://www.w3.org/2001/04/xmlenc#sha256",
 	                                          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
-    orderType = EbicsXmlFactory.createOrderType(type.getOrderType());
+    orderType = EbicsXmlFactory.createOrderType(type.toString());
     if (type.equals(org.kopi.ebics.session.OrderType.FDL)) {
       FDLOrderParamsType		fDLOrderParamsType;
       FileFormatType 			fileFormat;

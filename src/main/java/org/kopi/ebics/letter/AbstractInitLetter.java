@@ -23,14 +23,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
+import java.security.interfaces.RSAPublicKey;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
 import org.apache.commons.codec.binary.Hex;
+import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.InitLetter;
 import org.kopi.ebics.messages.Messages;
 
@@ -111,7 +113,36 @@ public abstract class AbstractInitLetter implements InitLetter {
     hash256 = new String(Hex.encodeHex(MessageDigest.getInstance("SHA-256").digest(certificate), false));
     return format(hash256).getBytes();
   }
+    
+    protected byte[] getHash(RSAPublicKey publicKey) throws EbicsException {
+        String			modulus;
+        String			exponent;
+        String			hash;
+        byte[]			digest;
 
+        exponent = Hex.encodeHexString(publicKey.getPublicExponent().toByteArray());
+        modulus =  Hex.encodeHexString(removeFirstByte(publicKey.getModulus().toByteArray()));
+        hash = exponent + " " + modulus;
+
+        if (hash.charAt(0) == '0') {
+          hash = hash.substring(1);
+        }
+
+        try {
+          digest = MessageDigest.getInstance("SHA-256", "BC").digest(hash.getBytes("US-ASCII"));
+        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+          throw new EbicsException(e.getMessage());
+        }
+
+        return format(new String(Hex.encodeHex(digest, false))).getBytes();
+    }
+    
+    private static byte[] removeFirstByte(byte[] byteArray) {
+        byte[] b = new byte[byteArray.length - 1];
+        System.arraycopy(byteArray, 1, b, 0, b.length);
+        return b;
+    }
+    
   /**
    * Formats a hash 256 input.
    * @param hash256 the hash input
@@ -189,7 +220,8 @@ public abstract class AbstractInitLetter implements InitLetter {
       writer = new PrintWriter(out, true);
       buildTitle();
       buildHeader();
-      buildCertificate(certTitle, certificate);
+      if (certificate != null)
+          buildCertificate(certTitle, certificate);
       buildHash(hashTitle, hash);
       buildFooter();
       writer.close();
