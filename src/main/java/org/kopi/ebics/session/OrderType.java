@@ -49,5 +49,6 @@ public enum OrderType {
     EUE,
     HAC,
     PTK,
-    STA
+    STA,
+    VMK
 }
