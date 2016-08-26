@@ -1,0 +1,13 @@
+password=
+userId=
+partnerId=
+hostId=
+bank.url=
+bank.name=
+user.name=
+user.email=
+user.country=
+user.org=
+languageCode=de
+countryCode=DE
+productName=EBICS Java Kernel 1.0
