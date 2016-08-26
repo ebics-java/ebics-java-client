@@ -43,7 +43,7 @@ import org.kopi.ebics.io.IOUtils;
 public class DefaultSerializationManager implements SerializationManager {
 
   /**
-   * Constructs a new <code>SerializationManage</code>
+   * Constructs a new <code>SerializationManager</code>
    * @param serializationDir the serialization directory
    */
   public DefaultSerializationManager(File serializationDir) {
@@ -51,7 +51,7 @@ public class DefaultSerializationManager implements SerializationManager {
   }
 
   /**
-   * Constructs a new <code>SerializationManage</code>
+   * Constructs a new <code>SerializationManager</code>
    */
   public DefaultSerializationManager() {
     this(null);
