@@ -70,7 +70,6 @@ public class Joiner {
       buffer.close();
       decrypted = user.decrypt(buffer.toByteArray(), transactionKey);
       output.write(Utils.unzip(decrypted));
-      output.close();
     } catch (GeneralSecurityException e) {
       throw new EbicsException(e.getMessage());
     } catch (IOException e) {

@@ -48,7 +48,6 @@ public class Partner implements EbicsPartner, Savable {
     this.bank = bank;
     this.partnerId = ois.readUTF();
     this.orderId = ois.readInt();
-    ois.close();
   }
 
   /**
@@ -105,7 +104,7 @@ public class Partner implements EbicsPartner, Savable {
   public String getPartnerId() {
     return partnerId;
   }
-  
+
   /**
    * In EBICS XSD schema - ebics_types.xsd, The order ID pattern
    * is defined as following: <b>pattern value="[A-Z][A-Z0-9]{3}"</b>.
@@ -132,7 +131,7 @@ public class Partner implements EbicsPartner, Savable {
     chars[1] = ALPHA_NUM_CHARS.charAt((orderId / 36 / 36) % 36);
     chars[0] = ALPHA_NUM_CHARS.charAt(orderId / 36 / 36 / 36);
     needSave = true;
-    
+
     return new String(chars);
   }
 
@@ -149,6 +148,6 @@ public class Partner implements EbicsPartner, Savable {
   private int				orderId = 10*36*36*36;
   private String			partnerId;
   private transient boolean		needSave;
-  
+
   private static final String		ALPHA_NUM_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 }

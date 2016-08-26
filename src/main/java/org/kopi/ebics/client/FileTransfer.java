@@ -19,8 +19,9 @@
 
 package org.kopi.ebics.client;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Date;
 
 import org.kopi.ebics.exception.EbicsException;
@@ -53,15 +54,15 @@ import org.kopi.ebics.xml.UTransferRequestElement;
  * methods that do the whole transfer in one method call.
  * To use the recoverable transfer mode, you may set a working
  * directory for temporarily created files.
- * 
+ *
  * <p> EBICS specification 2.4.2 - 6.2 Encryption at application level
- * 
+ *
  * <p>In the event of an upload transaction, a random symmetrical key is generated in the
  * customer system that is used exclusively within the framework of this transaction both for
  * encryption of the ES’s and for encryption of the order data. This key is encrypted
  * asymmetrically with the financial institution’s public encryption key and is transmitted by the
  * customer system to the bank system during the initialization phase of the transaction.
- * 
+ *
  * <p>Analogously, in the case of a download transaction a random symmetrical key is generated
  * in the bank system that is used for encryption of the order data that is to be downloaded and
  * for encryption of the bank-technical signature that has been provided by the financial
@@ -71,7 +72,7 @@ import org.kopi.ebics.xml.UTransferRequestElement;
  * transaction’s EBICS messages are sent by a technical subscriber. Otherwise the
  * asymmetrical encryption takes place with the public encryption key of the non-technical
  * subscriber, i.e. the submitter of the order.
- * 
+ *
  * @author Hachani
  *
  */
@@ -190,7 +191,7 @@ public class FileTransfer {
   public void fetchFile(OrderType orderType,
                         Date start,
                         Date end,
-                        OutputStream dest)
+                        File outputFile)
     throws IOException, EbicsException
   {
     HttpRequestSender			sender;
@@ -209,12 +210,14 @@ public class FileTransfer {
 	                                            end);
     initializer.build();
     initializer.validate();
+
     session.getConfiguration().getTraceManager().trace(initializer);
     httpCode = sender.send(new ByteArrayContentFactory(initializer.prettyPrint()));
     Utils.checkHttpCode(httpCode);
     response = new DInitializationResponseElement(sender.getResponseBody(),
 	                                          orderType,
 	                                          DefaultEbicsRootElement.generateName(orderType));
+
     response.build();
     session.getConfiguration().getTraceManager().trace(response);
     response.report();
@@ -233,7 +236,9 @@ public class FileTransfer {
 	        joiner);
     }
 
-    joiner.writeTo(dest, response.getTransactionKey());
+    try (FileOutputStream dest = new FileOutputStream(outputFile)) {
+        joiner.writeTo(dest, response.getTransactionKey());
+    }
     receipt = new ReceiptRequestElement(session,
 	                                state.getTransactionId(),
 	                                DefaultEbicsRootElement.generateName(orderType));

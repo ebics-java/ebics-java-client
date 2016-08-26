@@ -20,7 +20,6 @@
 package org.kopi.ebics.session;
 
 import java.io.Serializable;
-import java.util.Locale;
 
 /**
  * Optional information about the client product.
@@ -37,11 +36,11 @@ public class Product implements Serializable {
    * @param instituteID the institute, this is an optional value, you can leave this parameter empty.
    */
   public Product(String name,
-                 Locale language,
+                 String language,
                  String instituteID)
   {
     this.name = name;
-    this.language = language.getCountry().toLowerCase();
+    this.language = language;
     this.instituteID = instituteID;
   }
 

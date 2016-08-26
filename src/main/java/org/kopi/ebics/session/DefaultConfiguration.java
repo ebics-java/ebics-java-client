@@ -84,13 +84,13 @@ public class DefaultConfiguration implements Configuration {
    * Loads the configuration
    * @throws EbicsException
    */
-  public void load(String configFile) throws EbicsException {
+  public void load(File configFile) throws EbicsException {
     if (isConfigFileLoad) {
-      return;
+        throw new EbicsException("config already loaded");
     }
 
     try {
-      properties.load(new FileInputStream(new File(configFile)));
+      properties.load(new FileInputStream(configFile));
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
     }
