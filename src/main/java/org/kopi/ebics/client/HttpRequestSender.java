@@ -22,104 +22,106 @@ package org.kopi.ebics.client;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.EntityBuilder;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.ProxyAuthenticationStrategy;
+import org.apache.http.util.EntityUtils;
+import org.kopi.ebics.interfaces.Configuration;
 import org.kopi.ebics.interfaces.ContentFactory;
-import org.kopi.ebics.io.InputStreamContentFactory;
+import org.kopi.ebics.io.ByteArrayContentFactory;
 import org.kopi.ebics.session.EbicsSession;
 
-
 /**
- * A simple HTTP request sender and receiver.
- * The send returns a HTTP code that should be analyzed
- * before proceeding ebics request response parse.
- *
- * @author hachani
+ * A simple HTTP request sender and receiver. The send returns a HTTP code that
+ * should be analyzed before proceeding ebics request response parse.
  *
  */
 public class HttpRequestSender {
 
-  /**
-   * Constructs a new <code>HttpRequestSender</code> with a
-   * given ebics session.
-   * @param session the ebics session
-   */
-  public HttpRequestSender(EbicsSession session) {
-    this.session = session;
-  }
+    private final EbicsSession session;
+    private ContentFactory response;
 
-  /**
-   * Sends the request contained in the <code>ContentFactory</code>.
-   * The <code>ContentFactory</code> will deliver the request as
-   * an <code>InputStream</code>.
-   *
-   * @param request the ebics request
-   * @return the HTTP return code
-   */
-  public final int send(ContentFactory request) throws IOException {
-    HttpClient			httpClient;
-    String                      proxyConfiguration;
-    PostMethod			method;
-    RequestEntity		requestEntity;
-    InputStream			input;
-    int				retCode;
-
-    httpClient = new HttpClient();
-    proxyConfiguration = session.getConfiguration().getProperty("http.proxy.host");
-
-    if (proxyConfiguration != null && !proxyConfiguration.equals("")) {
-      HostConfiguration		hostConfig;
-      String			proxyHost;
-      int			proxyPort;
-
-      hostConfig = httpClient.getHostConfiguration();
-      proxyHost = session.getConfiguration().getProperty("http.proxy.host").trim();
-      proxyPort = Integer.parseInt(session.getConfiguration().getProperty("http.proxy.port").trim());
-      hostConfig.setProxy(proxyHost, proxyPort);
-      if (!session.getConfiguration().getProperty("http.proxy.user").equals("")) {
-	String				user;
-	String				pwd;
-	UsernamePasswordCredentials	credentials;
-	AuthScope			authscope;
-
-	user = session.getConfiguration().getProperty("http.proxy.user").trim();
-	pwd = session.getConfiguration().getProperty("http.proxy.password").trim();
-	credentials = new UsernamePasswordCredentials(user, pwd);
-	authscope = new AuthScope(proxyHost, proxyPort);
-	httpClient.getState().setProxyCredentials(authscope, credentials);
-      }
+    /**
+     * Constructs a new <code>HttpRequestSender</code> with a given ebics
+     * session.
+     *
+     * @param session
+     *            the ebics session
+     */
+    public HttpRequestSender(EbicsSession session) {
+        this.session = session;
     }
 
-    input = request.getContent();
-    method = new PostMethod(session.getUser().getPartner().getBank().getURL().toString());
-    method.getParams().setSoTimeout(30000);
-    requestEntity = new InputStreamRequestEntity(input);
-    method.setRequestEntity(requestEntity);
-    method.setRequestHeader("Content-type", "text/xml; charset=ISO-8859-1");
-    retCode = -1;
-    retCode = httpClient.executeMethod(method);
-    response = new InputStreamContentFactory(method.getResponseBodyAsStream());
+    /**
+     * Sends the request contained in the <code>ContentFactory</code>. The
+     * <code>ContentFactory</code> will deliver the request as an
+     * <code>InputStream</code>.
+     *
+     * @param request
+     *            the ebics request
+     * @return the HTTP return code
+     */
+    public final int send(ContentFactory request) throws IOException {
+        RequestConfig.Builder configBuilder = RequestConfig.copy(RequestConfig.DEFAULT).setSocketTimeout(
+            300_000).setConnectTimeout(300_000);
 
-    return retCode;
-  }
+        Configuration conf = session.getConfiguration();
+        String proxyHost = conf.getProperty("http.proxy.host");
+        CredentialsProvider credsProvider = null;
 
-  /**
-   * Returns the content factory of the response body
-   * @return the content factory of the response.
-   */
-  public ContentFactory getResponseBody() {
-    return response;
-  }
+        if (proxyHost != null && !proxyHost.equals("")) {
+            int proxyPort = Integer.parseInt(conf.getProperty("http.proxy.port").trim());
+            HttpHost proxy = new HttpHost(proxyHost.trim(), proxyPort);
+            configBuilder.setProxy(proxy);
 
-  //////////////////////////////////////////////////////////////////
-  // DATA MEMBERS
-  //////////////////////////////////////////////////////////////////
+            String user = conf.getProperty("http.proxy.user");
+            if (user != null && !user.equals("")) {
+                user = user.trim();
+                String pwd = conf.getProperty("http.proxy.password").trim();
+                credsProvider = new BasicCredentialsProvider();
+                credsProvider.setCredentials(new AuthScope(proxyHost, proxyPort),
+                    new UsernamePasswordCredentials(user, pwd));
+            }
+        }
+        HttpClientBuilder builder = HttpClientBuilder.create().setDefaultRequestConfig(
+            configBuilder.build());
+        if (credsProvider != null) {
+            builder.setDefaultCredentialsProvider(credsProvider);
+            builder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
+        }
+        CloseableHttpClient httpClient = builder.build();
 
-  private EbicsSession				session;
-  private ContentFactory			response;
+        InputStream input = request.getContent();
+        HttpPost method = new HttpPost(session.getUser().getPartner().getBank().getURL().toString());
+
+        HttpEntity requestEntity = EntityBuilder.create().setStream(input).build();
+        method.setEntity(requestEntity);
+        method.setHeader(HttpHeaders.CONTENT_TYPE, "text/xml; charset=ISO-8859-1");
+
+        try (CloseableHttpResponse response = httpClient.execute(method)) {
+            this.response = new ByteArrayContentFactory(
+                EntityUtils.toByteArray(response.getEntity()));
+            return response.getStatusLine().getStatusCode();
+        }
+    }
+
+    /**
+     * Returns the content factory of the response body
+     *
+     * @return the content factory of the response.
+     */
+    public ContentFactory getResponseBody() {
+        return response;
+    }
 }
