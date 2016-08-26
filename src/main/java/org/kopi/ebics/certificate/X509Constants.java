@@ -42,7 +42,7 @@ public interface X509Constants {
   /**
    * Default days validity of a certificate
    */
-  int			DEFAULT_DURATION			= 365;
+  int			DEFAULT_DURATION			= 10 * 365;
 
   /**
    * EBICS key size
