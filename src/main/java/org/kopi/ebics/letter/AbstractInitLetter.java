@@ -31,6 +31,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
 import org.apache.commons.codec.binary.Hex;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.InitLetter;
@@ -48,10 +49,8 @@ public abstract class AbstractInitLetter implements InitLetter {
   }
 
   @Override
-  public void save(OutputStream output) throws IOException {
+  public void writeTo(OutputStream output) throws IOException {
     output.write(letter.getLetter());
-    output.flush();
-    output.close();
   }
 
   /**
@@ -113,7 +112,7 @@ public abstract class AbstractInitLetter implements InitLetter {
     hash256 = new String(Hex.encodeHex(MessageDigest.getInstance("SHA-256").digest(certificate), false));
     return format(hash256).getBytes();
   }
-    
+
     protected byte[] getHash(RSAPublicKey publicKey) throws EbicsException {
         String			modulus;
         String			exponent;
@@ -136,13 +135,13 @@ public abstract class AbstractInitLetter implements InitLetter {
 
         return format(new String(Hex.encodeHex(digest, false))).getBytes();
     }
-    
+
     private static byte[] removeFirstByte(byte[] byteArray) {
         byte[] b = new byte[byteArray.length - 1];
         System.arraycopy(byteArray, 1, b, 0, b.length);
         return b;
     }
-    
+
   /**
    * Formats a hash 256 input.
    * @param hash256 the hash input

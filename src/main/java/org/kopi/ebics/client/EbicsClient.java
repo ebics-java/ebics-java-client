@@ -27,8 +27,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -45,6 +47,7 @@ import org.kopi.ebics.interfaces.Configuration;
 import org.kopi.ebics.interfaces.EbicsBank;
 import org.kopi.ebics.interfaces.EbicsUser;
 import org.kopi.ebics.interfaces.InitLetter;
+import org.kopi.ebics.interfaces.LetterManager;
 import org.kopi.ebics.interfaces.PasswordCallback;
 import org.kopi.ebics.io.IOUtils;
 import org.kopi.ebics.messages.Messages;
@@ -102,13 +105,9 @@ public class EbicsClient {
         configuration.getLogger().info(
             Messages.getString("user.create.directories", Constants.APPLICATION_BUNDLE_NAME,
                 user.getUserId()));
-        // Create the user directory
         IOUtils.createDirectories(configuration.getUserDirectory(user));
-        // Create the traces directory
         IOUtils.createDirectories(configuration.getTransferTraceDirectory(user));
-        // Create the key stores directory
         IOUtils.createDirectories(configuration.getKeystoreDirectory(user));
-        // Create the letters directory
         IOUtils.createDirectories(configuration.getLettersDirectory(user));
     }
 
@@ -187,7 +186,8 @@ public class EbicsClient {
         Bank bank = createBank(url, bankName, hostId, useCertificates);
         Partner partner = createPartner(bank, partnerId);
         try {
-            User user = new User(partner, userId, name, email, country, organization, passwordCallback);
+            User user = new User(partner, userId, name, email, country, organization,
+                passwordCallback);
             createUserDirectories(user);
             if (saveCertificates) {
                 user.saveUserCertificates(configuration.getKeystoreDirectory(user));
@@ -213,16 +213,16 @@ public class EbicsClient {
     private void createLetters(EbicsUser user, boolean useCertificates)
         throws GeneralSecurityException, IOException, EbicsException, FileNotFoundException {
         user.getPartner().getBank().setUseCertificate(useCertificates);
+        LetterManager letterManager = configuration.getLetterManager();
+        List<InitLetter> letters = Arrays.asList(letterManager.createA005Letter(user),
+            letterManager.createE002Letter(user), letterManager.createX002Letter(user));
 
-        InitLetter a005Letter = configuration.getLetterManager().createA005Letter(user);
-        InitLetter e002Letter = configuration.getLetterManager().createE002Letter(user);
-        InitLetter x002Letter = configuration.getLetterManager().createX002Letter(user);
-        a005Letter.save(new FileOutputStream(configuration.getLettersDirectory(user)
-            + File.separator + a005Letter.getName()));
-        e002Letter.save(new FileOutputStream(configuration.getLettersDirectory(user)
-            + File.separator + e002Letter.getName()));
-        x002Letter.save(new FileOutputStream(configuration.getLettersDirectory(user)
-            + File.separator + x002Letter.getName()));
+        File directory = new File(configuration.getLettersDirectory(user));
+        for (InitLetter letter : letters) {
+            try (FileOutputStream out = new FileOutputStream(new File(directory, letter.getName()))) {
+                letter.writeTo(out);
+            }
+        }
     }
 
     /**
@@ -393,7 +393,6 @@ public class EbicsClient {
             Messages.getString("spr.send.success", Constants.APPLICATION_BUNDLE_NAME, userId));
     }
 
-
     /**
      * Sends a file to the ebics bank sever
      *
@@ -416,10 +415,7 @@ public class EbicsClient {
 
         try {
             transferManager.sendFile(IOUtils.getFileContent(path), OrderType.FUL);
-        } catch (IOException e) {
-            configuration.getLogger().error(
-                Messages.getString("upload.file.error", Constants.APPLICATION_BUNDLE_NAME, path), e);
-        } catch (EbicsException e) {
+        } catch (IOException | EbicsException e) {
             configuration.getLogger().error(
                 Messages.getString("upload.file.error", Constants.APPLICATION_BUNDLE_NAME, path), e);
         }
@@ -596,7 +592,7 @@ public class EbicsClient {
             user = client.loadUser(hostId, partnerId, userId, pwdHandler);
         }
 
-        if (cmd.hasOption("ini")) {
+        if (cmd.hasOption("letters")) {
             client.createLetters(user, false);
         }
 
@@ -616,9 +612,7 @@ public class EbicsClient {
         if (cmd.hasOption("sta")) {
             client.fetchFile(getOutputFile(outputFileValue), user, product, OrderType.STA, false,
                 null, null);
-        }
-
-        if (cmd.hasOption("vmk")) {
+        } else if (cmd.hasOption("vmk")) {
             client.fetchFile(getOutputFile(outputFileValue), user, product, OrderType.VMK, false,
                 null, null);
         }

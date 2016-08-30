@@ -43,7 +43,7 @@ public interface InitLetter {
    * @throws IOException
    * @throws GeneralSecurityException
    */
-  public void create(EbicsUser user)
+  void create(EbicsUser user)
     throws GeneralSecurityException, IOException, EbicsException;
 
   /**
@@ -51,17 +51,17 @@ public interface InitLetter {
    * @param output the output stream.
    * @throws IOException Save error.
    */
-  public void save(OutputStream output) throws IOException;
+  void writeTo(OutputStream output) throws IOException;
 
   /**
    * Returns the initialization letter title.
    * @return the letter title.
    */
-  public String getTitle();
+  String getTitle();
 
   /**
    * Returns the letter name.
    * @return the letter name.
    */
-  public String getName();
+  String getName();
 }
