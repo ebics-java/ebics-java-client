@@ -549,6 +549,12 @@ public class EbicsClient {
         options.addOption(null, "create", false, "Create and initialize EBICS user");
         options.addOption(null, "sta", false, "Fetch STA file (MT940 file)");
         options.addOption(null, "vmk", false, "Fetch VMK file (MT942 file)");
+        options.addOption(null, "zdf", false, "Fetch ZDF file (zip file with documents)");
+        options.addOption(null, "zb6", false, "Fetch ZB6 file");
+        options.addOption(null, "ptk", false, "Fetch PTK file (TXT)");
+        options.addOption(null, "hac", false, "Fetch HAC file (XML)");
+        options.addOption(null, "z01", false, "Fetch Z01 file");
+
         options.addOption("o", "output", true, "output file");
 
         CommandLine cmd = parseArguments(options, args);
@@ -609,12 +615,15 @@ public class EbicsClient {
 
         String outputFileValue = cmd.getOptionValue("o");
 
-        if (cmd.hasOption("sta")) {
-            client.fetchFile(getOutputFile(outputFileValue), user, product, OrderType.STA, false,
-                null, null);
-        } else if (cmd.hasOption("vmk")) {
-            client.fetchFile(getOutputFile(outputFileValue), user, product, OrderType.VMK, false,
-                null, null);
+        List<OrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
+            OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
+
+        for (OrderType type : fetchFileOrders) {
+            if (cmd.hasOption(type.name().toLowerCase())) {
+                client.fetchFile(getOutputFile(outputFileValue), user, product, type, false,
+                    null, null);
+                break;
+            }
         }
         client.quit();
     }

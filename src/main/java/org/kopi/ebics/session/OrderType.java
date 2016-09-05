@@ -50,5 +50,8 @@ public enum OrderType {
     HAC,
     PTK,
     STA,
-    VMK
+    VMK,
+    ZDF,
+    ZB6,
+    Z01
 }
