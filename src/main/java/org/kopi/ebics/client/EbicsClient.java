@@ -65,10 +65,13 @@ import org.kopi.ebics.utils.Constants;
  */
 public class EbicsClient {
 
-    private Configuration configuration;
-    private Map<String, User> users = new HashMap<>();
-    private Map<String, Partner> partners = new HashMap<>();
-    private Map<String, Bank> banks = new HashMap<>();
+    private final Configuration configuration;
+    private final Map<String, User> users = new HashMap<>();
+    private final Map<String, Partner> partners = new HashMap<>();
+    private final Map<String, Bank> banks = new HashMap<>();
+    private final ConfigProperties properties;
+    private Product defaultProduct;
+    private User defaultUser;
 
     static {
         org.apache.xml.security.Init.init();
@@ -80,9 +83,11 @@ public class EbicsClient {
      *
      * @param configuration
      *            the application configuration
+     * @param properties
      */
-    public EbicsClient(Configuration configuration) {
+    public EbicsClient(Configuration configuration, ConfigProperties properties) {
         this.configuration = configuration;
+        this.properties = properties;
         Messages.setLocale(configuration.getLocale());
         configuration.getLogger().info(
             Messages.getString("init.configuration", Constants.APPLICATION_BUNDLE_NAME));
@@ -443,14 +448,9 @@ public class EbicsClient {
         }
     }
 
-    /**
-     * Sets the application configuration
-     *
-     * @param configuration
-     *            the configuration
-     */
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
+    public void fetchFile(File file, OrderType orderType, Date start, Date end) throws IOException,
+        EbicsException {
+        fetchFile(file, defaultUser, defaultProduct, orderType, false, start, end);
     }
 
     /**
@@ -489,9 +489,13 @@ public class EbicsClient {
                 Messages.getString("app.quit.error", Constants.APPLICATION_BUNDLE_NAME));
         }
 
-        // configuration.getLogger().info(Messages.getString("app.cache.clear",
-        // Constants.APPLICATION_BUNDLE_NAME));
-        // configuration.getTraceManager().clear();
+        clearTraces();
+    }
+
+    public void clearTraces() {
+        configuration.getLogger().info(
+            Messages.getString("app.cache.clear", Constants.APPLICATION_BUNDLE_NAME));
+        configuration.getTraceManager().clear();
     }
 
     public static class ConfigProperties {
@@ -540,6 +544,59 @@ public class EbicsClient {
         return line;
     }
 
+    public static EbicsClient createEbicsClient(File rootDir, File configFile) throws FileNotFoundException,
+        IOException {
+        ConfigProperties properties = new ConfigProperties(configFile);
+        final String country = properties.get("countryCode").toUpperCase();
+        final String language = properties.get("languageCode").toLowerCase();
+        final String productName = properties.get("productName");
+
+        final Locale locale = new Locale(language, country);
+
+        DefaultConfiguration configuration = new DefaultConfiguration(rootDir.getAbsolutePath()) {
+
+            @Override
+            public Locale getLocale() {
+                return locale;
+            }
+        };
+
+        EbicsClient client = new EbicsClient(configuration, properties);
+
+        Product product = new Product(productName, language, null);
+
+        client.setDefaultProduct(product);
+
+        return client;
+    }
+
+    public void createDefaultUser() throws Exception {
+        defaultUser = createUser(properties, createPasswordCallback());
+    }
+
+    public void loadDefaultUser() throws Exception {
+        String userId = properties.get("userId");
+        String hostId = properties.get("hostId");
+        String partnerId = properties.get("partnerId");
+        defaultUser = loadUser(hostId, partnerId, userId, createPasswordCallback());
+    }
+
+    private PasswordCallback createPasswordCallback() {
+        final String password = properties.get("password");
+        PasswordCallback pwdHandler = new PasswordCallback() {
+
+            @Override
+            public char[] getPassword() {
+                return password.toCharArray();
+            }
+        };
+        return pwdHandler;
+    }
+
+    private void setDefaultProduct(Product product) {
+        this.defaultProduct = product;
+    }
+
     public static void main(String[] args) throws Exception {
         Options options = new Options();
         options.addOption(null, "ini", false, "Send INI request");
@@ -559,58 +616,30 @@ public class EbicsClient {
 
         CommandLine cmd = parseArguments(options, args);
 
-        ConfigProperties properties = new ConfigProperties(new File("ebics.txt"));
-
-        String userId = properties.get("userId");
-        String hostId = properties.get("hostId");
-        String partnerId = properties.get("partnerId");
-        final String password = properties.get("password");
-        final String country = properties.get("countryCode").toUpperCase();
-        final String language = properties.get("languageCode").toLowerCase();
-        final String productName = properties.get("productName");
-
-        final Locale locale = new Locale(language, country);
-
-        DefaultConfiguration configuration = new DefaultConfiguration() {
-
-            @Override
-            public Locale getLocale() {
-                return locale;
-            }
-        };
-
-        PasswordCallback pwdHandler = new PasswordCallback() {
-
-            @Override
-            public char[] getPassword() {
-                return password.toCharArray();
-            }
-        };
-
-        EbicsClient client = new EbicsClient(configuration);
-
-        Product product = new Product(productName, language, null);
-        User user;
+        File defaultRootDir = new File(System.getProperty("user.home") + File.separator + "ebics"
+            + File.separator + "client");
+        File ebicsClientProperties = new File(defaultRootDir, "ebics.txt");
+        EbicsClient client = createEbicsClient(defaultRootDir, ebicsClientProperties);
 
         if (cmd.hasOption("create")) {
-            user = client.createUser(properties, pwdHandler);
+            client.createDefaultUser();
         } else {
-            user = client.loadUser(hostId, partnerId, userId, pwdHandler);
+            client.loadDefaultUser();
         }
 
         if (cmd.hasOption("letters")) {
-            client.createLetters(user, false);
+            client.createLetters(client.defaultUser, false);
         }
 
         if (cmd.hasOption("ini")) {
-            client.sendINIRequest(user, product);
+            client.sendINIRequest(client.defaultUser, client.defaultProduct);
         }
         if (cmd.hasOption("hia")) {
-            client.sendHIARequest(user, product);
+            client.sendHIARequest(client.defaultUser, client.defaultProduct);
         }
 
         if (cmd.hasOption("hpb")) {
-            client.sendHPBRequest(user, product);
+            client.sendHPBRequest(client.defaultUser, client.defaultProduct);
         }
 
         String outputFileValue = cmd.getOptionValue("o");
@@ -620,8 +649,8 @@ public class EbicsClient {
 
         for (OrderType type : fetchFileOrders) {
             if (cmd.hasOption(type.name().toLowerCase())) {
-                client.fetchFile(getOutputFile(outputFileValue), user, product, type, false,
-                    null, null);
+                client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
+                    client.defaultProduct, type, false, null, null);
                 break;
             }
         }
