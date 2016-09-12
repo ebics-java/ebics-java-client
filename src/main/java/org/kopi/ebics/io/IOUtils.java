@@ -104,20 +104,6 @@ public class IOUtils {
    * @param name the file name.
    * @return the created file.
    */
-  public static File createFile(String parent, String name) {
-    File			file;
-
-    file = new File(parent, name);
-
-    return file;
-  }
-
-  /**
-   * Creates a new <code>java.io.File</code> from a given root.
-   * @param parent the parent of the file.
-   * @param name the file name.
-   * @return the created file.
-   */
   public static File createFile(File parent, String name) {
     File			file;
 
@@ -126,36 +112,18 @@ public class IOUtils {
     return file;
   }
 
-  /**
-   * Creates a file from its name. The name can be absolute if
-   * only the directory tree is created
-   * @param name the file name
-   * @return the created file
-   */
-  public static File createFile(String name) {
-    File			file;
-
-    file = new File(name);
-
-    return file;
-  }
 
   /**
    * Returns the content of a file as byte array.
-   * @param path the file path
+   * @param file the file
    * @return the byte array content of the file
    * @throws EbicsException
    */
-  public static byte[] getFileContent(String path) throws EbicsException {
+  public static byte[] getFileContent(File file) throws EbicsException {
     try {
-      InputStream			input;
-      byte[]				content;
-
-      input = new FileInputStream(path);
-      content = new byte[input.available()];
-      input.read(content);
-      input.close();
-      return content;
+      try(FileInputStream input = new FileInputStream(file)) {
+          return inputStreamToBytes(input);
+      }
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
     }
@@ -167,24 +135,22 @@ public class IOUtils {
    * @return
    * @throws EbicsException
    */
-  public static byte[] getFactoryContent(ContentFactory content) throws EbicsException {
-    try {
-      byte[]			buffer;
-      ByteArrayOutputStream	out;
-      InputStream		in;
-      int			len = -1;
-      
-      out = new ByteArrayOutputStream();
-      in = content.getContent();
-      buffer = new byte[1024];
-      while ((len = in.read(buffer)) != -1) {
-	out.write(buffer, 0, len);
-      }
-      in.close();
-      out.close();
-      return out.toByteArray();
-    } catch (IOException e) {
-      throw new EbicsException(e.getMessage());
+    public static byte[] getFactoryContent(ContentFactory content) throws EbicsException {
+        try (InputStream in = content.getContent()) {
+            return inputStreamToBytes(in);
+        } catch (IOException e) {
+            throw new EbicsException(e.getMessage());
+        }
     }
-  }
+
+    private static byte[] inputStreamToBytes(InputStream in) throws IOException {
+        int len;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        while ((len = in.read(buffer)) != -1) {
+            out.write(buffer, 0, len);
+        }
+        out.close();
+        return out.toByteArray();
+    }
 }

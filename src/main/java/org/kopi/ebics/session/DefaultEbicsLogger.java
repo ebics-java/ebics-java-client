@@ -28,7 +28,6 @@ import org.apache.log4j.PatternLayout;
 import org.apache.log4j.RollingFileAppender;
 import org.kopi.ebics.exception.ReturnCode;
 import org.kopi.ebics.interfaces.EbicsLogger;
-import org.kopi.ebics.io.IOUtils;
 
 
 /**
@@ -189,7 +188,7 @@ public class DefaultEbicsLogger implements EbicsLogger {
 
   @Override
   public void setLogFile(String logFile) {
-    this.logFile = IOUtils.createFile(logFile);
+    this.logFile = new File(logFile);
   }
 
   // --------------------------------------------------------------------

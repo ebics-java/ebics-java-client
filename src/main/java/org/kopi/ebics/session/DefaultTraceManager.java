@@ -96,7 +96,7 @@ public class DefaultTraceManager implements TraceManager {
 
   @Override
   public void setTraceDirectory(String traceDir) {
-    this.traceDir = IOUtils.createFile(traceDir);
+    this.traceDir = new File(traceDir);
   }
 
   @Override
