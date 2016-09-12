@@ -910,18 +910,9 @@ public class EbicsXmlFactory {
                                                                                 OrderType orderType,
                                                                                 FULOrderParamsType orderParams)
   {
-    StaticHeaderOrderDetailsType newStaticHeaderOrderDetailsType = StaticHeaderOrderDetailsType.Factory.newInstance();
-    if (orderId != null) {
-      newStaticHeaderOrderDetailsType.setOrderID(orderId);
-    }
-    newStaticHeaderOrderDetailsType.setOrderAttribute(org.kopi.ebics.schema.h003.OrderAttributeType.Enum.forString(orderAttribute));
-    newStaticHeaderOrderDetailsType.setOrderType(orderType);
-    newStaticHeaderOrderDetailsType.setOrderParams(orderParams);
-    qualifySubstitutionGroup(newStaticHeaderOrderDetailsType.getOrderParams(), FULOrderParamsDocument.type.getDocumentElementName(), null);
-
-    return newStaticHeaderOrderDetailsType;
+        return createStaticHeaderOrderDetailsType(orderId, orderAttribute, orderType, orderParams,
+            FULOrderParamsDocument.type.getDocumentElementName());
   }
-
 
   /**
    * Creates a new <code>StaticHeaderOrderDetailsType</code> XML object
@@ -936,17 +927,8 @@ public class EbicsXmlFactory {
                                                                                 OrderType orderType,
                                                                                 FDLOrderParamsType orderParams)
   {
-    StaticHeaderOrderDetailsType newStaticHeaderOrderDetailsType = StaticHeaderOrderDetailsType.Factory.newInstance();
-
-    if (orderId != null) {
-      //newStaticHeaderOrderDetailsType.setOrderID(orderId);
-    }
-    newStaticHeaderOrderDetailsType.setOrderAttribute(org.kopi.ebics.schema.h003.OrderAttributeType.Enum.forString(orderAttribute));
-    newStaticHeaderOrderDetailsType.setOrderType(orderType);
-    newStaticHeaderOrderDetailsType.setOrderParams(orderParams);
-    qualifySubstitutionGroup(newStaticHeaderOrderDetailsType.getOrderParams(), FDLOrderParamsDocument.type.getDocumentElementName(), null);
-
-    return newStaticHeaderOrderDetailsType;
+      return createStaticHeaderOrderDetailsType(orderId, orderAttribute, orderType, orderParams,
+          FDLOrderParamsDocument.type.getDocumentElementName());
   }
 
   /**
@@ -962,17 +944,23 @@ public class EbicsXmlFactory {
                                                                                 OrderType orderType,
                                                                                 StandardOrderParamsType orderParams)
   {
-    StaticHeaderOrderDetailsType newStaticHeaderOrderDetailsType = StaticHeaderOrderDetailsType.Factory.newInstance();
-    if (orderId != null) {
-        newStaticHeaderOrderDetailsType.setOrderID(orderId);
-    }
-    newStaticHeaderOrderDetailsType.setOrderAttribute(org.kopi.ebics.schema.h003.OrderAttributeType.Enum.forString(orderAttribute));
-    newStaticHeaderOrderDetailsType.setOrderType(orderType);
-    newStaticHeaderOrderDetailsType.setOrderParams(orderParams);
-    qualifySubstitutionGroup(newStaticHeaderOrderDetailsType.getOrderParams(), StandardOrderParamsDocument.type.getDocumentElementName(), null);
-
-    return newStaticHeaderOrderDetailsType;
+      return createStaticHeaderOrderDetailsType(orderId, orderAttribute, orderType, orderParams,
+          StandardOrderParamsDocument.type.getDocumentElementName());
   }
+
+    private static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
+        String orderAttribute, OrderType orderType, XmlObject orderParams, QName newInstance) {
+        StaticHeaderOrderDetailsType type = StaticHeaderOrderDetailsType.Factory.newInstance();
+        if (orderId != null) {
+            type.setOrderID(orderId);
+        }
+        type.setOrderAttribute(org.kopi.ebics.schema.h003.OrderAttributeType.Enum.forString(orderAttribute));
+        type.setOrderType(orderType);
+        type.setOrderParams(orderParams);
+        qualifySubstitutionGroup(type.getOrderParams(), newInstance, null);
+
+        return type;
+    }
 
   /**
    * Creates a new <code>FULOrderParamsType</code> XML object
