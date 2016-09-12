@@ -20,6 +20,8 @@
 package org.kopi.ebics.exception;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.kopi.ebics.messages.Messages;
 
@@ -94,57 +96,11 @@ public class ReturnCode implements Serializable {
    * @return the equivalent <code>ReturnCode</code>
    */
   public static ReturnCode toReturnCode(String code, String text) {
-    if (code.equals(EBICS_OK.code)) {
-      return EBICS_OK;
-    } else if (code.equals(EBICS_DOWNLOAD_POSTPROCESS_DONE.code)) {
-      return EBICS_DOWNLOAD_POSTPROCESS_DONE;
-    } else if (code.equals(EBICS_DOWNLOAD_POSTPROCESS_SKIPPED.code)) {
-      return EBICS_DOWNLOAD_POSTPROCESS_SKIPPED;
-    } else if (code.equals(EBICS_TX_SEGMENT_NUMBER_UNDERRUN.code)) {
-      return EBICS_DOWNLOAD_POSTPROCESS_SKIPPED;
-    } else if (code.equals(EBICS_AUTHENTICATION_FAILED.code)) {
-      return EBICS_AUTHENTICATION_FAILED;
-    } else if (code.equals(EBICS_INVALID_REQUEST.code)) {
-      return EBICS_INVALID_REQUEST;
-    } else if (code.equals(EBICS_INTERNAL_ERROR.code)) {
-      return EBICS_INTERNAL_ERROR;
-    } else if (code.equals(EBICS_TX_RECOVERY_SYNC.code)) {
-      return EBICS_TX_RECOVERY_SYNC;
-    } else if (code.equals(EBICS_INVALID_USER_OR_USER_STATE.code)) {
-      return EBICS_INVALID_USER_OR_USER_STATE;
-    } else if (code.equals(EBICS_USER_UNKNOWN.code)) {
-      return EBICS_USER_UNKNOWN;
-    } else if (code.equals(EBICS_INVALID_USER_STATE.code)) {
-      return EBICS_INVALID_USER_STATE;
-    } else if (code.equals(EBICS_INVALID_ORDER_TYPE.code)) {
-      return EBICS_INVALID_ORDER_TYPE;
-    } else if (code.equals(EBICS_UNSUPPORTED_ORDER_TYPE.code)) {
-      return EBICS_UNSUPPORTED_ORDER_TYPE;
-    } else if (code.equals(EBICS_USER_AUTHENTICATION_REQUIRED.code)) {
-      return EBICS_USER_AUTHENTICATION_REQUIRED;
-    } else if (code.equals(EBICS_BANK_PUBKEY_UPDATE_REQUIRED.code)) {
-      return EBICS_BANK_PUBKEY_UPDATE_REQUIRED;
-    } else if (code.equals(EBICS_SEGMENT_SIZE_EXCEEDED.code)) {
-      return EBICS_SEGMENT_SIZE_EXCEEDED;
-    } else if (code.equals(EBICS_TX_UNKNOWN_TXID.code)) {
-      return EBICS_TX_UNKNOWN_TXID;
-    } else if (code.equals(EBICS_TX_ABORT.code)) {
-      return EBICS_TX_ABORT;
-    } else if (code.equals(EBICS_TX_MESSAGE_REPLAY.code)) {
-      return EBICS_TX_MESSAGE_REPLAY;
-    } else if (code.equals(EBICS_TX_SEGMENT_NUMBER_EXCEEDED.code)) {
-      return EBICS_TX_SEGMENT_NUMBER_EXCEEDED;
-    } else if (code.equals(EBICS_X509_CERTIFICATE_NOT_VALID_YET.code)) {
-      return EBICS_X509_CERTIFICATE_NOT_VALID_YET;
-    } else if (code.equals(EBICS_MAX_TRANSACTIONS_EXCEEDED.code)) {
-      return EBICS_MAX_TRANSACTIONS_EXCEEDED;
-    } else if (code.equals(EBICS_SIGNATURE_VERIFICATION_FAILED.code)) {
-      return EBICS_SIGNATURE_VERIFICATION_FAILED;
-    } else if (code.equals(EBICS_NO_DOWNLOAD_DATA_AVAILABLE.code)) {
-      return EBICS_NO_DOWNLOAD_DATA_AVAILABLE;
-    } else {
+      ReturnCode returnCode = returnCodes.get(code);
+      if (returnCode != null) {
+          return returnCode;
+      }
       return new ReturnCode(code, text, text);
-    }
   }
 
   @Override
@@ -158,16 +114,16 @@ public class ReturnCode implements Serializable {
 
   @Override
   public int hashCode() {
-    return Integer.parseInt(code);
+    return code.hashCode();
   }
 
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private String			code;
-  private String			symbolicName;
-  private String			text;
+  private final String			code;
+  private final String			symbolicName;
+  private final String			text;
   public static final ReturnCode 	EBICS_OK;
   public static final ReturnCode 	EBICS_DOWNLOAD_POSTPROCESS_DONE;
   public static final ReturnCode 	EBICS_DOWNLOAD_POSTPROCESS_SKIPPED;
@@ -192,33 +148,48 @@ public class ReturnCode implements Serializable {
   public static final ReturnCode	EBICS_MAX_TRANSACTIONS_EXCEEDED;
   public static final ReturnCode	EBICS_SIGNATURE_VERIFICATION_FAILED;
   public static final ReturnCode	EBICS_NO_DOWNLOAD_DATA_AVAILABLE;
+  public static final ReturnCode    EBICS_ORDERID_ALREADY_EXISTS;
   private static final String		BUNDLE_NAME = "org.kopi.ebics.exception.messages";
   private static final long 		serialVersionUID = -497883146384363199L;
 
+  private static final Map<String, ReturnCode> returnCodes = new HashMap<>();
+
   static {
-    EBICS_OK = new ReturnCode("000000", "EBICS_OK", Messages.getString("000000", BUNDLE_NAME));
-    EBICS_DOWNLOAD_POSTPROCESS_DONE = new ReturnCode("011000", "EBICS_DOWNLOAD_POSTPROCESS_DONE", Messages.getString("011000", BUNDLE_NAME));
-    EBICS_DOWNLOAD_POSTPROCESS_SKIPPED = new ReturnCode("011001", "EBICS_DOWNLOAD_POSTPROCESS_SKIPPED", Messages.getString("011001", BUNDLE_NAME));
-    EBICS_TX_SEGMENT_NUMBER_UNDERRUN = new ReturnCode("011101", "EBICS_TX_SEGMENT_NUMBER_UNDERRUN", Messages.getString("011101", BUNDLE_NAME));
-    EBICS_AUTHENTICATION_FAILED = new ReturnCode("061001", "EBICS_AUTHENTICATION_FAILED", Messages.getString("061001", BUNDLE_NAME));
-    EBICS_INVALID_REQUEST = new ReturnCode("061002", "EBICS_INVALID_REQUEST", Messages.getString("061002", BUNDLE_NAME));
-    EBICS_INTERNAL_ERROR = new ReturnCode("061099", "EBICS_INTERNAL_ERROR", Messages.getString("061099", BUNDLE_NAME));
-    EBICS_TX_RECOVERY_SYNC = new ReturnCode("061101", "EBICS_TX_RECOVERY_SYNC", Messages.getString("061101", BUNDLE_NAME));
-    EBICS_INVALID_USER_OR_USER_STATE = new ReturnCode("091002", "EBICS_INVALID_USER_OR_USER_STATE", Messages.getString("091002", BUNDLE_NAME));
-    EBICS_USER_UNKNOWN = new ReturnCode("091003", "EBICS_USER_UNKNOWN", Messages.getString("091003", BUNDLE_NAME));
-    EBICS_INVALID_USER_STATE = new ReturnCode("091004", "EBICS_INVALID_USER_STATE", Messages.getString("091004", BUNDLE_NAME));
-    EBICS_INVALID_ORDER_TYPE = new ReturnCode("091005", "EBICS_INVALID_ORDER_TYPE", Messages.getString("091005", BUNDLE_NAME));
-    EBICS_UNSUPPORTED_ORDER_TYPE = new ReturnCode("091006", "EBICS_UNSUPPORTED_ORDER_TYPE", Messages.getString("091006", BUNDLE_NAME));
-    EBICS_USER_AUTHENTICATION_REQUIRED = new ReturnCode("091007", "EBICS_USER_AUTHENTICATION_REQUIRED", Messages.getString("091007", BUNDLE_NAME));
-    EBICS_BANK_PUBKEY_UPDATE_REQUIRED = new ReturnCode("091008", "EBICS_BANK_PUBKEY_UPDATE_REQUIRED", Messages.getString("091008", BUNDLE_NAME));
-    EBICS_SEGMENT_SIZE_EXCEEDED = new ReturnCode("091009", "EBICS_SEGMENT_SIZE_EXCEEDED", Messages.getString("091009", BUNDLE_NAME));
-    EBICS_TX_UNKNOWN_TXID = new ReturnCode("091101", "EBICS_TX_UNKNOWN_TXID", Messages.getString("091101", BUNDLE_NAME));
-    EBICS_TX_ABORT = new ReturnCode("091102", "EBICS_TX_ABORT", Messages.getString("091102", BUNDLE_NAME));
-    EBICS_TX_MESSAGE_REPLAY = new ReturnCode("091103", "EBICS_TX_MESSAGE_REPLAY", Messages.getString("091103", BUNDLE_NAME));
-    EBICS_TX_SEGMENT_NUMBER_EXCEEDED = new ReturnCode("091104", "EBICS_TX_SEGMENT_NUMBER_EXCEEDED", Messages.getString("091104", BUNDLE_NAME));
-    EBICS_X509_CERTIFICATE_NOT_VALID_YET = new ReturnCode("091209", "EBICS_X509_CERTIFICATE_NOT_VALID_YET", Messages.getString("091209", BUNDLE_NAME));
-    EBICS_MAX_TRANSACTIONS_EXCEEDED = new ReturnCode("091119", "EBICS_MAX_TRANSACTIONS_EXCEEDED", Messages.getString("091119", BUNDLE_NAME));
-    EBICS_SIGNATURE_VERIFICATION_FAILED = new ReturnCode("091301", "EBICS_SIGNATURE_VERIFICATION_FAILED", Messages.getString("091301", BUNDLE_NAME));
-    EBICS_NO_DOWNLOAD_DATA_AVAILABLE = new ReturnCode("090005", "EBICS_NO_DOWNLOAD_DATA_AVAILABLE", Messages.getString("090005", BUNDLE_NAME));
+    EBICS_OK = create("000000", "EBICS_OK");
+    EBICS_DOWNLOAD_POSTPROCESS_DONE = create("011000", "EBICS_DOWNLOAD_POSTPROCESS_DONE");
+    EBICS_DOWNLOAD_POSTPROCESS_SKIPPED = create("011001", "EBICS_DOWNLOAD_POSTPROCESS_SKIPPED");
+    EBICS_TX_SEGMENT_NUMBER_UNDERRUN = create("011101", "EBICS_TX_SEGMENT_NUMBER_UNDERRUN");
+    EBICS_AUTHENTICATION_FAILED = create("061001", "EBICS_AUTHENTICATION_FAILED");
+    EBICS_INVALID_REQUEST = create("061002", "EBICS_INVALID_REQUEST");
+    EBICS_INTERNAL_ERROR = create("061099", "EBICS_INTERNAL_ERROR");
+    EBICS_TX_RECOVERY_SYNC = create("061101", "EBICS_TX_RECOVERY_SYNC");
+
+    EBICS_NO_DOWNLOAD_DATA_AVAILABLE = create("090005", "EBICS_NO_DOWNLOAD_DATA_AVAILABLE");
+    EBICS_INVALID_USER_OR_USER_STATE = create("091002", "EBICS_INVALID_USER_OR_USER_STATE");
+    EBICS_USER_UNKNOWN = create("091003", "EBICS_USER_UNKNOWN");
+    EBICS_INVALID_USER_STATE = create("091004", "EBICS_INVALID_USER_STATE");
+    EBICS_INVALID_ORDER_TYPE = create("091005", "EBICS_INVALID_ORDER_TYPE");
+    EBICS_UNSUPPORTED_ORDER_TYPE = create("091006", "EBICS_UNSUPPORTED_ORDER_TYPE");
+    EBICS_USER_AUTHENTICATION_REQUIRED = create("091007", "EBICS_USER_AUTHENTICATION_REQUIRED");
+    EBICS_BANK_PUBKEY_UPDATE_REQUIRED = create("091008", "EBICS_BANK_PUBKEY_UPDATE_REQUIRED");
+    EBICS_SEGMENT_SIZE_EXCEEDED = create("091009", "EBICS_SEGMENT_SIZE_EXCEEDED");
+    EBICS_TX_UNKNOWN_TXID = create("091101", "EBICS_TX_UNKNOWN_TXID");
+    EBICS_TX_ABORT = create("091102", "EBICS_TX_ABORT");
+    EBICS_TX_MESSAGE_REPLAY = create("091103", "EBICS_TX_MESSAGE_REPLAY");
+    EBICS_TX_SEGMENT_NUMBER_EXCEEDED = create("091104", "EBICS_TX_SEGMENT_NUMBER_EXCEEDED");
+    EBICS_ORDERID_ALREADY_EXISTS = create("091115", "EBICS_ORDERID_ALREADY_EXISTS");
+    EBICS_MAX_TRANSACTIONS_EXCEEDED = create("091119", "EBICS_MAX_TRANSACTIONS_EXCEEDED");
+    EBICS_X509_CERTIFICATE_NOT_VALID_YET = create("091209", "EBICS_X509_CERTIFICATE_NOT_VALID_YET");
+    EBICS_SIGNATURE_VERIFICATION_FAILED = create("091301", "EBICS_SIGNATURE_VERIFICATION_FAILED");
+
+
+
   }
+
+    private static ReturnCode create(String code, String symbolicName) {
+        ReturnCode returnCode = new ReturnCode(code, symbolicName, Messages.getString(code,
+            BUNDLE_NAME));
+        returnCodes.put(code, returnCode);
+        return returnCode;
+    }
 }
