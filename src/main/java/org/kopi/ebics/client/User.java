@@ -428,7 +428,7 @@ public class User implements EbicsUser, Savable {
 
   @Override
   public String getSaveName() {
-    return userId + ".cer";
+    return "user-" + userId + ".cer";
   }
 
   /**

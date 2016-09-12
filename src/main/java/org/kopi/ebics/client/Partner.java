@@ -137,7 +137,7 @@ public class Partner implements EbicsPartner, Savable {
 
   @Override
   public String getSaveName() {
-    return partnerId + ".cer";
+    return "partner-" + partnerId + ".cer";
   }
 
   // --------------------------------------------------------------------

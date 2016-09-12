@@ -250,11 +250,11 @@ public class EbicsClient {
                 bank = (Bank) input.readObject();
             }
             try (ObjectInputStream input = configuration.getSerializationManager().deserialize(
-                partnerId)) {
+                "partner-" + partnerId)) {
                 partner = new Partner(bank, input);
             }
             try (ObjectInputStream input = configuration.getSerializationManager().deserialize(
-                userId)) {
+                "user-" + userId)) {
                 user = new User(partner, input, passwordCallback);
             }
             users.put(userId, user);
