@@ -32,7 +32,7 @@ import org.kopi.ebics.session.OrderType;
  * @author Hachani
  *
  */
-public class DInitializationResponseElement extends InitializationResponseElement {
+public class DownloadInitializationResponseElement extends InitializationResponseElement {
 
   /**
    * Constructs a new <code>DInitializationResponseElement</code> object
@@ -40,7 +40,7 @@ public class DInitializationResponseElement extends InitializationResponseElemen
    * @param orderType the order type
    * @param name the element name
    */
-  public DInitializationResponseElement(ContentFactory factory,
+  public DownloadInitializationResponseElement(ContentFactory factory,
                                         OrderType orderType,
                                         String name)
   {
@@ -48,21 +48,24 @@ public class DInitializationResponseElement extends InitializationResponseElemen
   }
 
   @Override
-  public void build() throws EbicsException {
-    String			bodyRetCode;
+  protected void processBodyReturnCode() throws NoDownloadDataAvailableException {
+      String bodyRetCode = response.getBody().getReturnCode().getStringValue();
+      returnCode = ReturnCode.toReturnCode(bodyRetCode, "");
+      if (returnCode.equals(ReturnCode.EBICS_NO_DOWNLOAD_DATA_AVAILABLE)) {
+        throw new NoDownloadDataAvailableException();
+      }
+  }
 
+  @Override
+  public void build() throws EbicsException {
     super.build();
-    bodyRetCode = response.getBody().getReturnCode().getStringValue();
-    returnCode = ReturnCode.toReturnCode(bodyRetCode, "");
-    if (returnCode.equals(ReturnCode.EBICS_NO_DOWNLOAD_DATA_AVAILABLE)) {
-      throw new NoDownloadDataAvailableException();
-    }
     numSegments = (int)response.getHeader().getStatic().getNumSegments();
     segmentNumber = (int)response.getHeader().getMutable().getSegmentNumber().getLongValue();
     lastSegment = response.getHeader().getMutable().getSegmentNumber().getLastSegment();
     transactionKey = response.getBody().getDataTransfer().getDataEncryptionInfo().getTransactionKey();
     orderData = response.getBody().getDataTransfer().getOrderData().getByteArrayValue();
   }
+
 
   /**
    * Returns the total segments number.

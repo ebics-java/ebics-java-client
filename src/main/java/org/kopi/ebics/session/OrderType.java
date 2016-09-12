@@ -53,5 +53,8 @@ public enum OrderType {
     VMK,
     ZDF,
     ZB6,
-    Z01
+    Z01,
+    XKD,
+    XE2,
+    XCT
 }

@@ -244,7 +244,6 @@ public class EbicsClient {
             Bank bank;
             Partner partner;
             User user;
-
             try (ObjectInputStream input = configuration.getSerializationManager().deserialize(
                 hostId)) {
                 bank = (Bank) input.readObject();
@@ -399,30 +398,37 @@ public class EbicsClient {
     }
 
     /**
-     * Sends a file to the ebics bank sever
-     *
-     * @param path
-     *            the file path to send
-     * @param userId
-     *            the user ID that sends the file.
-     * @param product
-     *            the application product.
+     * Sends a file to the ebics bank server
+     * @throws Exception
      */
-    public void sendFile(String path, User user, Product product) {
+    public void sendFile(File file, User user, Product product, OrderType orderType) throws Exception {
         EbicsSession session = createSession(user, product);
-        session.addSessionParam("FORMAT", "pain.xxx.cfonb160.dct");
-        session.addSessionParam("TEST", "true");
-        session.addSessionParam("EBCDIC", "false");
+        String format = null;
+        String orderAttribute = "DZHNN";
+
+        if (orderType == OrderType.XKD) {
+            orderAttribute = "OZHNN";
+        } else {
+            format = "pain.xxx.cfonb160.dct";
+        }
+
+        if (format != null) {
+            session.addSessionParam("FORMAT", format);
+        }
+//         session.addSessionParam("TEST", "true");
+//         session.addSessionParam("EBCDIC", "false");
         FileTransfer transferManager = new FileTransfer(session);
 
         configuration.getTraceManager().setTraceDirectory(
             configuration.getTransferTraceDirectory(user));
 
         try {
-            transferManager.sendFile(IOUtils.getFileContent(path), OrderType.FUL);
+            transferManager.sendFile(IOUtils.getFileContent(file), orderType, orderAttribute);
         } catch (IOException | EbicsException e) {
             configuration.getLogger().error(
-                Messages.getString("upload.file.error", Constants.APPLICATION_BUNDLE_NAME, path), e);
+                Messages.getString("upload.file.error", Constants.APPLICATION_BUNDLE_NAME,
+                    file.getAbsolutePath()), e);
+            throw e;
         }
     }
 
@@ -608,11 +614,21 @@ public class EbicsClient {
         options.addOption(null, "vmk", false, "Fetch VMK file (MT942 file)");
         options.addOption(null, "zdf", false, "Fetch ZDF file (zip file with documents)");
         options.addOption(null, "zb6", false, "Fetch ZB6 file");
-        options.addOption(null, "ptk", false, "Fetch PTK file (TXT)");
-        options.addOption(null, "hac", false, "Fetch HAC file (XML)");
+        options.addOption(null, "ptk", false, "Fetch client protocol file (TXT)");
+        options.addOption(null, "hac", false, "Fetch client protocol file (XML)");
         options.addOption(null, "z01", false, "Fetch Z01 file");
 
+        options.addOption(null, "xkd", false, "Send payment order file (DTA format)");
+        options.addOption(null, "ful", false, "Send payment order file (any format)");
+        options.addOption(null, "xct", false, "Send XCT file (any format)");
+        options.addOption(null, "xe2", false, "Send XE2 file (any format)");
+        options.addOption(null, "cct", false, "Send CCT file (any format)");
+
+        options.addOption(null, "skip_order", true, "Skip a number of order ids");
+
         options.addOption("o", "output", true, "output file");
+        options.addOption("i", "input", true, "input file");
+
 
         CommandLine cmd = parseArguments(options, args);
 
@@ -643,6 +659,7 @@ public class EbicsClient {
         }
 
         String outputFileValue = cmd.getOptionValue("o");
+        String inputFileValue = cmd.getOptionValue("i");
 
         List<OrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
             OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
@@ -654,6 +671,25 @@ public class EbicsClient {
                 break;
             }
         }
+
+        List<OrderType> sendFileOrders = Arrays.asList(OrderType.XKD, OrderType.FUL, OrderType.XCT,
+            OrderType.XE2, OrderType.CCT);
+        for (OrderType type : sendFileOrders) {
+            if (cmd.hasOption(type.name().toLowerCase())) {
+                client.sendFile(new File(inputFileValue), client.defaultUser,
+                    client.defaultProduct, type);
+                break;
+            }
+        }
+
+
+        if (cmd.hasOption("skip_order")) {
+            int count = Integer.parseInt(cmd.getOptionValue("skip_order"));
+            while(count-- > 0) {
+                client.defaultUser.getPartner().nextOrderId();
+            }
+        }
+
         client.quit();
     }
 

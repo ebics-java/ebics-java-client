@@ -28,25 +28,26 @@ import javax.crypto.spec.SecretKeySpec;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.ContentFactory;
 import org.kopi.ebics.io.Splitter;
-import org.kopi.ebics.schema.h003.DataTransferRequestType;
-import org.kopi.ebics.schema.h003.FULOrderParamsType;
-import org.kopi.ebics.schema.h003.FileFormatType;
-import org.kopi.ebics.schema.h003.MutableHeaderType;
-import org.kopi.ebics.schema.h003.StaticHeaderOrderDetailsType;
-import org.kopi.ebics.schema.h003.StaticHeaderType;
 import org.kopi.ebics.schema.h003.DataEncryptionInfoType.EncryptionPubKeyDigest;
+import org.kopi.ebics.schema.h003.DataTransferRequestType;
 import org.kopi.ebics.schema.h003.DataTransferRequestType.DataEncryptionInfo;
 import org.kopi.ebics.schema.h003.DataTransferRequestType.SignatureData;
 import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest;
 import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest.Body;
 import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest.Header;
+import org.kopi.ebics.schema.h003.FULOrderParamsType;
+import org.kopi.ebics.schema.h003.FileFormatType;
+import org.kopi.ebics.schema.h003.MutableHeaderType;
 import org.kopi.ebics.schema.h003.ParameterDocument.Parameter;
 import org.kopi.ebics.schema.h003.ParameterDocument.Parameter.Value;
+import org.kopi.ebics.schema.h003.StandardOrderParamsType;
+import org.kopi.ebics.schema.h003.StaticHeaderOrderDetailsType;
 import org.kopi.ebics.schema.h003.StaticHeaderOrderDetailsType.OrderType;
+import org.kopi.ebics.schema.h003.StaticHeaderType;
 import org.kopi.ebics.schema.h003.StaticHeaderType.BankPubKeyDigests;
-import org.kopi.ebics.schema.h003.StaticHeaderType.Product;
 import org.kopi.ebics.schema.h003.StaticHeaderType.BankPubKeyDigests.Authentication;
 import org.kopi.ebics.schema.h003.StaticHeaderType.BankPubKeyDigests.Encryption;
+import org.kopi.ebics.schema.h003.StaticHeaderType.Product;
 import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.utils.Utils;
 
@@ -58,17 +59,18 @@ import org.kopi.ebics.utils.Utils;
  * @author Hachani
  *
  */
-public class UInitializationRequestElement extends InitializationRequestElement {
+public class UploadInitializationRequestElement extends InitializationRequestElement {
 
-  /**
+
+/**
    * Constructs a new <code>UInitializationRequestElement</code> for uploads initializations.
    * @param session the current ebics session.
    * @param orderType the upload order type
    * @param userData the user data to be uploaded
    * @throws EbicsException
    */
-  public UInitializationRequestElement(EbicsSession session,
-                                       org.kopi.ebics.session.OrderType orderType,
+  public UploadInitializationRequestElement(EbicsSession session,
+                                       org.kopi.ebics.session.OrderType orderType, String orderAttribute,
                                        byte[] userData)
     throws EbicsException
   {
@@ -76,6 +78,7 @@ public class UInitializationRequestElement extends InitializationRequestElement 
     this.userData = userData;
     keySpec = new SecretKeySpec(nonce, "EAS");
     splitter = new Splitter(userData);
+    this.orderAttribute = orderAttribute;
   }
 
   @Override
@@ -93,11 +96,8 @@ public class UInitializationRequestElement extends InitializationRequestElement 
     DataEncryptionInfo 			dataEncryptionInfo;
     SignatureData 			signatureData;
     EncryptionPubKeyDigest 		encryptionPubKeyDigest;
-    StaticHeaderOrderDetailsType 	orderDetails;
-    FULOrderParamsType			fULOrderParams;
     OrderType 				orderType;
     FileFormatType 			fileFormat;
-    List<Parameter>			parameters;
 
     userSignature = new UserSignature(session.getUser(),
 				      generateName("UserSignature"),
@@ -120,34 +120,41 @@ public class UInitializationRequestElement extends InitializationRequestElement 
     orderType = EbicsXmlFactory.createOrderType(type.toString());
     fileFormat = EbicsXmlFactory.createFileFormatType(session.getConfiguration().getLocale().getCountry().toUpperCase(),
 	                                              session.getSessionParam("FORMAT"));
-    fULOrderParams = EbicsXmlFactory.createFULOrderParamsType(fileFormat);
-    parameters = new ArrayList<Parameter>();
-    if (Boolean.valueOf(session.getSessionParam("TEST")).booleanValue()) {
-      Parameter 		parameter;
-      Value			value;
 
-      value = EbicsXmlFactory.createValue("String", "TRUE");
-      parameter = EbicsXmlFactory.createParameter("TEST", value);
-      parameters.add(parameter);
+    String nextOrderId = session.getUser().getPartner().nextOrderId();
+
+    StaticHeaderOrderDetailsType orderDetails;
+    if (type == org.kopi.ebics.session.OrderType.FUL) {
+        FULOrderParamsType fULOrderParams = EbicsXmlFactory.createFULOrderParamsType(fileFormat);
+
+        List<Parameter> parameters = new ArrayList<Parameter>();
+        if (Boolean.valueOf(session.getSessionParam("TEST")).booleanValue()) {
+          Value value = EbicsXmlFactory.createValue("String", "TRUE");
+          Parameter parameter = EbicsXmlFactory.createParameter("TEST", value);
+          parameters.add(parameter);
+        }
+
+        if (Boolean.valueOf(session.getSessionParam("EBCDIC")).booleanValue()) {
+          Value value = EbicsXmlFactory.createValue("String", "TRUE");
+          Parameter parameter = EbicsXmlFactory.createParameter("EBCDIC", value);
+          parameters.add(parameter);
+        }
+
+        if (parameters.size() > 0) {
+          fULOrderParams.setParameterArray(parameters.toArray(new Parameter[parameters.size()]));
+        }
+        orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(nextOrderId,
+            orderAttribute,
+            orderType,
+            fULOrderParams);
+    } else {
+        StandardOrderParamsType standardOrderParamsType = EbicsXmlFactory.createStandardOrderParamsType();
+        orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(nextOrderId,
+            orderAttribute,
+            orderType,
+            standardOrderParamsType);
     }
 
-    if (Boolean.valueOf(session.getSessionParam("EBCDIC")).booleanValue()) {
-      Parameter 		parameter;
-      Value			value;
-
-      value = EbicsXmlFactory.createValue("String", "TRUE");
-      parameter = EbicsXmlFactory.createParameter("EBCDIC", value);
-      parameters.add(parameter);
-    }
-
-    if (parameters.size() > 0) {
-      fULOrderParams.setParameterArray(parameters.toArray(new Parameter[parameters.size()]));
-    }
-
-    orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(session.getUser().getPartner().nextOrderId(),
-	                                                              "DZHNN",
-	                                                              orderType,
-	                                                              fULOrderParams);
     xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(),
 	                                             nonce,
 	                                             splitter.getSegmentNumber(),
@@ -211,6 +218,7 @@ public class UInitializationRequestElement extends InitializationRequestElement 
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
+  private final String orderAttribute;
   private byte[]			userData;
   private UserSignature			userSignature;
   private SecretKeySpec			keySpec;

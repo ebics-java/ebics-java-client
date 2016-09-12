@@ -51,19 +51,24 @@ public class InitializationResponseElement extends DefaultResponseElement {
 
   @Override
   public void build() throws EbicsException {
-    String			code;
-    String			text;
-
     parse(factory);
     response = ((EbicsResponseDocument)document).getEbicsResponse();
-    code = response.getHeader().getMutable().getReturnCode();
-    text = response.getHeader().getMutable().getReportText();
+    String code = response.getHeader().getMutable().getReturnCode();
+    String text = response.getHeader().getMutable().getReportText();
     returnCode = ReturnCode.toReturnCode(code, text);
-    report();
+    checkReturnCode(returnCode);
+    processBodyReturnCode();
     transactionId = response.getHeader().getStatic().getTransactionID();
   }
 
-  /**
+  protected void processBodyReturnCode() throws EbicsException {
+      String bodyRetCode = response.getBody().getReturnCode().getStringValue();
+      ReturnCode returnCode = ReturnCode.toReturnCode(bodyRetCode, "");
+      checkReturnCode(returnCode);
+  }
+
+
+/**
    * Returns the transaction ID.
    * @return the transaction ID.
    */

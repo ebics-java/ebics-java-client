@@ -50,7 +50,7 @@ import org.kopi.ebics.session.EbicsSession;
  * @author Hachani
  *
  */
-public class DInitializationRequestElement extends InitializationRequestElement {
+public class DownloadInitializationRequestElement extends InitializationRequestElement {
 
   /**
    * Constructs a new <code>DInitializationRequestElement</code> for downloads initializations.
@@ -60,7 +60,7 @@ public class DInitializationRequestElement extends InitializationRequestElement 
    * @param endRange the end range download
    * @throws EbicsException
    */
-  public DInitializationRequestElement(EbicsSession session,
+  public DownloadInitializationRequestElement(EbicsSession session,
                                        org.kopi.ebics.session.OrderType type,
                                        Date startRange,
                                        Date endRange)

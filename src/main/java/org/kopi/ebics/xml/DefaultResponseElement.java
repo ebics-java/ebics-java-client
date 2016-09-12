@@ -67,10 +67,14 @@ public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
    * @throws EbicsException request fails.
    */
   public void report() throws EbicsException {
+    checkReturnCode(returnCode);
+  }
+
+  protected void checkReturnCode(ReturnCode returnCode) throws EbicsException {
     if (!returnCode.isOk()) {
       returnCode.throwException();
     }
-  }
+}
 
   @Override
   public String getName() {
