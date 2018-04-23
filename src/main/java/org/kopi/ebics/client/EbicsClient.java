@@ -43,6 +43,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.kopi.ebics.exception.EbicsException;
+import org.kopi.ebics.exception.NoDownloadDataAvailableException;
 import org.kopi.ebics.interfaces.Configuration;
 import org.kopi.ebics.interfaces.EbicsBank;
 import org.kopi.ebics.interfaces.EbicsUser;
@@ -51,6 +52,7 @@ import org.kopi.ebics.interfaces.LetterManager;
 import org.kopi.ebics.interfaces.PasswordCallback;
 import org.kopi.ebics.io.IOUtils;
 import org.kopi.ebics.messages.Messages;
+import org.kopi.ebics.schema.h003.OrderAttributeType;
 import org.kopi.ebics.session.DefaultConfiguration;
 import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.session.OrderType;
@@ -403,20 +405,8 @@ public class EbicsClient {
      */
     public void sendFile(File file, User user, Product product, OrderType orderType) throws Exception {
         EbicsSession session = createSession(user, product);
-        String format = null;
-        String orderAttribute = "DZHNN";
+        OrderAttributeType.Enum orderAttribute = OrderAttributeType.OZHNN;
 
-        if (orderType == OrderType.XKD) {
-            orderAttribute = "OZHNN";
-        } else {
-            format = "pain.xxx.cfonb160.dct";
-        }
-
-        if (format != null) {
-            session.addSessionParam("FORMAT", format);
-        }
-//         session.addSessionParam("TEST", "true");
-//         session.addSessionParam("EBCDIC", "false");
         FileTransfer transferManager = new FileTransfer(session);
 
         configuration.getTraceManager().setTraceDirectory(
@@ -430,6 +420,10 @@ public class EbicsClient {
                     file.getAbsolutePath()), e);
             throw e;
         }
+    }
+
+    public void sendFile(File file, OrderType orderType) throws Exception {
+        sendFile(file, defaultUser, defaultProduct, orderType);
     }
 
     public void fetchFile(File file, User user, Product product, OrderType orderType,
@@ -447,6 +441,9 @@ public class EbicsClient {
 
         try {
             transferManager.fetchFile(orderType, start, end, file);
+        } catch (NoDownloadDataAvailableException e) {
+            // don't log this exception as an error, caller can decide how to handle
+            throw e;
         } catch (Exception e) {
             configuration.getLogger().error(
                 Messages.getString("download.file.error", Constants.APPLICATION_BUNDLE_NAME), e);
@@ -603,6 +600,10 @@ public class EbicsClient {
         this.defaultProduct = product;
     }
 
+    public User getDefaultUser() {
+        return defaultUser;
+    }
+
     public static void main(String[] args) throws Exception {
         Options options = new Options();
         options.addOption(null, "ini", false, "Send INI request");
@@ -681,7 +682,6 @@ public class EbicsClient {
                 break;
             }
         }
-
 
         if (cmd.hasOption("skip_order")) {
             int count = Integer.parseInt(cmd.getOptionValue("skip_order"));

@@ -29,6 +29,7 @@ import org.kopi.ebics.interfaces.ContentFactory;
 import org.kopi.ebics.io.ByteArrayContentFactory;
 import org.kopi.ebics.io.Joiner;
 import org.kopi.ebics.messages.Messages;
+import org.kopi.ebics.schema.h003.OrderAttributeType;
 import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.session.OrderType;
 import org.kopi.ebics.utils.Constants;
@@ -93,7 +94,7 @@ public class FileTransfer {
    * @throws IOException
    * @throws EbicsException
    */
-  public void sendFile(byte[] content, OrderType orderType, String orderAttribute)
+  public void sendFile(byte[] content, OrderType orderType, OrderAttributeType.Enum orderAttribute)
     throws IOException, EbicsException
   {
     HttpRequestSender sender = new HttpRequestSender(session);

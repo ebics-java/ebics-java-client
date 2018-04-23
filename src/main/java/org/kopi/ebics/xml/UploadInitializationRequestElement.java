@@ -38,6 +38,7 @@ import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest.Header;
 import org.kopi.ebics.schema.h003.FULOrderParamsType;
 import org.kopi.ebics.schema.h003.FileFormatType;
 import org.kopi.ebics.schema.h003.MutableHeaderType;
+import org.kopi.ebics.schema.h003.OrderAttributeType;
 import org.kopi.ebics.schema.h003.ParameterDocument.Parameter;
 import org.kopi.ebics.schema.h003.ParameterDocument.Parameter.Value;
 import org.kopi.ebics.schema.h003.StandardOrderParamsType;
@@ -70,7 +71,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
    * @throws EbicsException
    */
   public UploadInitializationRequestElement(EbicsSession session,
-                                       org.kopi.ebics.session.OrderType orderType, String orderAttribute,
+                                       org.kopi.ebics.session.OrderType orderType, OrderAttributeType.Enum orderAttribute,
                                        byte[] userData)
     throws EbicsException
   {
@@ -127,7 +128,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     if (type == org.kopi.ebics.session.OrderType.FUL) {
         FULOrderParamsType fULOrderParams = EbicsXmlFactory.createFULOrderParamsType(fileFormat);
 
-        List<Parameter> parameters = new ArrayList<Parameter>();
+        List<Parameter> parameters = new ArrayList<>();
         if (Boolean.valueOf(session.getSessionParam("TEST")).booleanValue()) {
           Value value = EbicsXmlFactory.createValue("String", "TRUE");
           Parameter parameter = EbicsXmlFactory.createParameter("TEST", value);
@@ -218,7 +219,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private final String orderAttribute;
+  private final OrderAttributeType.Enum orderAttribute;
   private byte[]			userData;
   private UserSignature			userSignature;
   private SecretKeySpec			keySpec;

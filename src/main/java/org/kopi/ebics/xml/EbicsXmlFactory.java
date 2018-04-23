@@ -56,6 +56,7 @@ import org.kopi.ebics.schema.h003.HIARequestOrderDataType;
 import org.kopi.ebics.schema.h003.MutableHeaderType;
 import org.kopi.ebics.schema.h003.MutableHeaderType.SegmentNumber;
 import org.kopi.ebics.schema.h003.NoPubKeyDigestsRequestStaticHeaderType;
+import org.kopi.ebics.schema.h003.OrderAttributeType;
 import org.kopi.ebics.schema.h003.OrderDetailsType;
 import org.kopi.ebics.schema.h003.ParameterDocument.Parameter;
 import org.kopi.ebics.schema.h003.ParameterDocument.Parameter.Value;
@@ -906,7 +907,7 @@ public class EbicsXmlFactory {
    * @return the <code>StaticHeaderOrderDetailsType</code> XML object
    */
   public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
-                                                                                String orderAttribute,
+                                                                                OrderAttributeType.Enum orderAttribute,
                                                                                 OrderType orderType,
                                                                                 FULOrderParamsType orderParams)
   {
@@ -923,7 +924,7 @@ public class EbicsXmlFactory {
    * @return the <code>StaticHeaderOrderDetailsType</code> XML object
    */
   public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
-                                                                                String orderAttribute,
+                                                                                OrderAttributeType.Enum orderAttribute,
                                                                                 OrderType orderType,
                                                                                 FDLOrderParamsType orderParams)
   {
@@ -940,7 +941,7 @@ public class EbicsXmlFactory {
    * @return the <code>StaticHeaderOrderDetailsType</code> XML object
    */
   public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
-                                                                                String orderAttribute,
+                                                                                OrderAttributeType.Enum orderAttribute,
                                                                                 OrderType orderType,
                                                                                 StandardOrderParamsType orderParams)
   {
@@ -949,12 +950,12 @@ public class EbicsXmlFactory {
   }
 
     private static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
-        String orderAttribute, OrderType orderType, XmlObject orderParams, QName newInstance) {
+        OrderAttributeType.Enum orderAttribute, OrderType orderType, XmlObject orderParams, QName newInstance) {
         StaticHeaderOrderDetailsType type = StaticHeaderOrderDetailsType.Factory.newInstance();
         if (orderId != null) {
             type.setOrderID(orderId);
         }
-        type.setOrderAttribute(org.kopi.ebics.schema.h003.OrderAttributeType.Enum.forString(orderAttribute));
+        type.setOrderAttribute(orderAttribute);
         type.setOrderType(orderType);
         type.setOrderParams(orderParams);
         qualifySubstitutionGroup(type.getOrderParams(), newInstance, null);
