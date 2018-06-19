@@ -520,6 +520,7 @@ public class EbicsClient {
     private User createUser(ConfigProperties properties, PasswordCallback pwdHandler)
         throws Exception {
         String userId = properties.get("userId");
+        String partnerId = properties.get("partnerId");
         String bankUrl = properties.get("bank.url");
         String bankName = properties.get("bank.name");
         String hostId = properties.get("hostId");
@@ -529,7 +530,7 @@ public class EbicsClient {
         String userOrg = properties.get("user.org");
         boolean useCertificates = false;
         boolean saveCertificates = true;
-        return createUser(new URL(bankUrl), bankName, hostId, userId, userId, userName, userEmail,
+        return createUser(new URL(bankUrl), bankName, hostId, partnerId, userId, userName, userEmail,
             userCountry, userOrg, useCertificates, saveCertificates, pwdHandler);
     }
 
