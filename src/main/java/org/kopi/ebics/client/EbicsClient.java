@@ -605,26 +605,34 @@ public class EbicsClient {
         return defaultUser;
     }
 
+    private static void addOption(Options options, OrderType type, String description) {
+        options.addOption(null, type.name().toLowerCase(), false, description);
+    }
+
+    private static boolean hasOption(CommandLine cmd, OrderType type) {
+        return cmd.hasOption(type.name().toLowerCase());
+    }
+
     public static void main(String[] args) throws Exception {
         Options options = new Options();
-        options.addOption(null, "ini", false, "Send INI request");
-        options.addOption(null, "hia", false, "Send HIA request");
-        options.addOption(null, "hbp", false, "Send HPB request");
+        addOption(options, OrderType.INI, "Send INI request");
+        addOption(options, OrderType.HIA, "Send HIA request");
+        addOption(options, OrderType.HPB, "Send HPB request");
         options.addOption(null, "letters", false, "Create INI Letters");
         options.addOption(null, "create", false, "Create and initialize EBICS user");
-        options.addOption(null, "sta", false, "Fetch STA file (MT940 file)");
-        options.addOption(null, "vmk", false, "Fetch VMK file (MT942 file)");
-        options.addOption(null, "zdf", false, "Fetch ZDF file (zip file with documents)");
-        options.addOption(null, "zb6", false, "Fetch ZB6 file");
-        options.addOption(null, "ptk", false, "Fetch client protocol file (TXT)");
-        options.addOption(null, "hac", false, "Fetch client protocol file (XML)");
-        options.addOption(null, "z01", false, "Fetch Z01 file");
+        addOption(options, OrderType.STA,"Fetch STA file (MT940 file)");
+        addOption(options, OrderType.VMK, "Fetch VMK file (MT942 file)");
+        addOption(options, OrderType.ZDF, "Fetch ZDF file (zip file with documents)");
+        addOption(options, OrderType.ZB6, "Fetch ZB6 file");
+        addOption(options, OrderType.PTK, "Fetch client protocol file (TXT)");
+        addOption(options, OrderType.HAC, "Fetch client protocol file (XML)");
+        addOption(options, OrderType.Z01, "Fetch Z01 file");
 
-        options.addOption(null, "xkd", false, "Send payment order file (DTA format)");
-        options.addOption(null, "ful", false, "Send payment order file (any format)");
-        options.addOption(null, "xct", false, "Send XCT file (any format)");
-        options.addOption(null, "xe2", false, "Send XE2 file (any format)");
-        options.addOption(null, "cct", false, "Send CCT file (any format)");
+        addOption(options, OrderType.XKD, "Send payment order file (DTA format)");
+        addOption(options, OrderType.FUL, "Send payment order file (any format)");
+        addOption(options, OrderType.XCT, "Send XCT file (any format)");
+        addOption(options, OrderType.XE2, "Send XE2 file (any format)");
+        addOption(options, OrderType.CCT, "Send CCT file (any format)");
 
         options.addOption(null, "skip_order", true, "Skip a number of order ids");
 
@@ -649,14 +657,13 @@ public class EbicsClient {
             client.createLetters(client.defaultUser, false);
         }
 
-        if (cmd.hasOption("ini")) {
+        if (hasOption(cmd, OrderType.INI)) {
             client.sendINIRequest(client.defaultUser, client.defaultProduct);
         }
-        if (cmd.hasOption("hia")) {
+        if (hasOption(cmd, OrderType.HIA)) {
             client.sendHIARequest(client.defaultUser, client.defaultProduct);
         }
-
-        if (cmd.hasOption("hpb")) {
+        if (hasOption(cmd, OrderType.HPB)) {
             client.sendHPBRequest(client.defaultUser, client.defaultProduct);
         }
 
@@ -667,7 +674,7 @@ public class EbicsClient {
             OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
 
         for (OrderType type : fetchFileOrders) {
-            if (cmd.hasOption(type.name().toLowerCase())) {
+            if (hasOption(cmd, type)) {
                 client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
                     client.defaultProduct, type, false, null, null);
                 break;
@@ -677,7 +684,7 @@ public class EbicsClient {
         List<OrderType> sendFileOrders = Arrays.asList(OrderType.XKD, OrderType.FUL, OrderType.XCT,
             OrderType.XE2, OrderType.CCT);
         for (OrderType type : sendFileOrders) {
-            if (cmd.hasOption(type.name().toLowerCase())) {
+            if (hasOption(cmd, type)) {
                 client.sendFile(new File(inputFileValue), client.defaultUser,
                     client.defaultProduct, type);
                 break;
@@ -693,6 +700,7 @@ public class EbicsClient {
 
         client.quit();
     }
+
 
     private static File getOutputFile(String outputFileName) {
         if (outputFileName == null || outputFileName.isEmpty()) {
