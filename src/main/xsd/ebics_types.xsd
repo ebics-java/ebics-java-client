@@ -1479,6 +1479,22 @@
 					<documentation xml:lang="de">Updates abholen</documentation>
 				</annotation>
 			</enumeration>
+			<enumeration value="C52">
+				<annotation>
+					<documentation xml:lang="de">camt.052 Vormerkposten / Avise (VMK)</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="C53">
+				<annotation>
+					<documentation xml:lang="de">camt.053 Tagesauszug (STA)</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="C54">
+				<annotation>
+					<documentation xml:lang="de">Sammelbuchungsinformationen (DTI)</documentation>
+				</annotation>
+			</enumeration>
+
 		</restriction>
 	</simpleType>
 	<simpleType name="OrderIDType">

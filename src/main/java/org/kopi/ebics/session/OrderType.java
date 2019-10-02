@@ -56,5 +56,8 @@ public enum OrderType {
     Z01,
     XKD,
     XE2,
-    XCT
+    XCT,
+    C52,
+    C53,
+    C54
 }
