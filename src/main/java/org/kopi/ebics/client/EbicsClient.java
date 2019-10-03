@@ -622,6 +622,9 @@ public class EbicsClient {
         options.addOption(null, "create", false, "Create and initialize EBICS user");
         addOption(options, OrderType.STA,"Fetch STA file (MT940 file)");
         addOption(options, OrderType.VMK, "Fetch VMK file (MT942 file)");
+        addOption(options, OrderType.C52, "Fetch camt.052 file");
+        addOption(options, OrderType.C53, "Fetch camt.053 file");
+        addOption(options, OrderType.C54, "Fetch camt.054 file");
         addOption(options, OrderType.ZDF, "Fetch ZDF file (zip file with documents)");
         addOption(options, OrderType.ZB6, "Fetch ZB6 file");
         addOption(options, OrderType.PTK, "Fetch client protocol file (TXT)");
@@ -671,6 +674,7 @@ public class EbicsClient {
         String inputFileValue = cmd.getOptionValue("i");
 
         List<OrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
+            OrderType.C52, OrderType.C53, OrderType.C54,
             OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
 
         for (OrderType type : fetchFileOrders) {
