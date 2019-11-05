@@ -81,6 +81,7 @@
         <configuration>
           <schemaDirectory>src/main/xsd</schemaDirectory>
           <defaultXmlConfigDir>src/main/xsd/config</defaultXmlConfigDir>
+          <javaSource>1.8</javaSource>
         </configuration>
       </plugin>
 
