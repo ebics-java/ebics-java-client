@@ -18,12 +18,15 @@ import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Random;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 class SplitterTest {
 
     private static final int ONE_KB = 1000;
     private static final int ONE_MB = ONE_KB * ONE_KB;
-    private static final int CHUNK_SIZE_LIMIT = 700*ONE_KB;
-    private static final int REQUEST_SIZE_LIMIT = 1000*ONE_KB;
+    private static final int CHUNK_SIZE_LIMIT = 700 * ONE_KB;
+    private static final int REQUEST_SIZE_LIMIT = 1000 * ONE_KB;
+    private static final Random RANDOM_SEED = new Random(0);
 
     @Test
     void testSplitOneMb() throws NoSuchAlgorithmException, InvalidKeySpecException, EbicsException, IOException {
@@ -34,21 +37,21 @@ class SplitterTest {
 
     @Test
     void testSplitTwoMb() throws NoSuchAlgorithmException, InvalidKeySpecException, EbicsException, IOException {
-        byte[] b = randomDataArray(2*ONE_MB);
+        byte[] b = randomDataArray(2 * ONE_MB);
         Splitter splitter = splitAndVerifyContent(b);
         verifyActualRequestSize(splitter);
     }
 
     @Test
     void testSplitTenMb() throws NoSuchAlgorithmException, InvalidKeySpecException, EbicsException, IOException {
-        byte[] b = randomDataArray(10*ONE_MB);
+        byte[] b = randomDataArray(10 * ONE_MB);
         Splitter splitter = splitAndVerifyContent(b);
         verifyActualRequestSize(splitter);
     }
 
     @Test
     void testSplitFiftyMb() throws NoSuchAlgorithmException, InvalidKeySpecException, EbicsException, IOException {
-        byte[] b = randomDataArray(50*ONE_MB);
+        byte[] b = randomDataArray(50 * ONE_MB);
         Splitter splitter = splitAndVerifyContent(b);
         verifyActualRequestSize(splitter);
     }
@@ -72,7 +75,7 @@ class SplitterTest {
     private void verifyActualRequestSize(Splitter splitter) throws EbicsException {
         UploadTransferRequestElement fullRequest = prepareActualRequest(splitter);
         int actualSize = fullRequest.prettyPrint().length;
-        assert (actualSize < REQUEST_SIZE_LIMIT);
+        assertTrue(actualSize < SplitterTest.REQUEST_SIZE_LIMIT);
     }
 
     private Splitter splitAndVerifyContent(byte[] b) throws InvalidKeySpecException, NoSuchAlgorithmException, EbicsException, IOException {
@@ -80,10 +83,10 @@ class SplitterTest {
         splitter.readInput(true, new SecretKeySpec(secretKey().getEncoded(), "EAS"));
         int segmentSize = splitter.getSegmentSize();
         int segmentCount = splitter.getSegmentNumber();
-        assert (segmentSize < CHUNK_SIZE_LIMIT);
+        assertTrue(segmentSize < SplitterTest.CHUNK_SIZE_LIMIT);
         for (int i = 1; i <= segmentCount; i++) {
             int contentLength = splitter.getContent(i).getContent().available();
-            assert (contentLength < CHUNK_SIZE_LIMIT);
+            assertTrue(contentLength < SplitterTest.CHUNK_SIZE_LIMIT);
         }
         return splitter;
     }
@@ -109,7 +112,7 @@ class SplitterTest {
 
     private byte[] randomDataArray(int size) {
         byte[] b = new byte[size];
-        new Random().nextBytes(b);
+        RANDOM_SEED.nextBytes(b);
         return b;
     }
 }
