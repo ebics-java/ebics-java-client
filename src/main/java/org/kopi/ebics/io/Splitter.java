@@ -37,6 +37,12 @@ import org.kopi.ebics.utils.Utils;
 public class Splitter {
 
   /**
+  * The maximum size of a segment to be put in a request. base64 encoding adds
+   * 33% to that, and we need to stay below 1 MB. This is where 700kB comes from,
+   * to make sure we stay below that.
+  */
+  private static final int SEGMENT_SIZE = 700000;
+  /**
    * Constructs a new <code>FileSplitter</code> with a given file.
    * @param input the input byte array
    */
@@ -93,9 +99,9 @@ public class Splitter {
    */
   private void segmentation() {
 
-    numSegments = content.length / 1048576; //(1024 * 1024)
+    numSegments = content.length / SEGMENT_SIZE;
     
-    if (content.length % 1048576 != 0) {
+    if (content.length % SEGMENT_SIZE != 0) {
       numSegments ++;
     }
 
@@ -139,6 +145,12 @@ public class Splitter {
   public int getSegmentNumber() {
     return numSegments;
   }
+
+  /**
+   * Returns the size of each segment.
+   * @return the size of each segment.
+   */
+  int getSegmentSize() { return segmentSize; }
 
   // --------------------------------------------------------------------
   // DATA MEMBERS

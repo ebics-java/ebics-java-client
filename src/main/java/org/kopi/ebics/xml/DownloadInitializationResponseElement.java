@@ -48,12 +48,13 @@ public class DownloadInitializationResponseElement extends InitializationRespons
   }
 
   @Override
-  protected void processBodyReturnCode() throws NoDownloadDataAvailableException {
+  protected void processBodyReturnCode() throws EbicsException {
       String bodyRetCode = response.getBody().getReturnCode().getStringValue();
       returnCode = ReturnCode.toReturnCode(bodyRetCode, "");
       if (returnCode.equals(ReturnCode.EBICS_NO_DOWNLOAD_DATA_AVAILABLE)) {
         throw new NoDownloadDataAvailableException();
       }
+      checkReturnCode(returnCode);
   }
 
   @Override
