@@ -80,7 +80,7 @@ public class CertificateManager {
 
   /**
    * Creates the signature certificate.
-   * @param the expiration date of a the certificate.
+   * @param end the expiration date of a the certificate.
    * @throws GeneralSecurityException
    * @throws IOException
    */
@@ -114,7 +114,7 @@ public class CertificateManager {
 
   /**
    * Creates the encryption certificate.
-   * @param the expiration date of a the certificate.
+   * @param end the expiration date of a the certificate.
    * @throws GeneralSecurityException
    * @throws IOException
    */

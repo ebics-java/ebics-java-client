@@ -40,7 +40,7 @@ public class EbicsSession {
   /**
    * Constructs a new ebics session
    * @param user the ebics user
-   * @param the ebics client configuration
+   * @param configuration the ebics client configuration
    */
   public EbicsSession(EbicsUser user, Configuration configuration) {
     this.user = user;
