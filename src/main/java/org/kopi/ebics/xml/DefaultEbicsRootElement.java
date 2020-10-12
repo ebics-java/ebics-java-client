@@ -38,11 +38,11 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsRootElement;
 import org.kopi.ebics.session.EbicsSession;
@@ -78,13 +78,12 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 
   /**
    * Prints a pretty XML document using jdom framework.
-   * @param input the XML input
    * @return the pretty XML document.
    * @throws EbicsException pretty print fails
    */
   public byte[] prettyPrint() throws EbicsException {
-    Document                  	document;
-    XMLOutputter              	xmlOutputter;
+    Document document;
+    XMLOutputter xmlOutputter;
     SAXBuilder                	sxb;
     ByteArrayOutputStream	output;
 
@@ -141,7 +140,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
   
   /**
    * Generates a random file name with a prefix.
-   * @param type the prefix to use.
+   * @param prefix the prefix to use.
    * @return the generated file name.
    */
   public static String generateName(String prefix) {
@@ -181,26 +180,20 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 
   @Override
   public void validate() throws EbicsException {
-    ArrayList<XmlError>		validationMessages;
-    boolean     		isValid;
-
-    validationMessages = new ArrayList<XmlError>();
-    isValid = document.validate(new XmlOptions().setErrorListener(validationMessages));
+    ArrayList<XmlError> validationMessages = new ArrayList<XmlError>();
+    boolean isValid = document.validate(new XmlOptions().setErrorListener(validationMessages));
 
     if (!isValid) {
-      String			message;
-      Iterator<XmlError>    	iter;
-
-      iter = validationMessages.iterator();
-      message = "";
+      Iterator<XmlError> iter = validationMessages.iterator();
+      StringBuilder message = new StringBuilder();
       while (iter.hasNext()) {
-	if (!message.equals("")) {
-	  message += ";";
-	}
-	message += iter.next().getMessage();
+        if (!message.toString().equals("")) {
+          message.append(";");
+        }
+        message.append(iter.next().getMessage());
       }
 
-      throw new EbicsException(message);
+      throw new EbicsException(message.toString());
     }
   }
 
