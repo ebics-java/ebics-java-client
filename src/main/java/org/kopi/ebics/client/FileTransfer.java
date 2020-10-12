@@ -145,9 +145,9 @@ public class FileTransfer {
     TransferResponseElement		response;
     int					httpCode;
 
-    session.getConfiguration().getLogger().info(Messages.getString("upload.segment",
-						                   Constants.APPLICATION_BUNDLE_NAME,
-	                                                           segmentNumber));
+    Messages messages = new Messages(Constants.APPLICATION_BUNDLE_NAME);
+    session.getConfiguration().getLogger()
+          .info(messages.getString("upload.segment", segmentNumber));
     uploader = new UploadTransferRequestElement(session,
 	                                   orderType,
 	                                   segmentNumber,
@@ -174,7 +174,7 @@ public class FileTransfer {
    * @param orderType type of file to fetch
    * @param start optional begin of fetch term
    * @param end optional end of fetch term
-   * @param dest where to put the data
+   * @param outputFile where to put the data
    * @throws IOException communication error
    * @throws EbicsException server generated error
    */
@@ -289,6 +289,5 @@ public class FileTransfer {
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-
-  private EbicsSession			session;
+  private final EbicsSession session;
 }

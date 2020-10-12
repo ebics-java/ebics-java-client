@@ -53,10 +53,10 @@ public class X002Letter extends AbstractInitLetter {
                     user.getUserId(),
                     user.getName(),
                     user.getPartner().getPartnerId(),
-                    getString("HIALetter.x002.version", BUNDLE_NAME, locale),
-                    getString("HIALetter.x002.certificate", BUNDLE_NAME, locale),
+                    getString("HIALetter.x002.version"),
+                    getString("HIALetter.x002.certificate"),
                     Base64.encodeBase64(user.getX002Certificate(), true),
-                    getString("HIALetter.x002.digest", BUNDLE_NAME, locale),
+                    getString("HIALetter.x002.digest"),
                     getHash(user.getX002Certificate()));
         } else {
             build(user.getPartner().getBank().getHostId(),
@@ -64,21 +64,21 @@ public class X002Letter extends AbstractInitLetter {
                     user.getUserId(),
                     user.getName(),
                     user.getPartner().getPartnerId(),
-                    getString("HIALetter.x002.version", BUNDLE_NAME, locale),
-                    getString("HIALetter.x002.certificate", BUNDLE_NAME, locale),
+                    getString("HIALetter.x002.version"),
+                    getString("HIALetter.x002.certificate"),
                     null,
-                    getString("HIALetter.x002.digest", BUNDLE_NAME, locale),
+                    getString("HIALetter.x002.digest"),
                     getHash(user.getX002PublicKey()));
         }
     }
 
-    @Override
+  @Override
   public String getTitle() {
-    return getString("HIALetter.x002.title", BUNDLE_NAME, locale);
+    return getString("HIALetter.x002.title");
   }
 
   @Override
   public String getName() {
-    return getString("HIALetter.x002.name", BUNDLE_NAME, locale) + ".txt";
+    return getString("HIALetter.x002.name") + ".txt";
   }
 }

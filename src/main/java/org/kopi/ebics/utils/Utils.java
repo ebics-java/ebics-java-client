@@ -54,7 +54,14 @@ import org.w3c.dom.traversal.NodeIterator;
  * @author hachani
  *
  */
-public class Utils {
+public final class Utils {
+
+  static {
+    org.apache.xml.security.Init.init();
+  }
+
+  private Utils() {
+  }
 
   /**
    * Compresses an input of byte array
@@ -271,7 +278,7 @@ public class Utils {
    * @param input the input to encrypt or decrypt.
    * @param keySpec the key spec.
    * @return the encrypted or decrypted data.
-   * @throws GeneralSecurityException
+   * @throws EbicsException
    */
   private static byte[] encryptOrDecrypt(int mode, byte[] input, SecretKeySpec keySpec)
     throws EbicsException
@@ -309,9 +316,8 @@ public class Utils {
    */
   public static void checkHttpCode(int httpCode) throws EbicsException {
     if (httpCode != 200) {
-      throw new EbicsException(Messages.getString("http.code.error",
-	                                          Constants.APPLICATION_BUNDLE_NAME,
-	                                          httpCode));
+      Messages messages = new Messages(Constants.APPLICATION_BUNDLE_NAME);
+      throw new EbicsException(messages.getString("http.code.error", httpCode));
     }
   }
 }
