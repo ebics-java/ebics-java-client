@@ -50,21 +50,13 @@ public class DefaultConfiguration implements Configuration {
    * Creates a new application configuration.
    * @param rootDir the root directory
    */
-  public DefaultConfiguration(String rootDir) {
+  public DefaultConfiguration(String rootDir, Properties properties) {
     this.rootDir = rootDir;
     bundle = ResourceBundle.getBundle(RESOURCE_DIR);
-    properties = new Properties();
+    this.properties = properties;
     logger = new DefaultEbicsLogger();
     serializationManager = new DefaultSerializationManager();
     traceManager = new DefaultTraceManager();
-  }
-
-  /**
-   * Creates a new application configuration.
-   * The root directory will be user.home/ebics/client
-   */
-  public DefaultConfiguration() {
-    this(System.getProperty("user.home") + File.separator + "ebics" + File.separator + "client");
   }
 
   /**
@@ -78,24 +70,6 @@ public class DefaultConfiguration implements Configuration {
     } catch(MissingResourceException e) {
       return "!!" + key + "!!";
     }
-  }
-
-  /**
-   * Loads the configuration
-   * @throws EbicsException
-   */
-  public void load(File configFile) throws EbicsException {
-    if (isConfigFileLoad) {
-        throw new EbicsException("config already loaded");
-    }
-
-    try {
-      properties.load(new FileInputStream(configFile));
-    } catch (IOException e) {
-      throw new EbicsException(e.getMessage());
-    }
-
-    isConfigFileLoad = true;
   }
 
   @Override
@@ -150,14 +124,6 @@ public class DefaultConfiguration implements Configuration {
 
   @Override
   public String getProperty(String key) {
-    if (!isConfigFileLoad) {
-      return null;
-    }
-
-    if (key == null) {
-      return null;
-    }
-
     return properties.getProperty(key);
   }
 
@@ -265,14 +231,13 @@ public class DefaultConfiguration implements Configuration {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private final String				rootDir;
-  private ResourceBundle			bundle;
-  private Properties				properties;
-  private EbicsLogger				logger;
-  private SerializationManager			serializationManager;
-  private TraceManager				traceManager;
-  private LetterManager				letterManager;
-  private boolean				isConfigFileLoad;
+  private final String rootDir;
+  private final ResourceBundle bundle;
+  private final Properties properties;
+  private final EbicsLogger logger;
+  private final SerializationManager serializationManager;
+  private final TraceManager traceManager;
+  private LetterManager letterManager;
 
-  private static final String			RESOURCE_DIR = "org.kopi.ebics.client.config";
+  private static final String RESOURCE_DIR = "org.kopi.ebics.client.config";
 }

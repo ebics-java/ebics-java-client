@@ -481,7 +481,7 @@ public class EbicsClient {
         public String get(String key) {
             String value = properties.getProperty(key);
             if (value == null || value.isEmpty()) {
-                throw new IllegalArgumentException("property not set or emtpy" + key);
+                throw new IllegalArgumentException("property not set or empty: " + key);
             }
             return value.trim();
         }
@@ -526,7 +526,8 @@ public class EbicsClient {
 
         final Locale locale = new Locale(language, country);
 
-        DefaultConfiguration configuration = new DefaultConfiguration(rootDir.getAbsolutePath()) {
+        DefaultConfiguration configuration = new DefaultConfiguration(rootDir.getAbsolutePath(),
+            properties.properties) {
 
             @Override
             public Locale getLocale() {
