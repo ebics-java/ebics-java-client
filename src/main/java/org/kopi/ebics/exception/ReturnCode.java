@@ -117,6 +117,11 @@ public class ReturnCode implements Serializable {
     return code.hashCode();
   }
 
+  @Override
+  public String toString() {
+    return code + " " + symbolicName + " " + text;
+  }
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
@@ -153,6 +158,7 @@ public class ReturnCode implements Serializable {
   private static final long 		serialVersionUID = -497883146384363199L;
 
   private static final Map<String, ReturnCode> returnCodes = new HashMap<>();
+  private static final Messages messages = new Messages(BUNDLE_NAME);
 
   static {
     EBICS_OK = create("000000", "EBICS_OK");
@@ -183,11 +189,16 @@ public class ReturnCode implements Serializable {
     EBICS_SIGNATURE_VERIFICATION_FAILED = create("091301", "EBICS_SIGNATURE_VERIFICATION_FAILED");
   }
 
-  private static final Messages messages = new Messages(BUNDLE_NAME);
-
   private static ReturnCode create(String code, String symbolicName) {
-    ReturnCode returnCode = new ReturnCode(code, symbolicName, messages.getString(code));
-    returnCodes.put(code, returnCode);
+    String text = messages.getString(code);
+    if (text == null) {
+      throw new NullPointerException("No text for code: " + code);
+    }
+    ReturnCode returnCode = new ReturnCode(code, symbolicName, text);
+    ReturnCode prev = returnCodes.put(code, returnCode);
+    if (prev != null) {
+      throw new IllegalStateException("Duplicated code: " + code);
+    }
     return returnCode;
   }
 }
