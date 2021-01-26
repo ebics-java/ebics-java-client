@@ -9,35 +9,35 @@ How to get started:
 
 https://github.com/uwemaurer/ebics-java-client/wiki/EBICS-Client-HowTo
 
-You can build it directly from the source with maven or use the releases from JitPack.
+You can build it directly from the source with maven or use the releases from [JitPack](https://jitpack.io/#uwemaurer/ebics-java-client/).
 
 Gradle:
 ```
-	allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
-	}
-  
-  dependencies {
-	        implementation 'com.github.uwemaurer:ebics-java-client:6c34a44995'
-	}
+allprojects {
+  repositories {
+    ...
+    maven { url 'https://jitpack.io' }
+  }
+}
+
+dependencies {
+    implementation 'com.github.uwemaurer:ebics-java-client:97867ac56e'
+}
 ```
 Maven
 ```
-	<repositories>
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
-	</repositories>
-  
-	<dependency>
-	    <groupId>com.github.uwemaurer</groupId>
-	    <artifactId>ebics-java-client</artifactId>
-	    <version>6c34a44995</version>
-	</dependency>
+<repositories>
+	<repository>
+	    <id>jitpack.io</id>
+	    <url>https://jitpack.io</url>
+	</repository>
+</repositories>
+
+<dependency>
+    <groupId>com.github.uwemaurer</groupId>
+    <artifactId>ebics-java-client</artifactId>
+    <version>97867ac56e</version>
+</dependency>
 ```
  
 
