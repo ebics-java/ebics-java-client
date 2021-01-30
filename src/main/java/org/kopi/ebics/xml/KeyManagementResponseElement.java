@@ -70,6 +70,7 @@ public class KeyManagementResponseElement extends DefaultResponseElement {
 
     parse(factory);
     response = ((EbicsKeyManagementResponseDocument)document).getEbicsKeyManagementResponse();
+ //   System.out.println("response" + response);
     code = response.getHeader().getMutable().getReturnCode();
     text = response.getHeader().getMutable().getReportText();
     returnCode = ReturnCode.toReturnCode(code, text);

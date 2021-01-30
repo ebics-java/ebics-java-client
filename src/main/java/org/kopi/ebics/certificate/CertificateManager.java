@@ -26,6 +26,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Date;
@@ -76,6 +77,8 @@ public class CertificateManager {
     user.setA005PrivateKey(a005PrivateKey);
     user.setX002PrivateKey(x002PrivateKey);
     user.setE002PrivateKey(e002PrivateKey);
+    
+    user.setDN(a005Certificate.getSubjectDN().getName());
   }
 
   /**
@@ -149,21 +152,24 @@ public class CertificateManager {
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  public void load(String path, PasswordCallback pwdCallBack)
+  public void load(String path)
     throws GeneralSecurityException, IOException
   {
     KeyStoreManager		loader;
 
     loader = new KeyStoreManager();
-
-    loader.load(path, pwdCallBack.getPassword());
+    loader.load(user, path);
     a005Certificate = loader.getCertificate(user.getUserId() + "-A005");
     x002Certificate = loader.getCertificate(user.getUserId() + "-X002");
     e002Certificate = loader.getCertificate(user.getUserId() + "-E002");
 
-    a005PrivateKey = loader.getPrivateKey(user.getUserId() + "-A005");
-    x002PrivateKey = loader.getPrivateKey(user.getUserId() + "-X002");
-    e002PrivateKey = loader.getPrivateKey(user.getUserId() + "-E002");
+    // HSM private key need to be loaded when used
+    if(!user.getisUsingHSM()) {
+	    a005PrivateKey = loader.getPrivateKey(user.getUserId() + "-A005");
+	    x002PrivateKey = loader.getPrivateKey(user.getUserId() + "-X002");
+	    e002PrivateKey = loader.getPrivateKey(user.getUserId() + "-E002");
+    }
+ 
     setUserCertificates();
   }
 

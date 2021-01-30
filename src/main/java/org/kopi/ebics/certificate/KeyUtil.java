@@ -117,7 +117,7 @@ public class KeyUtil {
     } catch (UnsupportedEncodingException e) {
       throw new EbicsException(e.getMessage());
     }
-
+    
     return new String(Hex.encodeHex(digest, false)).getBytes();
   }
 

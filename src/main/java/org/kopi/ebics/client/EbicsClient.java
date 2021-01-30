@@ -19,6 +19,8 @@
 
 package org.kopi.ebics.client;
 
+import java.io.ByteArrayInputStream;
+import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,6 +29,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.security.Provider;
+import java.security.Security;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,6 +62,8 @@ import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.session.OrderType;
 import org.kopi.ebics.session.Product;
 import org.kopi.ebics.utils.Constants;
+
+import java.util.Scanner;
 
 /**
  * The ebics client application. Performs necessary tasks to contact the ebics
@@ -185,14 +191,15 @@ public class EbicsClient {
      */
     public User createUser(URL url, String bankName, String hostId, String partnerId,
         String userId, String name, String email, String country, String organization,
-        boolean useCertificates, boolean saveCertificates, PasswordCallback passwordCallback)
+        boolean useCertificates, boolean saveCertificates, boolean useHSM, PasswordCallback passwordCallback)
         throws Exception {
         configuration.getLogger().info(messages.getString("user.create.info", userId));
 
+      //  System.out.println("certs:" + useCertificates);
         Bank bank = createBank(url, bankName, hostId, useCertificates);
         Partner partner = createPartner(bank, partnerId);
         try {
-            User user = new User(partner, userId, name, email, country, organization,
+            User user = new User(partner, userId, name, email, country, organization, useHSM,
                 passwordCallback);
             createUserDirectories(user);
             if (saveCertificates) {
@@ -201,7 +208,9 @@ public class EbicsClient {
             configuration.getSerializationManager().serialize(bank);
             configuration.getSerializationManager().serialize(partner);
             configuration.getSerializationManager().serialize(user);
-            createLetters(user, useCertificates);
+            if (!useHSM)
+              createLetters(user, useCertificates);
+            
             users.put(userId, user);
             partners.put(partner.getPartnerId(), partner);
             banks.put(bank.getHostId(), bank);
@@ -228,14 +237,23 @@ public class EbicsClient {
             }
         }
     }
+    
+    private void resetIniHia(User user)
+            throws GeneralSecurityException, IOException, EbicsException {
+    	
+          user.setInitializedHIA(false);
+          user.setInitialized(false);
+          users.put(user.getUserId(), user);
+        }
+    
 
     /**
      * Loads a user knowing its ID
      *
      * @throws Exception
      */
-    public User loadUser(String hostId, String partnerId, String userId,
-        PasswordCallback passwordCallback) throws Exception {
+    public User loadUser(String hostId, String partnerId, String userId, String userName, String path,
+    	   String pkcs11ModPath, PasswordCallback passwordCallback) throws Exception {
         configuration.getLogger().info(messages.getString("user.load.info", userId));
 
         try {
@@ -252,8 +270,26 @@ public class EbicsClient {
             }
             try (ObjectInputStream input = configuration.getSerializationManager().deserialize(
                 "user-" + userId)) {
-                user = new User(partner, input, passwordCallback);
+        	    
+            	user = new User(partner, userId, userName, input, passwordCallback);
+            	if (path.equals("default"))
+            		path = configuration.getKeystoreDirectory(user) ;
+            	
+            	if (path.equals("use-hsm")) {
+            		user.setisUsingHSM(true);         		
+            		String pkcs11Config = pkcs11ModPath;
+            	    ByteArrayInputStream confStream = new ByteArrayInputStream(pkcs11Config.getBytes());
+            	    Provider prov = new sun.security.pkcs11.SunPKCS11(confStream);
+            	    Security.addProvider(prov);
+            	    
+            	    user.setProvider(prov);
+            	}
+            	
+            	user.loadCertificates(path);
+
             }
+            
+
             users.put(userId, user);
             partners.put(partner.getPartnerId(), partner);
             banks.put(bank.getHostId(), bank);
@@ -386,6 +422,9 @@ public class EbicsClient {
 
         FileTransfer transferManager = new FileTransfer(session);
 
+        if (orderType==OrderType.XE2) {
+        	session.addSessionParam("FORMAT", "pain.001.001.03.ch.02");
+        }
         configuration.getTraceManager().setTraceDirectory(
             configuration.getTransferTraceDirectory(user));
 
@@ -487,8 +526,13 @@ public class EbicsClient {
         }
     }
 
-    private User createUser(ConfigProperties properties, PasswordCallback pwdHandler)
+    private User createUser(ConfigProperties properties)
         throws Exception {
+    	
+    	boolean useHSM = false;
+        boolean useCertificates = false;
+        boolean saveCertificates = true;
+        PasswordCallback passwordCallback = null;
         String userId = properties.get("userId");
         String partnerId = properties.get("partnerId");
         String bankUrl = properties.get("bank.url");
@@ -498,10 +542,16 @@ public class EbicsClient {
         String userEmail = properties.get("user.email");
         String userCountry = properties.get("user.country");
         String userOrg = properties.get("user.org");
-        boolean useCertificates = false;
-        boolean saveCertificates = true;
+        String path = properties.get("keyDir");  
+        if (path.equals("use-hsm")) {
+        	useHSM = true;
+        	saveCertificates = false;
+        }       
+        else {
+        	passwordCallback = createPasswordCallback();
+        }
         return createUser(new URL(bankUrl), bankName, hostId, partnerId, userId, userName, userEmail,
-            userCountry, userOrg, useCertificates, saveCertificates, pwdHandler);
+            userCountry, userOrg, useCertificates, saveCertificates, useHSM, passwordCallback);
     }
 
     private static CommandLine parseArguments(Options options, String[] args) throws ParseException {
@@ -545,23 +595,36 @@ public class EbicsClient {
     }
 
     public void createDefaultUser() throws Exception {
-        defaultUser = createUser(properties, createPasswordCallback());
+        defaultUser = createUser(properties);
     }
 
     public void loadDefaultUser() throws Exception {
+    	String pkcs11ModPath = null;
         String userId = properties.get("userId");
         String hostId = properties.get("hostId");
         String partnerId = properties.get("partnerId");
-        defaultUser = loadUser(hostId, partnerId, userId, createPasswordCallback());
+        String userName = properties.get("user.name");
+        String path = properties.get("keyDir"); 
+        if (path.equals("use-hsm"))
+          pkcs11ModPath = properties.get("pkcs11.module.path"); 
+        
+        defaultUser = loadUser(hostId, partnerId, userId, userName, path, pkcs11ModPath, createPasswordCallback());
     }
 
     private PasswordCallback createPasswordCallback() {
-        final String password = properties.get("password");
+        Console cnsl = System.console(); 
+        if (cnsl == null) { 
+            System.out.println("No console available"); 
+          } 
+  
+        // Read password 
+        final char[] password = cnsl.readPassword("Enter password : "); 
+         
         return new PasswordCallback() {
 
             @Override
             public char[] getPassword() {
-                return password.toCharArray();
+                return password;
             }
         };
     }
@@ -589,6 +652,7 @@ public class EbicsClient {
         addOption(options, OrderType.HPB, "Send HPB request");
         options.addOption(null, "letters", false, "Create INI Letters");
         options.addOption(null, "create", false, "Create and initialize EBICS user");
+        options.addOption(null, "reset-init", false, "Reset INI and HIA to not initialized (only locally)");
         addOption(options, OrderType.STA,"Fetch STA file (MT940 file)");
         addOption(options, OrderType.VMK, "Fetch VMK file (MT942 file)");
         addOption(options, OrderType.C52, "Fetch camt.052 file");
@@ -605,6 +669,9 @@ public class EbicsClient {
         addOption(options, OrderType.XCT, "Send XCT file (any format)");
         addOption(options, OrderType.XE2, "Send XE2 file (any format)");
         addOption(options, OrderType.CCT, "Send CCT file (any format)");
+        
+        addOption(options, OrderType.Z53, "camt.053");
+        addOption(options, OrderType.Z54, "camt.054");
 
         options.addOption(null, "skip_order", true, "Skip a number of order ids");
 
@@ -613,9 +680,9 @@ public class EbicsClient {
 
 
         CommandLine cmd = parseArguments(options, args);
-
+        
         File defaultRootDir = new File(System.getProperty("user.home") + File.separator + "ebics"
-            + File.separator + "client");
+                + File.separator + "client");
         File ebicsClientProperties = new File(defaultRootDir, "ebics.txt");
         EbicsClient client = createEbicsClient(defaultRootDir, ebicsClientProperties);
 
@@ -627,6 +694,10 @@ public class EbicsClient {
 
         if (cmd.hasOption("letters")) {
             client.createLetters(client.defaultUser, false);
+        }
+        
+        if (cmd.hasOption("reset-init")) {
+            client.resetIniHia(client.defaultUser);
         }
 
         if (hasOption(cmd, OrderType.INI)) {
@@ -644,7 +715,8 @@ public class EbicsClient {
 
         List<OrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
             OrderType.C52, OrderType.C53, OrderType.C54,
-            OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
+            OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01,
+            OrderType.Z53, OrderType.Z54);
 
         for (OrderType type : fetchFileOrders) {
             if (hasOption(cmd, type)) {

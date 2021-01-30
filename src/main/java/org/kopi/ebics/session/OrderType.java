@@ -59,5 +59,7 @@ public enum OrderType {
     XCT,
     C52,
     C53,
-    C54
+    C54,
+    Z54,
+    Z53
 }

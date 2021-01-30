@@ -93,6 +93,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 
     try {
       document = sxb.build(new InputStreamReader(new ByteArrayInputStream(toByteArray()), "UTF-8"));
+   //   System.out.println("document" +document);
       xmlOutputter.output(document, output);
     } catch (JDOMException e) {
       throw new EbicsException(e.getMessage());

@@ -19,12 +19,17 @@
 
 package org.kopi.ebics.client;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.Security;
 import java.security.Signature;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -76,6 +81,7 @@ public class User implements EbicsUser, Savable {
               String email,
               String country,
               String organization,
+              boolean useHSM,
               PasswordCallback passwordCallback)
     throws GeneralSecurityException, IOException
   {
@@ -84,38 +90,9 @@ public class User implements EbicsUser, Savable {
     this.name = name;
     this.dn = makeDN(name, email, country, organization);
     this.passwordCallback = passwordCallback;
-    createUserCertificates();
+    if (!useHSM)
+    	createUserCertificates();
     needSave = true;
-  }
-
-  /**
-   * Reconstructs a persisted EBICS user.
-   *
-   * @param partner the customer in whose name we operate.
-   * @param ois the object stream
-   * @param passwordCallback a callback-handler that supplies us with the password.
-   * @throws IOException
-   * @throws GeneralSecurityException if the supplies password is wrong.
-   * @throws ClassNotFoundException
-   */
-  public User(EbicsPartner partner,
-              ObjectInputStream ois,
-              PasswordCallback passwordCallback)
-    throws IOException, GeneralSecurityException, ClassNotFoundException
-  {
-    this.partner = partner;
-    this.passwordCallback = passwordCallback;
-    this.userId = ois.readUTF();
-    this.name = ois.readUTF();
-    this.dn = ois.readUTF();
-    this.isInitialized = ois.readBoolean();
-    this.isInitializedHIA = ois.readBoolean();
-    this.a005Certificate = (X509Certificate)ois.readObject();
-    this.e002Certificate = (X509Certificate)ois.readObject();
-    this.x002Certificate = (X509Certificate)ois.readObject();
-    this.a005PrivateKey = (PrivateKey)ois.readObject();
-    this.e002PrivateKey = (PrivateKey)ois.readObject();
-    this.x002PrivateKey = (PrivateKey)ois.readObject();
   }
 
   /**
@@ -131,7 +108,7 @@ public class User implements EbicsUser, Savable {
   public User(EbicsPartner partner,
               String userId,
               String name,
-              String keystorePath,
+              ObjectInputStream ois,
               PasswordCallback passwordCallback)
     throws GeneralSecurityException, IOException
   {
@@ -139,8 +116,9 @@ public class User implements EbicsUser, Savable {
     this.userId = userId;
     this.name = name;
     this.passwordCallback = passwordCallback;
-    loadCertificates(keystorePath);
-    this.dn = a005Certificate.getSubjectDN().getName();
+    this.isInitialized =ois.readBoolean();
+    this.isInitializedHIA = ois.readBoolean();  
+   // this.dn = a005Certificate.getSubjectDN().getName();
     needSave = true;
   }
 
@@ -174,31 +152,28 @@ public class User implements EbicsUser, Savable {
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  private void loadCertificates(String keyStorePath)
+  @Override
+  public void loadCertificates(String keyStorePath)
     throws GeneralSecurityException, IOException
   {
+	
     manager = new CertificateManager(this);
-    manager.load(keyStorePath, passwordCallback);
+    manager.load(keyStorePath);   
+   
+	
   }
 
   @Override
   public void save(ObjectOutputStream oos) throws IOException {
-    oos.writeUTF(userId);
-    oos.writeUTF(name);
-    oos.writeUTF(dn);
     oos.writeBoolean(isInitialized);
     oos.writeBoolean(isInitializedHIA);
-    oos.writeObject(a005Certificate);
-    oos.writeObject(e002Certificate);
-    oos.writeObject(x002Certificate);
-    oos.writeObject(a005PrivateKey);
-    oos.writeObject(e002PrivateKey);
-    oos.writeObject(x002PrivateKey);
     oos.flush();
     oos.close();
     needSave = false;
   }
 
+
+  
   /**
    * Has the users signature key been sent to the bank?
    * @return True if the users signature key been sent to the bank
@@ -232,6 +207,16 @@ public class User implements EbicsUser, Savable {
     this.isInitializedHIA = isInitializedHIA;
     needSave = true;
   }
+  
+
+  /**
+   * Set the provider for HSM
+   * @param Security Provider
+   */
+  public void setProvider(Provider prov) {
+    this.prov = prov;
+  }
+ 
 
   /**
    * Generates new keys for this user and sends them to the bank.
@@ -420,6 +405,21 @@ public class User implements EbicsUser, Savable {
   }
 
   @Override
+  public void setDN(String dn) {
+     this.dn = dn;
+  }
+  
+  @Override
+  public boolean getisUsingHSM() {
+    return isUsingHSM;
+  }
+
+  @Override
+  public void setisUsingHSM(boolean bool) {
+     this.isUsingHSM = bool;
+  }
+  
+  @Override
   public PasswordCallback getPasswordCallback() {
     return passwordCallback;
   }
@@ -429,6 +429,15 @@ public class User implements EbicsUser, Savable {
     return "user-" + userId + ".cer";
   }
 
+  /**
+   * get the provider for HSM
+   * @param Security Provider
+   */
+  @Override
+  public Provider getProvider() {
+    return prov;
+  }
+  
   /**
    * EBICS Specification 2.4.2 - 11.1.1 Process:
    *
@@ -464,9 +473,26 @@ public class User implements EbicsUser, Savable {
   @Override
   public byte[] authenticate(byte[] digest) throws GeneralSecurityException {
     Signature			signature;
+    
+    if(this.isUsingHSM) {
 
-    signature = Signature.getInstance("SHA256WithRSA", BouncyCastleProvider.PROVIDER_NAME);
-    signature.initSign(x002PrivateKey);
+    	signature = Signature.getInstance("SHA256WithRSA", prov);
+	    KeyStore keyStore = KeyStore.getInstance("PKCS11",prov);
+		try {
+			keyStore.load(null, passwordCallback.getPassword());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		PrivateKey key = (PrivateKey) keyStore.getKey(userId + "-X002", passwordCallback.getPassword());
+	    signature.initSign(key);
+	    
+    }else
+    {
+    	signature = Signature.getInstance("SHA256WithRSA", BouncyCastleProvider.PROVIDER_NAME);
+    	signature.initSign(x002PrivateKey);
+    }  
+    
     signature.update(digest);
     return signature.sign();
   }
@@ -517,9 +543,28 @@ public class User implements EbicsUser, Savable {
    * will be sent to the EBICS server.
    */
   @Override
-  public byte[] sign(byte[] digest) throws IOException, GeneralSecurityException {
-    Signature signature = Signature.getInstance("SHA256WithRSA", BouncyCastleProvider.PROVIDER_NAME);
-    signature.initSign(a005PrivateKey);
+  public byte[] sign(byte[] digest) throws IOException, GeneralSecurityException {  
+	Signature signature;  
+	
+	if(this.isUsingHSM) {
+	
+	    signature = Signature.getInstance("SHA256WithRSA", prov);    
+	    KeyStore keyStore = KeyStore.getInstance("PKCS11",prov);
+		try {
+			keyStore.load(null, passwordCallback.getPassword());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		PrivateKey key = (PrivateKey) keyStore.getKey(userId + "-A005", passwordCallback.getPassword());
+	    signature.initSign(key);
+		    
+    }else  
+    {
+    	signature = Signature.getInstance("SHA256WithRSA", BouncyCastleProvider.PROVIDER_NAME);
+        signature.initSign(a005PrivateKey);
+    }
+	  
     signature.update(removeOSSpecificChars(digest));
     return signature.sign();
   }
@@ -545,13 +590,36 @@ public class User implements EbicsUser, Savable {
     int				blockSize;
     ByteArrayOutputStream	outputStream;
 
-    cipher = Cipher.getInstance("RSA/NONE/PKCS1Padding", BouncyCastleProvider.PROVIDER_NAME);
-    cipher.init(Cipher.DECRYPT_MODE, e002PrivateKey);
-    blockSize = cipher.getBlockSize();
-    outputStream = new ByteArrayOutputStream();
-    for (int j = 0; j * blockSize < transactionKey.length; j++) {
-      outputStream.write(cipher.doFinal(transactionKey, j * blockSize, blockSize));
+    if (this.isUsingHSM) {    	
+	    KeyStore keyStore = KeyStore.getInstance("PKCS11",prov);
+		try {
+			keyStore.load(null, passwordCallback.getPassword());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		PrivateKey key = (PrivateKey) keyStore.getKey(userId + "-E002", passwordCallback.getPassword());
+		
+		cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding", prov);
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        blockSize = cipher.getBlockSize();
+        outputStream = new ByteArrayOutputStream();
+        
+        outputStream.write(cipher.doFinal(transactionKey));
     }
+    else
+    {
+	    cipher = Cipher.getInstance("RSA/NONE/PKCS1Padding", BouncyCastleProvider.PROVIDER_NAME);
+	    cipher.init(Cipher.DECRYPT_MODE, e002PrivateKey);
+	    blockSize = cipher.getBlockSize();
+	    outputStream = new ByteArrayOutputStream();
+	    
+	    for (int j = 0; j * blockSize < transactionKey.length; j++) {
+	      outputStream.write(cipher.doFinal(transactionKey, j * blockSize, blockSize));
+	    }
+    }
+   
+
 
     return decryptData(encryptedData, outputStream.toByteArray());
   }
@@ -585,15 +653,18 @@ public class User implements EbicsUser, Savable {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private EbicsPartner				partner;
+  private EbicsPartner			partner;
   private String				userId;
   private String				name;
   private String				dn;
   private boolean				isInitializedHIA;
   private boolean				isInitialized;
-  private PasswordCallback 			passwordCallback;
-  private transient boolean			needSave;
-  private CertificateManager			manager;
+  private PasswordCallback 		passwordCallback;
+  private transient boolean		needSave;
+  private CertificateManager	manager;
+  private boolean				isUsingHSM;
+  private Provider 				prov;
+ 
 
   private PrivateKey				a005PrivateKey;
   private PrivateKey				e002PrivateKey;

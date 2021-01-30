@@ -67,6 +67,7 @@ public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
    * @throws EbicsException request fails.
    */
   public void report() throws EbicsException {
+	 System.out.println(returnCode);
     checkReturnCode(returnCode);
   }
 

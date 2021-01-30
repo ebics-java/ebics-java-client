@@ -19,9 +19,12 @@
 
 package org.kopi.ebics.xml;
 
+import java.io.ByteArrayInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.Provider;
+import java.security.Security;
 
 import javax.crypto.Cipher;
 
@@ -95,7 +98,16 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
     addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
 
     try {
-      return MessageDigest.getInstance("SHA-256", "BC").digest(Utils.canonize(toByteArray()));
+    	if (session.getUser().getisUsingHSM()) {
+    		String pkcs11Config = "name = SmartCard\nlibrary = /usr/lib/opensc-pkcs11.so";
+    	    ByteArrayInputStream confStream = new ByteArrayInputStream(pkcs11Config.getBytes());
+    	    Provider prov = new sun.security.pkcs11.SunPKCS11(confStream);
+    	    Security.addProvider(prov);
+            return MessageDigest.getInstance("SHA-256", prov).digest(Utils.canonize(toByteArray()));
+    	}
+    	else {
+    		return MessageDigest.getInstance("SHA-256", "BC").digest(Utils.canonize(toByteArray()));
+    	}
     } catch (NoSuchAlgorithmException e) {
       throw new EbicsException(e.getMessage());
     } catch (NoSuchProviderException e) {

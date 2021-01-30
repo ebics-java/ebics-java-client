@@ -43,7 +43,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.bouncycastle.openssl.PEMReader;
+import org.kopi.ebics.interfaces.EbicsUser;
 
 /**
  * Key store loader. This class loads a key store from
@@ -87,7 +89,7 @@ public class KeyStoreManager {
     if (key == null) {
       throw new IllegalArgumentException("private key not found for alias " + alias);
     }
-
+   
     return key;
   }
 
@@ -98,29 +100,27 @@ public class KeyStoreManager {
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  public void load(String path, char[] password)
+  public void load(EbicsUser user, String path)
     throws GeneralSecurityException, IOException
   {
-    keyStore = KeyStore.getInstance("PKCS12", "BC");
-    this.password = password;
-    load(path);
+    this.password = user.getPasswordCallback().getPassword();
+	if (user.getisUsingHSM()) {
+	  this.keyStore = KeyStore.getInstance("PKCS11",user.getProvider());
+	  this.keyStore.load(null, password);	
+  	  this.certs = read(this.keyStore);
+	}
+	else {
+      keyStore = KeyStore.getInstance("PKCS12", "BC");
+      if (path.equals("")) {
+          this.keyStore.load(null, null);
+        }
+        else {
+          this.keyStore.load(new FileInputStream(path + "/" + user.getUserId() + ".p12"), password);
+          this.certs = read(this.keyStore);
+        }
+	}
   }
-
-  /**
-   * Loads a key store and cache the loaded one
-   * @param path the key store path.
-   * @throws GeneralSecurityException
-   * @throws IOException
-   */
-  private void load(String path) throws GeneralSecurityException, IOException {
-    if (path.equals("")) {
-      this.keyStore.load(null, null);
-    } else {
-      this.keyStore.load(new FileInputStream(path), password);
-      this.certs = read(this.keyStore);
-    }
-  }
-
+  
   /**
    * Reads a certificate from an input stream for a given provider
    * @param input the input stream

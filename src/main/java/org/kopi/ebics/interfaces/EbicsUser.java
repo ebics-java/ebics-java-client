@@ -22,6 +22,7 @@ package org.kopi.ebics.interfaces;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 
@@ -140,6 +141,19 @@ public interface EbicsUser {
    * @return the distinguished name
    */
   public String getDN();
+  
+  public void setDN(String dn);
+  
+  /**
+   * Returns if User is using a HSM (Smartcard)
+   * @return the distinguished name
+   */
+  public boolean getisUsingHSM();
+
+  public void setisUsingHSM(boolean bool);
+  
+  public Provider getProvider();
+  
 
   /**
    * Returns the password callback handler for the current user.
@@ -175,4 +189,8 @@ public interface EbicsUser {
    */
   public byte[] decrypt(byte[] encryptedKey, byte[] transactionKey)
     throws GeneralSecurityException, IOException, EbicsException;
+  
+  public void loadCertificates(String keyStorePath)
+		    throws GeneralSecurityException, IOException;
+  
 }
