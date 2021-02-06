@@ -644,7 +644,7 @@ public class EbicsClient {
             System.out.println("No console available"); 
           } 
   
-        // Read password 
+        // Read password from console
         final char[] password = cnsl.readPassword("Enter password : "); 
          
         return new PasswordCallback() {
