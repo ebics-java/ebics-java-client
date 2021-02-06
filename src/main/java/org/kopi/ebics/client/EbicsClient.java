@@ -437,9 +437,36 @@ public class EbicsClient {
         }
     }
 
+    public void sendFile(byte[] data, User user, Product product, OrderType orderType) throws Exception {
+        EbicsSession session = createSession(user, product);
+        OrderAttributeType.Enum orderAttribute = OrderAttributeType.OZHNN;
+
+        FileTransfer transferManager = new FileTransfer(session);
+
+        if (orderType==OrderType.XE2) {
+               session.addSessionParam("FORMAT", "pain.001.001.03.ch.02");
+        }
+        configuration.getTraceManager().setTraceDirectory(
+            configuration.getTransferTraceDirectory(user));
+
+        try {
+            transferManager.sendFile(data, orderType, orderAttribute);
+        } catch (IOException | EbicsException e) {
+            configuration.getLogger()
+            .error(messages.getString("upload.file.error"), e);
+        throw e;
+        }
+    }
+
+    
     public void sendFile(File file, OrderType orderType) throws Exception {
         sendFile(file, defaultUser, defaultProduct, orderType);
     }
+    
+    public void sendFile(byte[] data, OrderType orderType) throws Exception {
+         sendFile(data, defaultUser, defaultProduct, orderType);
+   }
+
 
     public void fetchFile(File file, User user, Product product, OrderType orderType,
         boolean isTest, Date start, Date end) throws IOException, EbicsException {
