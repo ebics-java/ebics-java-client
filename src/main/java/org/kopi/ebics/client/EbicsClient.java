@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -62,8 +61,6 @@ import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.session.OrderType;
 import org.kopi.ebics.session.Product;
 import org.kopi.ebics.utils.Constants;
-
-import java.util.Scanner;
 
 /**
  * The ebics client application. Performs necessary tasks to contact the ebics
