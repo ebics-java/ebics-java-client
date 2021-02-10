@@ -694,6 +694,7 @@ public class EbicsClient {
         addOption(options, OrderType.XE2, "Send XE2 file (any format)");
         addOption(options, OrderType.CCT, "Send CCT file (any format)");
         
+        addOption(options, OrderType.Z52, "camt.052");
         addOption(options, OrderType.Z53, "camt.053");
         addOption(options, OrderType.Z54, "camt.054");
 
@@ -740,7 +741,7 @@ public class EbicsClient {
         List<OrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
             OrderType.C52, OrderType.C53, OrderType.C54,
             OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01,
-            OrderType.Z53, OrderType.Z54);
+            OrderType.Z52, OrderType.Z53, OrderType.Z54);
 
         for (OrderType type : fetchFileOrders) {
             if (hasOption(cmd, type)) {

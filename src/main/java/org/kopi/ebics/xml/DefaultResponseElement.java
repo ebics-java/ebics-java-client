@@ -73,6 +73,7 @@ public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
 
   protected void checkReturnCode(ReturnCode returnCode) throws EbicsException {
     if (!returnCode.isOk()) {
+      System.out.println("Response code " + returnCode.getCode() + " - " + returnCode.getText() );	
       returnCode.throwException();
     }
 }

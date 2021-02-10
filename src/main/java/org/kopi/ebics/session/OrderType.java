@@ -60,6 +60,7 @@ public enum OrderType {
     C52,
     C53,
     C54,
+    Z52,
     Z54,
     Z53
 }
