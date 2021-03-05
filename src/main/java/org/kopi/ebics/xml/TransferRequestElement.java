@@ -24,9 +24,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
 import org.kopi.ebics.exception.EbicsException;
+import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.schema.h003.EbicsRequestDocument;
 import org.kopi.ebics.session.EbicsSession;
-import org.kopi.ebics.session.OrderType;
 import org.kopi.ebics.utils.Utils;
 
 
@@ -50,7 +50,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
    */
   public TransferRequestElement(EbicsSession session,
                                 String name,
-                                OrderType type,
+                                EbicsOrderType type,
                                 int segmentNumber,
                                 boolean lastSegment,
                                 byte[] transactionId)
@@ -101,7 +101,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
    * @return the order type element.
    */
   public String getOrderType() {
-    return type.toString();
+    return type.getCode();
   }
 
   @Override
@@ -124,7 +124,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
   protected int				segmentNumber;
   protected boolean			lastSegment;
   protected byte[]			transactionId;
-  private OrderType			type;
+  private EbicsOrderType type;
   private String 			name;
   private static final long 		serialVersionUID = -4212072825371398259L;
 }

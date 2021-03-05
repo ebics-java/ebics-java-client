@@ -19,13 +19,15 @@
 
 package org.kopi.ebics.session;
 
+import org.kopi.ebics.interfaces.EbicsOrderType;
+
 /**
  * A BCS order type.
  *
  * @author Pierre Ducroquet
  *
  */
-public enum OrderType {
+public enum OrderType implements EbicsOrderType {
     HIA,
     HAA,
     HKD,
@@ -59,5 +61,11 @@ public enum OrderType {
     XCT,
     C52,
     C53,
-    C54
+    C54;
+
+    @Override
+    public String getCode() {
+        return name();
+    }
+
 }

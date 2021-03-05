@@ -22,9 +22,9 @@ package org.kopi.ebics.xml;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.ReturnCode;
 import org.kopi.ebics.interfaces.ContentFactory;
+import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.schema.h003.EbicsResponseDocument;
 import org.kopi.ebics.schema.h003.EbicsResponseDocument.EbicsResponse;
-import org.kopi.ebics.session.OrderType;
 
 /**
  * The <code>InitializationResponseElement</code> is the common
@@ -42,7 +42,7 @@ public class InitializationResponseElement extends DefaultResponseElement {
    * @param name the element name
    */
   public InitializationResponseElement(ContentFactory factory,
-                                       OrderType orderType,
+                                       EbicsOrderType orderType,
                                        String name)
   {
     super(factory, name);
@@ -81,7 +81,7 @@ public class InitializationResponseElement extends DefaultResponseElement {
    * @return the order type.
    */
   public String getOrderType() {
-    return orderType.toString();
+    return orderType.getCode();
   }
 
   // --------------------------------------------------------------------
@@ -89,7 +89,7 @@ public class InitializationResponseElement extends DefaultResponseElement {
   // --------------------------------------------------------------------
 
   protected EbicsResponse			response;
-  private OrderType				orderType;
+  private EbicsOrderType orderType;
   private byte[]				transactionId;
   private static final long 			serialVersionUID = 7684048385353175772L;
 }
