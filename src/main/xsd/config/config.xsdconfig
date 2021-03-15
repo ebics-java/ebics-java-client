@@ -6,31 +6,31 @@
 	       >
 	       
   <xb:namespace uri="http://www.ebics.org/H000">
-    <xb:package>org.kopi.ebics.schema.h000</xb:package>
+    <xb:package>org.ebics.schema.h000</xb:package>
   </xb:namespace>
   
   <xb:namespace uri="http://www.ebics.org/H003">
-    <xb:package>org.kopi.ebics.schema.h003</xb:package>
+    <xb:package>org.ebics.schema.h003</xb:package>
   </xb:namespace>
 
     <xb:namespace uri="urn:org:ebics:H004">
-      <xb:package>org.kopi.ebics.schema.h004</xb:package>
+      <xb:package>org.ebics.schema.h004</xb:package>
     </xb:namespace>
 
     <xb:namespace uri="urn:org:ebics:H005">
-      <xb:package>org.kopi.ebics.schema.h005</xb:package>
+      <xb:package>org.ebics.schema.h005</xb:package>
     </xb:namespace>
 
   <xb:namespace uri="http://www.w3.org/2000/09/xmldsig#">
-    <xb:package>org.kopi.ebics.schema.xmldsig</xb:package>
+    <xb:package>org.ebics.schema.xmldsig</xb:package>
   </xb:namespace>
 
   <xb:namespace uri="http://www.ebics.org/S001">
-    <xb:package>org.kopi.ebics.schema.s001</xb:package>
+    <xb:package>org.ebics.schema.s001</xb:package>
   </xb:namespace>
 
     <xb:namespace uri="http://www.ebics.org/S002">
-      <xb:package>org.kopi.ebics.schema.s002</xb:package>
+      <xb:package>org.ebics.schema.s002</xb:package>
     </xb:namespace>
 
 </xb:config>

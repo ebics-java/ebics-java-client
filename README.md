@@ -15,7 +15,7 @@ Main differences with this fork:
 
 Running from command line (without Maven) 
 
-java -cp target/ebics-1.1-SNAPSHOT.jar:target/lib/* org.kopi.ebics.client.EbicsClient -xe2 -i src/test/resources/pain001/pain001.xml
+java -cp target/ebics-1.1-SNAPSHOT.jar:target/lib/* EbicsClient -xe2 -i src/test/resources/pain001/pain001.xml
 
 Issues: 
 * Fat jar build seems to be not standard due to bouncy castle signed jar.
