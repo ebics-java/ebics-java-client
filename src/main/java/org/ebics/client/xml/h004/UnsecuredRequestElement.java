@@ -49,12 +49,10 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
    */
   public UnsecuredRequestElement(EbicsSession session,
                                  OrderType orderType,
-                                 String orderId,
                                  byte[] orderData)
   {
     super(session);
     this.orderType = orderType;
-    this.orderId = orderId;
     this.orderData = orderData;
   }
 
@@ -71,7 +69,6 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
     EbicsUnsecuredRequest			request;
 
     orderDetails = EbicsXmlFactory.createOrderDetailsType("DZNNN",
-						          orderId == null ? session.getUser().getPartner().nextOrderId() : orderId,
 	                                                  orderType.toString());
 
     productType = EbicsXmlFactory.creatProductElementType(session.getProduct().getLanguage(),
@@ -110,7 +107,6 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
   // --------------------------------------------------------------------
 
   private OrderType			orderType;
-  private String			orderId;
   private byte[]			orderData;
   private static final long 		serialVersionUID = -3548730114599886711L;
 }

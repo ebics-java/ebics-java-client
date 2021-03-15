@@ -455,17 +455,13 @@ public class EbicsXmlFactory {
   /**
    * Creates a new <code>OrderDetailsType</code> XML object
    * @param orderAttribute the order attribute
-   * @param orderId the order ID
    * @param orderType the order type
    * @return the <code>OrderDetailsType</code> XML object
    */
   @SuppressWarnings("deprecation")
-  public static OrderDetailsType createOrderDetailsType(String orderAttribute, String orderId, String orderType) {
+  public static OrderDetailsType createOrderDetailsType(String orderAttribute, String orderType) {
     OrderDetailsType newOrderDetailsType = OrderDetailsType.Factory.newInstance();
     newOrderDetailsType.setOrderAttribute(orderAttribute);
-    if (orderId != null) {
-      newOrderDetailsType.setOrderID(orderId);
-    }
     newOrderDetailsType.setOrderType(orderType);
 
     return newOrderDetailsType;

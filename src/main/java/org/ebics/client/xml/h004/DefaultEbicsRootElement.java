@@ -72,7 +72,6 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 
   /**
    * Prints a pretty XML document using jdom framework.
-   * @param input the XML input
    * @return the pretty XML document.
    * @throws EbicsException pretty print fails
    */

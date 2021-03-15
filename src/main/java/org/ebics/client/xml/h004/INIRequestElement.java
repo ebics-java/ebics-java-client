@@ -56,7 +56,6 @@ public class INIRequestElement extends DefaultEbicsRootElement {
     signaturePubKey.build();
     unsecuredRequest = new UnsecuredRequestElement(session,
 	                                           OrderType.INI,
-	                                           orderId == null ? session.getUser().getPartner().nextOrderId() : orderId,
 	                                           Utils.zip(signaturePubKey.prettyPrint()));
     unsecuredRequest.build();
   }
