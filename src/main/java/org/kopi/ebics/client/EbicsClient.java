@@ -274,7 +274,7 @@ public class EbicsClient {
     /**
      * Sends an INI request to the ebics bank server
      *
-     * @param userId
+     * @param user
      *            the user ID
      * @param product
      *            the application product
@@ -309,7 +309,7 @@ public class EbicsClient {
     /**
      * Sends a HIA request to the ebics server.
      *
-     * @param userId
+     * @param user
      *            the user ID.
      * @param product
      *            the application product.
@@ -369,7 +369,7 @@ public class EbicsClient {
     /**
      * Sends the SPR order to the bank.
      *
-     * @param userId
+     * @param user
      *            the user ID
      * @param product
      *            the session product

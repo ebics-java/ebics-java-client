@@ -32,22 +32,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.X509Extensions;
-import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
+import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.cert.X509ExtensionUtils;
 import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.operator.DigestCalculator;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 
 /**
@@ -177,7 +169,7 @@ public class X509Generator {
     vector = new ASN1EncodableVector();
     vector.add(KeyPurposeId.id_kp_emailProtection);
 
-    generator.addExtension(X509Extensions.ExtendedKeyUsage, false, new ExtendedKeyUsage(new DERSequence(vector)));
+    generator.addExtension(X509Extensions.ExtendedKeyUsage, false, ExtendedKeyUsage.getInstance(new DERSequence(vector)));
 
     switch (keyusage) {
     case X509Constants.SIGNATURE_KEY_USAGE:
@@ -224,7 +216,7 @@ public class X509Generator {
     vector = new ASN1EncodableVector();
     vector.add(new GeneralName(new X509Name(issuer)));
 
-    return new AuthorityKeyIdentifier(keyInfo, new GeneralNames(new DERSequence(vector)), serial);
+    return new AuthorityKeyIdentifier(keyInfo, GeneralNames.getInstance(new DERSequence(vector)), serial);
   }
 
   /**
@@ -232,18 +224,20 @@ public class X509Generator {
    * to a given <code>PublicKey</code>
    * @param publicKey the given public key
    * @return the subject key identifier
-   * @throws IOException
+   * @throws GeneralSecurityException
    */
   private SubjectKeyIdentifier getSubjectKeyIdentifier(PublicKey publicKey)
-    throws IOException
+    throws GeneralSecurityException
   {
-    InputStream			input;
-    SubjectPublicKeyInfo	keyInfo;
-
-    input = new ByteArrayInputStream(publicKey.getEncoded());
-    keyInfo = new SubjectPublicKeyInfo((ASN1Sequence)new ASN1InputStream(input).readObject());
-
-    return new SubjectKeyIdentifier(keyInfo);
+    SubjectPublicKeyInfo pubKeyInfo =
+            SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
+    try {
+      DigestCalculator digCalc = new BcDigestCalculatorProvider().get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
+      X509ExtensionUtils utils = new X509ExtensionUtils(digCalc);
+      return utils.createSubjectKeyIdentifier(pubKeyInfo);
+    } catch (OperatorCreationException e) {
+      throw new GeneralSecurityException(e);
+    }
   }
 
   /**
