@@ -30,21 +30,21 @@ import org.ebics.client.messages.Messages;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.session.OrderType;
 import org.ebics.client.utils.Utils;
-import org.ebics.client.xml.DownloadTransferResponseElement;
-import org.ebics.client.xml.ReceiptResponseElement;
+import org.ebics.client.xml.h003.DownloadTransferResponseElement;
+import org.ebics.client.xml.h003.ReceiptResponseElement;
 import org.ebics.client.io.ByteArrayContentFactory;
 import org.ebics.client.io.Joiner;
 import org.ebics.schema.h003.OrderAttributeType;
 import org.ebics.client.utils.Constants;
-import org.ebics.client.xml.DefaultEbicsRootElement;
-import org.ebics.client.xml.DownloadInitializationRequestElement;
-import org.ebics.client.xml.DownloadInitializationResponseElement;
-import org.ebics.client.xml.DownloadTransferRequestElement;
-import org.ebics.client.xml.InitializationResponseElement;
-import org.ebics.client.xml.ReceiptRequestElement;
-import org.ebics.client.xml.TransferResponseElement;
-import org.ebics.client.xml.UploadInitializationRequestElement;
-import org.ebics.client.xml.UploadTransferRequestElement;
+import org.ebics.client.xml.h003.DefaultEbicsRootElement;
+import org.ebics.client.xml.h003.DownloadInitializationRequestElement;
+import org.ebics.client.xml.h003.DownloadInitializationResponseElement;
+import org.ebics.client.xml.h003.DownloadTransferRequestElement;
+import org.ebics.client.xml.h003.InitializationResponseElement;
+import org.ebics.client.xml.h003.ReceiptRequestElement;
+import org.ebics.client.xml.h003.TransferResponseElement;
+import org.ebics.client.xml.h003.UploadInitializationRequestElement;
+import org.ebics.client.xml.h003.UploadTransferRequestElement;
 
 
 /**
@@ -174,7 +174,7 @@ public class FileTransfer {
    * @param orderType type of file to fetch
    * @param start optional begin of fetch term
    * @param end optional end of fetch term
-   * @param dest where to put the data
+   * @param outputFile dest where to put the data
    * @throws IOException communication error
    * @throws EbicsException server generated error
    */

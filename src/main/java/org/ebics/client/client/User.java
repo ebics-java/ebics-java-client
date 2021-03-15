@@ -42,7 +42,7 @@ import org.ebics.client.interfaces.EbicsUser;
 import org.ebics.client.interfaces.PasswordCallback;
 import org.ebics.client.interfaces.Savable;
 import org.ebics.client.utils.Utils;
-import org.ebics.client.xml.UserSignature;
+import org.ebics.client.xml.h003.UserSignature;
 
 /**
  * Simple implementation of an EBICS user.

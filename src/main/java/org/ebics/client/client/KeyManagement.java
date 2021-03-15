@@ -34,13 +34,13 @@ import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.io.ByteArrayContentFactory;
 import org.ebics.client.utils.Utils;
-import org.ebics.client.xml.HIARequestElement;
-import org.ebics.client.xml.HPBRequestElement;
-import org.ebics.client.xml.HPBResponseOrderDataElement;
-import org.ebics.client.xml.INIRequestElement;
-import org.ebics.client.xml.KeyManagementResponseElement;
-import org.ebics.client.xml.SPRRequestElement;
-import org.ebics.client.xml.SPRResponseElement;
+import org.ebics.client.xml.h003.HIARequestElement;
+import org.ebics.client.xml.h003.HPBRequestElement;
+import org.ebics.client.xml.h003.HPBResponseOrderDataElement;
+import org.ebics.client.xml.h003.INIRequestElement;
+import org.ebics.client.xml.h003.KeyManagementResponseElement;
+import org.ebics.client.xml.h003.SPRRequestElement;
+import org.ebics.client.xml.h003.SPRResponseElement;
 
 
 /**
