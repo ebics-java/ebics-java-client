@@ -59,18 +59,20 @@ public class User implements EbicsUser, Savable {
    * if you want to prepare the first communication with the bank. For further communications you should recover persisted objects.
    * All required signature keys will be generated now.
    *
+   * @param ebicsVersion version of EBICS to be used.
    * @param partner customer in whose name we operate.
    * @param userId UserId as obtained from the bank.
    * @param name the user name,
    * @param email the user email
    * @param country the user country
-   * @param organisation the user organization or company
+   * @param organization the user organization or company
    * @param passwordCallback a callback-handler that supplies us with the password.
    *                         This parameter can be null, in this case no password is used.
    * @throws IOException
    * @throws GeneralSecurityException
    */
-  public User(EbicsPartner partner,
+  public User(EbicsVersion ebicsVersion,
+              EbicsPartner partner,
               String userId,
               String name,
               String email,
@@ -79,6 +81,7 @@ public class User implements EbicsUser, Savable {
               PasswordCallback passwordCallback)
     throws GeneralSecurityException, IOException
   {
+    this.ebicsVersion = ebicsVersion;
     this.partner = partner;
     this.userId = userId;
     this.name = name;
@@ -255,8 +258,6 @@ public class User implements EbicsUser, Savable {
    * <p> All white-space characters should be removed from entry buffer {@code buf}.
    *
    * @param buf the given byte buffer
-   * @param offset the offset
-   * @param length the length
    * @return The byte buffer portion corresponding to the given length and offset
    */
   public static byte[] removeOSSpecificChars(byte[] buf) {
@@ -361,6 +362,11 @@ public class User implements EbicsUser, Savable {
   public void setX002Certificate(X509Certificate x002Certificate) {
     this.x002Certificate = x002Certificate;
     needSave = true;
+  }
+
+  @Override
+  public EbicsVersion getEbicsVersion() {
+    return this.ebicsVersion;
   }
 
   @Override
@@ -589,6 +595,7 @@ public class User implements EbicsUser, Savable {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
+  private EbicsVersion              ebicsVersion;
   private EbicsPartner				partner;
   private String				userId;
   private String				name;

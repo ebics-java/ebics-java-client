@@ -183,7 +183,7 @@ public class EbicsClient {
      * @return
      * @throws Exception
      */
-    public User createUser(URL url, String bankName, String hostId, String partnerId,
+    public User createUser(URL url, EbicsVersion ebicsVersion, String bankName, String hostId, String partnerId,
         String userId, String name, String email, String country, String organization,
         boolean useCertificates, boolean saveCertificates, PasswordCallback passwordCallback)
         throws Exception {
@@ -193,7 +193,7 @@ public class EbicsClient {
         Bank bank = createBank(url, bankName, hostId, useCertificates);
         Partner partner = createPartner(bank, partnerId);
         try {
-            User user = new User(partner, userId, name, email, country, organization,
+            User user = new User(ebicsVersion, partner, userId, name, email, country, organization,
                 passwordCallback);
             createUserDirectories(user);
             if (saveCertificates) {
@@ -519,6 +519,7 @@ public class EbicsClient {
 
     private User createUser(ConfigProperties properties, PasswordCallback pwdHandler)
         throws Exception {
+        EbicsVersion ebicsVersion = EbicsVersion.valueOf(properties.get("ebicsVersion"));
         String userId = properties.get("userId");
         String partnerId = properties.get("partnerId");
         String bankUrl = properties.get("bank.url");
@@ -530,7 +531,7 @@ public class EbicsClient {
         String userOrg = properties.get("user.org");
         boolean useCertificates = false;
         boolean saveCertificates = true;
-        return createUser(new URL(bankUrl), bankName, hostId, partnerId, userId, userName, userEmail,
+        return createUser(new URL(bankUrl), ebicsVersion, bankName, hostId, partnerId, userId, userName, userEmail,
             userCountry, userOrg, useCertificates, saveCertificates, pwdHandler);
     }
 
