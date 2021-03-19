@@ -21,7 +21,7 @@ package org.ebics.client.xml.h004;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.client.session.OrderType;
+import org.ebics.client.order.EbicsOrderType;
 import org.ebics.schema.h004.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest;
 import org.ebics.schema.h004.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Body;
 import org.ebics.schema.h004.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Body.DataTransfer;
@@ -48,7 +48,7 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
    * @param orderId the order id, if null a random one is generated.
    */
   public UnsecuredRequestElement(EbicsSession session,
-                                 OrderType orderType,
+                                 EbicsOrderType orderType,
                                  byte[] orderData)
   {
     super(session);
@@ -106,7 +106,7 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private OrderType			orderType;
+  private EbicsOrderType orderType;
   private byte[]			orderData;
   private static final long 		serialVersionUID = -3548730114599886711L;
 }

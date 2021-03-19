@@ -59,6 +59,7 @@ public class HPBResponseOrderDataElement extends DefaultResponseElement {
     return response.getEncryptionPubKeyInfo().getX509Data().getX509CertificateArray(0);
   }
 
+  /*
   public byte[] getBankE002PublicKeyModulus() {
       return response.getEncryptionPubKeyInfo().getPubKeyValue().getRSAKeyValue().getModulus();
   }
@@ -74,6 +75,7 @@ public class HPBResponseOrderDataElement extends DefaultResponseElement {
   public byte[] getBankX002PublicKeyExponent() {
       return response.getAuthenticationPubKeyInfo().getPubKeyValue().getRSAKeyValue().getExponent();
   }
+   */
 
   @Override
   public void build() throws EbicsException {

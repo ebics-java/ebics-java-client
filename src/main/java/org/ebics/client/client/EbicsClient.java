@@ -42,11 +42,16 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.ebics.client.filetransfer.FileTransfer;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.exception.NoDownloadDataAvailableException;
+import org.ebics.client.keymgmt.KeyManagement;
 import org.ebics.client.messages.Messages;
+import org.ebics.client.order.EbicsDownloadOrder;
+import org.ebics.client.order.EbicsService;
+import org.ebics.client.order.EbicsUploadOrder;
 import org.ebics.client.session.DefaultConfiguration;
-import org.ebics.client.session.OrderType;
+import org.ebics.client.order.EbicsOrderType;
 import org.ebics.client.session.Product;
 import org.ebics.client.interfaces.Configuration;
 import org.ebics.client.interfaces.EbicsBank;
@@ -55,7 +60,6 @@ import org.ebics.client.interfaces.InitLetter;
 import org.ebics.client.interfaces.LetterManager;
 import org.ebics.client.interfaces.PasswordCallback;
 import org.ebics.client.io.IOUtils;
-import org.ebics.schema.h003.OrderAttributeType;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.utils.Constants;
 
@@ -291,11 +295,10 @@ public class EbicsClient {
             return;
         }
         EbicsSession session = createSession(user, product);
-        KeyManagement keyManager = new KeyManagement(session);
         configuration.getTraceManager().setTraceDirectory(
             configuration.getTransferTraceDirectory(user));
         try {
-            keyManager.sendINI(null);
+            getKeyManagement(session).sendINI(null);
             user.setInitialized(true);
             configuration.getLogger().info(
                 Messages.getString("ini.send.success", Constants.APPLICATION_BUNDLE_NAME, userId));
@@ -326,11 +329,10 @@ public class EbicsClient {
             return;
         }
         EbicsSession session = createSession(user, product);
-        KeyManagement keyManager = new KeyManagement(session);
         configuration.getTraceManager().setTraceDirectory(
             configuration.getTransferTraceDirectory(user));
         try {
-            keyManager.sendHIA(null);
+            getKeyManagement(session).sendHIA(null);
             user.setInitializedHIA(true);
         } catch (Exception e) {
             configuration.getLogger().error(
@@ -350,13 +352,12 @@ public class EbicsClient {
             Messages.getString("hpb.request.send", Constants.APPLICATION_BUNDLE_NAME, userId));
 
         EbicsSession session = createSession(user, product);
-        KeyManagement keyManager = new KeyManagement(session);
 
         configuration.getTraceManager().setTraceDirectory(
             configuration.getTransferTraceDirectory(user));
 
         try {
-            keyManager.sendHPB();
+            getKeyManagement(session).sendHPB();
             configuration.getLogger().info(
                 Messages.getString("hpb.send.success", Constants.APPLICATION_BUNDLE_NAME, userId));
         } catch (Exception e) {
@@ -382,13 +383,12 @@ public class EbicsClient {
             Messages.getString("spr.request.send", Constants.APPLICATION_BUNDLE_NAME, userId));
 
         EbicsSession session = createSession(user, product);
-        KeyManagement keyManager = new KeyManagement(session);
 
         configuration.getTraceManager().setTraceDirectory(
             configuration.getTransferTraceDirectory(user));
 
         try {
-            keyManager.lockAccess();
+            getKeyManagement(session).lockAccess();
         } catch (Exception e) {
             configuration.getLogger().error(
                 Messages.getString("spr.send.error", Constants.APPLICATION_BUNDLE_NAME, userId), e);
@@ -400,20 +400,19 @@ public class EbicsClient {
     }
 
     /**
-     * Sends a file to the ebics bank server
+     * Sends a file to the EBICS bank server
      * @throws Exception
      */
-    public void sendFile(File file, User user, Product product, OrderType orderType) throws Exception {
+    public void sendFile(File file, User user, Product product, EbicsUploadOrder uploadOrder) throws Exception {
         EbicsSession session = createSession(user, product);
-        OrderAttributeType.Enum orderAttribute = OrderAttributeType.OZHNN;
 
-        FileTransfer transferManager = new FileTransfer(session);
+        final FileTransfer transferManager = getFileTransfer(session);
 
         configuration.getTraceManager().setTraceDirectory(
             configuration.getTransferTraceDirectory(user));
 
         try {
-            transferManager.sendFile(IOUtils.getFileContent(file), orderType, orderAttribute);
+            transferManager.sendFile(IOUtils.getFileContent(file), uploadOrder);
         } catch (IOException | EbicsException e) {
             configuration.getLogger().error(
                 Messages.getString("upload.file.error", Constants.APPLICATION_BUNDLE_NAME,
@@ -422,25 +421,53 @@ public class EbicsClient {
         }
     }
 
-    public void sendFile(File file, OrderType orderType) throws Exception {
-        sendFile(file, defaultUser, defaultProduct, orderType);
+    private KeyManagement getKeyManagement(EbicsSession session) {
+        final KeyManagement keyManagement;
+        switch (session.getUser().getEbicsVersion()) {
+            case H003:
+                keyManagement = new org.ebics.client.keymgmt.h003.KeyManagementImpl(session);
+                break;
+            case H004:
+                keyManagement = new org.ebics.client.keymgmt.h004.KeyManagementImpl(session);
+                break;
+            default: //H005
+                keyManagement = new org.ebics.client.keymgmt.h005.KeyManagementImpl(session);
+                break;
+        }
+        return keyManagement;
     }
 
-    public void fetchFile(File file, User user, Product product, OrderType orderType,
-        boolean isTest, Date start, Date end) throws IOException, EbicsException {
-        FileTransfer transferManager;
+    private FileTransfer getFileTransfer(EbicsSession session) {
+        final FileTransfer transferManager;
+        switch (session.getUser().getEbicsVersion()) {
+            case H003:
+                transferManager = new org.ebics.client.filetransfer.h003.FileTransferImpl(session);
+                break;
+            case H004:
+                transferManager = new org.ebics.client.filetransfer.h004.FileTransferImpl(session);
+                break;
+            default: //H005
+                transferManager = new org.ebics.client.filetransfer.h005.FileTransferImpl(session);
+                break;
+        }
+        return transferManager;
+    }
+
+    public void fetchFile(File file, User user, Product product, EbicsDownloadOrder downloadOrder,
+        boolean isTest) throws IOException, EbicsException {
+        final FileTransfer transferManager;
         EbicsSession session = createSession(user, product);
         session.addSessionParam("FORMAT", "pain.xxx.cfonb160.dct");
         if (isTest) {
             session.addSessionParam("TEST", "true");
         }
-        transferManager = new FileTransfer(session);
+        transferManager = getFileTransfer(session);
 
         configuration.getTraceManager().setTraceDirectory(
             configuration.getTransferTraceDirectory(user));
 
         try {
-            transferManager.fetchFile(orderType, start, end, file);
+            transferManager.fetchFile(downloadOrder, file);
         } catch (NoDownloadDataAvailableException e) {
             // don't log this exception as an error, caller can decide how to handle
             throw e;
@@ -449,11 +476,6 @@ public class EbicsClient {
                 Messages.getString("download.file.error", Constants.APPLICATION_BUNDLE_NAME), e);
             throw e;
         }
-    }
-
-    public void fetchFile(File file, OrderType orderType, Date start, Date end) throws IOException,
-        EbicsException {
-        fetchFile(file, defaultUser, defaultProduct, orderType, false, start, end);
     }
 
     /**
@@ -529,7 +551,12 @@ public class EbicsClient {
         String userEmail = properties.get("user.email");
         String userCountry = properties.get("user.country");
         String userOrg = properties.get("user.org");
-        boolean useCertificates = false;
+        final boolean useCertificates;
+        if (ebicsVersion == EbicsVersion.H005)
+            //Due to missing h005.PubKeyInfoType.getPubKeyValue in EBCICS XSDs is not possible to calculate exp + module, must be x509 cert instead
+            useCertificates = true;
+        else
+            useCertificates = false;
         boolean saveCertificates = true;
         return createUser(new URL(bankUrl), ebicsVersion, bankName, hostId, partnerId, userId, userName, userEmail,
             userCountry, userOrg, useCertificates, saveCertificates, pwdHandler);
@@ -606,40 +633,49 @@ public class EbicsClient {
         return defaultUser;
     }
 
-    private static void addOption(Options options, OrderType type, String description) {
+    private static void addOption(Options options, EbicsOrderType type, String description) {
         options.addOption(null, type.name().toLowerCase(), false, description);
     }
 
-    private static boolean hasOption(CommandLine cmd, OrderType type) {
+    private static boolean hasOption(CommandLine cmd, EbicsOrderType type) {
         return cmd.hasOption(type.name().toLowerCase());
     }
 
     public static void main(String[] args) throws Exception {
         Options options = new Options();
-        addOption(options, OrderType.INI, "Send INI request");
-        addOption(options, OrderType.HIA, "Send HIA request");
-        addOption(options, OrderType.HPB, "Send HPB request");
+        addOption(options, EbicsOrderType.INI, "Send INI request");
+        addOption(options, EbicsOrderType.HIA, "Send HIA request");
+        addOption(options, EbicsOrderType.HPB, "Send HPB request");
         options.addOption(null, "letters", false, "Create INI Letters");
         options.addOption(null, "create", false, "Create and initialize EBICS user");
-        addOption(options, OrderType.STA,"Fetch STA file (MT940 file)");
-        addOption(options, OrderType.VMK, "Fetch VMK file (MT942 file)");
-        addOption(options, OrderType.ZDF, "Fetch ZDF file (zip file with documents)");
-        addOption(options, OrderType.ZB6, "Fetch ZB6 file");
-        addOption(options, OrderType.PTK, "Fetch client protocol file (TXT)");
-        addOption(options, OrderType.HAC, "Fetch client protocol file (XML)");
-        addOption(options, OrderType.Z01, "Fetch Z01 file");
+        addOption(options, EbicsOrderType.STA,"Fetch STA file (MT940 file)");
+        addOption(options, EbicsOrderType.VMK, "Fetch VMK file (MT942 file)");
+        addOption(options, EbicsOrderType.ZDF, "Fetch ZDF file (zip file with documents)");
+        addOption(options, EbicsOrderType.ZB6, "Fetch ZB6 file");
+        addOption(options, EbicsOrderType.PTK, "Fetch client protocol file (TXT)");
+        addOption(options, EbicsOrderType.HAC, "Fetch client protocol file (XML)");
+        addOption(options, EbicsOrderType.Z01, "Fetch Z01 file");
 
-        addOption(options, OrderType.XKD, "Send payment order file (DTA format)");
-        addOption(options, OrderType.FUL, "Send payment order file (any format)");
-        addOption(options, OrderType.XCT, "Send XCT file (any format)");
-        addOption(options, OrderType.XE2, "Send XE2 file (any format)");
-        addOption(options, OrderType.CCT, "Send CCT file (any format)");
+        addOption(options, EbicsOrderType.XKD, "Send payment order file (DTA format)");
+        addOption(options, EbicsOrderType.FUL, "Send payment order file (any format)");
+        addOption(options, EbicsOrderType.XCT, "Send XCT file (any format)");
+        addOption(options, EbicsOrderType.XE2, "Send XE2 file (any format)");
+        addOption(options, EbicsOrderType.CCT, "Send CCT file (any format)");
 
         options.addOption(null, "skip_order", true, "Skip a number of order ids");
 
         options.addOption("o", "output", true, "output file");
         options.addOption("i", "input", true, "input file");
 
+        options.addOption("p", "params", true, "key:value array of string parameters for upload or download request, example FORMAT:pain.001 TEST:TRUE EBCDIC:TRUE");
+        options.addOption("sn","service-name", true, "EBICS 3.0 Name of service, example 'SCT' (SEPA credit transfer)");
+        options.addOption("so","service-option", true, "EBICS 3.0 Optional characteristic(s) of a service Example: “URG” = urgent");
+        options.addOption("ss", "service-scope", true, "EBICS 3.0 Specifies whose rules have to be taken into account for the service. 2-char country codes, 3-char codes for other scopes “BIL” means bilaterally agreed");
+        options.addOption("ct", "service-container", false, "EBICS 3.0 Flag to indicate the use of a container");
+        options.addOption("mn", "service-message-name", true, "EBICS 3.0 Service message name, for example pain.001 or mt103");
+        options.addOption("mve", "service-message-version", true, "EBICS 3.0 Service message version for ISO formats, for example 03");
+        options.addOption("mva", "service-message-variant", true, "EBICS 3.0 Service message variant for ISO formats, for example 001");
+        options.addOption("mf", "service-message-format", true, "EBICS 3.0 Service message format, for example XML, JSON, PFD, ASN1");
 
         CommandLine cmd = parseArguments(options, args);
 
@@ -658,39 +694,25 @@ public class EbicsClient {
             client.createLetters(client.defaultUser, false);
         }
 
-        if (hasOption(cmd, OrderType.INI)) {
+        if (hasOption(cmd, EbicsOrderType.INI)) {
             client.sendINIRequest(client.defaultUser, client.defaultProduct);
         }
-        if (hasOption(cmd, OrderType.HIA)) {
+        if (hasOption(cmd, EbicsOrderType.HIA)) {
             client.sendHIARequest(client.defaultUser, client.defaultProduct);
         }
-        if (hasOption(cmd, OrderType.HPB)) {
+        if (hasOption(cmd, EbicsOrderType.HPB)) {
             client.sendHPBRequest(client.defaultUser, client.defaultProduct);
         }
 
+        //Download file
         String outputFileValue = cmd.getOptionValue("o");
+        if (outputFileValue != null)
+            fetchFile(cmd, client, outputFileValue);
+
+        //Upload file
         String inputFileValue = cmd.getOptionValue("i");
-
-        List<OrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
-            OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
-
-        for (OrderType type : fetchFileOrders) {
-            if (hasOption(cmd, type)) {
-                client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
-                    client.defaultProduct, type, false, null, null);
-                break;
-            }
-        }
-
-        List<OrderType> sendFileOrders = Arrays.asList(OrderType.XKD, OrderType.FUL, OrderType.XCT,
-            OrderType.XE2, OrderType.CCT);
-        for (OrderType type : sendFileOrders) {
-            if (hasOption(cmd, type)) {
-                client.sendFile(new File(inputFileValue), client.defaultUser,
-                    client.defaultProduct, type);
-                break;
-            }
-        }
+        if (inputFileValue != null)
+            sendFile(cmd, client, inputFileValue);
 
         if (cmd.hasOption("skip_order")) {
             int count = Integer.parseInt(cmd.getOptionValue("skip_order"));
@@ -700,6 +722,70 @@ public class EbicsClient {
         }
 
         client.quit();
+    }
+
+    private static void fetchFile(CommandLine cmd, EbicsClient client, String outputFileValue) throws IOException, EbicsException {
+        final EbicsDownloadOrder downloadOrder;
+        final Map<String, String> params = readParams(cmd.getOptionValues("p"));
+        //TBD: Reading of start/date from command line
+        final Date start = null;
+        final Date end = null;
+        switch (client.defaultUser.getEbicsVersion()) {
+            case H003:
+            case H004:
+                downloadOrder = new EbicsDownloadOrder(readOrderType(cmd, Arrays.asList(EbicsOrderType.STA, EbicsOrderType.VMK,
+                        EbicsOrderType.ZDF, EbicsOrderType.ZB6, EbicsOrderType.PTK, EbicsOrderType.HAC, EbicsOrderType.Z01)), start, end, params);
+                break;
+            default:
+                downloadOrder = new EbicsDownloadOrder(readEbicsService(cmd), start, end, params);
+                break;
+        }
+        client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
+            client.defaultProduct, downloadOrder, false);
+    }
+
+    private static EbicsService readEbicsService(CommandLine cmd) {
+        return new EbicsService(cmd.getOptionValue("sn"), cmd.getOptionValue("so"), cmd.getOptionValue("ss"), cmd.getOptionValue("ct"),
+                cmd.getOptionValue("mn"), cmd.getOptionValue("mve"), cmd.getOptionValue("mvr"), cmd.getOptionValue("mf"));
+    }
+
+    private static EbicsOrderType readOrderType(CommandLine cmd, List<EbicsOrderType> ebicsOrderTypes) {
+        for (EbicsOrderType orderType : ebicsOrderTypes) {
+            if (hasOption(cmd, orderType)) {
+                return orderType;
+            }
+        }
+        throw new IllegalArgumentException("For option o must be download ordertype specified for example -STA");
+    }
+
+    private static void sendFile(CommandLine cmd, EbicsClient client, String inputFileValue) throws Exception {
+        final EbicsUploadOrder uploadOrder;
+        final File inputFile = new File(inputFileValue);
+        final Map<String, String> params = readParams(cmd.getOptionValues("p"));
+        switch (client.defaultUser.getEbicsVersion()) {
+            case H003:
+            case H004:
+                uploadOrder = new EbicsUploadOrder(
+                        readOrderType(cmd, Arrays.asList(EbicsOrderType.XKD, EbicsOrderType.FUL, EbicsOrderType.XCT,
+                        EbicsOrderType.XE2, EbicsOrderType.CCT)), !cmd.hasOption("ns"), params);
+                break;
+            default:
+                uploadOrder = new EbicsUploadOrder(readEbicsService(cmd), !cmd.hasOption("ns"), inputFile.getName(), params);
+                break;
+        }
+        client.sendFile(new File(inputFileValue), client.defaultUser,
+            client.defaultProduct, uploadOrder);
+    }
+
+    private static Map<String, String> readParams(String[] paramPairs) {
+        final Map<String, String> paramMap = new HashMap<>(paramPairs.length);
+        for (String paramPair : paramPairs) {
+            String[] keyValArr = paramPair.split(":");
+            if (keyValArr.length != 2)
+                throw new IllegalArgumentException(String.format("The key value pair '%s' must have one separator ':'", paramPair));
+            paramMap.put(keyValArr[0], keyValArr[1]);
+        }
+        return paramMap;
     }
 
 

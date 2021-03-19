@@ -17,7 +17,18 @@
  * $Id$
  */
 
-package org.ebics.client.client;
+package org.ebics.client.keymgmt.h005;
+
+import org.ebics.client.certificate.KeyStoreManager;
+import org.ebics.client.certificate.KeyUtil;
+import org.ebics.client.client.HttpRequestSender;
+import org.ebics.client.exception.EbicsException;
+import org.ebics.client.interfaces.ContentFactory;
+import org.ebics.client.io.ByteArrayContentFactory;
+import org.ebics.client.keymgmt.KeyManagement;
+import org.ebics.client.session.EbicsSession;
+import org.ebics.client.utils.Utils;
+import org.ebics.client.xml.h005.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -26,21 +37,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.interfaces.RSAPublicKey;
-
-import org.ebics.client.certificate.KeyStoreManager;
-import org.ebics.client.certificate.KeyUtil;
-import org.ebics.client.exception.EbicsException;
-import org.ebics.client.interfaces.ContentFactory;
-import org.ebics.client.session.EbicsSession;
-import org.ebics.client.io.ByteArrayContentFactory;
-import org.ebics.client.utils.Utils;
-import org.ebics.client.xml.h003.HIARequestElement;
-import org.ebics.client.xml.h003.HPBRequestElement;
-import org.ebics.client.xml.h003.HPBResponseOrderDataElement;
-import org.ebics.client.xml.h003.INIRequestElement;
-import org.ebics.client.xml.h003.KeyManagementResponseElement;
-import org.ebics.client.xml.h003.SPRRequestElement;
-import org.ebics.client.xml.h003.SPRResponseElement;
 
 
 /**
@@ -52,15 +48,15 @@ import org.ebics.client.xml.h003.SPRResponseElement;
  * @author Hachani
  *
  */
-public class KeyManagement {
+public class KeyManagementImpl extends KeyManagement {
 
   /**
    * Constructs a new <code>KeyManagement</code> instance
    * with a given ebics session
    * @param session the ebics session
    */
-  public KeyManagement(EbicsSession session) {
-    this.session = session;
+  public KeyManagementImpl(EbicsSession session) {
+    super(session);
   }
 
   /**
@@ -73,7 +69,7 @@ public class KeyManagement {
   public void sendINI(String orderId) throws EbicsException, IOException {
     INIRequestElement			request;
     KeyManagementResponseElement	response;
-    HttpRequestSender			sender;
+    HttpRequestSender sender;
     int					httpCode;
 
     sender = new HttpRequestSender(session);
@@ -165,13 +161,7 @@ public class KeyManagement {
     }
     else
     {
-        e002PubKey = keystoreManager.getPublicKey(new BigInteger(orderData.getBankE002PublicKeyExponent()), new BigInteger(orderData.getBankE002PublicKeyModulus()));
-        x002PubKey = keystoreManager.getPublicKey(new BigInteger(orderData.getBankX002PublicKeyExponent()), new BigInteger(orderData.getBankX002PublicKeyModulus()));
-        session.getUser().getPartner().getBank().setBankKeys(e002PubKey, x002PubKey);
-        session.getUser().getPartner().getBank().setDigests(KeyUtil.getKeyDigest(e002PubKey), KeyUtil.getKeyDigest(x002PubKey));
-        //keystoreManager.setCertificateEntry(session.getBankID() + "-E002", new ByteArrayInputStream(orderData.getBankE002Certificate()));
-        //keystoreManager.setCertificateEntry(session.getBankID() + "-X002", new ByteArrayInputStream(orderData.getBankX002Certificate()));
-        keystoreManager.save(new FileOutputStream(path + File.separator + session.getBankID() + ".p12"));
+      throw new IllegalArgumentException("H005 allow only certificates. Please set useCertificate=true.");
     }
   }
 
@@ -199,10 +189,4 @@ public class KeyManagement {
     session.getConfiguration().getTraceManager().trace(response);
     response.report();
   }
-
-  // --------------------------------------------------------------------
-  // DATA MEMBERS
-  // --------------------------------------------------------------------
-
-  private EbicsSession 				session;
 }

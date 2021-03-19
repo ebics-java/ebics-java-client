@@ -21,7 +21,7 @@ package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.client.session.OrderType;
+import org.ebics.client.order.EbicsOrderType;
 import org.ebics.schema.h005.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest;
 import org.ebics.schema.h005.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Body;
 import org.ebics.schema.h005.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Body.DataTransfer;
@@ -48,7 +48,7 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
    * @param orderId the order id, if null a random one is generated.
    */
   public UnsecuredRequestElement(EbicsSession session,
-                                 OrderType orderType,
+                                 EbicsOrderType orderType,
                                  String orderId,
                                  byte[] orderData)
   {
@@ -70,11 +70,9 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
     OrderData 					orderData;
     EbicsUnsecuredRequest			request;
 
-    orderDetails = EbicsXmlFactory.createOrderDetailsType("DZNNN",
-						          orderId == null ? session.getUser().getPartner().nextOrderId() : orderId,
-	                                                  orderType.toString());
+    orderDetails = EbicsXmlFactory.createOrderDetailsType(orderType.toString());
 
-    productType = EbicsXmlFactory.creatProductElementType(session.getProduct().getLanguage(),
+    productType = EbicsXmlFactory.createProductElementType(session.getProduct().getLanguage(),
 	                                                  session.getProduct().getName());
 
     xstatic = EbicsXmlFactory.createUnsecuredRequestStaticHeaderType(session.getBankID(),
@@ -109,7 +107,7 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private OrderType			orderType;
+  private EbicsOrderType orderType;
   private String			orderId;
   private byte[]			orderData;
   private static final long 		serialVersionUID = -3548730114599886711L;

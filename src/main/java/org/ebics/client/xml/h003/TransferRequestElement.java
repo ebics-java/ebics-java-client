@@ -25,7 +25,7 @@ import java.security.NoSuchProviderException;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.client.session.OrderType;
+import org.ebics.client.order.EbicsOrderType;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h003.EbicsRequestDocument;
 
@@ -50,7 +50,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
    */
   public TransferRequestElement(EbicsSession session,
                                 String name,
-                                OrderType type,
+                                EbicsOrderType type,
                                 int segmentNumber,
                                 boolean lastSegment,
                                 byte[] transactionId)
@@ -124,7 +124,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
   protected int				segmentNumber;
   protected boolean			lastSegment;
   protected byte[]			transactionId;
-  private OrderType			type;
+  private EbicsOrderType type;
   private String 			name;
   private static final long 		serialVersionUID = -4212072825371398259L;
 }

@@ -21,7 +21,7 @@ package org.ebics.client.xml.h004;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.client.session.OrderType;
+import org.ebics.client.order.EbicsOrderType;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h004.*;
 import org.ebics.schema.h004.EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest;
@@ -95,7 +95,7 @@ public class NoPubKeyDigestsRequestElement extends DefaultEbicsRootElement {
     OrderDetailsType 				orderDetails;
 
     product = EbicsXmlFactory.creatProductElementType(session.getProduct().getLanguage(), session.getProduct().getName());
-    orderDetails = EbicsXmlFactory.createOrderDetailsType("DZHNN", OrderType.HPB.toString());
+    orderDetails = EbicsXmlFactory.createOrderDetailsType("DZHNN", EbicsOrderType.HPB.toString());
     xstatic = EbicsXmlFactory.createNoPubKeyDigestsRequestStaticHeaderType(session.getBankID(),
 	                                                                   Utils.generateNonce(),
 	                                                                   Calendar.getInstance(),

@@ -41,6 +41,7 @@ import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.EbicsUser;
 import org.ebics.client.interfaces.PasswordCallback;
 import org.ebics.client.interfaces.Savable;
+import org.ebics.client.keymgmt.KeyManagement;
 import org.ebics.client.utils.Utils;
 import org.ebics.client.xml.h003.UserSignature;
 

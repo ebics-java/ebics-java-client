@@ -21,7 +21,7 @@ package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.client.session.OrderType;
+import org.ebics.client.order.EbicsOrderType;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Body;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Header;
@@ -47,7 +47,7 @@ public class DownloadTransferRequestElement extends TransferRequestElement {
    * @param transactionId the transaction ID
    */
   public DownloadTransferRequestElement(EbicsSession session,
-                                        OrderType type,
+                                        EbicsOrderType type,
                                         int segmentNumber,
                                         boolean lastSegment,
                                         byte[] transactionId)

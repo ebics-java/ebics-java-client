@@ -22,6 +22,10 @@ package org.ebics.client.xml.h005;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
+import org.ebics.client.order.EbicsDownloadOrder;
+import org.ebics.client.order.EbicsOrder;
+import org.ebics.client.order.EbicsService;
+import org.ebics.client.order.EbicsUploadOrder;
 import org.ebics.schema.h005.*;
 import org.ebics.schema.h005.DataEncryptionInfoType.EncryptionPubKeyDigest;
 import org.ebics.schema.h005.DataTransferRequestType.DataEncryptionInfo;
@@ -34,11 +38,10 @@ import org.ebics.schema.h005.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest
 import org.ebics.schema.h005.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Body.DataTransfer;
 import org.ebics.schema.h005.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Body.DataTransfer.OrderData;
 import org.ebics.schema.h005.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Header;
-import org.ebics.schema.h005.FDLOrderParamsType.DateRange;
 import org.ebics.schema.h005.MutableHeaderType.SegmentNumber;
 import org.ebics.schema.h005.ParameterDocument.Parameter;
 import org.ebics.schema.h005.ParameterDocument.Parameter.Value;
-import org.ebics.schema.h005.StaticHeaderOrderDetailsType.OrderType;
+import org.ebics.schema.h005.StaticHeaderOrderDetailsType.AdminOrderType;
 import org.ebics.schema.h005.StaticHeaderType.BankPubKeyDigests;
 import org.ebics.schema.h005.StaticHeaderType.BankPubKeyDigests.Authentication;
 import org.ebics.schema.h005.StaticHeaderType.BankPubKeyDigests.Encryption;
@@ -444,7 +447,7 @@ public class EbicsXmlFactory {
    * @param product the product name
    * @return the <code>ProductElementType</code> XML object
    */
-  public static ProductElementType creatProductElementType(String language, String product) {
+  public static ProductElementType createProductElementType(String language, String product) {
     ProductElementType newProductElementType = ProductElementType.Factory.newInstance();
     newProductElementType.setLanguage(language);
     newProductElementType.setStringValue(product);
@@ -454,19 +457,13 @@ public class EbicsXmlFactory {
 
   /**
    * Creates a new <code>OrderDetailsType</code> XML object
-   * @param orderAttribute the order attribute
-   * @param orderId the order ID
-   * @param orderType the order type
+   * @param adminOrderType the order type
    * @return the <code>OrderDetailsType</code> XML object
    */
   @SuppressWarnings("deprecation")
-  public static OrderDetailsType createOrderDetailsType(String orderAttribute, String orderId, String orderType) {
+  public static OrderDetailsType createOrderDetailsType(String adminOrderType) {
     OrderDetailsType newOrderDetailsType = OrderDetailsType.Factory.newInstance();
-    newOrderDetailsType.setOrderAttribute(orderAttribute);
-    if (orderId != null) {
-      newOrderDetailsType.setOrderID(orderId);
-    }
-    newOrderDetailsType.setOrderType(orderType);
+    newOrderDetailsType.setAdminOrderType(adminOrderType);
 
     return newOrderDetailsType;
   }
@@ -546,17 +543,14 @@ public class EbicsXmlFactory {
   /**
    * Creates a new <code>AuthenticationPubKeyInfoType</code> XML object
    * @param authenticationVersion the authentication version
-   * @param pubKeyValue the <code>org.ebics.schema.h005.PubKeyValueType</code> element
    * @param x509Data the <code>X509DataType</code> element
    * @return the <code>AuthenticationPubKeyInfoType</code> XML object
    */
   public static AuthenticationPubKeyInfoType createAuthenticationPubKeyInfoType(String authenticationVersion,
-                                                                                org.ebics.schema.h005.PubKeyValueType pubKeyValue,
                                                                                 X509DataType x509Data)
   {
     AuthenticationPubKeyInfoType newAuthenticationPubKeyInfoType = AuthenticationPubKeyInfoType.Factory.newInstance();
     newAuthenticationPubKeyInfoType.setAuthenticationVersion(authenticationVersion);
-    newAuthenticationPubKeyInfoType.setPubKeyValue(pubKeyValue);
     if (x509Data != null)
         newAuthenticationPubKeyInfoType.setX509Data(x509Data);
 
@@ -566,36 +560,20 @@ public class EbicsXmlFactory {
   /**
    * Creates a new <code>EncryptionPubKeyInfoType</code> XML object
    * @param encryptionVersion the encryption version
-   * @param pubKeyValue the <code>org.ebics.schema.h005.PubKeyValueType</code> element
    * @param x509Data the <code>X509DataType</code> element
    * @return the <code>EncryptionPubKeyInfoType</code> XML object
    */
   public static EncryptionPubKeyInfoType createEncryptionPubKeyInfoType(String encryptionVersion,
-      									org.ebics.schema.h005.PubKeyValueType pubKeyValue,
       									X509DataType x509Data)
   {
     EncryptionPubKeyInfoType newEncryptionPubKeyInfoType = EncryptionPubKeyInfoType.Factory.newInstance();
     newEncryptionPubKeyInfoType.setEncryptionVersion(encryptionVersion);
-    newEncryptionPubKeyInfoType.setPubKeyValue(pubKeyValue);
     if (x509Data != null)
         newEncryptionPubKeyInfoType.setX509Data(x509Data);
 
     return newEncryptionPubKeyInfoType;
   }
 
-  /**
-   * Creates a new <code>org.ebics.schema.h005.PubKeyValueType</code> XML object
-   * @param rsaKeyValue the <code>RSAKeyValueType</code> element
-   * @param timeStamp the current time stamp
-   * @return the <code>org.ebics.schema.h005.PubKeyValueType</code> XML object
-   */
-  public static org.ebics.schema.h005.PubKeyValueType createh005PubKeyValueType(RSAKeyValueType rsaKeyValue, Calendar timeStamp) {
-    org.ebics.schema.h005.PubKeyValueType newPubKeyValueType = org.ebics.schema.h005.PubKeyValueType.Factory.newInstance();
-    newPubKeyValueType.setRSAKeyValue(rsaKeyValue);
-    newPubKeyValueType.setTimeStamp(timeStamp);
-
-    return newPubKeyValueType;
-  }
 
   //-----------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -860,91 +838,107 @@ public class EbicsXmlFactory {
 
   /**
    * Creates a new <code>StaticHeaderOrderDetailsType</code> XML object
-   * @param orderId the order ID
-   * @param orderAttribute the order attribute
-   * @param orderType the order type
-   * @param orderParams the <code>FULOrderParamsType</code> element
+   * @param adminOrderType the admin order type
+   * @param orderParams the <code>BTUParamsType</code> element
    * @return the <code>StaticHeaderOrderDetailsType</code> XML object
    */
-  public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
-                                                                                OrderAttributeType.Enum orderAttribute,
-                                                                                OrderType orderType,
-                                                                                FULOrderParamsType orderParams)
+  public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(StaticHeaderOrderDetailsType.AdminOrderType adminOrderType,
+                                                                                BTUParamsType orderParams)//FULOrderParamsType orderParams)
   {
-        return createStaticHeaderOrderDetailsType(orderId, orderAttribute, orderType, orderParams,
-            FULOrderParamsDocument.type.getDocumentElementName());
+        return createStaticHeaderOrderDetailsType(null, adminOrderType, orderParams,
+            BTUParamsType.type.getDocumentElementName());
   }
 
   /**
    * Creates a new <code>StaticHeaderOrderDetailsType</code> XML object
-   * @param orderId the order ID
-   * @param orderAttribute the order attribute
-   * @param orderType the order type
-   * @param orderParams the <code>FDLOrderParamsType</code> element
+   * @param adminOrderType the admin order type
+   * @param orderParams the <code>BTDParamsType</code> element
    * @return the <code>StaticHeaderOrderDetailsType</code> XML object
    */
-  public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
-                                                                                OrderAttributeType.Enum orderAttribute,
-                                                                                OrderType orderType,
-                                                                                FDLOrderParamsType orderParams)
+  public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(StaticHeaderOrderDetailsType.AdminOrderType adminOrderType,
+                                                                                BTDParamsType orderParams) //FDLOrderParamsType orderParams
   {
-      return createStaticHeaderOrderDetailsType(orderId, orderAttribute, orderType, orderParams,
-          FDLOrderParamsDocument.type.getDocumentElementName());
+      return createStaticHeaderOrderDetailsType(null, adminOrderType, orderParams,
+              BTDParamsType.type.getDocumentElementName());
   }
 
   /**
    * Creates a new <code>StaticHeaderOrderDetailsType</code> XML object
-   * @param orderId the order ID
-   * @param orderAttribute the order attribute
-   * @param orderType the order type
+   * @param orderId the order ID (only for HVE/HVS request)
+   * @param adminOrderType the admin order type
    * @param orderParams the <code>StandardOrderParamsType</code> element
    * @return the <code>StaticHeaderOrderDetailsType</code> XML object
    */
   public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
-                                                                                OrderAttributeType.Enum orderAttribute,
-                                                                                OrderType orderType,
+                                                                                StaticHeaderOrderDetailsType.AdminOrderType adminOrderType,
                                                                                 StandardOrderParamsType orderParams)
   {
-      return createStaticHeaderOrderDetailsType(orderId, orderAttribute, orderType, orderParams,
+      return createStaticHeaderOrderDetailsType(orderId, adminOrderType, orderParams,
           StandardOrderParamsDocument.type.getDocumentElementName());
   }
 
-    private static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
-        OrderAttributeType.Enum orderAttribute, OrderType orderType, XmlObject orderParams, QName newInstance) {
+  /**
+   *
+   * @param orderId orderId (only for HVE/HVS request)
+   * @param adminOrderType the admin order type
+   * @param orderParams the order params
+   * @param newInstance xml document element name of the orderParams
+   * @return static header order params
+   */
+    private static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(
+            String orderId,
+            StaticHeaderOrderDetailsType.AdminOrderType adminOrderType,
+            XmlObject orderParams, QName newInstance) {
         StaticHeaderOrderDetailsType type = StaticHeaderOrderDetailsType.Factory.newInstance();
-        if (orderId != null) {
+        if (orderId != null) { //Only for HVE, HVS
             type.setOrderID(orderId);
         }
-        type.setOrderAttribute(orderAttribute);
-        type.setOrderType(orderType);
+        type.setAdminOrderType(adminOrderType);
         type.setOrderParams(orderParams);
         qualifySubstitutionGroup(type.getOrderParams(), newInstance, null);
-
         return type;
     }
 
-  /**
-   * Creates a new <code>FULOrderParamsType</code> XML object
-   * @param fileFormat the <code>FileFormatType</code> element
-   * @return the <code>FULOrderParamsType</code> XML object
-   */
-  public static FULOrderParamsType createFULOrderParamsType(FileFormatType fileFormat) {
-    FULOrderParamsType newFULOrderParamsType = FULOrderParamsType.Factory.newInstance();
-    newFULOrderParamsType.setFileFormat(fileFormat);
 
-    return newFULOrderParamsType;
+    public static MessageType createMessageType(EbicsService ebicsService) {
+      MessageType messageType = MessageType.Factory.newInstance();
+      messageType.setFormat(ebicsService.getMessageNameFormat());
+      messageType.setVariant(ebicsService.getMessageNameVariant());
+      messageType.setVersion(ebicsService.getMessageNameVersion());
+      return messageType;
+    }
+
+  public static RestrictedServiceType createRestrictedServiceType(EbicsService ebicsService) {
+    RestrictedServiceType serviceType = RestrictedServiceType.Factory.newInstance();
+    serviceType.setMsgName(createMessageType(ebicsService));
+    serviceType.setServiceName(ebicsService.getServiceName());
+    serviceType.setScope(ebicsService.getScope());
+    return serviceType;
   }
 
   /**
-   * Creates a new <code>FDLOrderParamsType</code> XML object
-   * @param fileFormat the <code>FileFormatType</code> element
-   * @return the <code>FDLOrderParamsType</code> XML object
+   * Create BTU params type object from EbicsOrder
+   * @param ebicsOrder the EBICS order
+   * @return BTU params type
    */
-  public static FDLOrderParamsType createFDLOrderParamsType(FileFormatType fileFormat) {
-    FDLOrderParamsType newFDLOrderParamsType = FDLOrderParamsType.Factory.newInstance();
-    newFDLOrderParamsType.setFileFormat(fileFormat);
+  public static BTUParamsType createBTUParamsType(EbicsUploadOrder ebicsOrder) {
+    BTUParamsType btuParamsType = BTUParamsType.Factory.newInstance();
+    btuParamsType.setFileName(ebicsOrder.getFileName());
+    btuParamsType.setService(createRestrictedServiceType(ebicsOrder.getOrderService()));
+    return btuParamsType;
+  }
 
-    return newFDLOrderParamsType;
+  /**
+   * Create BTD params type object from EbicsOrder
+   * @param ebicsOrder the EBICS order
+   * @return BTD params type
+   */
+  public static BTDParamsType createBTDParamsType(EbicsDownloadOrder ebicsOrder) {
+    BTDParamsType btdParamsType = BTDParamsType.Factory.newInstance();
+    if (ebicsOrder.getStartDate() != null && ebicsOrder.getEndDate() != null)
+      btdParamsType.setDateRange(createDateRangeType(ebicsOrder.getStartDate(), ebicsOrder.getEndDate()));
+    btdParamsType.setService(createRestrictedServiceType(ebicsOrder.getOrderService()));
+    return btdParamsType;
   }
 
   /**
@@ -958,36 +952,21 @@ public class EbicsXmlFactory {
   }
 
   /**
-   * Creates a new <code>DateRange</code> XML object
+   * Creates a new <code>DateRangeType</code> XML object
    * @param start the start range
    * @param end the end range
-   * @return the <code>DateRange</code> XML object
+   * @return the <code>DateRangeType</code> XML object
    */
-  public static DateRange createDateRange(Date start, Date end) {
-    DateRange newDateRange = DateRange.Factory.newInstance();
+  public static DateRangeType createDateRangeType(Date start, Date end) {
+    DateRangeType dateRangeType = DateRangeType.Factory.newInstance();
     Calendar startRange = Calendar.getInstance();
     Calendar endRange = Calendar.getInstance();
 
     startRange.setTime(start);
     endRange.setTime(end);
-    newDateRange.setStart(startRange);
-    newDateRange.setEnd(endRange);
-
-    return newDateRange;
-  }
-
-  /**
-   * Creates a new <code>FileFormatType</code> XML object
-   * @param countryCode the country code
-   * @param value the file format value
-   * @return the <code>FileFormatType</code> XML object
-   */
-  public static FileFormatType createFileFormatType(String countryCode, String value) {
-    FileFormatType newFileFormatType = FileFormatType.Factory.newInstance();
-    newFileFormatType.setCountryCode(countryCode);
-    newFileFormatType.setStringValue(value);
-
-    return newFileFormatType;
+    dateRangeType.setStart(startRange);
+    dateRangeType.setEnd(endRange);
+    return dateRangeType;
   }
 
   /**
@@ -1023,8 +1002,8 @@ public class EbicsXmlFactory {
    * @param orderType the order type
    * @return the <code>OrderType</code> XML object
    */
-  public static OrderType createOrderType(String orderType) {
-    OrderType newOrderType = OrderType.Factory.newInstance();
+  public static StaticHeaderOrderDetailsType.AdminOrderType createAdminOrderType(String orderType) {
+    AdminOrderType newOrderType = AdminOrderType.Factory.newInstance();
     newOrderType.setStringValue(orderType);
 
     return newOrderType;

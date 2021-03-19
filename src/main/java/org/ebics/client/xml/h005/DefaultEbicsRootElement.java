@@ -26,7 +26,7 @@ import org.apache.xmlbeans.XmlOptions;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.EbicsRootElement;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.client.session.OrderType;
+import org.ebics.client.order.EbicsOrderType;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
@@ -129,7 +129,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
    * @param type the order type.
    * @return the generated file name.
    */
-  public static String generateName(OrderType type) {
+  public static String generateName(EbicsOrderType type) {
     return type.toString() + new BigInteger(130, new SecureRandom()).toString(32);
   }
   

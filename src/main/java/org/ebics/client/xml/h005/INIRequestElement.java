@@ -21,7 +21,7 @@ package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.client.session.OrderType;
+import org.ebics.client.order.EbicsOrderType;
 import org.ebics.client.utils.Utils;
 
 /**
@@ -55,7 +55,7 @@ public class INIRequestElement extends DefaultEbicsRootElement {
     signaturePubKey = new SignaturePubKeyOrderDataElement(session);
     signaturePubKey.build();
     unsecuredRequest = new UnsecuredRequestElement(session,
-	                                           OrderType.INI,
+	                                           EbicsOrderType.INI,
 	                                           orderId == null ? session.getUser().getPartner().nextOrderId() : orderId,
 	                                           Utils.zip(signaturePubKey.prettyPrint()));
     unsecuredRequest.build();

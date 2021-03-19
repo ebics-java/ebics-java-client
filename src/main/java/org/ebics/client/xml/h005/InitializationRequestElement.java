@@ -24,7 +24,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.client.session.OrderType;
+import org.ebics.client.order.EbicsOrder;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h005.EbicsRequestDocument;
 
@@ -47,17 +47,17 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
   /**
    * Construct a new <code>InitializationRequestElement</code> root element.
    * @param session the current ebics session.
-   * @param type the initialization type (UPLOAD, DOWNLOAD).
+   * @param ebicsOrder the initialization order details.
    * @param name the element name.
    * @throws EbicsException
    */
   public InitializationRequestElement(EbicsSession session,
-                                      OrderType type,
+                                      EbicsOrder ebicsOrder,
                                       String name)
     throws EbicsException
   {
     super(session);
-    this.type = type;
+    this.ebicsOrder = ebicsOrder;
     this.name = name;
     nonce = Utils.generateNonce();
   }
@@ -100,14 +100,6 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
     } catch (NoSuchProviderException e) {
       throw new EbicsException(e.getMessage());
     }
-  }
-
-  /**
-   * Returns the element type.
-   * @return the element type.
-   */
-  public String getType() {
-    return type.toString();
   }
 
   /**
@@ -157,7 +149,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
   // --------------------------------------------------------------------
 
   private String			name;
-  protected OrderType			type;
+  protected EbicsOrder ebicsOrder;
   protected byte[]			nonce;
   private static final long 		serialVersionUID = 8983807819242699280L;
 }

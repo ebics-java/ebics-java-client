@@ -17,34 +17,28 @@
  * $Id$
  */
 
-package org.ebics.client.client;
+package org.ebics.client.filetransfer.h004;
+
+import org.ebics.client.client.HttpRequestSender;
+import org.ebics.client.client.TransferState;
+import org.ebics.client.exception.EbicsException;
+import org.ebics.client.filetransfer.FileTransfer;
+import org.ebics.client.interfaces.ContentFactory;
+import org.ebics.client.io.ByteArrayContentFactory;
+import org.ebics.client.io.Joiner;
+import org.ebics.client.messages.Messages;
+import org.ebics.client.order.EbicsDownloadOrder;
+import org.ebics.client.order.EbicsUploadOrder;
+import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.session.EbicsSession;
+import org.ebics.client.utils.Constants;
+import org.ebics.client.utils.Utils;
+import org.ebics.client.xml.h004.*;
+import org.ebics.schema.h004.OrderAttributeType;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Date;
-
-import org.ebics.client.exception.EbicsException;
-import org.ebics.client.interfaces.ContentFactory;
-import org.ebics.client.messages.Messages;
-import org.ebics.client.session.EbicsSession;
-import org.ebics.client.session.OrderType;
-import org.ebics.client.utils.Utils;
-import org.ebics.client.xml.h003.DownloadTransferResponseElement;
-import org.ebics.client.xml.h003.ReceiptResponseElement;
-import org.ebics.client.io.ByteArrayContentFactory;
-import org.ebics.client.io.Joiner;
-import org.ebics.schema.h003.OrderAttributeType;
-import org.ebics.client.utils.Constants;
-import org.ebics.client.xml.h003.DefaultEbicsRootElement;
-import org.ebics.client.xml.h003.DownloadInitializationRequestElement;
-import org.ebics.client.xml.h003.DownloadInitializationResponseElement;
-import org.ebics.client.xml.h003.DownloadTransferRequestElement;
-import org.ebics.client.xml.h003.InitializationResponseElement;
-import org.ebics.client.xml.h003.ReceiptRequestElement;
-import org.ebics.client.xml.h003.TransferResponseElement;
-import org.ebics.client.xml.h003.UploadInitializationRequestElement;
-import org.ebics.client.xml.h003.UploadTransferRequestElement;
 
 
 /**
@@ -77,26 +71,35 @@ import org.ebics.client.xml.h003.UploadTransferRequestElement;
  * @author Hachani
  *
  */
-public class FileTransfer {
+public class FileTransferImpl extends FileTransfer {
 
-  /**
-   * Constructs a new FileTransfer session
-   * @param session the user session
-   */
-  public FileTransfer(EbicsSession session) {
-    this.session = session;
-  }
+    /**
+     * Constructs a new FileTransfer session
+     *
+     * @param session the user session
+     */
+    public FileTransferImpl(EbicsSession session) {
+        super(session);
+    }
 
   /**
    * Initiates a file transfer to the bank.
    * @param content The bytes you want to send.
-   * @param orderType As which order type
+   * @param uploadOrder As which order type details
    * @throws IOException
    * @throws EbicsException
    */
-  public void sendFile(byte[] content, OrderType orderType, OrderAttributeType.Enum orderAttribute)
+  @Override
+  public void sendFile(byte[] content, EbicsUploadOrder uploadOrder)
     throws IOException, EbicsException
   {
+      EbicsOrderType orderType = uploadOrder.getOrderType();
+      final OrderAttributeType.Enum orderAttribute;
+      if (!uploadOrder.isSignatureFlag())
+          orderAttribute = OrderAttributeType.OZHNN;
+      else
+          orderAttribute  = OrderAttributeType.DZHNN;
+
     HttpRequestSender sender = new HttpRequestSender(session);
     UploadInitializationRequestElement initializer = new UploadInitializationRequestElement(session,
 	                                            orderType, orderAttribute,
@@ -118,7 +121,7 @@ public class FileTransfer {
 
         while (state.hasNext()) {
             int segmentNumber = state.next();
-            sendFile(initializer.getContent(segmentNumber), segmentNumber, state.isLastSegment(),
+            sendFileSegment(initializer.getContent(segmentNumber), segmentNumber, state.isLastSegment(),
                 state.getTransactionId(), orderType);
         }
     }
@@ -133,11 +136,11 @@ public class FileTransfer {
    * @throws IOException
    * @throws EbicsException
    */
-  public void sendFile(ContentFactory factory,
-                       int segmentNumber,
-                       boolean lastSegment,
-                       byte[] transactionId,
-                       OrderType orderType)
+  protected void sendFileSegment(ContentFactory factory,
+                              int segmentNumber,
+                              boolean lastSegment,
+                              byte[] transactionId,
+                              EbicsOrderType orderType)
     throws IOException, EbicsException
   {
     UploadTransferRequestElement		uploader;
@@ -171,19 +174,17 @@ public class FileTransfer {
    * You may give an optional start and end date.
    * This type of transfer will run until everything is processed.
    * No transaction recovery is possible.
-   * @param orderType type of file to fetch
-   * @param start optional begin of fetch term
-   * @param end optional end of fetch term
+   * @param downloadOrder type of file to fetch
    * @param outputFile dest where to put the data
    * @throws IOException communication error
    * @throws EbicsException server generated error
    */
-  public void fetchFile(OrderType orderType,
-                        Date start,
-                        Date end,
+  @Override
+  public void fetchFile(EbicsDownloadOrder downloadOrder,
                         File outputFile)
     throws IOException, EbicsException
   {
+      final EbicsOrderType orderType = downloadOrder.getOrderType();
     HttpRequestSender			sender;
     DownloadInitializationRequestElement	initializer;
     DownloadInitializationResponseElement	response;
@@ -196,8 +197,8 @@ public class FileTransfer {
     sender = new HttpRequestSender(session);
     initializer = new DownloadInitializationRequestElement(session,
 	                                            orderType,
-	                                            start,
-	                                            end);
+	                                            downloadOrder.getStartDate(),
+	                                            downloadOrder.getEndDate());
     initializer.build();
     initializer.validate();
 
@@ -219,7 +220,7 @@ public class FileTransfer {
       int		segmentNumber;
 
       segmentNumber = state.next();
-      fetchFile(orderType,
+      fetchFileSegment(orderType,
 	        segmentNumber,
 	        state.isLastSegment(),
 	        state.getTransactionId(),
@@ -254,11 +255,11 @@ public class FileTransfer {
    * @throws IOException communication error
    * @throws EbicsException server generated error
    */
-  public void fetchFile(OrderType orderType,
-                        int segmentNumber,
-                        boolean lastSegment,
-                        byte[] transactionId,
-                        Joiner joiner)
+  protected void fetchFileSegment(EbicsOrderType orderType,
+                                  int segmentNumber,
+                                  boolean lastSegment,
+                                  byte[] transactionId,
+                                  Joiner joiner)
     throws IOException, EbicsException
   {
     DownloadTransferRequestElement		downloader;

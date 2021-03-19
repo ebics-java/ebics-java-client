@@ -22,6 +22,9 @@ package org.ebics.client.xml.h005;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.io.Splitter;
+import org.ebics.client.order.EbicsOrder;
+import org.ebics.client.order.EbicsUploadOrder;
+import org.ebics.client.order.EbicsOrderType;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h005.DataEncryptionInfoType.EncryptionPubKeyDigest;
@@ -33,7 +36,6 @@ import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Body;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Header;
 import org.ebics.schema.h005.ParameterDocument.Parameter;
 import org.ebics.schema.h005.ParameterDocument.Parameter.Value;
-import org.ebics.schema.h005.StaticHeaderOrderDetailsType.OrderType;
 import org.ebics.schema.h005.StaticHeaderType.BankPubKeyDigests;
 import org.ebics.schema.h005.StaticHeaderType.BankPubKeyDigests.Authentication;
 import org.ebics.schema.h005.StaticHeaderType.BankPubKeyDigests.Encryption;
@@ -58,20 +60,19 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
 /**
    * Constructs a new <code>UInitializationRequestElement</code> for uploads initializations.
    * @param session the current ebics session.
-   * @param orderType the upload order type
+   * @param ebicsOrder the EBICS order details
    * @param userData the user data to be uploaded
    * @throws EbicsException
    */
   public UploadInitializationRequestElement(EbicsSession session,
-                                       org.ebics.client.session.OrderType orderType, OrderAttributeType.Enum orderAttribute,
+                                       EbicsOrder ebicsOrder,
                                        byte[] userData)
     throws EbicsException
   {
-    super(session, orderType, generateName(orderType));
+    super(session, ebicsOrder, generateName(ebicsOrder.getOrderType()));
     this.userData = userData;
     keySpec = new SecretKeySpec(nonce, "EAS");
     splitter = new Splitter(userData);
-    this.orderAttribute = orderAttribute;
   }
 
   @Override
@@ -89,8 +90,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     DataEncryptionInfo 			dataEncryptionInfo;
     SignatureData 			signatureData;
     EncryptionPubKeyDigest 		encryptionPubKeyDigest;
-    OrderType 				orderType;
-    FileFormatType 			fileFormat;
+    StaticHeaderOrderDetailsType.AdminOrderType adminOrderType;
 
     userSignature = new UserSignature(session.getUser(),
 				      generateName("UserSignature"),
@@ -110,41 +110,34 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
 	                                          "http://www.w3.org/2001/04/xmlenc#sha256",
 	                                          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
-    orderType = EbicsXmlFactory.createOrderType(type.toString());
-    fileFormat = EbicsXmlFactory.createFileFormatType(session.getConfiguration().getLocale().getCountry().toUpperCase(),
-	                                              session.getSessionParam("FORMAT"));
+    adminOrderType = EbicsXmlFactory.createAdminOrderType(ebicsOrder.getOrderType().toString());
 
     String nextOrderId = session.getUser().getPartner().nextOrderId();
 
     StaticHeaderOrderDetailsType orderDetails;
-    if (type == org.ebics.client.session.OrderType.FUL) {
-        FULOrderParamsType fULOrderParams = EbicsXmlFactory.createFULOrderParamsType(fileFormat);
+    if (ebicsOrder.getOrderType() == EbicsOrderType.BTU) {
+        BTUParamsType btuParamsType = EbicsXmlFactory.createBTUParamsType((EbicsUploadOrder)ebicsOrder);
 
         List<Parameter> parameters = new ArrayList<>();
-        if (Boolean.valueOf(session.getSessionParam("TEST")).booleanValue()) {
+        if (Boolean.parseBoolean(session.getSessionParam("TEST"))) {
           Value value = EbicsXmlFactory.createValue("String", "TRUE");
           Parameter parameter = EbicsXmlFactory.createParameter("TEST", value);
           parameters.add(parameter);
         }
 
-        if (Boolean.valueOf(session.getSessionParam("EBCDIC")).booleanValue()) {
+        if (Boolean.parseBoolean(session.getSessionParam("EBCDIC"))) {
           Value value = EbicsXmlFactory.createValue("String", "TRUE");
           Parameter parameter = EbicsXmlFactory.createParameter("EBCDIC", value);
           parameters.add(parameter);
         }
 
         if (parameters.size() > 0) {
-          fULOrderParams.setParameterArray(parameters.toArray(new Parameter[parameters.size()]));
+            btuParamsType.setParameterArray(parameters.toArray(new Parameter[parameters.size()]));
         }
-        orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(nextOrderId,
-            orderAttribute,
-            orderType,
-            fULOrderParams);
+        orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(adminOrderType, btuParamsType);
     } else {
         StandardOrderParamsType standardOrderParamsType = EbicsXmlFactory.createStandardOrderParamsType();
-        orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(nextOrderId,
-            orderAttribute,
-            orderType,
+        orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(nextOrderId, adminOrderType,
             standardOrderParamsType);
     }
 
@@ -211,7 +204,6 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private final OrderAttributeType.Enum orderAttribute;
   private byte[]			userData;
   private UserSignature userSignature;
   private SecretKeySpec			keySpec;

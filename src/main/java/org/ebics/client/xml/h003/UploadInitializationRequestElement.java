@@ -27,6 +27,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
+import org.ebics.client.order.EbicsOrderType;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.utils.Utils;
 import org.ebics.client.io.Splitter;
@@ -71,8 +72,8 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
    * @throws EbicsException
    */
   public UploadInitializationRequestElement(EbicsSession session,
-                                       org.ebics.client.session.OrderType orderType, OrderAttributeType.Enum orderAttribute,
-                                       byte[] userData)
+                                            EbicsOrderType orderType, OrderAttributeType.Enum orderAttribute,
+                                            byte[] userData)
     throws EbicsException
   {
     super(session, orderType, generateName(orderType));
@@ -125,7 +126,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     String nextOrderId = session.getUser().getPartner().nextOrderId();
 
     StaticHeaderOrderDetailsType orderDetails;
-    if (type == org.ebics.client.session.OrderType.FUL) {
+    if (type == EbicsOrderType.FUL) {
         FULOrderParamsType fULOrderParams = EbicsXmlFactory.createFULOrderParamsType(fileFormat);
 
         List<Parameter> parameters = new ArrayList<>();

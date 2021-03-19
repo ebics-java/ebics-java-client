@@ -17,15 +17,15 @@
  * $Id$
  */
 
-package org.ebics.client.session;
+package org.ebics.client.order;
 
 /**
- * A BCS order type.
+ * EBICS order type.
  *
  * @author Pierre Ducroquet
  *
  */
-public enum OrderType {
+public enum EbicsOrderType {
     HIA,
     HAA,
     HKD,
@@ -56,5 +56,7 @@ public enum OrderType {
     Z01,
     XKD,
     XE2,
-    XCT
+    XCT,
+    BTU,
+    BTD
 }
