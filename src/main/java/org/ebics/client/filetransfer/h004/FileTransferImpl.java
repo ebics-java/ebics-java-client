@@ -286,10 +286,4 @@ public class FileTransferImpl extends FileTransfer {
     response.report();
     joiner.append(response.getOrderData());
   }
-
-  // --------------------------------------------------------------------
-  // DATA MEMBERS
-  // --------------------------------------------------------------------
-
-  private EbicsSession			session;
 }
