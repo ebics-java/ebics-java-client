@@ -107,6 +107,7 @@ public class User implements EbicsUser, Savable {
               PasswordCallback passwordCallback)
     throws IOException, GeneralSecurityException, ClassNotFoundException
   {
+    this.ebicsVersion = (EbicsVersion)ois.readObject();
     this.partner = partner;
     this.passwordCallback = passwordCallback;
     this.userId = ois.readUTF();
@@ -132,13 +133,15 @@ public class User implements EbicsUser, Savable {
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  public User(EbicsPartner partner,
+  public User(EbicsVersion ebicsVersion,
+              EbicsPartner partner,
               String userId,
               String name,
               String keystorePath,
               PasswordCallback passwordCallback)
     throws GeneralSecurityException, IOException
   {
+    this.ebicsVersion = ebicsVersion;
     this.partner = partner;
     this.userId = userId;
     this.name = name;
@@ -187,6 +190,7 @@ public class User implements EbicsUser, Savable {
 
   @Override
   public void save(ObjectOutputStream oos) throws IOException {
+    oos.writeObject(ebicsVersion);
     oos.writeUTF(userId);
     oos.writeUTF(name);
     oos.writeUTF(dn);

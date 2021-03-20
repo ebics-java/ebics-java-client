@@ -778,14 +778,18 @@ public class EbicsClient {
     }
 
     private static Map<String, String> readParams(String[] paramPairs) {
-        final Map<String, String> paramMap = new HashMap<>(paramPairs.length);
-        for (String paramPair : paramPairs) {
-            String[] keyValArr = paramPair.split(":");
-            if (keyValArr.length != 2)
-                throw new IllegalArgumentException(String.format("The key value pair '%s' must have one separator ':'", paramPair));
-            paramMap.put(keyValArr[0], keyValArr[1]);
+        if (paramPairs == null)
+            return new HashMap<>(0);
+        else {
+            final Map<String, String> paramMap = new HashMap<>(paramPairs.length);
+            for (String paramPair : paramPairs) {
+                String[] keyValArr = paramPair.split(":");
+                if (keyValArr.length != 2)
+                    throw new IllegalArgumentException(String.format("The key value pair '%s' must have one separator ':'", paramPair));
+                paramMap.put(keyValArr[0], keyValArr[1]);
+            }
+            return paramMap;
         }
-        return paramMap;
     }
 
 
