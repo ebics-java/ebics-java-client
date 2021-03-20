@@ -26,12 +26,12 @@ import java.util.Date;
 
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.ContentFactory;
+import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.io.ByteArrayContentFactory;
 import org.kopi.ebics.io.Joiner;
 import org.kopi.ebics.messages.Messages;
 import org.kopi.ebics.schema.h003.OrderAttributeType;
 import org.kopi.ebics.session.EbicsSession;
-import org.kopi.ebics.session.OrderType;
 import org.kopi.ebics.utils.Constants;
 import org.kopi.ebics.utils.Utils;
 import org.kopi.ebics.xml.DefaultEbicsRootElement;
@@ -94,7 +94,7 @@ public class FileTransfer {
    * @throws IOException
    * @throws EbicsException
    */
-  public void sendFile(byte[] content, OrderType orderType, OrderAttributeType.Enum orderAttribute)
+  public void sendFile(byte[] content, EbicsOrderType orderType, OrderAttributeType.Enum orderAttribute)
     throws IOException, EbicsException
   {
     HttpRequestSender sender = new HttpRequestSender(session);
@@ -137,7 +137,7 @@ public class FileTransfer {
                        int segmentNumber,
                        boolean lastSegment,
                        byte[] transactionId,
-                       OrderType orderType)
+                       EbicsOrderType orderType)
     throws IOException, EbicsException
   {
     UploadTransferRequestElement		uploader;
@@ -178,7 +178,7 @@ public class FileTransfer {
    * @throws IOException communication error
    * @throws EbicsException server generated error
    */
-  public void fetchFile(OrderType orderType,
+  public void fetchFile(EbicsOrderType orderType,
                         Date start,
                         Date end,
                         File outputFile)
@@ -254,7 +254,7 @@ public class FileTransfer {
    * @throws IOException communication error
    * @throws EbicsException server generated error
    */
-  public void fetchFile(OrderType orderType,
+  public void fetchFile(EbicsOrderType orderType,
                         int segmentNumber,
                         boolean lastSegment,
                         byte[] transactionId,

@@ -44,10 +44,9 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.kopi.ebics.exception.EbicsException;
+import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.interfaces.EbicsRootElement;
 import org.kopi.ebics.session.EbicsSession;
-import org.kopi.ebics.session.OrderType;
-
 
 public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 
@@ -134,7 +133,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
    * @param type the order type.
    * @return the generated file name.
    */
-  public static String generateName(OrderType type) {
+  public static String generateName(EbicsOrderType type) {
     return type.toString() + new BigInteger(130, new SecureRandom()).toString(32);
   }
   

@@ -21,7 +21,6 @@ package org.kopi.ebics.client;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -46,6 +45,7 @@ import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.NoDownloadDataAvailableException;
 import org.kopi.ebics.interfaces.Configuration;
 import org.kopi.ebics.interfaces.EbicsBank;
+import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.interfaces.EbicsUser;
 import org.kopi.ebics.interfaces.InitLetter;
 import org.kopi.ebics.interfaces.LetterManager;
@@ -380,7 +380,7 @@ public class EbicsClient {
      * Sends a file to the ebics bank server
      * @throws Exception
      */
-    public void sendFile(File file, User user, Product product, OrderType orderType) throws Exception {
+    public void sendFile(File file, User user, Product product, EbicsOrderType orderType) throws Exception {
         EbicsSession session = createSession(user, product);
         OrderAttributeType.Enum orderAttribute = OrderAttributeType.OZHNN;
 
@@ -398,11 +398,11 @@ public class EbicsClient {
         }
     }
 
-    public void sendFile(File file, OrderType orderType) throws Exception {
+    public void sendFile(File file, EbicsOrderType orderType) throws Exception {
         sendFile(file, defaultUser, defaultProduct, orderType);
     }
 
-    public void fetchFile(File file, User user, Product product, OrderType orderType,
+    public void fetchFile(File file, User user, Product product, EbicsOrderType orderType,
         boolean isTest, Date start, Date end) throws IOException, EbicsException {
         FileTransfer transferManager;
         EbicsSession session = createSession(user, product);
@@ -426,7 +426,7 @@ public class EbicsClient {
         }
     }
 
-    public void fetchFile(File file, OrderType orderType, Date start, Date end) throws IOException,
+    public void fetchFile(File file, EbicsOrderType orderType, Date start, Date end) throws IOException,
         EbicsException {
         fetchFile(file, defaultUser, defaultProduct, orderType, false, start, end);
     }
@@ -574,12 +574,12 @@ public class EbicsClient {
         return defaultUser;
     }
 
-    private static void addOption(Options options, OrderType type, String description) {
-        options.addOption(null, type.name().toLowerCase(), false, description);
+    private static void addOption(Options options, EbicsOrderType type, String description) {
+        options.addOption(null, type.getCode().toLowerCase(), false, description);
     }
 
-    private static boolean hasOption(CommandLine cmd, OrderType type) {
-        return cmd.hasOption(type.name().toLowerCase());
+    private static boolean hasOption(CommandLine cmd, EbicsOrderType type) {
+        return cmd.hasOption(type.getCode().toLowerCase());
     }
 
     public static void main(String[] args) throws Exception {
@@ -642,11 +642,11 @@ public class EbicsClient {
         String outputFileValue = cmd.getOptionValue("o");
         String inputFileValue = cmd.getOptionValue("i");
 
-        List<OrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
+        List<? extends EbicsOrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
             OrderType.C52, OrderType.C53, OrderType.C54,
             OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
 
-        for (OrderType type : fetchFileOrders) {
+        for (EbicsOrderType type : fetchFileOrders) {
             if (hasOption(cmd, type)) {
                 client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
                     client.defaultProduct, type, false, null, null);
@@ -654,9 +654,9 @@ public class EbicsClient {
             }
         }
 
-        List<OrderType> sendFileOrders = Arrays.asList(OrderType.XKD, OrderType.FUL, OrderType.XCT,
+        List<? extends EbicsOrderType> sendFileOrders = Arrays.asList(OrderType.XKD, OrderType.FUL, OrderType.XCT,
             OrderType.XE2, OrderType.CCT);
-        for (OrderType type : sendFileOrders) {
+        for (EbicsOrderType type : sendFileOrders) {
             if (hasOption(cmd, type)) {
                 client.sendFile(new File(inputFileValue), client.defaultUser,
                     client.defaultProduct, type);
