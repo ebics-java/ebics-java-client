@@ -111,10 +111,7 @@ public class NoPubKeyDigestsRequestElement extends DefaultEbicsRootElement {
     mutable = EbicsXmlFactory.createEmptyMutableHeaderType();
     header = EbicsXmlFactory.createDigestsRequestHeader(true, mutable, xstatic);
     body = EbicsXmlFactory.createDigestsRequestBody();
-    request = EbicsXmlFactory.createEbicsNoPubKeyDigestsRequest(session.getConfiguration().getRevision(),
-	                                                        session.getConfiguration().getVersion(),
-	                                                        header,
-	                                                        body);
+    request = EbicsXmlFactory.createEbicsNoPubKeyDigestsRequest(header, body);
     document = EbicsXmlFactory.createEbicsNoPubKeyDigestsRequestDocument(request);
   }
 

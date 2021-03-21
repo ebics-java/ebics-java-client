@@ -90,10 +90,7 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
     orderData = EbicsXmlFactory.createOrderData(this.orderData);
     dataTransfer = EbicsXmlFactory.createDataTransfer(orderData);
     body = EbicsXmlFactory.createBody(dataTransfer);
-    request = EbicsXmlFactory.createEbicsUnsecuredRequest(header,
-	                                                  body,
-	                                                  session.getConfiguration().getRevision(),
-	                                                  session.getConfiguration().getVersion());
+    request = EbicsXmlFactory.createEbicsUnsecuredRequest(header, body);
 
     document = EbicsXmlFactory.createEbicsUnsecuredRequestDocument(request);
   }

@@ -115,8 +115,6 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     fileFormat = EbicsXmlFactory.createFileFormatType(session.getConfiguration().getLocale().getCountry().toUpperCase(),
 	                                              session.getSessionParam("FORMAT"));
 
-    String nextOrderId = session.getUser().getPartner().nextOrderId();
-
     StaticHeaderOrderDetailsType orderDetails;
     if (type == EbicsOrderType.FUL) {
         FULOrderParamsType fULOrderParams = EbicsXmlFactory.createFULOrderParamsType(fileFormat);
@@ -137,13 +135,13 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
         if (parameters.size() > 0) {
           fULOrderParams.setParameterArray(parameters.toArray(new Parameter[parameters.size()]));
         }
-        orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(nextOrderId,
+        orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(
             orderAttribute,
             orderType,
             fULOrderParams);
     } else {
         StandardOrderParamsType standardOrderParamsType = EbicsXmlFactory.createStandardOrderParamsType();
-        orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(nextOrderId,
+        orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(
             orderAttribute,
             orderType,
             standardOrderParamsType);
@@ -169,10 +167,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
 	                                                          generateTransactionKey());
     dataTransfer = EbicsXmlFactory.createDataTransferRequestType(dataEncryptionInfo, signatureData);
     body = EbicsXmlFactory.createEbicsRequestBody(dataTransfer);
-    request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(),
-	                                         session.getConfiguration().getVersion(),
-	                                         header,
-	                                         body);
+    request = EbicsXmlFactory.createEbicsRequest(header, body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
   }
 

@@ -114,17 +114,14 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
 	parameter = EbicsXmlFactory.createParameter("TEST", value);
 	fDLOrderParamsType.setParameterArray(new Parameter[] {parameter});
       }
-      orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(session.getUser().getPartner().nextOrderId(),
-                                                                        OrderAttributeType.DZHNN,
+      orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(OrderAttributeType.DZHNN,
                                                                         orderType,
                                                                         fDLOrderParamsType);
     } else {
       StandardOrderParamsType		standardOrderParamsType;
 
       standardOrderParamsType = EbicsXmlFactory.createStandardOrderParamsType();
-      //FIXME Some banks cannot handle OrderID element in download process. Add parameter in configuration!!!
-      orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(null,//session.getUser().getPartner().nextOrderId(),
-	                                                                OrderAttributeType.DZHNN,
+      orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(OrderAttributeType.DZHNN,
 	                                                                orderType,
 	                                                                standardOrderParamsType);
     }
@@ -139,10 +136,7 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
                                                      bankPubKeyDigests);
     header = EbicsXmlFactory.createEbicsRequestHeader(true, mutable, xstatic);
     body = EbicsXmlFactory.createEbicsRequestBody();
-    request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(),
-                                                 session.getConfiguration().getVersion(),
-                                                 header,
-                                                 body);
+    request = EbicsXmlFactory.createEbicsRequest(header, body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
   }
 

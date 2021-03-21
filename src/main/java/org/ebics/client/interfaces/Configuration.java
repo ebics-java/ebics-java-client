@@ -65,7 +65,7 @@ public interface Configuration {
   /**
    * Returns the directory path of the key store that contains
    * bank and user certificates.
-   * @param the ebics user.
+   * @param user the ebics user.
    * @return the key store directory of a given user.
    */
   public String getKeystoreDirectory(EbicsUser user);
@@ -80,7 +80,6 @@ public interface Configuration {
 
   /**
    * Returns the object serialization directory.
-   * @param user the ebics user
    * @return the object serialization directory.
    */
   public String getSerializationDirectory();

@@ -69,10 +69,7 @@ public class DownloadTransferRequestElement extends TransferRequestElement {
     xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(), transactionId);
     header = EbicsXmlFactory.createEbicsRequestHeader(true, mutable, xstatic);
     body = EbicsXmlFactory.createEbicsRequestBody();
-    request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(),
-        				         session.getConfiguration().getVersion(),
-	                                         header,
-	                                         body);
+    request = EbicsXmlFactory.createEbicsRequest(header, body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
   }
 

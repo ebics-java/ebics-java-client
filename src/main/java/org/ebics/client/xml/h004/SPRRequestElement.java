@@ -96,7 +96,7 @@ public class SPRRequestElement extends InitializationRequestElement {
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
     orderType = EbicsXmlFactory.createOrderType(type.toString());
     standardOrderParamsType = EbicsXmlFactory.createStandardOrderParamsType();
-    orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(session.getUser().getPartner().nextOrderId(),
+    orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(
 	                                                              OrderAttributeType.UZHNN,
 	                                                              orderType,
 	                                                              standardOrderParamsType);
@@ -120,10 +120,7 @@ public class SPRRequestElement extends InitializationRequestElement {
 	                                                          generateTransactionKey());
     dataTransfer = EbicsXmlFactory.createDataTransferRequestType(dataEncryptionInfo, signatureData);
     body = EbicsXmlFactory.createEbicsRequestBody(dataTransfer);
-    request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(),
-	                                         session.getConfiguration().getVersion(),
-	                                         header,
-	                                         body);
+    request = EbicsXmlFactory.createEbicsRequest(header, body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
   }
 

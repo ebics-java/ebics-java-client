@@ -80,10 +80,7 @@ public class UploadTransferRequestElement extends TransferRequestElement {
     orderData = EbicsXmlFactory.createEbicsRequestOrderData(IOUtils.getFactoryContent(content));
     dataTransfer = EbicsXmlFactory.createDataTransferRequestType(orderData);
     body = EbicsXmlFactory.createEbicsRequestBody(dataTransfer);
-    request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(),
-	                                         session.getConfiguration().getVersion(),
-	                                         header,
-	                                         body);
+    request = EbicsXmlFactory.createEbicsRequest(header, body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
   }
 

@@ -363,20 +363,16 @@ public class EbicsXmlFactory {
    * Creates a new <code>EbicsUnsecuredRequest</code> XML object
    * @param header the <code>Header</code> element
    * @param body the <code>Body</code> element
-   * @param revision the current revision
-   * @param version the current version
    * @return the <code>EbicsUnsecuredRequest</code> XML object
    */
   public static EbicsUnsecuredRequest createEbicsUnsecuredRequest(Header header,
-                                                                  Body body,
-                                                                  int revision,
-                                                                  String version)
+                                                                  Body body)
   {
     EbicsUnsecuredRequest newEbicsUnsecuredRequest = EbicsUnsecuredRequest.Factory.newInstance();
     newEbicsUnsecuredRequest.setHeader(header);
     newEbicsUnsecuredRequest.setBody(body);
-    newEbicsUnsecuredRequest.setRevision(revision);
-    newEbicsUnsecuredRequest.setVersion(version);
+    newEbicsUnsecuredRequest.setRevision(1);
+    newEbicsUnsecuredRequest.setVersion("H004");
 
     return newEbicsUnsecuredRequest;
   }
@@ -597,20 +593,16 @@ public class EbicsXmlFactory {
 
   /**
    * Creates a new <code>EbicsNoPubKeyDigestsRequest</code> XML object
-   * @param revision the default revision
-   * @param version the default version
    * @param header the <code>org.ebics.schema.h004.EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest.Header</code> element
    * @param body the <code>org.ebics.schema.h004.EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest.Body</code> element
    * @return the <code>EbicsNoPubKeyDigestsRequest</code> XML object
    */
-  public static EbicsNoPubKeyDigestsRequest createEbicsNoPubKeyDigestsRequest(int revision,
-                                                                              String version,
-                                                                              EbicsNoPubKeyDigestsRequest.Header header,
+  public static EbicsNoPubKeyDigestsRequest createEbicsNoPubKeyDigestsRequest(EbicsNoPubKeyDigestsRequest.Header header,
                                                                               EbicsNoPubKeyDigestsRequest.Body body)
   {
     EbicsNoPubKeyDigestsRequest newEbicsNoPubKeyDigestsRequest = EbicsNoPubKeyDigestsRequest.Factory.newInstance();
-    newEbicsNoPubKeyDigestsRequest.setRevision(revision);
-    newEbicsNoPubKeyDigestsRequest.setVersion(version);
+    newEbicsNoPubKeyDigestsRequest.setRevision(1);
+    newEbicsNoPubKeyDigestsRequest.setVersion("H004");
     newEbicsNoPubKeyDigestsRequest.setHeader(header);
     newEbicsNoPubKeyDigestsRequest.setBody(body);
 
@@ -708,20 +700,16 @@ public class EbicsXmlFactory {
 
   /**
    * Creates a new <code>EbicsRequest</code> XML object
-   * @param revision the default revision
-   * @param version the default version
    * @param header the <code>org.ebics.schema.h004.EbicsRequestDocument.EbicsRequest.Header</code> element
    * @param body the <code>org.ebics.schema.h004.EbicsRequestDocument.EbicsRequest.Body</code> element
    * @return the <code>EbicsRequest</code> XML object
    */
-  public static EbicsRequest createEbicsRequest(int revision,
-                                                String version,
-                                                EbicsRequest.Header header,
+  public static EbicsRequest createEbicsRequest(EbicsRequest.Header header,
                                                 EbicsRequest.Body body)
   {
     EbicsRequest newEbicsRequest = EbicsRequest.Factory.newInstance();
-    newEbicsRequest.setRevision(revision);
-    newEbicsRequest.setVersion(version);
+    newEbicsRequest.setRevision(1);
+    newEbicsRequest.setVersion("H004");
     newEbicsRequest.setHeader(header);
     newEbicsRequest.setBody(body);
 
@@ -856,61 +844,52 @@ public class EbicsXmlFactory {
 
   /**
    * Creates a new <code>StaticHeaderOrderDetailsType</code> XML object
-   * @param orderId the order ID
    * @param orderAttribute the order attribute
    * @param orderType the order type
    * @param orderParams the <code>FULOrderParamsType</code> element
    * @return the <code>StaticHeaderOrderDetailsType</code> XML object
    */
-  public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
-                                                                                OrderAttributeType.Enum orderAttribute,
+  public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(OrderAttributeType.Enum orderAttribute,
                                                                                 OrderType orderType,
                                                                                 FULOrderParamsType orderParams)
   {
-        return createStaticHeaderOrderDetailsType(orderId, orderAttribute, orderType, orderParams,
+        return createStaticHeaderOrderDetailsType(orderAttribute, orderType, orderParams,
             FULOrderParamsDocument.type.getDocumentElementName());
   }
 
   /**
    * Creates a new <code>StaticHeaderOrderDetailsType</code> XML object
-   * @param orderId the order ID
    * @param orderAttribute the order attribute
    * @param orderType the order type
    * @param orderParams the <code>FDLOrderParamsType</code> element
    * @return the <code>StaticHeaderOrderDetailsType</code> XML object
    */
-  public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
-                                                                                OrderAttributeType.Enum orderAttribute,
+  public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(OrderAttributeType.Enum orderAttribute,
                                                                                 OrderType orderType,
                                                                                 FDLOrderParamsType orderParams)
   {
-      return createStaticHeaderOrderDetailsType(orderId, orderAttribute, orderType, orderParams,
+      return createStaticHeaderOrderDetailsType(orderAttribute, orderType, orderParams,
           FDLOrderParamsDocument.type.getDocumentElementName());
   }
 
   /**
    * Creates a new <code>StaticHeaderOrderDetailsType</code> XML object
-   * @param orderId the order ID
    * @param orderAttribute the order attribute
    * @param orderType the order type
    * @param orderParams the <code>StandardOrderParamsType</code> element
    * @return the <code>StaticHeaderOrderDetailsType</code> XML object
    */
-  public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
-                                                                                OrderAttributeType.Enum orderAttribute,
+  public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(OrderAttributeType.Enum orderAttribute,
                                                                                 OrderType orderType,
                                                                                 StandardOrderParamsType orderParams)
   {
-      return createStaticHeaderOrderDetailsType(orderId, orderAttribute, orderType, orderParams,
+      return createStaticHeaderOrderDetailsType(orderAttribute, orderType, orderParams,
           StandardOrderParamsDocument.type.getDocumentElementName());
   }
 
-    private static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
+    private static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(
         OrderAttributeType.Enum orderAttribute, OrderType orderType, XmlObject orderParams, QName newInstance) {
         StaticHeaderOrderDetailsType type = StaticHeaderOrderDetailsType.Factory.newInstance();
-        if (orderId != null) {
-            type.setOrderID(orderId);
-        }
         type.setOrderAttribute(orderAttribute);
         type.setOrderType(orderType);
         type.setOrderParams(orderParams);
