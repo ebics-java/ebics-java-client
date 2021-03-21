@@ -45,16 +45,13 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
    * Constructs a Unsecured Request Element.
    * @param session the ebics session.
    * @param orderType the order type (INI | HIA).
-   * @param orderId the order id, if null a random one is generated.
    */
   public UnsecuredRequestElement(EbicsSession session,
                                  EbicsOrderType orderType,
-                                 String orderId,
                                  byte[] orderData)
   {
     super(session);
     this.orderType = orderType;
-    this.orderId = orderId;
     this.orderData = orderData;
   }
 
@@ -105,7 +102,6 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
   // --------------------------------------------------------------------
 
   private EbicsOrderType orderType;
-  private String			orderId;
   private byte[]			orderData;
   private static final long 		serialVersionUID = -3548730114599886711L;
 }

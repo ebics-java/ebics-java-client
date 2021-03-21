@@ -37,11 +37,9 @@ public class HIARequestElement extends DefaultEbicsRootElement {
   /**
    * Constructs a new HIA Request root element
    * @param session the current ebics session
-   * @param orderId the order id, if null a random one is generated.
    */
-  public HIARequestElement(EbicsSession session, String orderId) {
+  public HIARequestElement(EbicsSession session) {
     super(session);
-    this.orderId = orderId;
   }
 
   @Override
@@ -77,7 +75,6 @@ public class HIARequestElement extends DefaultEbicsRootElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private String			orderId;
   private UnsecuredRequestElement unsecuredRequest;
   private static final long 		serialVersionUID = 1130436605993828777L;
 }

@@ -45,7 +45,6 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
    * Constructs a Unsecured Request Element.
    * @param session the ebics session.
    * @param orderType the order type (INI | HIA).
-   * @param orderId the order id, if null a random one is generated.
    */
   public UnsecuredRequestElement(EbicsSession session,
                                  EbicsOrderType orderType,

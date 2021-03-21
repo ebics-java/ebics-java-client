@@ -36,11 +36,9 @@ public class INIRequestElement extends DefaultEbicsRootElement {
   /**
    * Constructs a new INI request element.
    * @param session the ebics session.
-   * @param orderId the order id, if null a random one is generated.
    */
-  public INIRequestElement(EbicsSession session, String orderId) {
+  public INIRequestElement(EbicsSession session) {
     super(session);
-    this.orderId = orderId;
   }
 
   @Override
@@ -56,7 +54,6 @@ public class INIRequestElement extends DefaultEbicsRootElement {
     signaturePubKey.build();
     unsecuredRequest = new UnsecuredRequestElement(session,
 	                                           EbicsOrderType.INI,
-	                                           orderId == null ? session.getUser().getPartner().nextOrderId() : orderId,
 	                                           Utils.zip(signaturePubKey.prettyPrint()));
     unsecuredRequest.build();
   }
@@ -77,7 +74,6 @@ public class INIRequestElement extends DefaultEbicsRootElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private String			orderId;
   private UnsecuredRequestElement unsecuredRequest;
   private static final long 		serialVersionUID = -1966559247739923555L;
 }

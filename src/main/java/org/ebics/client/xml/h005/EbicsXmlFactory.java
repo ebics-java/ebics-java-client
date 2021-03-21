@@ -878,7 +878,8 @@ public class EbicsXmlFactory {
             StaticHeaderOrderDetailsType.AdminOrderType adminOrderType,
             XmlObject orderParams, QName newInstance) {
         StaticHeaderOrderDetailsType type = StaticHeaderOrderDetailsType.Factory.newInstance();
-        if (orderId != null) { //Only for HVE, HVS
+        if (orderId != null && (adminOrderType.getStringValue().equals("HVE") || adminOrderType.getStringValue().equals("HVS"))) {
+            //orderId is set for HVE, HVS only, otherwise must not be used in H005
             type.setOrderID(orderId);
         }
         type.setAdminOrderType(adminOrderType);
