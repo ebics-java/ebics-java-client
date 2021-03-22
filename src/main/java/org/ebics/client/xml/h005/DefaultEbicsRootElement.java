@@ -27,11 +27,11 @@ import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.EbicsRootElement;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.order.EbicsOrderType;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 import javax.xml.namespace.QName;
 import java.io.*;

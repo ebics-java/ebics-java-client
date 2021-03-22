@@ -1,3 +1,9 @@
+#EBICS protocol version
+#Possible values:
+# H003 for EBICS 2.4
+# H004 for EBICS 2.5
+# H005 for EBICS 3.0
+ebicsVersion=
 password=
 userId=
 partnerId=
