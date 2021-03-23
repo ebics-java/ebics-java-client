@@ -79,7 +79,7 @@ public class TransferState implements Serializable {
   }
 
   /**
-   * @param transactionID the transactionID to set
+   * @param transactionId the transactionID to set
    */
   public void setTransactionId(byte[] transactionId) {
     this.transactionId = transactionId;

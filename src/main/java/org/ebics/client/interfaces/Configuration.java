@@ -191,16 +191,4 @@ public interface Configuration {
    * @return true if the file compression is enabled
    */
   public boolean isCompressionEnabled();
-
-  /**
-   * Returns the default revision of sent XML.
-   * @return the default revision of sent XML.
-   */
-  public int getRevision();
-
-  /**
-   * Returns the version of the EBICS protocol used by the client.
-   * @return the version of the EBICS protocol.
-   */
-  public String getVersion();
 }

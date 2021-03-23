@@ -251,16 +251,6 @@ public class DefaultConfiguration implements Configuration {
     return true;
   }
 
-  @Override
-  public int getRevision() {
-    return 1;
-  }
-
-  @Override
-  public String getVersion() {
-    return getString("ebics.version");
-  }
-
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
