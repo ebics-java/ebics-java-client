@@ -19,8 +19,13 @@
 
 package org.ebics.client.client;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
@@ -36,6 +41,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.ProxyAuthenticationStrategy;
+import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.interfaces.Configuration;
@@ -99,6 +105,19 @@ public class HttpRequestSender {
         if (credsProvider != null) {
             builder.setDefaultCredentialsProvider(credsProvider);
             builder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
+        }
+        //TBD:
+        // - make external configuration using spring property file
+        // - make trusstorefile name as configuration parameter - currently hardcoded "truststore.jks"
+        // - proper error handling
+        File trustStoreFile = new File(conf.getSSLTrustedStoreDirectory() + "truststore.jks");
+        if (trustStoreFile.exists()) {
+            try {
+                builder.setSSLContext(SSLContexts.custom().loadTrustMaterial(trustStoreFile).build());
+            } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | KeyManagementException e) {
+                conf.getLogger().error("Error loading truststore: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
         CloseableHttpClient httpClient = builder.build();
 
