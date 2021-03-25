@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,6 +35,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -45,6 +48,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.ebics.client.filetransfer.FileTransfer;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.exception.NoDownloadDataAvailableException;
+import org.ebics.client.interfaces.*;
 import org.ebics.client.keymgmt.KeyManagement;
 import org.ebics.client.messages.Messages;
 import org.ebics.client.order.EbicsDownloadOrder;
@@ -53,12 +57,6 @@ import org.ebics.client.order.EbicsUploadOrder;
 import org.ebics.client.session.DefaultConfiguration;
 import org.ebics.client.order.EbicsOrderType;
 import org.ebics.client.session.Product;
-import org.ebics.client.interfaces.Configuration;
-import org.ebics.client.interfaces.EbicsBank;
-import org.ebics.client.interfaces.EbicsUser;
-import org.ebics.client.interfaces.InitLetter;
-import org.ebics.client.interfaces.LetterManager;
-import org.ebics.client.interfaces.PasswordCallback;
 import org.ebics.client.io.IOUtils;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.utils.Constants;
@@ -553,13 +551,13 @@ public class EbicsClient {
         String userOrg = properties.get("user.org");
         final boolean useCertificates;
         if (ebicsVersion == EbicsVersion.H005)
-            //Due to missing h005.PubKeyInfoType.getPubKeyValue in EBCICS XSDs is not possible to calculate exp + module, must be x509 cert instead
+            //Due to missing h005.PubKeyInfoType.getPubKeyValue in EBICS XSDs is not possible to calculate exp + module,
+            //x509 certificates must be used instead
             useCertificates = true;
         else
             useCertificates = false;
-        boolean saveCertificates = true;
         return createUser(new URL(bankUrl), ebicsVersion, bankName, hostId, partnerId, userId, userName, userEmail,
-            userCountry, userOrg, useCertificates, saveCertificates, pwdHandler);
+            userCountry, userOrg, useCertificates, true, pwdHandler);
     }
 
     private static CommandLine parseArguments(Options options, String[] args) throws ParseException {
@@ -647,7 +645,7 @@ public class EbicsClient {
         addOption(options, EbicsOrderType.HIA, "Send HIA request");
         addOption(options, EbicsOrderType.HPB, "Send HPB request");
         options.addOption(null, "letters", false, "Create INI Letters");
-        options.addOption(null, "create", false, "Create and initialize EBICS user");
+        options.addOption(null, "create", false, "Create user keys and initialize EBICS user");
         addOption(options, EbicsOrderType.STA,"Fetch STA file (MT940 file)");
         addOption(options, EbicsOrderType.VMK, "Fetch VMK file (MT942 file)");
         addOption(options, EbicsOrderType.ZDF, "Fetch ZDF file (zip file with documents)");
@@ -657,17 +655,23 @@ public class EbicsClient {
         addOption(options, EbicsOrderType.Z01, "Fetch Z01 file");
 
         addOption(options, EbicsOrderType.XKD, "Send payment order file (DTA format)");
-        addOption(options, EbicsOrderType.FUL, "Send payment order file (any format)");
+        addOption(options, EbicsOrderType.FUL, "Send payment order file (any format, need to be specified by -p)");
         addOption(options, EbicsOrderType.XCT, "Send XCT file (any format)");
         addOption(options, EbicsOrderType.XE2, "Send XE2 file (any format)");
         addOption(options, EbicsOrderType.CCT, "Send CCT file (any format)");
 
         options.addOption(null, "skip_order", true, "Skip a number of order ids");
 
-        options.addOption("o", "output", true, "output file");
-        options.addOption("i", "input", true, "input file");
+        options.addOption("o", "output", true, "Output file for EBICS download");
+        options.addOption("i", "input", true, "Input file for EBICS upload");
 
         options.addOption("p", "params", true, "key:value array of string parameters for upload or download request, example FORMAT:pain.001 TEST:TRUE EBCDIC:TRUE");
+        options.addOption("s","start", true, "Download request starting with date");
+        options.addOption("e","end", true, "Download request ending with date");
+
+        //EBICS 3.0 parameters
+        options.addOption("btf", "business-transaction-format", true, "EBICS 3.0 BTF service given by following pattern:\nSERVICE NAME:[OPTION]:[SCOPE]:[container]:message name:[variant]:[version]:[variant]:[FORMAT]\nfor example: GLB::CH:zip:camt.054:001:03:XML");
+
         options.addOption("sn","service-name", true, "EBICS 3.0 Name of service, example 'SCT' (SEPA credit transfer)");
         options.addOption("so","service-option", true, "EBICS 3.0 Optional characteristic(s) of a service Example: “URG” = urgent");
         options.addOption("ss", "service-scope", true, "EBICS 3.0 Specifies whose rules have to be taken into account for the service. 2-char country codes, 3-char codes for other scopes “BIL” means bilaterally agreed");
@@ -705,14 +709,19 @@ public class EbicsClient {
         }
 
         //Download file
-        String outputFileValue = cmd.getOptionValue("o");
-        if (outputFileValue != null)
-            fetchFile(cmd, client, outputFileValue);
+        if (cmd.hasOption('o')) {
+            EbicsDownloadOrder downloadOrder = readDownloadOder(cmd, client.configuration.getLogger(), client.defaultUser.getEbicsVersion());
+            client.fetchFile(getOutputFile(cmd.getOptionValue('o')), client.defaultUser,
+                    client.defaultProduct, downloadOrder, false);
+        }
 
         //Upload file
-        String inputFileValue = cmd.getOptionValue("i");
-        if (inputFileValue != null)
-            sendFile(cmd, client, inputFileValue);
+        if (cmd.hasOption('i')) {
+            String inputFileValue = cmd.getOptionValue("i");
+            EbicsUploadOrder uploadOrder = readUploadOrder(cmd, client.defaultUser.getEbicsVersion(), inputFileValue, client.configuration.getLogger());
+            client.sendFile(new File(inputFileValue), client.defaultUser,
+                    client.defaultProduct, uploadOrder);
+        }
 
         if (cmd.hasOption("skip_order")) {
             int count = Integer.parseInt(cmd.getOptionValue("skip_order"));
@@ -724,29 +733,58 @@ public class EbicsClient {
         client.quit();
     }
 
-    private static void fetchFile(CommandLine cmd, EbicsClient client, String outputFileValue) throws IOException, EbicsException {
-        final EbicsDownloadOrder downloadOrder;
+    private static EbicsDownloadOrder readDownloadOder(CommandLine cmd, EbicsLogger logger, EbicsVersion version) throws java.text.ParseException {
         final Map<String, String> params = readParams(cmd.getOptionValues("p"));
-        //TBD: Reading of start/date from command line
-        final Date start = null;
-        final Date end = null;
-        switch (client.defaultUser.getEbicsVersion()) {
+        final Date start = readDate(logger, cmd, 's');
+        final Date end = readDate(logger, cmd, 'e');
+        switch (version) {
             case H003:
             case H004:
-                downloadOrder = new EbicsDownloadOrder(readOrderType(cmd, Arrays.asList(EbicsOrderType.STA, EbicsOrderType.VMK,
+                return new EbicsDownloadOrder(readOrderType(cmd, Arrays.asList(EbicsOrderType.STA, EbicsOrderType.VMK,
                         EbicsOrderType.ZDF, EbicsOrderType.ZB6, EbicsOrderType.PTK, EbicsOrderType.HAC, EbicsOrderType.Z01)), start, end, params);
-                break;
             default:
-                downloadOrder = new EbicsDownloadOrder(readEbicsService(cmd), start, end, params);
-                break;
+                return new EbicsDownloadOrder(readEbicsService(cmd, logger), start, end, params);
         }
-        client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
-            client.defaultProduct, downloadOrder, false);
     }
 
-    private static EbicsService readEbicsService(CommandLine cmd) {
-        return new EbicsService(cmd.getOptionValue("sn"), cmd.getOptionValue("so"), cmd.getOptionValue("ss"), cmd.getOptionValue("ct"),
-                cmd.getOptionValue("mn"), cmd.getOptionValue("mve"), cmd.getOptionValue("mvr"), cmd.getOptionValue("mf"));
+    /**
+     * Parse EBICS 3.0 BTF from command line to EbicsService
+     * BTF String pattern:
+     * SERVICE NAME:[OPTION]:[SCOPE]:[container]:message name:[variant]:[version]:[variant]:[FORMAT]
+     * Example BTFs in one string:
+     *   GLB::CH:zip:camt.054:001:03:XML
+     *   BTC::CH:xml:pain.001:001:09:XML
+     *   BTC:URG:DE:xml:pain.001:001:09:XML
+     * @param logger
+     * @param cmd
+     * @return
+     */
+    private static EbicsService readEbicsService(CommandLine cmd, EbicsLogger logger) {
+        //sn Service name: BCT
+        //so Service option: -
+        //ss Service scope: CH
+        //ct Container type: zip / xml / scv
+        //mn Message name: pain.001
+        //mva: Message variant: - / 001
+        //mve: Message version: 03
+        //mf: Message format: -
+        if (cmd.hasOption("btf")) {
+            String btf = cmd.getOptionValue("btf");
+            String regex = "([A-Z0-9]{3}):([A-Z0-9]{3,10})?:([A-Z0-9]{2,3})?:([a-z]{3})?:([a-z\\.0-9]{1,10}):([0-9]{3})?:([0-9]{2})?:([A-Z0-9]{1,4})?";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(cmd.getOptionValue("btf"));
+            if (matcher.find()) {
+                return new EbicsService(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4),
+                        matcher.group(5), matcher.group(6), matcher.group(7), matcher.group(8));
+            } else {
+                String errorMessage = Messages.getString("btf.parse.error", Constants.APPLICATION_BUNDLE_NAME, btf);
+                logger.error(errorMessage);
+                throw new IllegalArgumentException(errorMessage);
+            }
+        } else {
+            return new EbicsService(cmd.getOptionValue("sn"), cmd.getOptionValue("so"), cmd.getOptionValue("ss"), cmd.getOptionValue("ct"),
+                    cmd.getOptionValue("mn"), cmd.getOptionValue("mva"), cmd.getOptionValue("mve"), cmd.getOptionValue("mf"));
+        }
     }
 
     private static EbicsOrderType readOrderType(CommandLine cmd, List<EbicsOrderType> ebicsOrderTypes) {
@@ -755,26 +793,35 @@ public class EbicsClient {
                 return orderType;
             }
         }
-        throw new IllegalArgumentException("For option o must be download ordertype specified for example -STA");
+        throw new IllegalArgumentException("For option -o must be download order type specified for example -STA");
     }
 
-    private static void sendFile(CommandLine cmd, EbicsClient client, String inputFileValue) throws Exception {
-        final EbicsUploadOrder uploadOrder;
+    private static Date readDate(EbicsLogger logger, CommandLine cmd, char dateParam) throws java.text.ParseException {
+        if (cmd.hasOption(dateParam)) {
+            String inputDate = cmd.getOptionValue(dateParam);
+            try {
+                return new SimpleDateFormat("dd/MM/yyyy").parse(inputDate);
+            } catch (java.text.ParseException e) {
+                logger.error(Messages.getString("download.date.error", Constants.APPLICATION_BUNDLE_NAME, inputDate), e);
+                throw e;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private static EbicsUploadOrder readUploadOrder(CommandLine cmd, EbicsVersion ebicsVersion, String inputFileValue, EbicsLogger logger) throws Exception {
         final File inputFile = new File(inputFileValue);
         final Map<String, String> params = readParams(cmd.getOptionValues("p"));
-        switch (client.defaultUser.getEbicsVersion()) {
+        switch (ebicsVersion) {
             case H003:
             case H004:
-                uploadOrder = new EbicsUploadOrder(
+                return new EbicsUploadOrder(
                         readOrderType(cmd, Arrays.asList(EbicsOrderType.XKD, EbicsOrderType.FUL, EbicsOrderType.XCT,
                         EbicsOrderType.XE2, EbicsOrderType.CCT)), !cmd.hasOption("ns"), params);
-                break;
             default:
-                uploadOrder = new EbicsUploadOrder(readEbicsService(cmd), !cmd.hasOption("ns"), inputFile.getName(), params);
-                break;
+                return new EbicsUploadOrder(readEbicsService(cmd, logger), !cmd.hasOption("ns"), inputFile.getName(), params);
         }
-        client.sendFile(new File(inputFileValue), client.defaultUser,
-            client.defaultProduct, uploadOrder);
     }
 
     private static Map<String, String> readParams(String[] paramPairs) {
