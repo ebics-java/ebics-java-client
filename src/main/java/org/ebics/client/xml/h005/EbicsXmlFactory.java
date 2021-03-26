@@ -23,7 +23,6 @@ import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.ebics.client.order.EbicsDownloadOrder;
-import org.ebics.client.order.EbicsOrder;
 import org.ebics.client.order.EbicsService;
 import org.ebics.client.order.EbicsUploadOrder;
 import org.ebics.schema.h005.*;
@@ -47,8 +46,7 @@ import org.ebics.schema.h005.StaticHeaderType.BankPubKeyDigests.Authentication;
 import org.ebics.schema.h005.StaticHeaderType.BankPubKeyDigests.Encryption;
 import org.ebics.schema.h005.StaticHeaderType.Product;
 import org.ebics.schema.h005.TransactionPhaseType.Enum;
-import org.ebics.schema.s001.PubKeyValueType;
-import org.ebics.schema.s001.*;
+import org.ebics.schema.s002.*;
 import org.ebics.schema.xmldsig.SignatureType;
 import org.ebics.schema.xmldsig.*;
 
@@ -289,18 +287,15 @@ public class EbicsXmlFactory {
   /**
    * Creates a new <code>SignaturePubKeyInfoType</code> XML object
    * @param x509Data the <code>X509DataType</code> element
-   * @param pubKeyValue <code>PubKeyValueType</code> element
    * @param signatureVersion the signature version
    * @return the <code>SignaturePubKeyInfoType</code> XML object
    */
   public static SignaturePubKeyInfoType createSignaturePubKeyInfoType(X509DataType x509Data,
-                                                                      PubKeyValueType pubKeyValue,
                                                                       String signatureVersion)
   {
     SignaturePubKeyInfoType newSignaturePubKeyInfoType = SignaturePubKeyInfoType.Factory.newInstance();
     if (x509Data != null)
         newSignaturePubKeyInfoType.setX509Data(x509Data);
-    newSignaturePubKeyInfoType.setPubKeyValue(pubKeyValue);
     newSignaturePubKeyInfoType.setSignatureVersion(signatureVersion);
 
     return newSignaturePubKeyInfoType;
@@ -320,33 +315,6 @@ public class EbicsXmlFactory {
     return newX509DataType;
   }
 
-  /**
-   * Creates a new <code>PubKeyValueType</code> XML object
-   * @param rsaKeyValue the <code>rsaKeyValue</code> element
-   * @param timeStamp the current time stamp
-   * @return the <code>PubKeyValueType</code> XML object
-   */
-  public static PubKeyValueType createPubKeyValueType(RSAKeyValueType rsaKeyValue, Calendar timeStamp) {
-    PubKeyValueType newPubKeyValueType = PubKeyValueType.Factory.newInstance();
-    newPubKeyValueType.setRSAKeyValue(rsaKeyValue);
-    newPubKeyValueType.setTimeStamp(timeStamp);
-
-    return newPubKeyValueType;
-  }
-
-  /**
-   * Creates a new <code>RSAKeyValueType</code> XML object
-   * @param exponent the public exponent of the public key
-   * @param modulus the modulus of the public key
-   * @return the <code>RSAKeyValueType</code> XML object
-   */
-  public static RSAKeyValueType createRSAKeyValueType(byte[] exponent, byte[] modulus) {
-    RSAKeyValueType newRSAKeyValueType = RSAKeyValueType.Factory.newInstance();
-    newRSAKeyValueType.setExponent(exponent);
-    newRSAKeyValueType.setModulus(modulus);
-
-    return newRSAKeyValueType;
-  }
 
   //-----------------------------------------------------------------------------------------------------------------------------------------------
 

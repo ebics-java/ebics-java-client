@@ -108,9 +108,9 @@ public class HttpRequestSender {
         }
         //TBD:
         // - make external configuration using spring property file
-        // - make trusstorefile name as configuration parameter - currently hardcoded "truststore.jks"
+        // - make trustStoreFile name as configuration parameter - currently hardcoded "truststore.jks"
         // - proper error handling
-        File trustStoreFile = new File(conf.getSSLTrustedStoreDirectory() + "truststore.jks");
+        File trustStoreFile = new File(conf.getSSLTrustedStoreDirectory() + File.separator + "truststore.jks");
         if (trustStoreFile.exists()) {
             try {
                 builder.setSSLContext(SSLContexts.custom().loadTrustMaterial(trustStoreFile).build());
