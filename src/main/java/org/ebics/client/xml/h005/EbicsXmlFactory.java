@@ -859,9 +859,13 @@ public class EbicsXmlFactory {
 
     public static MessageType createMessageType(EbicsService ebicsService) {
       MessageType messageType = MessageType.Factory.newInstance();
-      messageType.setFormat(ebicsService.getMessageNameFormat());
-      messageType.setVariant(ebicsService.getMessageNameVariant());
-      messageType.setVersion(ebicsService.getMessageNameVersion());
+      messageType.setStringValue(ebicsService.getMessageName());
+      if (ebicsService.getMessageNameFormat() != null)
+        messageType.setFormat(ebicsService.getMessageNameFormat());
+      if (ebicsService.getMessageNameVariant() != null)
+        messageType.setVariant(ebicsService.getMessageNameVariant());
+      if (ebicsService.getMessageNameVersion() != null)
+        messageType.setVersion(ebicsService.getMessageNameVersion());
       return messageType;
     }
 
@@ -869,8 +873,19 @@ public class EbicsXmlFactory {
     RestrictedServiceType serviceType = RestrictedServiceType.Factory.newInstance();
     serviceType.setMsgName(createMessageType(ebicsService));
     serviceType.setServiceName(ebicsService.getServiceName());
-    serviceType.setScope(ebicsService.getScope());
+    if (ebicsService.getScope() != null)
+      serviceType.setScope(ebicsService.getScope());
+    if (ebicsService.getContainerType() != null)
+      serviceType.setContainer(createMessageContainer(ebicsService));
+    if (ebicsService.getServiceOption() != null)
+      serviceType.setServiceOption(ebicsService.getServiceOption());
     return serviceType;
+  }
+
+  private static ContainerFlagType createMessageContainer(EbicsService ebicsService) {
+    ContainerFlagType containerType = ContainerFlagType.Factory.newInstance();
+    containerType.setContainerType(ContainerStringType.Enum.forString(ebicsService.getContainerType()));
+    return containerType;
   }
 
   /**

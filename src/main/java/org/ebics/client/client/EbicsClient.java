@@ -670,7 +670,7 @@ public class EbicsClient {
         options.addOption("e","end", true, "Download request ending with date");
 
         //EBICS 3.0 parameters
-        options.addOption("btf", "business-transaction-format", true, "EBICS 3.0 BTF service given by following pattern:\nSERVICE NAME:[OPTION]:[SCOPE]:[container]:message name:[variant]:[version]:[variant]:[FORMAT]\nfor example: GLB::CH:zip:camt.054:001:03:XML");
+        options.addOption("btf", "business-transaction-format", true, "EBICS 3.0 BTF service given by following pattern:\nSERVICE NAME:[OPTION]:[SCOPE]:[container]:message name:[variant]:[version]:[FORMAT]\nfor example: GLB::CH:zip:camt.054:001:03:XML");
 
         options.addOption("sn","service-name", true, "EBICS 3.0 Name of service, example 'SCT' (SEPA credit transfer)");
         options.addOption("so","service-option", true, "EBICS 3.0 Optional characteristic(s) of a service Example: “URG” = urgent");
