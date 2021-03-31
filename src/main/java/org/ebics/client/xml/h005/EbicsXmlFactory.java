@@ -802,7 +802,7 @@ public class EbicsXmlFactory {
                                                                                 BTUParamsType orderParams)//FULOrderParamsType orderParams)
   {
         return createStaticHeaderOrderDetailsType(null, adminOrderType, orderParams,
-            BTUParamsType.type.getDocumentElementName());
+            BTUOrderParamsDocument.type.getDocumentElementName());
   }
 
   /**
@@ -815,7 +815,7 @@ public class EbicsXmlFactory {
                                                                                 BTDParamsType orderParams) //FDLOrderParamsType orderParams
   {
       return createStaticHeaderOrderDetailsType(null, adminOrderType, orderParams,
-              BTDParamsType.type.getDocumentElementName());
+              BTDOrderParamsDocument.type.getDocumentElementName());
   }
 
   /**
