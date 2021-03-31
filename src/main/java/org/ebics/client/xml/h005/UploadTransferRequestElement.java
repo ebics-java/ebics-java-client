@@ -73,15 +73,13 @@ public class UploadTransferRequestElement extends TransferRequestElement {
     StaticHeaderType 			xstatic;
     OrderData 				orderData;
     DataTransferRequestType 		dataTransfer;
-    DataDigestType dataDigest;
 
     segmentNumber = EbicsXmlFactory.createSegmentNumber(this.segmentNumber, lastSegment);
     mutable = EbicsXmlFactory.createMutableHeaderType("Transfer", segmentNumber);
     xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(), transactionId);
     header = EbicsXmlFactory.createEbicsRequestHeader(true, mutable, xstatic);
     orderData = EbicsXmlFactory.createEbicsRequestOrderData(IOUtils.getFactoryContent(content));
-    dataDigest = EbicsXmlFactory.createDataDigestType(session.getConfiguration().getSignatureVersion(), null);
-    dataTransfer = EbicsXmlFactory.createDataTransferRequestType(orderData, dataDigest);
+    dataTransfer = EbicsXmlFactory.createDataTransferRequestType(orderData);
     body = EbicsXmlFactory.createEbicsRequestBody(dataTransfer);
     request = EbicsXmlFactory.createEbicsRequest(header, body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);

@@ -1114,10 +1114,9 @@ public class EbicsXmlFactory {
    * @param orderData the <code>org.ebics.schema.h005.DataTransferRequestType.OrderData</code> element
    * @return the <code>DataTransferRequestType</code> XML object
    */
-  public static DataTransferRequestType createDataTransferRequestType(DataTransferRequestType.OrderData orderData, DataDigestType dataDigest) {
+  public static DataTransferRequestType createDataTransferRequestType(DataTransferRequestType.OrderData orderData) {
     DataTransferRequestType newDataTransferRequestType = DataTransferRequestType.Factory.newInstance();
     newDataTransferRequestType.setOrderData(orderData);
-    newDataTransferRequestType.setDataDigest(dataDigest);
 
     return newDataTransferRequestType;
   }
