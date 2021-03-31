@@ -21,10 +21,8 @@ package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.schema.s001.PubKeyValueType;
-import org.ebics.schema.s001.SignaturePubKeyInfoType;
-import org.ebics.schema.s001.SignaturePubKeyOrderDataType;
-import org.ebics.schema.xmldsig.RSAKeyValueType;
+import org.ebics.schema.s002.SignaturePubKeyInfoType;
+import org.ebics.schema.s002.SignaturePubKeyOrderDataType;
 import org.ebics.schema.xmldsig.X509DataType;
 
 import java.util.Calendar;
@@ -50,20 +48,12 @@ public class SignaturePubKeyOrderDataElement extends DefaultEbicsRootElement {
   @Override
   public void build() throws EbicsException {
     SignaturePubKeyInfoType		signaturePubKeyInfo;
-    X509DataType 			x509Data;
-    RSAKeyValueType 			rsaKeyValue;
-    PubKeyValueType 			pubKeyValue;
+    final X509DataType 			x509Data;
     SignaturePubKeyOrderDataType	signaturePubKeyOrderData;
 
-    x509Data = null;
-    if (session.getUser().getPartner().getBank().useCertificate())
-        x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
+    x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
 	                                          session.getUser().getA005Certificate());
-    rsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getA005PublicKey().getPublicExponent().toByteArray(),
-	                                                session.getUser().getA005PublicKey().getModulus().toByteArray());
-    pubKeyValue = EbicsXmlFactory.createPubKeyValueType(rsaKeyValue, Calendar.getInstance());
     signaturePubKeyInfo = EbicsXmlFactory.createSignaturePubKeyInfoType(x509Data,
-	                                                                pubKeyValue,
 	                                                                session.getConfiguration().getSignatureVersion());
     signaturePubKeyOrderData = EbicsXmlFactory.createSignaturePubKeyOrderData(signaturePubKeyInfo,
 									      session.getUser().getPartner().getPartnerId(),
@@ -79,7 +69,7 @@ public class SignaturePubKeyOrderDataElement extends DefaultEbicsRootElement {
   @Override
   public byte[] toByteArray() {
     addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
-    setSaveSuggestedPrefixes("http://www.ebics.org/S001", "");
+    setSaveSuggestedPrefixes("http://www.ebics.org/S002", "");
 
     return super.toByteArray();
   }

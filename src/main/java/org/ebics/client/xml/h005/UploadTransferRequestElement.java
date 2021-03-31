@@ -24,6 +24,7 @@ import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.io.IOUtils;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.order.EbicsOrderType;
+import org.ebics.schema.h005.DataDigestType;
 import org.ebics.schema.h005.DataTransferRequestType;
 import org.ebics.schema.h005.DataTransferRequestType.OrderData;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest;

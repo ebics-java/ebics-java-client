@@ -21,8 +21,8 @@ package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.EbicsUser;
-import org.ebics.schema.s001.OrderSignatureDataType;
-import org.ebics.schema.s001.UserSignatureDataSigBookType;
+import org.ebics.schema.s002.OrderSignatureDataType;
+import org.ebics.schema.s002.UserSignatureDataSigBookType;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -85,7 +85,7 @@ public class UserSignature extends DefaultEbicsRootElement {
 
   @Override
   public byte[] toByteArray() {
-    setSaveSuggestedPrefixes("http://www.ebics.org/S001", "");
+    setSaveSuggestedPrefixes("http://www.ebics.org/S002", "");
 
     return super.toByteArray();
   }

@@ -78,6 +78,7 @@ public class SPRRequestElement extends InitializationRequestElement {
     AdminOrderType 				orderType;
     StandardOrderParamsType		standardOrderParamsType;
     UserSignature userSignature;
+    DataDigestType dataDigest;
 
     userSignature = new UserSignature(session.getUser(),
 				      generateName("SIG"),
@@ -118,7 +119,8 @@ public class SPRRequestElement extends InitializationRequestElement {
     dataEncryptionInfo = EbicsXmlFactory.createDataEncryptionInfo(true,
 	                                                          encryptionPubKeyDigest,
 	                                                          generateTransactionKey());
-    dataTransfer = EbicsXmlFactory.createDataTransferRequestType(dataEncryptionInfo, signatureData);
+    dataDigest = EbicsXmlFactory.createDataDigestType(session.getConfiguration().getSignatureVersion(), null);
+    dataTransfer = EbicsXmlFactory.createDataTransferRequestType(dataEncryptionInfo, signatureData, dataDigest);
     body = EbicsXmlFactory.createEbicsRequestBody(dataTransfer);
     request = EbicsXmlFactory.createEbicsRequest(header, body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);

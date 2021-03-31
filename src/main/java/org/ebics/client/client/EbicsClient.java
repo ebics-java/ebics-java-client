@@ -672,12 +672,12 @@ public class EbicsClient {
         options.addOption("ns", "no-signature", false, "Don't provide electronic signature for EBICS upload (ES flag=false, DZHNN)");
 
         //EBICS 3.0 parameters
-        options.addOption("btf", "business-transaction-format", true, "EBICS 3.0 BTF service given by following pattern:\nSERVICE NAME:[OPTION]:[SCOPE]:[container]:message name:[variant]:[version]:[variant]:[FORMAT]\nfor example: GLB::CH:zip:camt.054:001:03:XML");
+        options.addOption("btf", "business-transaction-format", true, "EBICS 3.0 BTF service given by following pattern:\nSERVICE NAME:[OPTION]:[SCOPE]:[container]:message name:[variant]:[version]:[FORMAT]\nfor example: GLB::CH:zip:camt.054:001:03:XML");
 
         options.addOption("sn","service-name", true, "EBICS 3.0 Name of service, example 'SCT' (SEPA credit transfer)");
         options.addOption("so","service-option", true, "EBICS 3.0 Optional characteristic(s) of a service Example: “URG” = urgent");
         options.addOption("ss", "service-scope", true, "EBICS 3.0 Specifies whose rules have to be taken into account for the service. 2-char country codes, 3-char codes for other scopes “BIL” means bilaterally agreed");
-        options.addOption("ct", "service-container", false, "EBICS 3.0 Flag to indicate the use of a container");
+        options.addOption("ct", "service-container", true, "EBICS 3.0 The container type if required (SVC, XML, ZIP)");
         options.addOption("mn", "service-message-name", true, "EBICS 3.0 Service message name, for example pain.001 or mt103");
         options.addOption("mve", "service-message-version", true, "EBICS 3.0 Service message version for ISO formats, for example 03");
         options.addOption("mva", "service-message-variant", true, "EBICS 3.0 Service message variant for ISO formats, for example 001");
@@ -765,14 +765,14 @@ public class EbicsClient {
         //sn Service name: BCT
         //so Service option: -
         //ss Service scope: CH
-        //ct Container type: zip / xml / scv
+        //ct Container type: zip / xml / svc (enum)
         //mn Message name: pain.001
         //mva: Message variant: - / 001
         //mve: Message version: 03
         //mf: Message format: -
         if (cmd.hasOption("btf")) {
             String btf = cmd.getOptionValue("btf");
-            String regex = "([A-Z0-9]{3}):([A-Z0-9]{3,10})?:([A-Z0-9]{2,3})?:([a-z]{3})?:([a-z\\.0-9]{1,10}):([0-9]{3})?:([0-9]{2})?:([A-Z0-9]{1,4})?";
+            String regex = "([A-Z0-9]{3}):([A-Z0-9]{3,10})?:([A-Z0-9]{2,3})?:(zip|xml|svc)?:([a-z\\.0-9]{1,10}):([0-9]{3})?:([0-9]{2})?:([A-Z0-9]{1,4})?";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(cmd.getOptionValue("btf"));
             if (matcher.find()) {
