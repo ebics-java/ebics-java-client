@@ -669,6 +669,8 @@ public class EbicsClient {
         options.addOption("s","start", true, "Download request starting with date");
         options.addOption("e","end", true, "Download request ending with date");
 
+        options.addOption("ns", "no-signature", false, "Don't provide electronic signature for EBICS upload (ES flag=false, DZHNN)");
+
         //EBICS 3.0 parameters
         options.addOption("btf", "business-transaction-format", true, "EBICS 3.0 BTF service given by following pattern:\nSERVICE NAME:[OPTION]:[SCOPE]:[container]:message name:[variant]:[version]:[variant]:[FORMAT]\nfor example: GLB::CH:zip:camt.054:001:03:XML");
 

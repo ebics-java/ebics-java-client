@@ -914,7 +914,15 @@ public class EbicsXmlFactory {
     BTUParamsType btuParamsType = BTUParamsType.Factory.newInstance();
     btuParamsType.setFileName(ebicsOrder.getFileName());
     btuParamsType.setService(createRestrictedServiceType(ebicsOrder.getOrderService()));
+    if (ebicsOrder.isSignatureFlag())
+      btuParamsType.setSignatureFlag(createSignatureFlag(ebicsOrder.isSignatureFlag()));
     return btuParamsType;
+  }
+
+  private static SignatureFlagType createSignatureFlag(boolean signatureFlag) {
+    SignatureFlagType signatureFlagType = SignatureFlagType.Factory.newInstance();
+    signatureFlagType.setRequestEDS(signatureFlag);
+    return signatureFlagType;
   }
 
   /**
