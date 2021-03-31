@@ -1080,14 +1080,17 @@ public class EbicsXmlFactory {
    * Create the <code>DataTransferRequestType</code> XML object
    * @param dataEncryptionInfo the <code>DataEncryptionInfo</code> element
    * @param signatureData the <code>SignatureData</code> element
+   * @param dataDigest the <code>DataDigest</code> element
    * @return the <code>DataTransferRequestType</code> XML object
    */
   public static DataTransferRequestType createDataTransferRequestType(DataEncryptionInfo dataEncryptionInfo,
-                                                                      SignatureData signatureData)
+                                                                      SignatureData signatureData,
+                                                                      DataDigestType dataDigest)
   {
     DataTransferRequestType newDataTransferRequestType = DataTransferRequestType.Factory.newInstance();
     newDataTransferRequestType.setDataEncryptionInfo(dataEncryptionInfo);
     newDataTransferRequestType.setSignatureData(signatureData);
+    newDataTransferRequestType.setDataDigest(dataDigest);
 
     return newDataTransferRequestType;
   }
@@ -1111,9 +1114,10 @@ public class EbicsXmlFactory {
    * @param orderData the <code>org.ebics.schema.h005.DataTransferRequestType.OrderData</code> element
    * @return the <code>DataTransferRequestType</code> XML object
    */
-  public static DataTransferRequestType createDataTransferRequestType(DataTransferRequestType.OrderData orderData) {
+  public static DataTransferRequestType createDataTransferRequestType(DataTransferRequestType.OrderData orderData, DataDigestType dataDigest) {
     DataTransferRequestType newDataTransferRequestType = DataTransferRequestType.Factory.newInstance();
     newDataTransferRequestType.setOrderData(orderData);
+    newDataTransferRequestType.setDataDigest(dataDigest);
 
     return newDataTransferRequestType;
   }
@@ -1252,5 +1256,13 @@ public class EbicsXmlFactory {
     cursor.dispose();
 
     return null;
+  }
+
+  public static DataDigestType createDataDigestType(String signatureVersion, byte[] value) {
+    DataDigestType digestType = DataDigestType.Factory.newInstance();
+    digestType.setSignatureVersion(signatureVersion);
+    if (value != null)
+      digestType.setByteArrayValue(value);
+    return digestType;
   }
 }

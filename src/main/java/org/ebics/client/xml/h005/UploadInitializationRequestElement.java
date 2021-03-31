@@ -91,6 +91,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     SignatureData 			signatureData;
     EncryptionPubKeyDigest 		encryptionPubKeyDigest;
     StaticHeaderOrderDetailsType.AdminOrderType adminOrderType;
+    DataDigestType dataDigest;
 
     userSignature = new UserSignature(session.getUser(),
 				      generateName("UserSignature"),
@@ -159,7 +160,8 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     dataEncryptionInfo = EbicsXmlFactory.createDataEncryptionInfo(true,
 	                                                          encryptionPubKeyDigest,
 	                                                          generateTransactionKey());
-    dataTransfer = EbicsXmlFactory.createDataTransferRequestType(dataEncryptionInfo, signatureData);
+    dataDigest = EbicsXmlFactory.createDataDigestType(session.getConfiguration().getSignatureVersion(), null);
+    dataTransfer = EbicsXmlFactory.createDataTransferRequestType(dataEncryptionInfo, signatureData, dataDigest);
     body = EbicsXmlFactory.createEbicsRequestBody(dataTransfer);
     request = EbicsXmlFactory.createEbicsRequest(header, body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);

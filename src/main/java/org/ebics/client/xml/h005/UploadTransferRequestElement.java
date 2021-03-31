@@ -24,6 +24,7 @@ import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.io.IOUtils;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.order.EbicsOrderType;
+import org.ebics.schema.h005.DataDigestType;
 import org.ebics.schema.h005.DataTransferRequestType;
 import org.ebics.schema.h005.DataTransferRequestType.OrderData;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest;
@@ -72,13 +73,15 @@ public class UploadTransferRequestElement extends TransferRequestElement {
     StaticHeaderType 			xstatic;
     OrderData 				orderData;
     DataTransferRequestType 		dataTransfer;
+    DataDigestType dataDigest;
 
     segmentNumber = EbicsXmlFactory.createSegmentNumber(this.segmentNumber, lastSegment);
     mutable = EbicsXmlFactory.createMutableHeaderType("Transfer", segmentNumber);
     xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(), transactionId);
     header = EbicsXmlFactory.createEbicsRequestHeader(true, mutable, xstatic);
     orderData = EbicsXmlFactory.createEbicsRequestOrderData(IOUtils.getFactoryContent(content));
-    dataTransfer = EbicsXmlFactory.createDataTransferRequestType(orderData);
+    dataDigest = EbicsXmlFactory.createDataDigestType(session.getConfiguration().getSignatureVersion(), null);
+    dataTransfer = EbicsXmlFactory.createDataTransferRequestType(orderData, dataDigest);
     body = EbicsXmlFactory.createEbicsRequestBody(dataTransfer);
     request = EbicsXmlFactory.createEbicsRequest(header, body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
