@@ -149,6 +149,7 @@ public class ReturnCode implements Serializable {
   public static final ReturnCode	EBICS_SIGNATURE_VERIFICATION_FAILED;
   public static final ReturnCode	EBICS_NO_DOWNLOAD_DATA_AVAILABLE;
   public static final ReturnCode    EBICS_ORDERID_ALREADY_EXISTS;
+  public static final ReturnCode    EBICS_INVALID_ORDER_DATA_FORMAT;
   private static final String		BUNDLE_NAME = "org.ebics.client.exception.messages";
   private static final long 		serialVersionUID = -497883146384363199L;
 
@@ -181,7 +182,7 @@ public class ReturnCode implements Serializable {
     EBICS_MAX_TRANSACTIONS_EXCEEDED = create("091119", "EBICS_MAX_TRANSACTIONS_EXCEEDED");
     EBICS_X509_CERTIFICATE_NOT_VALID_YET = create("091209", "EBICS_X509_CERTIFICATE_NOT_VALID_YET");
     EBICS_SIGNATURE_VERIFICATION_FAILED = create("091301", "EBICS_SIGNATURE_VERIFICATION_FAILED");
-
+    EBICS_INVALID_ORDER_DATA_FORMAT = create("090004", "EBICS_INVALID_ORDER_DATA_FORMAT");
 
 
   }
