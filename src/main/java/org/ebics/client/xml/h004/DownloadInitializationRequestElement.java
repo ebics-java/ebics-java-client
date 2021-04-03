@@ -20,7 +20,7 @@
 package org.ebics.client.xml.h004;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.schema.h004.EbicsRequestDocument.EbicsRequest;
 import org.ebics.schema.h004.EbicsRequestDocument.EbicsRequest.Body;
@@ -57,7 +57,7 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
    * @throws EbicsException
    */
   public DownloadInitializationRequestElement(EbicsSession session,
-                                       EbicsOrderType type,
+                                       EbicsAdminOrderType type,
                                        Date startRange,
                                        Date endRange)
     throws EbicsException
@@ -91,7 +91,7 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
 	                                          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
     orderType = EbicsXmlFactory.createOrderType(type.toString());
-    if (type.equals(EbicsOrderType.FDL)) {
+    if (type.equals(EbicsAdminOrderType.FDL)) {
       FDLOrderParamsType		fDLOrderParamsType;
       FileFormatType 			fileFormat;
 

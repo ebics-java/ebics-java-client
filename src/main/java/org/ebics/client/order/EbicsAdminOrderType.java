@@ -25,7 +25,7 @@ package org.ebics.client.order;
  * @author Pierre Ducroquet
  *
  */
-public enum EbicsOrderType {
+public enum EbicsAdminOrderType {
     HIA,
     HAA,
     HKD,
@@ -33,30 +33,11 @@ public enum EbicsOrderType {
     HPD,
     HTD,
     INI,
-    FUL,
-    FDL,
     SPR,
-    AZV,
-    C2C,
-    CCC,
-    CCT,
-    CCU,
-    CD1,
-    CDB,
-    CDC,
-    CDD,
-    DTE,
-    EUE,
-    HAC,
-    PTK,
-    STA,
-    VMK,
-    ZDF,
-    ZB6,
-    Z01,
-    XKD,
-    XE2,
-    XCT,
-    BTU,
-    BTD
+    FUL, //EBICS 2.4/2.5 FR Upload (standard business order types)
+    FDL, //EBICS 2.4/2.5 FR Download (standard business order types)
+    UPL, //EBICS 2.4/2.5 DE Upload (standard business order types)
+    DNL, //EBICS 2.4/2.5 DE Download (standard business order types)
+    BTU, //EBICS 3.0 Upload
+    BTD  //EBICS 3.0 Download
 }

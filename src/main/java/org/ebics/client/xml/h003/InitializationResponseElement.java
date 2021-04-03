@@ -22,7 +22,7 @@ package org.ebics.client.xml.h003;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.exception.ReturnCode;
 import org.ebics.client.interfaces.ContentFactory;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.schema.h003.EbicsResponseDocument;
 import org.ebics.schema.h003.EbicsResponseDocument.EbicsResponse;
 
@@ -42,7 +42,7 @@ public class InitializationResponseElement extends DefaultResponseElement {
    * @param name the element name
    */
   public InitializationResponseElement(ContentFactory factory,
-                                       EbicsOrderType orderType,
+                                       EbicsAdminOrderType orderType,
                                        String name)
   {
     super(factory, name);
@@ -89,7 +89,7 @@ public class InitializationResponseElement extends DefaultResponseElement {
   // --------------------------------------------------------------------
 
   protected EbicsResponse			response;
-  private EbicsOrderType orderType;
+  private EbicsAdminOrderType orderType;
   private byte[]				transactionId;
   private static final long 			serialVersionUID = 7684048385353175772L;
 }

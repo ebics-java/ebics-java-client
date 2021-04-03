@@ -24,7 +24,7 @@ import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.io.Splitter;
 import org.ebics.client.order.EbicsOrder;
 import org.ebics.client.order.EbicsUploadOrder;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h005.DataEncryptionInfoType.EncryptionPubKeyDigest;
@@ -69,7 +69,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
                                        byte[] userData)
     throws EbicsException
   {
-    super(session, ebicsOrder, generateName(ebicsOrder.getOrderType()));
+    super(session, ebicsOrder, generateName(ebicsOrder.getAdminOrderType()));
     this.userData = userData;
     keySpec = new SecretKeySpec(nonce, "EAS");
     splitter = new Splitter(userData);
@@ -111,12 +111,12 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
 	                                          "http://www.w3.org/2001/04/xmlenc#sha256",
 	                                          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
-    adminOrderType = EbicsXmlFactory.createAdminOrderType(ebicsOrder.getOrderType().toString());
+    adminOrderType = EbicsXmlFactory.createAdminOrderType(ebicsOrder.getAdminOrderType().toString());
 
     String nextOrderId = session.getUser().getPartner().nextOrderId();
 
     StaticHeaderOrderDetailsType orderDetails;
-    if (ebicsOrder.getOrderType() == EbicsOrderType.BTU) {
+    if (ebicsOrder.getAdminOrderType() == EbicsAdminOrderType.BTU) {
         BTUParamsType btuParamsType = EbicsXmlFactory.createBTUParamsType((EbicsUploadOrder)ebicsOrder);
 
         List<Parameter> parameters = new ArrayList<>();

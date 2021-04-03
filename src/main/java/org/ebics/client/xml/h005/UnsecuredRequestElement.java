@@ -21,7 +21,7 @@ package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.schema.h005.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest;
 import org.ebics.schema.h005.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Body;
 import org.ebics.schema.h005.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Body.DataTransfer;
@@ -47,7 +47,7 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
    * @param orderType the order type (INI | HIA).
    */
   public UnsecuredRequestElement(EbicsSession session,
-                                 EbicsOrderType orderType,
+                                 EbicsAdminOrderType orderType,
                                  byte[] orderData)
   {
     super(session);
@@ -101,7 +101,7 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private EbicsOrderType orderType;
+  private EbicsAdminOrderType orderType;
   private byte[]			orderData;
   private static final long 		serialVersionUID = -3548730114599886711L;
 }

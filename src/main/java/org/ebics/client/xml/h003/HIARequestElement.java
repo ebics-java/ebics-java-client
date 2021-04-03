@@ -21,7 +21,7 @@ package org.ebics.client.xml.h003;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.utils.Utils;
 
 /**
@@ -56,7 +56,7 @@ public class HIARequestElement extends DefaultEbicsRootElement {
     requestOrderData = new HIARequestOrderDataElement(session);
     requestOrderData.build();
     unsecuredRequest = new UnsecuredRequestElement(session,
-	                                           EbicsOrderType.HIA,
+	                                           EbicsAdminOrderType.HIA,
 	                                           orderId == null ? session.getUser().getPartner().nextOrderId() : orderId,
 	                                           Utils.zip(requestOrderData.prettyPrint()));
     unsecuredRequest.build();

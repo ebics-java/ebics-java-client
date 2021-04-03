@@ -32,7 +32,7 @@ import org.ebics.client.messages.Messages;
 import org.ebics.client.order.EbicsDownloadOrder;
 import org.ebics.client.order.EbicsUploadOrder;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.utils.Utils;
 import org.ebics.client.xml.h003.DownloadTransferResponseElement;
 import org.ebics.client.xml.h003.ReceiptResponseElement;
@@ -104,9 +104,9 @@ public class FileTransferImpl extends FileTransfer {
   public void sendFile(byte[] content, EbicsUploadOrder uploadOrder)
     throws IOException, EbicsException
   {
-      EbicsOrderType orderType = uploadOrder.getOrderType();
+      EbicsAdminOrderType orderType = uploadOrder.getAdminOrderType();
       final OrderAttributeType.Enum orderAttribute;
-      if (!uploadOrder.isSignatureFlag())
+      if (uploadOrder.isSignatureFlag())
           orderAttribute = OrderAttributeType.OZHNN;
       else
           orderAttribute  = OrderAttributeType.DZHNN;
@@ -151,7 +151,7 @@ public class FileTransferImpl extends FileTransfer {
                               int segmentNumber,
                               boolean lastSegment,
                               byte[] transactionId,
-                              EbicsOrderType orderType)
+                              EbicsAdminOrderType orderType)
     throws IOException, EbicsException
   {
     UploadTransferRequestElement		uploader;
@@ -195,7 +195,7 @@ public class FileTransferImpl extends FileTransfer {
                         File outputFile)
     throws IOException, EbicsException
   {
-      final EbicsOrderType orderType = downloadOrder.getOrderType();
+      final EbicsAdminOrderType orderType = downloadOrder.getAdminOrderType();
     HttpRequestSender			sender;
     DownloadInitializationRequestElement	initializer;
     DownloadInitializationResponseElement	response;
@@ -266,7 +266,7 @@ public class FileTransferImpl extends FileTransfer {
    * @throws IOException communication error
    * @throws EbicsException server generated error
    */
-  public void fetchFileSegment(EbicsOrderType orderType,
+  public void fetchFileSegment(EbicsAdminOrderType orderType,
                                int segmentNumber,
                                boolean lastSegment,
                                byte[] transactionId,

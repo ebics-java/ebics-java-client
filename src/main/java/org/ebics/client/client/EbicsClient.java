@@ -55,7 +55,7 @@ import org.ebics.client.order.EbicsDownloadOrder;
 import org.ebics.client.order.EbicsService;
 import org.ebics.client.order.EbicsUploadOrder;
 import org.ebics.client.session.DefaultConfiguration;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.session.Product;
 import org.ebics.client.io.IOUtils;
 import org.ebics.client.session.EbicsSession;
@@ -631,34 +631,23 @@ public class EbicsClient {
         return defaultUser;
     }
 
-    private static void addOption(Options options, EbicsOrderType type, String description) {
+    private static void addOption(Options options, EbicsAdminOrderType type, String description) {
         options.addOption(null, type.name().toLowerCase(), false, description);
     }
 
-    private static boolean hasOption(CommandLine cmd, EbicsOrderType type) {
+    private static boolean hasOption(CommandLine cmd, EbicsAdminOrderType type) {
         return cmd.hasOption(type.name().toLowerCase());
     }
 
     public static void main(String[] args) throws Exception {
         Options options = new Options();
-        addOption(options, EbicsOrderType.INI, "Send INI request");
-        addOption(options, EbicsOrderType.HIA, "Send HIA request");
-        addOption(options, EbicsOrderType.HPB, "Send HPB request");
+        addOption(options, EbicsAdminOrderType.INI, "Send INI request");
+        addOption(options, EbicsAdminOrderType.HIA, "Send HIA request");
+        addOption(options, EbicsAdminOrderType.HPB, "Send HPB request");
         options.addOption(null, "letters", false, "Create INI Letters");
         options.addOption(null, "create", false, "Create user keys and initialize EBICS user");
-        addOption(options, EbicsOrderType.STA,"Fetch STA file (MT940 file)");
-        addOption(options, EbicsOrderType.VMK, "Fetch VMK file (MT942 file)");
-        addOption(options, EbicsOrderType.ZDF, "Fetch ZDF file (zip file with documents)");
-        addOption(options, EbicsOrderType.ZB6, "Fetch ZB6 file");
-        addOption(options, EbicsOrderType.PTK, "Fetch client protocol file (TXT)");
-        addOption(options, EbicsOrderType.HAC, "Fetch client protocol file (XML)");
-        addOption(options, EbicsOrderType.Z01, "Fetch Z01 file");
 
-        addOption(options, EbicsOrderType.XKD, "Send payment order file (DTA format)");
-        addOption(options, EbicsOrderType.FUL, "Send payment order file (any format, need to be specified by -p)");
-        addOption(options, EbicsOrderType.XCT, "Send XCT file (any format)");
-        addOption(options, EbicsOrderType.XE2, "Send XE2 file (any format)");
-        addOption(options, EbicsOrderType.CCT, "Send CCT file (any format)");
+        addOption(options, EbicsAdminOrderType.FUL, "Send payment order file (any format, need to be specified by -p)");
 
         options.addOption(null, "skip_order", true, "Skip a number of order ids");
 
@@ -669,8 +658,12 @@ public class EbicsClient {
         options.addOption("s","start", true, "Download request starting with date");
         options.addOption("e","end", true, "Download request ending with date");
 
-        options.addOption("ns", "no-signature", false, "Don't provide electronic signature for EBICS upload (ES flag=false, DZHNN)");
+        options.addOption("ns", "no-signature", false, "Don't provide electronic signature for EBICS upload (ES flag=false, OrderAttribute=DZHNN)");
 
+        //EBICS 2.4/2.5 admin order type
+        options.addOption("at", "admin-type", true, "EBICS 2.4/2.5/3.0 admin order type (INI, HIA, HPB, SPR)");
+        //EBICS 2.4/2.5 business order type
+        options.addOption("ot", "order-type", true, "EBICS 2.4/2.5 business order type like(XE2, XE3, CCT, CDD,..)");
         //EBICS 3.0 parameters
         options.addOption("btf", "business-transaction-format", true, "EBICS 3.0 BTF service given by following pattern:\nSERVICE NAME:[OPTION]:[SCOPE]:[container]:message name:[variant]:[version]:[FORMAT]\nfor example: GLB::CH:zip:camt.054:001:03:XML");
 
@@ -700,14 +693,22 @@ public class EbicsClient {
             client.createLetters(client.defaultUser, false);
         }
 
-        if (hasOption(cmd, EbicsOrderType.INI)) {
-            client.sendINIRequest(client.defaultUser, client.defaultProduct);
-        }
-        if (hasOption(cmd, EbicsOrderType.HIA)) {
-            client.sendHIARequest(client.defaultUser, client.defaultProduct);
-        }
-        if (hasOption(cmd, EbicsOrderType.HPB)) {
-            client.sendHPBRequest(client.defaultUser, client.defaultProduct);
+        //Administrative order types processing
+        if (cmd.hasOption("at")) {
+            {
+                String adminOrderType = cmd.getOptionValue("at");
+                switch (adminOrderType) {
+                    case "INI":
+                        client.sendINIRequest(client.defaultUser, client.defaultProduct);
+                        break;
+                    case "HIA":
+                        client.sendHIARequest(client.defaultUser, client.defaultProduct);
+                        break;
+                    case "HPB":
+                        client.sendHPBRequest(client.defaultUser, client.defaultProduct);
+                        break;
+                }
+            }
         }
 
         //Download file
@@ -742,8 +743,11 @@ public class EbicsClient {
         switch (version) {
             case H003:
             case H004:
-                return new EbicsDownloadOrder(readOrderType(cmd, Arrays.asList(EbicsOrderType.STA, EbicsOrderType.VMK,
-                        EbicsOrderType.ZDF, EbicsOrderType.ZB6, EbicsOrderType.PTK, EbicsOrderType.HAC, EbicsOrderType.Z01)), start, end, params);
+                String orderType = readOrderType(cmd);
+                if (orderType.equals("FDL"))
+                    return new EbicsDownloadOrder(start, end, params);
+                else
+                    return new EbicsDownloadOrder(readOrderType(cmd), start, end, params);
             default:
                 return new EbicsDownloadOrder(readEbicsService(cmd, logger), start, end, params);
         }
@@ -789,13 +793,11 @@ public class EbicsClient {
         }
     }
 
-    private static EbicsOrderType readOrderType(CommandLine cmd, List<EbicsOrderType> ebicsOrderTypes) {
-        for (EbicsOrderType orderType : ebicsOrderTypes) {
-            if (hasOption(cmd, orderType)) {
-                return orderType;
-            }
+    private static String readOrderType(CommandLine cmd) {
+        if (cmd.hasOption("ot")) {
+            return cmd.getOptionValue("ot");
         }
-        throw new IllegalArgumentException("For option -o must be download order type specified for example -STA");
+        throw new IllegalArgumentException("For option -i/-o must be upload/download order type specified for example -ot XE2");
     }
 
     private static Date readDate(EbicsLogger logger, CommandLine cmd, char dateParam) throws java.text.ParseException {
@@ -818,9 +820,11 @@ public class EbicsClient {
         switch (ebicsVersion) {
             case H003:
             case H004:
-                return new EbicsUploadOrder(
-                        readOrderType(cmd, Arrays.asList(EbicsOrderType.XKD, EbicsOrderType.FUL, EbicsOrderType.XCT,
-                        EbicsOrderType.XE2, EbicsOrderType.CCT)), !cmd.hasOption("ns"), params);
+                String orderType = readOrderType(cmd);
+                if (orderType.equals("FUL"))
+                    return new EbicsUploadOrder(!cmd.hasOption("ns"), params);
+                else
+                    return new EbicsUploadOrder(readOrderType(cmd), !cmd.hasOption("ns"), params);
             default:
                 return new EbicsUploadOrder(readEbicsService(cmd, logger), !cmd.hasOption("ns"), inputFile.getName(), params);
         }

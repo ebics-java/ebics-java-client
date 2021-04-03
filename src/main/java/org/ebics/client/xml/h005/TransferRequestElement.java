@@ -21,7 +21,7 @@ package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h005.EbicsRequestDocument;
 
@@ -50,7 +50,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
    */
   public TransferRequestElement(EbicsSession session,
                                 String name,
-                                EbicsOrderType type,
+                                EbicsAdminOrderType type,
                                 int segmentNumber,
                                 boolean lastSegment,
                                 byte[] transactionId)
@@ -124,7 +124,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
   protected int				segmentNumber;
   protected boolean			lastSegment;
   protected byte[]			transactionId;
-  private EbicsOrderType type;
+  private EbicsAdminOrderType type;
   private String 			name;
   private static final long 		serialVersionUID = -4212072825371398259L;
 }

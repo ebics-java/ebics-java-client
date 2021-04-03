@@ -23,7 +23,7 @@ import org.ebics.client.exception.EbicsException;
 import org.ebics.client.exception.NoDownloadDataAvailableException;
 import org.ebics.client.exception.ReturnCode;
 import org.ebics.client.interfaces.ContentFactory;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 
 /**
  * The <code>DInitializationResponseElement</code> is the response element
@@ -41,7 +41,7 @@ public class DownloadInitializationResponseElement extends InitializationRespons
    * @param name the element name
    */
   public DownloadInitializationResponseElement(ContentFactory factory,
-                                               EbicsOrderType orderType,
+                                               EbicsAdminOrderType orderType,
                                                String name)
   {
     super(factory, orderType, name);

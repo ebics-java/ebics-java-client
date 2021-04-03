@@ -22,7 +22,7 @@ package org.ebics.client.xml.h005;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.order.EbicsDownloadOrder;
 import org.ebics.client.order.EbicsOrder;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Body;
@@ -57,7 +57,7 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
     public DownloadInitializationRequestElement(EbicsSession session,
                                                 EbicsOrder ebicsOrder)
             throws EbicsException {
-        super(session, ebicsOrder, generateName(ebicsOrder.getOrderType()));
+        super(session, ebicsOrder, generateName(ebicsOrder.getAdminOrderType()));
     }
 
     @Override
@@ -83,8 +83,8 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
                 "http://www.w3.org/2001/04/xmlenc#sha256",
                 decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
         bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
-        adminOrderType = EbicsXmlFactory.createAdminOrderType(ebicsOrder.getOrderType().toString());
-        if (ebicsOrder.getOrderType().equals(EbicsOrderType.BTD)) {
+        adminOrderType = EbicsXmlFactory.createAdminOrderType(ebicsOrder.getAdminOrderType().toString());
+        if (ebicsOrder.getAdminOrderType().equals(EbicsAdminOrderType.BTD)) {
             BTDParamsType btdParamsType = EbicsXmlFactory.createBTDParamsType((EbicsDownloadOrder)ebicsOrder);
 
             if (Boolean.getBoolean(session.getSessionParam("TEST"))) {

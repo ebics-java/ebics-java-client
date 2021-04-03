@@ -23,8 +23,7 @@ import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.io.IOUtils;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.client.order.EbicsOrderType;
-import org.ebics.schema.h005.DataDigestType;
+import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.schema.h005.DataTransferRequestType;
 import org.ebics.schema.h005.DataTransferRequestType.OrderData;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest;
@@ -53,7 +52,7 @@ public class UploadTransferRequestElement extends TransferRequestElement {
    * @param content the content factory
    */
   public UploadTransferRequestElement(EbicsSession session,
-                                      EbicsOrderType orderType,
+                                      EbicsAdminOrderType orderType,
                                       int segmentNumber,
                                       boolean lastSegment,
                                       byte[] transactionId,

@@ -22,7 +22,7 @@ package org.ebics.client.xml.h004;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.io.Splitter;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h004.DataEncryptionInfoType.EncryptionPubKeyDigest;
@@ -64,7 +64,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
    * @throws EbicsException
    */
   public UploadInitializationRequestElement(EbicsSession session,
-                                            EbicsOrderType orderType, OrderAttributeType.Enum orderAttribute,
+                                            EbicsAdminOrderType orderType, OrderAttributeType.Enum orderAttribute,
                                             byte[] userData)
     throws EbicsException
   {
@@ -116,7 +116,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
 	                                              session.getSessionParam("FORMAT"));
 
     StaticHeaderOrderDetailsType orderDetails;
-    if (type == EbicsOrderType.FUL) {
+    if (type == EbicsAdminOrderType.FUL) {
         FULOrderParamsType fULOrderParams = EbicsXmlFactory.createFULOrderParamsType(fileFormat);
 
         List<Parameter> parameters = new ArrayList<>();

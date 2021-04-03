@@ -29,7 +29,7 @@ import org.ebics.client.io.Joiner;
 import org.ebics.client.messages.Messages;
 import org.ebics.client.order.EbicsDownloadOrder;
 import org.ebics.client.order.EbicsUploadOrder;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.utils.Constants;
 import org.ebics.client.utils.Utils;
@@ -92,7 +92,7 @@ public class FileTransferImpl extends FileTransfer {
   public void sendFile(byte[] content, EbicsUploadOrder ebicsUploadOrder)
     throws IOException, EbicsException
   {
-      EbicsOrderType orderType = ebicsUploadOrder.getOrderType();
+      EbicsAdminOrderType orderType = ebicsUploadOrder.getAdminOrderType();
     HttpRequestSender sender = new HttpRequestSender(session);
     UploadInitializationRequestElement initializer = new UploadInitializationRequestElement(session,
 	                                            ebicsUploadOrder,
@@ -133,7 +133,7 @@ public class FileTransferImpl extends FileTransfer {
                               int segmentNumber,
                               boolean lastSegment,
                               byte[] transactionId,
-                              EbicsOrderType orderType)
+                              EbicsAdminOrderType orderType)
     throws IOException, EbicsException
   {
     UploadTransferRequestElement		uploader;
@@ -185,7 +185,7 @@ public class FileTransferImpl extends FileTransfer {
     int					httpCode;
     TransferState			state;
     Joiner				joiner;
-    EbicsOrderType orderType = downloadOrder.getOrderType();
+    EbicsAdminOrderType orderType = downloadOrder.getAdminOrderType();
 
     sender = new HttpRequestSender(session);
     initializer = new DownloadInitializationRequestElement(session, downloadOrder);
@@ -245,7 +245,7 @@ public class FileTransferImpl extends FileTransfer {
    * @throws IOException communication error
    * @throws EbicsException server generated error
    */
-  protected void fetchFileSegment(EbicsOrderType orderType,
+  protected void fetchFileSegment(EbicsAdminOrderType orderType,
                                   int segmentNumber,
                                   boolean lastSegment,
                                   byte[] transactionId,

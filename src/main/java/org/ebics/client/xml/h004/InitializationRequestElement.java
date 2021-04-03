@@ -24,7 +24,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.session.EbicsSession;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h004.EbicsRequestDocument;
 
@@ -52,7 +52,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
    * @throws EbicsException
    */
   public InitializationRequestElement(EbicsSession session,
-                                      EbicsOrderType type,
+                                      EbicsAdminOrderType type,
                                       String name)
     throws EbicsException
   {
@@ -157,7 +157,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
   // --------------------------------------------------------------------
 
   private String			name;
-  protected EbicsOrderType type;
+  protected EbicsAdminOrderType type;
   protected byte[]			nonce;
   private static final long 		serialVersionUID = 8983807819242699280L;
 }

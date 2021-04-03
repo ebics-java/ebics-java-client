@@ -21,7 +21,7 @@ package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.order.EbicsOrder;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h005.DataEncryptionInfoType.EncryptionPubKeyDigest;
@@ -55,7 +55,7 @@ public class SPRRequestElement extends InitializationRequestElement {
    * @param session the current ebics session.
    */
   public SPRRequestElement(EbicsSession session) throws EbicsException {
-    super(session, new EbicsOrder(EbicsOrderType.SPR), "SPRRequest.xml");
+    super(session, new EbicsOrder(EbicsAdminOrderType.SPR), "SPRRequest.xml");
     keySpec = new SecretKeySpec(nonce, "EAS");
   }
 
@@ -96,7 +96,7 @@ public class SPRRequestElement extends InitializationRequestElement {
 	                                          "http://www.w3.org/2001/04/xmlenc#sha256",
 	                                          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
-    orderType = EbicsXmlFactory.createAdminOrderType(ebicsOrder.getOrderType().toString());
+    orderType = EbicsXmlFactory.createAdminOrderType(ebicsOrder.getAdminOrderType().toString());
     standardOrderParamsType = EbicsXmlFactory.createStandardOrderParamsType();
     orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(null,
 	                                                              orderType,

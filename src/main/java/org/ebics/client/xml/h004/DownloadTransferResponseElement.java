@@ -21,7 +21,7 @@ package org.ebics.client.xml.h004;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
-import org.ebics.client.order.EbicsOrderType;
+import org.ebics.client.order.EbicsAdminOrderType;
 
 /**
  * The <code>DTransferResponseElement</code> is the response element
@@ -39,7 +39,7 @@ public class DownloadTransferResponseElement extends TransferResponseElement {
    * @param name the element name.
    */
   public DownloadTransferResponseElement(ContentFactory factory,
-                                         EbicsOrderType orderType,
+                                         EbicsAdminOrderType orderType,
                                          String name)
   {
     super(factory, name);

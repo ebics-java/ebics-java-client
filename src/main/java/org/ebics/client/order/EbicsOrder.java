@@ -4,21 +4,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EbicsOrder {
-    public EbicsOrder(EbicsOrderType orderType) {
-        this.orderType = orderType;
+    public EbicsOrder(EbicsAdminOrderType adminOrderType) {
+        this.adminOrderType = adminOrderType;
         this.params = new HashMap<>(0);
     }
 
-    public EbicsOrder(EbicsOrderType orderType, Map params) {
-        this.orderType = orderType;
+    public EbicsOrder(EbicsAdminOrderType adminOrderType, Map params) {
+        this.adminOrderType = adminOrderType;
         this.params = params;
     }
 
-    public EbicsOrderType getOrderType() {
-        return orderType;
+    public EbicsAdminOrderType getAdminOrderType() {
+        return adminOrderType;
     }
     public Map<String, String> getParams() { return params; }
 
-    private EbicsOrderType orderType;
+    private EbicsAdminOrderType adminOrderType;
     private Map<String, String> params;
 }
