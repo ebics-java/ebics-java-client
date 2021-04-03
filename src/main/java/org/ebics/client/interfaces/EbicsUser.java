@@ -25,7 +25,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 
-import org.ebics.client.client.EbicsVersion;
+import org.ebics.client.api.EbicsVersion;
 import org.ebics.client.exception.EbicsException;
 
 

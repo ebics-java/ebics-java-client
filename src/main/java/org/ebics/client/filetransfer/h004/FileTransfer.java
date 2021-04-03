@@ -19,16 +19,16 @@
 
 package org.ebics.client.filetransfer.h004;
 
-import org.ebics.client.client.HttpRequestSender;
-import org.ebics.client.client.TransferState;
+import org.ebics.client.api.HttpRequestSender;
+import org.ebics.client.api.TransferState;
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.filetransfer.FileTransfer;
+import org.ebics.client.filetransfer.AbstractFileTransfer;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.io.ByteArrayContentFactory;
 import org.ebics.client.io.Joiner;
 import org.ebics.client.messages.Messages;
-import org.ebics.client.order.EbicsDownloadOrder;
-import org.ebics.client.order.EbicsUploadOrder;
+import org.ebics.client.order.h003.EbicsDownloadOrder;
+import org.ebics.client.order.h003.EbicsUploadOrder;
 import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.utils.Constants;
@@ -71,14 +71,14 @@ import java.io.IOException;
  * @author Hachani
  *
  */
-public class FileTransferImpl extends FileTransfer {
+public class FileTransfer extends AbstractFileTransfer {
 
     /**
      * Constructs a new FileTransfer session
      *
      * @param session the user session
      */
-    public FileTransferImpl(EbicsSession session) {
+    public FileTransfer(EbicsSession session) {
         super(session);
     }
 
@@ -89,7 +89,6 @@ public class FileTransferImpl extends FileTransfer {
    * @throws IOException
    * @throws EbicsException
    */
-  @Override
   public void sendFile(byte[] content, EbicsUploadOrder uploadOrder)
     throws IOException, EbicsException
   {
@@ -179,7 +178,6 @@ public class FileTransferImpl extends FileTransfer {
    * @throws IOException communication error
    * @throws EbicsException server generated error
    */
-  @Override
   public void fetchFile(EbicsDownloadOrder downloadOrder,
                         File outputFile)
     throws IOException, EbicsException

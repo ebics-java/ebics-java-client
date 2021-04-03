@@ -17,7 +17,7 @@
  * $Id$
  */
 
-package org.ebics.client.client;
+package org.ebics.client.api;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

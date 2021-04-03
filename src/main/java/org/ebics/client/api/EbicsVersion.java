@@ -1,4 +1,4 @@
-package org.ebics.client.client;
+package org.ebics.client.api;
 
 public enum EbicsVersion {
     H003,

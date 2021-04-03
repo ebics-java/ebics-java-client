@@ -21,7 +21,7 @@ package org.ebics.client.keymgmt.h004;
 
 import org.ebics.client.certificate.KeyStoreManager;
 import org.ebics.client.certificate.KeyUtil;
-import org.ebics.client.client.HttpRequestSender;
+import org.ebics.client.api.HttpRequestSender;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.io.ByteArrayContentFactory;

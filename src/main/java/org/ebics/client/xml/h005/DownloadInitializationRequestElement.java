@@ -20,8 +20,7 @@
 package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.order.EbicsDownloadOrder;
-import org.ebics.client.order.EbicsOrder;
+import org.ebics.client.order.h005.EbicsDownloadOrder;
 import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest;
@@ -55,7 +54,7 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
      * @throws EbicsException
      */
     public DownloadInitializationRequestElement(EbicsSession session,
-                                                EbicsOrder ebicsOrder)
+                                                EbicsDownloadOrder ebicsOrder)
             throws EbicsException {
         super(session, ebicsOrder, generateName(ebicsOrder.getAdminOrderType()));
     }

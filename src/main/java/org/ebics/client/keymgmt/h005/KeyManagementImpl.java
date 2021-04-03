@@ -21,7 +21,7 @@ package org.ebics.client.keymgmt.h005;
 
 import org.ebics.client.certificate.KeyStoreManager;
 import org.ebics.client.certificate.KeyUtil;
-import org.ebics.client.client.HttpRequestSender;
+import org.ebics.client.api.HttpRequestSender;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.io.ByteArrayContentFactory;
@@ -34,7 +34,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.interfaces.RSAPublicKey;
 

@@ -22,8 +22,7 @@ package org.ebics.client.xml.h005;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.io.Splitter;
-import org.ebics.client.order.EbicsOrder;
-import org.ebics.client.order.EbicsUploadOrder;
+import org.ebics.client.order.h005.EbicsUploadOrder;
 import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.session.EbicsSession;
 import org.ebics.client.utils.Utils;
@@ -65,8 +64,8 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
    * @throws EbicsException
    */
   public UploadInitializationRequestElement(EbicsSession session,
-                                       EbicsOrder ebicsOrder,
-                                       byte[] userData)
+                                            EbicsUploadOrder ebicsOrder,
+                                            byte[] userData)
     throws EbicsException
   {
     super(session, ebicsOrder, generateName(ebicsOrder.getAdminOrderType()));
