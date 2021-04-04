@@ -1,6 +1,7 @@
 package org.ebics.client.console.h003;
 
 import org.apache.commons.cli.*;
+import org.ebics.client.api.AbstractEbicsClient;
 import org.ebics.client.api.h003.EbicsClient;
 import org.ebics.client.interfaces.EbicsLogger;
 import org.ebics.client.messages.Messages;
@@ -25,7 +26,7 @@ public class App {
         if (line.hasOption("help")) {
             HelpFormatter formatter = new HelpFormatter();
             System.out.println();
-            formatter.printHelp(EbicsClient.class.getSimpleName(), options);
+            formatter.printHelp(AbstractEbicsClient.class.getSimpleName(), options);
             System.out.println();
             System.exit(0);
         }
@@ -94,6 +95,9 @@ public class App {
                         break;
                     case "HPB":
                         client.sendHPBRequest(client.getDefaultUser(), client.getDefaultProduct());
+                        break;
+                    case "SPR":
+                        client.revokeSubscriber(client.getDefaultUser(), client.getDefaultProduct());
                         break;
                 }
             }
@@ -202,7 +206,7 @@ public class App {
     }
 
     private static EbicsUploadOrder readUploadOrder(CommandLine cmd, String inputFileValue, EbicsLogger logger) throws Exception {
-        final File inputFile = new File(inputFileValue);
+        //final File inputFile = new File(inputFileValue);
         final Map<String, String> params = readParams(cmd.getOptionValues("p"));
 
         String orderType = readOrderType(cmd);
