@@ -30,7 +30,6 @@ import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.*;
 import org.ebics.client.messages.Messages;
 
-import org.ebics.client.session.DefaultConfiguration;
 import org.ebics.client.session.Product;
 import org.ebics.client.io.IOUtils;
 import org.ebics.client.session.EbicsSession;
