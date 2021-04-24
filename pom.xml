@@ -10,9 +10,14 @@
     <modules>
         <module>ebics-java-lib</module>
         <module>ebics-console-app</module>
+        <module>ebics-rest-api</module>
     </modules>
     <properties>
         <revision>1.2-SNAPSHOT</revision>
+        <java.version>1.8</java.version>
+        <kotlin.version>1.4.32</kotlin.version>
+        <kotlin.version.short>1.4</kotlin.version.short>
+        <kotlin.version>${kotlin.version.short}.32</kotlin.version>
     </properties>
     <dependencies>
 
