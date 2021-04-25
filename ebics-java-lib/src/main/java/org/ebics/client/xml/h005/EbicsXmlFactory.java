@@ -898,13 +898,13 @@ public class EbicsXmlFactory {
     btuParamsType.setFileName(ebicsOrder.getFileName());
     btuParamsType.setService(createRestrictedServiceType(ebicsOrder.getOrderService()));
     if (ebicsOrder.isSignatureFlag())
-      btuParamsType.setSignatureFlag(createSignatureFlag(ebicsOrder.isSignatureFlag()));
+      btuParamsType.setSignatureFlag(createSignatureFlag(ebicsOrder.isRequestEDSFlag()));
     return btuParamsType;
   }
 
-  private static SignatureFlagType createSignatureFlag(boolean signatureFlag) {
+  private static SignatureFlagType createSignatureFlag(boolean requestEDS) {
     SignatureFlagType signatureFlagType = SignatureFlagType.Factory.newInstance();
-    signatureFlagType.setRequestEDS(signatureFlag);
+    signatureFlagType.setRequestEDS(requestEDS);
     return signatureFlagType;
   }
 

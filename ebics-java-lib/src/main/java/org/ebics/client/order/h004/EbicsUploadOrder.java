@@ -15,7 +15,6 @@ public class EbicsUploadOrder extends AbstractEbicsUploadOrder {
     public EbicsUploadOrder(String orderType, boolean signatureFlag, Map<String, String> params) {
         super(EbicsAdminOrderType.UPL, signatureFlag, params);
         this.orderType = orderType;
-        this.signatureFlag = signatureFlag;
     }
 
     /**
@@ -24,16 +23,11 @@ public class EbicsUploadOrder extends AbstractEbicsUploadOrder {
      */
     public EbicsUploadOrder(boolean signatureFlag, Map<String, String> params) {
         super(EbicsAdminOrderType.FUL, signatureFlag, params);
-        this.signatureFlag = signatureFlag;
     }
 
-    public boolean isSignatureFlag() {
-        return signatureFlag;
-    }
     public String getOrderType() {
         return orderType;
     }
 
     private String orderType;
-    private boolean signatureFlag;
 }

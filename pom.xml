@@ -10,7 +10,6 @@
     <modules>
         <module>ebics-java-lib</module>
         <module>ebics-console-app</module>
-        <module>ebics-rest-api</module>
     </modules>
     <properties>
         <revision>1.2-SNAPSHOT</revision>

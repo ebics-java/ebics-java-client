@@ -153,7 +153,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
 
     private fun readUploadOrder(inputFileValue: String): EbicsUploadOrder {
         val params = readParams(cmd.getOptionValues("p"))
-        return EbicsUploadOrder(readEbicsService(), !cmd.hasOption("ns"), inputFileValue, params)
+        return EbicsUploadOrder(readEbicsService(), !cmd.hasOption("ns"), !cmd.hasOption("neds"), inputFileValue, params)
     }
 
     private fun readParams(paramPairs: Array<String>?): Map<String, String> {
@@ -365,7 +365,8 @@ private fun createCmdOptions(): Options {
     options.addOption("p", "params", true, "key:value array of string parameters for upload or download request, example FORMAT:pain.001 TEST:TRUE EBCDIC:TRUE")
     options.addOption("s", "start", true, "Download request starting with date")
     options.addOption("e", "end", true, "Download request ending with date")
-    options.addOption("ns", "no-signature", false, "Don't provide electronic signature for EBICS upload (ES flag=false, OrderAttribute=DZHNN)")
+    options.addOption("ns", "no-signature", false, "Don't provide electronic signature for EBICS upload (ES flag=false, equivalent of OrderAttribute=DZHNN)")
+    options.addOption("neds", "no-eds", false, "Don't request EDS (electronic distributed signature) for EBICS upload only when (no-signature is not used = ES flag=true)")
 
     //EBICS 2.4/2.5/3.0 admin order type
     options.addOption("at", "admin-type", true, "EBICS admin order type (INI, HIA, HPB, SPR)")
