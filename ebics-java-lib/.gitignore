@@ -1,5 +1,4 @@
 /target/
-/log/
 .gradle
 **/build/
 !src/**/build/
