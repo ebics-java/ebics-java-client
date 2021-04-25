@@ -25,7 +25,7 @@ import java.util.*
 import java.util.regex.Pattern
 import kotlin.system.exitProcess
 
-class ConsoleApp private constructor(rootDir: File, defaultEbicsConfigFile: File, private val cmd: CommandLine) {
+class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: CommandLine) {
     private val app: ConsoleAppBase = createConsoleApp(rootDir, defaultEbicsConfigFile)
     private val ebicsModel: EbicsModel
         get() = app.ebicsModel
@@ -35,7 +35,7 @@ class ConsoleApp private constructor(rootDir: File, defaultEbicsConfigFile: File
         get() = app.defaultProduct
 
     @Throws(Exception::class)
-    private fun runMain() {
+    fun runMain() {
         if (cmd.hasOption("listUsers")) {
             logger.info(Messages.getString("list.user.ids", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, ebicsModel.listUserId().toString()))
         }
@@ -325,61 +325,59 @@ class ConsoleApp private constructor(rootDir: File, defaultEbicsConfigFile: File
 
     companion object {
         private val logger = LoggerFactory.getLogger(ConsoleApp::class.java)
-
-        @Throws(Exception::class)
-        fun main(args: Array<String>) {
-            val options = createCmdOptions()
-            val cmd = parseArguments(options, args)
-            val defaultRootDir = File(System.getProperty("user.home") + File.separator + "ebics"
-                    + File.separator + "client")
-            val defaultEbicsConfigFile = File(defaultRootDir, "ebics.txt")
-            ConsoleApp(defaultRootDir, defaultEbicsConfigFile, cmd).runMain()
-        }
-
-        @Throws(org.apache.commons.cli.ParseException::class)
-        private fun parseArguments(options: Options, args: Array<String>): CommandLine {
-            val parser: CommandLineParser = DefaultParser()
-            options.addOption(null, "help", false, "Print this help text")
-            val line = parser.parse(options, args)
-            if (line.hasOption("help")) {
-                val formatter = HelpFormatter()
-                println()
-                formatter.printHelp(ConsoleApp::class.java.simpleName, options)
-                println()
-                exitProcess(0)
-            }
-            return line
-        }
-
-        private fun createCmdOptions(): Options {
-            val options = Options()
-            options.addOption(null, "letters", false, "Create INI Letters")
-            options.addOption(null, "create", false, "Create user keys and initialize EBICS user")
-            options.addOption(null, "listUsers", false, "List stored user ids")
-            options.addOption(null, "listPartners", false, "List stored partner ids")
-            options.addOption(null, "listBank", false, "List stored bank ids")
-            options.addOption(null, "skip_order", true, "Skip a number of order ids")
-            options.addOption("o", "output", true, "Output file for EBICS download")
-            options.addOption("i", "input", true, "Input file for EBICS upload")
-            options.addOption("p", "params", true, "key:value array of string parameters for upload or download request, example FORMAT:pain.001 TEST:TRUE EBCDIC:TRUE")
-            options.addOption("s", "start", true, "Download request starting with date")
-            options.addOption("e", "end", true, "Download request ending with date")
-            options.addOption("ns", "no-signature", false, "Don't provide electronic signature for EBICS upload (ES flag=false, OrderAttribute=DZHNN)")
-
-            //EBICS 2.4/2.5/3.0 admin order type
-            options.addOption("at", "admin-type", true, "EBICS 2.4/2.5/3.0 admin order type (INI, HIA, HPB, SPR)")
-            //EBICS 3.0 parameters
-            options.addOption("btf", "business-transaction-format", true, "EBICS 3.0 BTF service given by following pattern:\nSERVICE NAME:[OPTION]:[SCOPE]:[container]:message name:[variant]:[version]:[FORMAT]\nfor example: GLB::CH:zip:camt.054:001:03:XML")
-            options.addOption("sn", "service-name", true, "EBICS 3.0 Name of service, example 'SCT' (SEPA credit transfer)")
-            options.addOption("so", "service-option", true, "EBICS 3.0 Optional characteristic(s) of a service Example: “URG” = urgent")
-            options.addOption("ss", "service-scope", true, "EBICS 3.0 Specifies whose rules have to be taken into account for the service. 2-char country codes, 3-char codes for other scopes “BIL” means bilaterally agreed")
-            options.addOption("ct", "service-container", true, "EBICS 3.0 The container type if required (SVC, XML, ZIP)")
-            options.addOption("mn", "service-message-name", true, "EBICS 3.0 Service message name, for example pain.001 or mt103")
-            options.addOption("mve", "service-message-version", true, "EBICS 3.0 Service message version for ISO formats, for example 03")
-            options.addOption("mva", "service-message-variant", true, "EBICS 3.0 Service message variant for ISO formats, for example 001")
-            options.addOption("mf", "service-message-format", true, "EBICS 3.0 Service message format, for example XML, JSON, PFD, ASN1")
-            return options
-        }
     }
 
+}
+
+fun main(args: Array<String>) {
+    val options = createCmdOptions()
+    val cmd = parseArguments(options, args)
+    val defaultRootDir = File(System.getProperty("user.home") + File.separator + "ebics"
+            + File.separator + "client")
+    val defaultEbicsConfigFile = File(defaultRootDir, "ebics.txt")
+    ConsoleApp(defaultRootDir, defaultEbicsConfigFile, cmd).runMain()
+}
+
+private fun parseArguments(options: Options, args: Array<String>): CommandLine {
+    val parser: CommandLineParser = DefaultParser()
+    options.addOption(null, "help", false, "Print this help text")
+    val line = parser.parse(options, args)
+    if (line.hasOption("help")) {
+        val formatter = HelpFormatter()
+        println()
+        formatter.printHelp(ConsoleApp::class.java.simpleName, options)
+        println()
+        exitProcess(0)
+    }
+    return line
+}
+
+private fun createCmdOptions(): Options {
+    val options = Options()
+    options.addOption(null, "letters", false, "Create INI Letters")
+    options.addOption(null, "create", false, "Create user keys and initialize EBICS user")
+    options.addOption(null, "listUsers", false, "List stored user ids")
+    options.addOption(null, "listPartners", false, "List stored partner ids")
+    options.addOption(null, "listBank", false, "List stored bank ids")
+    options.addOption(null, "skip_order", true, "Skip a number of order ids")
+    options.addOption("o", "output", true, "Output file for EBICS download")
+    options.addOption("i", "input", true, "Input file for EBICS upload")
+    options.addOption("p", "params", true, "key:value array of string parameters for upload or download request, example FORMAT:pain.001 TEST:TRUE EBCDIC:TRUE")
+    options.addOption("s", "start", true, "Download request starting with date")
+    options.addOption("e", "end", true, "Download request ending with date")
+    options.addOption("ns", "no-signature", false, "Don't provide electronic signature for EBICS upload (ES flag=false, OrderAttribute=DZHNN)")
+
+    //EBICS 2.4/2.5/3.0 admin order type
+    options.addOption("at", "admin-type", true, "EBICS 2.4/2.5/3.0 admin order type (INI, HIA, HPB, SPR)")
+    //EBICS 3.0 parameters
+    options.addOption("btf", "business-transaction-format", true, "EBICS 3.0 BTF service given by following pattern:\nSERVICE NAME:[OPTION]:[SCOPE]:[container]:message name:[variant]:[version]:[FORMAT]\nfor example: GLB::CH:zip:camt.054:001:03:XML")
+    options.addOption("sn", "service-name", true, "EBICS 3.0 Name of service, example 'SCT' (SEPA credit transfer)")
+    options.addOption("so", "service-option", true, "EBICS 3.0 Optional characteristic(s) of a service Example: “URG” = urgent")
+    options.addOption("ss", "service-scope", true, "EBICS 3.0 Specifies whose rules have to be taken into account for the service. 2-char country codes, 3-char codes for other scopes “BIL” means bilaterally agreed")
+    options.addOption("ct", "service-container", true, "EBICS 3.0 The container type if required (SVC, XML, ZIP)")
+    options.addOption("mn", "service-message-name", true, "EBICS 3.0 Service message name, for example pain.001 or mt103")
+    options.addOption("mve", "service-message-version", true, "EBICS 3.0 Service message version for ISO formats, for example 03")
+    options.addOption("mva", "service-message-variant", true, "EBICS 3.0 Service message variant for ISO formats, for example 001")
+    options.addOption("mf", "service-message-format", true, "EBICS 3.0 Service message format, for example XML, JSON, PFD, ASN1")
+    return options
 }
