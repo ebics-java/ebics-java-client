@@ -19,7 +19,4 @@
         <kotlin.version.short>1.4</kotlin.version.short>
         <kotlin.version>${kotlin.version.short}.32</kotlin.version>
     </properties>
-    <dependencies>
-
-    </dependencies>
 </project>

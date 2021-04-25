@@ -337,8 +337,8 @@ private fun createCmdOptions(): Options {
     options.addOption("ns", "no-signature", false, "Don't provide electronic signature for EBICS upload (ES flag=false, OrderAttribute=DZHNN)")
 
     //EBICS 2.4/2.5/3.0 admin order type
-    options.addOption("at", "admin-type", true, "EBICS 2.4/2.5/3.0 admin order type (INI, HIA, HPB, SPR)")
+    options.addOption("at", "admin-type", true, "EBICS admin order type (INI, HIA, HPB, SPR)")
     //EBICS 2.4/2.5 business order type
-    options.addOption("ot", "order-type", true, "EBICS 2.4/2.5 business order type like(XE2, XE3, CCT, CDD,..)")
+    options.addOption("ot", "order-type", true, "EBICS business order type like(XE2, XE3, CCT, CDD,..)")
     return options
 }
