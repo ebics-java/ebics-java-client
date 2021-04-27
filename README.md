@@ -9,10 +9,11 @@ https://github.com/honza-toegel/ebics-java-client/wiki/EBICS-Client-HowTo
 
 Main differences with this fork:
 
-- Support of EBICS Versions 
-  - 2.4 (H003) 
-  - 2.5 (H004)
-  - 3.0 (H005 - in testing)
+- Support of following versions 
+  - EBICS 2.4 (H003) 
+  - EBICS 2.5 (H004)
+  - EBICS 3.0 (H005 - in testing)
+- Separated EBICS API from console client
 - Support of bcprov-jdk15on
 
 Issues: 
