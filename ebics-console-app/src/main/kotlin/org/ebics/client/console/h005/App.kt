@@ -1,4 +1,4 @@
-package org.ebics.client.console.h003
+package org.ebics.client.console.h005
 
 import org.apache.commons.cli.*
 import org.ebics.client.api.EbicsModel
@@ -7,12 +7,13 @@ import org.ebics.client.console.ConsoleAppBase
 import org.ebics.client.console.ConsoleAppBase.Companion.createConsoleApp
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.exception.NoDownloadDataAvailableException
-import org.ebics.client.filetransfer.h003.FileTransfer
+import org.ebics.client.filetransfer.h005.FileTransfer
 import org.ebics.client.io.IOUtils
-import org.ebics.client.keymgmt.h003.KeyManagementImpl
+import org.ebics.client.keymgmt.h005.KeyManagementImpl
 import org.ebics.client.messages.Messages
-import org.ebics.client.order.h003.EbicsDownloadOrder
-import org.ebics.client.order.h003.EbicsUploadOrder
+import org.ebics.client.order.EbicsService
+import org.ebics.client.order.h005.EbicsDownloadOrder
+import org.ebics.client.order.h005.EbicsUploadOrder
 import org.ebics.client.session.EbicsSession
 import org.ebics.client.session.Product
 import org.slf4j.LoggerFactory
@@ -21,10 +22,11 @@ import java.io.IOException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Pattern
 import kotlin.system.exitProcess
 
-class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: CommandLine) {
-    private val app: ConsoleAppBase = createConsoleApp(rootDir, defaultEbicsConfigFile)
+class ConsoleApp(private val cmd: CommandLine) {
+    private val app: ConsoleAppBase = createConsoleApp()
     private val ebicsModel: EbicsModel
         get() = app.ebicsModel
     private val defaultUser: User?
@@ -34,23 +36,8 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
 
     @Throws(Exception::class)
     fun runMain() {
-        if (cmd.hasOption("listUsers")) {
-            logger.info(Messages.getString("list.user.ids", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, ebicsModel.listUserId().toString()))
-        }
-        if (cmd.hasOption("listBanks")) {
-            logger.info(Messages.getString("list.bank.ids", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, ebicsModel.listBankId().toString()))
-        }
-        if (cmd.hasOption("listPartners")) {
-            logger.info(Messages.getString("list.partner.ids", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, ebicsModel.listPartnerId().toString()))
-        }
-        if (cmd.hasOption("create")) {
-            app.createDefaultUser()
-        } else {
-            app.loadDefaultUser()
-        }
-        if (cmd.hasOption("letters")) {
-            ebicsModel.createLetters(defaultUser, false)
-        }
+        app.loadDefaultUser()
+
         val session = ebicsModel.createSession(defaultUser, defaultProduct)
 
         //Administrative order types processing
@@ -78,12 +65,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
             val uploadOrder = readUploadOrder(inputFileValue)
             sendFile(File(inputFileValue), session, uploadOrder)
         }
-        if (cmd.hasOption("skip_order")) {
-            var count = cmd.getOptionValue("skip_order").toInt()
-            while (count-- > 0) {
-                defaultUser!!.partner.nextOrderId()
-            }
-        }
+
         ebicsModel.saveAll()
     }
 
@@ -92,15 +74,46 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
         val params = readParams(cmd.getOptionValues("p"))
         val start = readDate('s')
         val end = readDate('e')
-        val orderType = readOrderType()
-        return if (orderType == "FDL") EbicsDownloadOrder(start, end, params) else EbicsDownloadOrder(readOrderType(), start, end, params)
+        return EbicsDownloadOrder(readEbicsService(), start, end, params)
     }
 
-    private fun readOrderType(): String {
-        if (cmd.hasOption("ot")) {
-            return cmd.getOptionValue("ot")
+    /**
+     * Parse EBICS 3.0 BTF from command line to EbicsService
+     * BTF String pattern:
+     * SERVICE NAME:[OPTION]:[SCOPE]:[container]:message name:[variant]:[version]:[variant]:[FORMAT]
+     * Example BTFs in one string:
+     * GLB::CH:zip:camt.054:001:03:XML
+     * BTC::CH:xml:pain.001:001:09:XML
+     * BTC:URG:DE:xml:pain.001:001:09:XML
+     *
+     * @return
+     */
+    private fun readEbicsService(): EbicsService {
+        //sn Service name: BCT
+        //so Service option: -
+        //ss Service scope: CH
+        //ct Container type: zip / xml / svc (enum)
+        //mn Message name: pain.001
+        //mva: Message variant: - / 001
+        //mve: Message version: 03
+        //mf: Message format: -
+        return if (cmd.hasOption("btf")) {
+            val btf = cmd.getOptionValue("btf")
+            val regex = "([A-Z0-9]{3}):([A-Z0-9]{3,10})?:([A-Z0-9]{2,3})?:(zip|xml|svc)?:([a-z\\.0-9]{1,10}):([0-9]{3})?:([0-9]{2})?:([A-Z0-9]{1,4})?"
+            val pattern = Pattern.compile(regex)
+            val matcher = pattern.matcher(cmd.getOptionValue("btf"))
+            if (matcher.find()) {
+                EbicsService(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4),
+                        matcher.group(5), matcher.group(6), matcher.group(7), matcher.group(8))
+            } else {
+                val errorMessage = Messages.getString("btf.parse.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, btf)
+                logger.error(errorMessage)
+                throw IllegalArgumentException(errorMessage)
+            }
+        } else {
+            EbicsService(cmd.getOptionValue("sn"), cmd.getOptionValue("so"), cmd.getOptionValue("ss"), cmd.getOptionValue("ct"),
+                    cmd.getOptionValue("mn"), cmd.getOptionValue("mva"), cmd.getOptionValue("mve"), cmd.getOptionValue("mf"))
         }
-        throw IllegalArgumentException("For option -i/-o must be upload/download order type specified for example -ot XE2")
     }
 
     @Throws(ParseException::class)
@@ -118,18 +131,16 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
         }
     }
 
-    @Throws(Exception::class)
     private fun readUploadOrder(inputFileValue: String): EbicsUploadOrder {
         val params = readParams(cmd.getOptionValues("p"))
-        val orderType = readOrderType()
-        return if (orderType == "FUL") EbicsUploadOrder(!cmd.hasOption("ns"), params) else EbicsUploadOrder(readOrderType(), !cmd.hasOption("ns"), params)
+        return EbicsUploadOrder(readEbicsService(), !cmd.hasOption("ns"), !cmd.hasOption("neds"), inputFileValue, params)
     }
 
     private fun readParams(paramPairs: Array<String>?): Map<String, String> {
         return if (paramPairs == null) HashMap(0) else {
             val paramMap: MutableMap<String, String> = HashMap(paramPairs.size)
             for (paramPair in paramPairs) {
-                val keyValArr = paramPair.split(":".toRegex())
+                val keyValArr = paramPair.split(":".toRegex()).toTypedArray()
                 require(keyValArr.size == 2) { String.format("The key value pair '%s' must have one separator ':'", paramPair) }
                 paramMap[keyValArr[0]] = keyValArr[1]
             }
@@ -301,10 +312,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
 fun main(args: Array<String>) {
     val options = createCmdOptions()
     val cmd = parseArguments(options, args)
-    val defaultRootDir = File(System.getProperty("user.home") + File.separator + "ebics"
-            + File.separator + "client")
-    val defaultEbicsConfigFile = File(defaultRootDir, "ebics.txt")
-    ConsoleApp(defaultRootDir, defaultEbicsConfigFile, cmd).runMain()
+    ConsoleApp(cmd).runMain()
 }
 
 private fun parseArguments(options: Options, args: Array<String>): CommandLine {
@@ -334,11 +342,20 @@ private fun createCmdOptions(): Options {
     options.addOption("p", "params", true, "key:value array of string parameters for upload or download request, example FORMAT:pain.001 TEST:TRUE EBCDIC:TRUE")
     options.addOption("s", "start", true, "Download request starting with date")
     options.addOption("e", "end", true, "Download request ending with date")
-    options.addOption("ns", "no-signature", false, "Don't provide electronic signature for EBICS upload (ES flag=false, OrderAttribute=DZHNN)")
+    options.addOption("ns", "no-signature", false, "Don't provide electronic signature for EBICS upload (ES flag=false, equivalent of OrderAttribute=DZHNN)")
+    options.addOption("neds", "no-eds", false, "Don't request EDS (electronic distributed signature) for EBICS upload only when (no-signature is not used = ES flag=true)")
 
     //EBICS 2.4/2.5/3.0 admin order type
     options.addOption("at", "admin-type", true, "EBICS admin order type (INI, HIA, HPB, SPR)")
-    //EBICS 2.4/2.5 business order type
-    options.addOption("ot", "order-type", true, "EBICS business order type like(XE2, XE3, CCT, CDD,..)")
+    //EBICS 3.0 parameters
+    options.addOption("btf", "business-transaction-format", true, "EBICS 3.0 BTF service given by following pattern:\nSERVICE NAME:[OPTION]:[SCOPE]:[container]:message name:[variant]:[version]:[FORMAT]\nfor example: GLB::CH:zip:camt.054:001:03:XML")
+    options.addOption("sn", "service-name", true, "EBICS 3.0 Name of service, example 'SCT' (SEPA credit transfer)")
+    options.addOption("so", "service-option", true, "EBICS 3.0 Optional characteristic(s) of a service Example: “URG” = urgent")
+    options.addOption("ss", "service-scope", true, "EBICS 3.0 Specifies whose rules have to be taken into account for the service. 2-char country codes, 3-char codes for other scopes “BIL” means bilaterally agreed")
+    options.addOption("ct", "service-container", true, "EBICS 3.0 The container type if required (SVC, XML, ZIP)")
+    options.addOption("mn", "service-message-name", true, "EBICS 3.0 Service message name, for example pain.001 or mt103")
+    options.addOption("mve", "service-message-version", true, "EBICS 3.0 Service message version for ISO formats, for example 03")
+    options.addOption("mva", "service-message-variant", true, "EBICS 3.0 Service message variant for ISO formats, for example 001")
+    options.addOption("mf", "service-message-format", true, "EBICS 3.0 Service message format, for example XML, JSON, PFD, ASN1")
     return options
 }

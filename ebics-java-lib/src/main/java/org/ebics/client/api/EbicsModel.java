@@ -226,7 +226,10 @@ public class EbicsModel {
 
     private List<String> listPersistentObjectId(final String prefix, final String extension) {
         String [] userFiles = new File(configuration.getSerializationDirectory()).list((dir, name) -> name.startsWith(prefix) && name.endsWith("." + extension));
-        return Arrays.stream(userFiles).map(name -> name.replaceFirst(prefix, "").replaceFirst("\\." + extension, "")).collect(Collectors.toList());
+        if (userFiles != null)
+            return Arrays.stream(userFiles).map(name -> name.replaceFirst(prefix, "").replaceFirst("\\." + extension, "")).collect(Collectors.toList());
+        else
+            return Collections.emptyList();
     }
 
     public List<String> listUserId() {

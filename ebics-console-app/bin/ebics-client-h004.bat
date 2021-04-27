@@ -1,1 +1,1 @@
-java -cp target/ebics-console-app-1.2-SNAPSHOT.jar:target/lib/* org.ebics.client.console.h004.ConsoleAppKt %*
+java -cp target/ebics-console-app-1.2-SNAPSHOT.jar:target/lib/* org.ebics.client.console.h004.AppKt %*

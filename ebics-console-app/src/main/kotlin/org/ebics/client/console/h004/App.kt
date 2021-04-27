@@ -23,8 +23,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.system.exitProcess
 
-class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: CommandLine) {
-    private val app: ConsoleAppBase = createConsoleApp(rootDir, defaultEbicsConfigFile)
+class ConsoleApp(private val cmd: CommandLine) {
+    private val app: ConsoleAppBase = createConsoleApp()
     private val ebicsModel: EbicsModel
         get() = app.ebicsModel
     private val defaultUser: User?
@@ -78,12 +78,6 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
             val uploadOrder = readUploadOrder(inputFileValue)
             sendFile(File(inputFileValue), session, uploadOrder)
         }
-        if (cmd.hasOption("skip_order")) {
-            var count = cmd.getOptionValue("skip_order").toInt()
-            while (count-- > 0) {
-                defaultUser!!.partner.nextOrderId()
-            }
-        }
         ebicsModel.saveAll()
     }
 
@@ -122,7 +116,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
     private fun readUploadOrder(inputFileValue: String): EbicsUploadOrder {
         val params = readParams(cmd.getOptionValues("p"))
         val orderType = readOrderType()
-        return if (orderType == "FUL") EbicsUploadOrder(!cmd.hasOption("ns"), params) else EbicsUploadOrder(readOrderType(), !cmd.hasOption("ns"), params)
+        return if (orderType == "FUL") EbicsUploadOrder(!cmd.hasOption("dz"), params) else EbicsUploadOrder(readOrderType(), !cmd.hasOption("dz"), params)
     }
 
     private fun readParams(paramPairs: Array<String>?): Map<String, String> {
@@ -301,10 +295,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
 fun main(args: Array<String>) {
     val options = createCmdOptions()
     val cmd = parseArguments(options, args)
-    val defaultRootDir = File(System.getProperty("user.home") + File.separator + "ebics"
-            + File.separator + "client")
-    val defaultEbicsConfigFile = File(defaultRootDir, "ebics.txt")
-    ConsoleApp(defaultRootDir, defaultEbicsConfigFile, cmd).runMain()
+    ConsoleApp(cmd).runMain()
 }
 
 private fun parseArguments(options: Options, args: Array<String>): CommandLine {
@@ -328,13 +319,12 @@ private fun createCmdOptions(): Options {
     options.addOption(null, "listUsers", false, "List stored user ids")
     options.addOption(null, "listPartners", false, "List stored partner ids")
     options.addOption(null, "listBank", false, "List stored bank ids")
-    options.addOption(null, "skip_order", true, "Skip a number of order ids")
     options.addOption("o", "output", true, "Output file for EBICS download")
     options.addOption("i", "input", true, "Input file for EBICS upload")
     options.addOption("p", "params", true, "key:value array of string parameters for upload or download request, example FORMAT:pain.001 TEST:TRUE EBCDIC:TRUE")
     options.addOption("s", "start", true, "Download request starting with date")
     options.addOption("e", "end", true, "Download request ending with date")
-    options.addOption("ns", "no-signature", false, "Don't provide electronic signature for EBICS upload (ES flag=false, OrderAttribute=DZHNN)")
+    options.addOption("dz", "dzhnn", false, "Set OrderAttribute to DZHNN, for upload only (by default OZHNN - signed order)")
 
     //EBICS 2.4/2.5/3.0 admin order type
     options.addOption("at", "admin-type", true, "EBICS admin order type (INI, HIA, HPB, SPR)")
