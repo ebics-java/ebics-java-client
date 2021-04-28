@@ -4,19 +4,19 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class UsersResource (private val ebicsFileModel: EbicsFileModel) {
+class EbicsFileModelResource (private val ebicsFileModel: EbicsFileModel) {
     @GetMapping
     fun index(): List<Pair<String, String>> = listOf(
             Pair("1", "Hello!"),
             Pair("2", "Bonjour!"),
     )
 
-    @GetMapping("listUserId")
+    @GetMapping("users")
     fun listUserId(): List<String> = ebicsFileModel.listUserId()
 
-    @GetMapping("listPartnerId")
+    @GetMapping("partners")
     fun listPartnerId(): List<String> = ebicsFileModel.listPartnerId()
 
-    @GetMapping("listBankId")
+    @GetMapping("banks")
     fun listBankIds(): List<String> = ebicsFileModel.listBankId()
 }
