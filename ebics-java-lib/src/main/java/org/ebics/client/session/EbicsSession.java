@@ -26,7 +26,8 @@ import java.util.Map;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.Configuration;
-import org.ebics.client.interfaces.EbicsUser;
+import org.ebics.client.user.base.EbicsUser;
+import org.ebics.client.user.base.EbicsUserInfoInt;
 
 
 /**

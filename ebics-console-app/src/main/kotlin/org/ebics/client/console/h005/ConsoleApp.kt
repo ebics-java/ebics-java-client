@@ -2,12 +2,14 @@ package org.ebics.client.console.h005
 
 import org.apache.commons.cli.*
 import org.ebics.client.api.EbicsModel
-import org.ebics.client.api.User
+import org.ebics.client.api.EbicsVersion
+import org.ebics.client.user.SerializableEbicsUser
 import org.ebics.client.console.ConsoleAppBase
 import org.ebics.client.console.ConsoleAppBase.Companion.createConsoleApp
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.exception.NoDownloadDataAvailableException
 import org.ebics.client.filetransfer.h005.FileTransfer
+import org.ebics.client.interfaces.PasswordCallback
 import org.ebics.client.io.IOUtils
 import org.ebics.client.keymgmt.h005.KeyManagementImpl
 import org.ebics.client.messages.Messages
@@ -16,6 +18,7 @@ import org.ebics.client.order.h005.EbicsDownloadOrder
 import org.ebics.client.order.h005.EbicsUploadOrder
 import org.ebics.client.session.EbicsSession
 import org.ebics.client.session.Product
+import org.ebics.client.user.EbicsUserAction
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
@@ -29,8 +32,6 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
     private val app: ConsoleAppBase = createConsoleApp(rootDir, defaultEbicsConfigFile)
     private val ebicsModel: EbicsModel
         get() = app.ebicsModel
-    private val defaultUser: User?
-        get() = app.defaultUser
     private val defaultProduct: Product
         get() = app.defaultProduct
 
@@ -45,11 +46,14 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
         if (cmd.hasOption("listPartners")) {
             logger.info(Messages.getString("list.partner.ids", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, ebicsModel.listPartnerId().toString()))
         }
-        if (cmd.hasOption("create")) {
-            app.createDefaultUser()
+        val defaultUser = if (cmd.hasOption("create")) {
+            app.createDefaultUser(EbicsVersion.H005)
         } else {
-            app.loadDefaultUser()
+            app.loadDefaultUser().apply { require(userInfo.ebicsVersion == EbicsVersion.H005)
+                {"User was initialized with ${userInfo.ebicsVersion} version, but you are running H005 client"}
+            }
         }
+
         if (cmd.hasOption("letters")) {
             ebicsModel.createLetters(defaultUser, false)
         }
@@ -61,7 +65,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
                 when (val adminOrderType = cmd.getOptionValue("at")) {
                     "INI" -> sendINIRequest(defaultUser, session)
                     "HIA" -> sendHIARequest(defaultUser, session)
-                    "HPB" -> sendHPBRequest(defaultUser, session)
+                    "HPB" -> sendHPBRequest(defaultUser, session, app.createPasswordCallback())
                     "SPR" -> revokeSubscriber(defaultUser, session)
                     else -> logger.error(Messages.getString("unknown.admin.ordertype", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, adminOrderType))
                 }
@@ -79,12 +83,6 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
             val inputFileValue = cmd.getOptionValue("i")
             val uploadOrder = readUploadOrder(inputFileValue)
             sendFile(File(inputFileValue), session, uploadOrder)
-        }
-        if (cmd.hasOption("skip_order")) {
-            var count = cmd.getOptionValue("skip_order").toInt()
-            while (count-- > 0) {
-                defaultUser!!.partner.nextOrderId()
-            }
         }
         ebicsModel.saveAll()
     }
@@ -227,19 +225,14 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
      * @throws Exception
      */
     @Throws(Exception::class)
-    fun sendINIRequest(user: User?, session: EbicsSession?) {
-        val userId = user!!.userId
+    fun sendINIRequest(user: SerializableEbicsUser, session: EbicsSession) {
+        val userId = user.userInfo.userId
         logger.info(
                 Messages.getString("ini.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
-        if (user.isInitialized) {
-            logger.info(
-                    Messages.getString("user.already.initialized", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME,
-                            userId))
-            return
-        }
         try {
+            user.userInfo.userStatus.check(EbicsUserAction.INI)
             KeyManagementImpl(session).sendINI(null)
-            user.isInitialized = true
+            user.userInfo.userStatus.update(EbicsUserAction.INI)
             logger.info(
                     Messages.getString("ini.send.success", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
         } catch (e: Exception) {
@@ -257,19 +250,14 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
      * @throws Exception
      */
     @Throws(Exception::class)
-    fun sendHIARequest(user: User?, session: EbicsSession?) {
-        val userId = user!!.userId
+    fun sendHIARequest(user: SerializableEbicsUser, session: EbicsSession) {
+        val userId = user.userInfo.userId
         logger.info(
                 Messages.getString("hia.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
-        if (user.isInitializedHIA) {
-            logger.info(
-                    Messages.getString("user.already.hia.initialized",
-                            ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
-            return
-        }
         try {
+            user.userInfo.userStatus.check(EbicsUserAction.HIA)
             KeyManagementImpl(session).sendHIA(null)
-            user.isInitializedHIA = true
+            user.userInfo.userStatus.update(EbicsUserAction.HIA)
         } catch (e: Exception) {
             logger.error(
                     Messages.getString("hia.send.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId), e)
@@ -285,12 +273,14 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
      * @param session the EBICS session
      */
     @Throws(Exception::class)
-    fun sendHPBRequest(user: User?, session: EbicsSession?) {
-        val userId = user!!.userId
+    fun sendHPBRequest(user: SerializableEbicsUser, session: EbicsSession, passwordCallback: PasswordCallback) {
+        val userId = user.userInfo.userId
         logger.info(
                 Messages.getString("hpb.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
         try {
-            KeyManagementImpl(session).sendHPB()
+            user.userInfo.userStatus.check(EbicsUserAction.HPB)
+            KeyManagementImpl(session).sendHPB(passwordCallback)
+            user.userInfo.userStatus.update(EbicsUserAction.HPB)
             logger.info(
                     Messages.getString("hpb.send.success", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
         } catch (e: Exception) {
@@ -308,12 +298,14 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
      * @throws Exception
      */
     @Throws(Exception::class)
-    fun revokeSubscriber(user: User?, session: EbicsSession?) {
-        val userId = user!!.userId
+    fun revokeSubscriber(user: SerializableEbicsUser, session: EbicsSession) {
+        val userId = user.userInfo.userId
         logger.info(
                 Messages.getString("spr.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
         try {
+            user.userInfo.userStatus.check(EbicsUserAction.SPR)
             KeyManagementImpl(session).lockAccess()
+            user.userInfo.userStatus.update(EbicsUserAction.SPR)
         } catch (e: Exception) {
             logger.error(
                     Messages.getString("spr.send.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId), e)
@@ -359,7 +351,6 @@ private fun createCmdOptions(): Options {
     options.addOption(null, "listUsers", false, "List stored user ids")
     options.addOption(null, "listPartners", false, "List stored partner ids")
     options.addOption(null, "listBank", false, "List stored bank ids")
-    options.addOption(null, "skip_order", true, "Skip a number of order ids")
     options.addOption("o", "output", true, "Output file for EBICS download")
     options.addOption("i", "input", true, "Input file for EBICS upload")
     options.addOption("p", "params", true, "key:value array of string parameters for upload or download request, example FORMAT:pain.001 TEST:TRUE EBCDIC:TRUE")

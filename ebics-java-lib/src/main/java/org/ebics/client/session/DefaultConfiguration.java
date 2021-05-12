@@ -29,7 +29,8 @@ import java.util.ResourceBundle;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.Configuration;
-import org.ebics.client.interfaces.EbicsUser;
+import org.ebics.client.user.base.EbicsUser;
+import org.ebics.client.user.base.EbicsUserInfoInt;
 import org.ebics.client.interfaces.LetterManager;
 import org.ebics.client.interfaces.SerializationManager;
 import org.ebics.client.interfaces.TraceManager;
@@ -123,7 +124,7 @@ public class DefaultConfiguration implements Configuration {
 
   @Override
   public Locale getLocale() {
-    return Locale.FRANCE;
+    return Locale.ENGLISH;
   }
 
   @Override
@@ -201,7 +202,7 @@ public class DefaultConfiguration implements Configuration {
 
   @Override
   public String getUserDirectory(EbicsUser user) {
-    return getUsersDirectory() + File.separator + user.getUserId();
+    return getUsersDirectory() + File.separator + user.getUserInfo().getUserId();
   }
 
   @Override

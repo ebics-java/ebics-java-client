@@ -1,6 +1,7 @@
 package org.ebics.client.keymgmt;
 
 import org.ebics.client.exception.EbicsException;
+import org.ebics.client.interfaces.PasswordCallback;
 import org.ebics.client.session.EbicsSession;
 
 import java.io.IOException;
@@ -41,7 +42,7 @@ public abstract class KeyManagement {
      * @throws GeneralSecurityException data decryption error
      * @throws EbicsException server generated error message
      */
-    public abstract void sendHPB() throws IOException, GeneralSecurityException, EbicsException;
+    public abstract void sendHPB(PasswordCallback passwordCallback) throws IOException, GeneralSecurityException, EbicsException;
 
     /**
      * Sends the SPR order to the bank.

@@ -24,7 +24,8 @@ import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.utils.IgnoreAllErrorHandler;
 import org.apache.xpath.XPathAPI;
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.interfaces.EbicsUser;
+import org.ebics.client.user.base.EbicsUser;
+import org.ebics.client.user.base.EbicsUserInfoInt;
 import org.ebics.schema.xmldsig.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -114,7 +115,7 @@ public class SignedInfo extends DefaultEbicsRootElement {
    * the EBICS specification for common namespaces nomination.
    * 
    * <p> The signature is ensured using the user X002 private key. This step is done in
-   * {@link EbicsUser#authenticate(byte[]) authenticate}.
+   * {@link EbicsUserInfoInt#authenticate(byte[]) authenticate}.
    * 
    * @param toSign the input to sign
    * @return the signed input
@@ -160,6 +161,6 @@ public class SignedInfo extends DefaultEbicsRootElement {
   // --------------------------------------------------------------------
 
   private byte[]			digest;
-  private EbicsUser 			user;
+  private EbicsUser user;
   private static final long 		serialVersionUID = 4194924578678778580L;
 }

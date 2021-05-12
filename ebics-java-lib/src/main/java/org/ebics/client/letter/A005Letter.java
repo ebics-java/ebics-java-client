@@ -25,7 +25,7 @@ import java.util.Locale;
 
 import org.apache.commons.codec.binary.Base64;
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.interfaces.EbicsUser;
+import org.ebics.client.user.base.EbicsUser;
 
 
 /**
@@ -50,19 +50,19 @@ public class A005Letter extends AbstractInitLetter {
         if (user.getPartner().getBank().useCertificate()) {
             build(user.getPartner().getBank().getHostId(),
                     user.getPartner().getBank().getName(),
-                    user.getUserId(),
-                    user.getName(),
+                    user.getUserInfo().getUserId(),
+                    user.getUserInfo().getName(),
                     user.getPartner().getPartnerId(),
                     getString("INILetter.version", BUNDLE_NAME, locale),
                     getString("INILetter.certificate", BUNDLE_NAME, locale),
-                    Base64.encodeBase64(user.getA005Certificate(), true),
+                    Base64.encodeBase64(user.getA005CertificateBytes(), true),
                     getString("INILetter.digest", BUNDLE_NAME, locale),
-                    getHash(user.getA005Certificate()));
+                    getHash(user.getA005CertificateBytes()));
         } else {
             build(user.getPartner().getBank().getHostId(),
                     user.getPartner().getBank().getName(),
-                    user.getUserId(),
-                    user.getName(),
+                    user.getUserInfo().getUserId(),
+                    user.getUserInfo().getName(),
                     user.getPartner().getPartnerId(),
                     getString("INILetter.version", BUNDLE_NAME, locale),
                     getString("INILetter.certificate", BUNDLE_NAME, locale),

@@ -1,7 +1,7 @@
 package org.ebics.client.ebicsrestapi
 
 import org.ebics.client.api.EbicsModel
-import org.ebics.client.api.User
+import org.ebics.client.user.SerializableEbicsUser
 import org.ebics.client.session.DefaultConfiguration
 import org.ebics.client.session.EbicsSession
 import org.ebics.client.session.Product
@@ -16,9 +16,9 @@ class EbicsFileModel {
     fun listBankId(): List<String> = ebicsModel.listBankId()
     fun listPartnerId(): List<String> = ebicsModel.listPartnerId()
 
-    fun loadUser(hostId: String, partnerId: String, userId: String, password: String):User =
-        ebicsModel.loadUser(hostId, partnerId, userId) { password.toCharArray() }
+    fun loadUser(hostId: String, partnerId: String, userId: String, password: String): SerializableEbicsUser =
+        ebicsModel.loadUser(hostId, partnerId, userId)
 
-    fun createSession(user: User, defaultProduct: Product): EbicsSession =
+    fun createSession(user: SerializableEbicsUser, defaultProduct: Product): EbicsSession =
         ebicsModel.createSession(user, defaultProduct)
 }

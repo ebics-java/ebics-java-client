@@ -20,7 +20,8 @@
 package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.interfaces.EbicsUser;
+import org.ebics.client.user.base.EbicsUser;
+import org.ebics.client.user.base.EbicsUserInfoInt;
 import org.ebics.schema.s002.OrderSignatureDataType;
 import org.ebics.schema.s002.UserSignatureDataSigBookType;
 
@@ -72,7 +73,7 @@ public class UserSignature extends DefaultEbicsRootElement {
 
     orderSignatureData = EbicsXmlFactory.createOrderSignatureDataType(signatureVersion,
                                                                       user.getPartner().getPartnerId(),
-                                                                      user.getUserId(),
+                                                                      user.getUserInfo().getUserId(),
                                                                       signature);
     userSignatureData = EbicsXmlFactory.createUserSignatureDataSigBookType(new OrderSignatureDataType[] {orderSignatureData});
     document = EbicsXmlFactory.createUserSignatureDataDocument(userSignatureData);
@@ -94,7 +95,7 @@ public class UserSignature extends DefaultEbicsRootElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private EbicsUser 			user;
+  private EbicsUser user;
   private String 			signatureVersion;
   private byte[]			toSign;
   private String			name;

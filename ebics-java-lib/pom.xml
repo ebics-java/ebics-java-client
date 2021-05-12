@@ -11,11 +11,25 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ebics-java-lib</artifactId>
     <name>EBICS client library</name>
-    <packaging>jar</packaging>
+    <modules>
+        <module>ebics-dbmodel</module>
+    </modules>
+    <packaging>pom</packaging>
     <version>${revision}</version>
 
     <url>http://maven.apache.org</url>
     <dependencies>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.xmlbeans</groupId>
             <artifactId>xmlbeans</artifactId>
@@ -78,29 +92,86 @@
     <build>
         <plugins>
             <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>xmlbeans-maven-plugin</artifactId>
-              <version>2.3.3</version>
-              <executions>
-                <execution>
-                  <goals>
-                    <goal>xmlbeans</goal>
-                  </goals>
-                </execution>
-              </executions>
-              <inherited>true</inherited>
-              <configuration>
-                <schemaDirectory>src/main/xsd</schemaDirectory>
-                <defaultXmlConfigDir>src/main/xsd/config</defaultXmlConfigDir>
-              </configuration>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xmlbeans-maven-plugin</artifactId>
+                <version>2.3.3</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>xmlbeans</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <inherited>true</inherited>
+                <configuration>
+                    <schemaDirectory>src/main/xsd</schemaDirectory>
+                    <defaultXmlConfigDir>src/main/xsd/config</defaultXmlConfigDir>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
+                                <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
+                                <sourceDir>${project.basedir}/src/test/java</sourceDir>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.5.1</version>
+                <executions>
+                    <!-- Replacing default-compile as it is treated specially by maven -->
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <!-- Replacing default-testCompile as it is treated specially by maven -->
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>java-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>java-test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
             <plugin>

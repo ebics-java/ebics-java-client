@@ -54,20 +54,20 @@ public class HIARequestOrderDataElement extends DefaultEbicsRootElement {
 
     encryptionX509Data = null;
     if (session.getUser().getPartner().getBank().useCertificate())
-        encryptionX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
-	                                                    session.getUser().getE002Certificate());
+        encryptionX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getUserInfo().getDn(),
+	                                                    session.getUser().getE002CertificateBytes());
     encryptionPubKeyInfo = EbicsXmlFactory.createEncryptionPubKeyInfoType(session.getConfiguration().getEncryptionVersion(),
 	                                                                  encryptionX509Data);
     authX509Data = null;
     if (session.getUser().getPartner().getBank().useCertificate())
-        authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
-	                                              session.getUser().getX002Certificate());
+        authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getUserInfo().getDn(),
+	                                              session.getUser().getX002CertificateBytes());
     authenticationPubKeyInfo = EbicsXmlFactory.createAuthenticationPubKeyInfoType(session.getConfiguration().getAuthenticationVersion(),
 	                                                                          authX509Data);
     request = EbicsXmlFactory.createHIARequestOrderDataType(authenticationPubKeyInfo,
 	                                                    encryptionPubKeyInfo,
 	                                                    session.getUser().getPartner().getPartnerId(),
-	                                                    session.getUser().getUserId());
+	                                                    session.getUser().getUserInfo().getUserId());
     document = EbicsXmlFactory.createHIARequestOrderDataDocument(request);
   }
 

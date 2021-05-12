@@ -25,8 +25,6 @@ import org.ebics.schema.s002.SignaturePubKeyInfoType;
 import org.ebics.schema.s002.SignaturePubKeyOrderDataType;
 import org.ebics.schema.xmldsig.X509DataType;
 
-import java.util.Calendar;
-
 
 /**
  * The <code>SignaturePubKeyOrderDataElement</code> is the order data
@@ -51,13 +49,13 @@ public class SignaturePubKeyOrderDataElement extends DefaultEbicsRootElement {
     final X509DataType 			x509Data;
     SignaturePubKeyOrderDataType	signaturePubKeyOrderData;
 
-    x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
-	                                          session.getUser().getA005Certificate());
+    x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getUserInfo().getDn(),
+	                                          session.getUser().getA005CertificateBytes());
     signaturePubKeyInfo = EbicsXmlFactory.createSignaturePubKeyInfoType(x509Data,
 	                                                                session.getConfiguration().getSignatureVersion());
     signaturePubKeyOrderData = EbicsXmlFactory.createSignaturePubKeyOrderData(signaturePubKeyInfo,
 									      session.getUser().getPartner().getPartnerId(),
-									      session.getUser().getUserId());
+									      session.getUser().getUserInfo().getUserId());
     document = EbicsXmlFactory.createSignaturePubKeyOrderDataDocument(signaturePubKeyOrderData);
   }
 

@@ -163,7 +163,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
 	                                             session.getUser().getPartner().getPartnerId(),
 	                                             product,
 	                                             session.getUser().getSecurityMedium(),
-	                                             session.getUser().getUserId(),
+	                                             session.getUser().getUserInfo().getUserId(),
 	                                             Calendar.getInstance(),
 	                                             orderDetails,
 	                                             bankPubKeyDigests);

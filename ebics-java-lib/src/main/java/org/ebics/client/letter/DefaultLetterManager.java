@@ -24,7 +24,8 @@ import java.security.GeneralSecurityException;
 import java.util.Locale;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.interfaces.EbicsUser;
+import org.ebics.client.user.base.EbicsUser;
+import org.ebics.client.user.base.EbicsUserInfoInt;
 import org.ebics.client.interfaces.InitLetter;
 import org.ebics.client.interfaces.LetterManager;
 

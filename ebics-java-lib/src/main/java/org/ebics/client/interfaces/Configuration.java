@@ -19,6 +19,9 @@
 
 package org.ebics.client.interfaces;
 
+import org.ebics.client.user.base.EbicsUser;
+import org.ebics.client.user.base.EbicsUserInfoInt;
+
 import java.util.Locale;
 
 

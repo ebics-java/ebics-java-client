@@ -33,21 +33,24 @@ import org.ebics.client.messages.Messages;
 import org.ebics.client.session.Product;
 import org.ebics.client.io.IOUtils;
 import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsUserInfo;
+import org.ebics.client.user.EbicsUserStatus;
+import org.ebics.client.user.base.EbicsUser;
+import org.ebics.client.user.SerializableEbicsUser;
 import org.ebics.client.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The ebics client application. Performs necessary tasks to contact the ebics
- * bank server like sending the INI, HIA and HPB requests for keys retrieval and
- * also performs the files transfer including uploads and downloads.
+ * The EBICS Model is used to load/store information
+ * about EBICS users/partners/banks from/to filesystem
  */
 public class EbicsModel {
 
     private static Logger logger = LoggerFactory.getLogger(EbicsModel.class);
 
     protected final Configuration configuration;
-    private final Map<String, User> users = new HashMap<>();
+    private final Map<String, SerializableEbicsUser> users = new HashMap<>();
     private final Map<String, Partner> partners = new HashMap<>();
     private final Map<String, Bank> banks = new HashMap<>();
 
@@ -69,7 +72,7 @@ public class EbicsModel {
         configuration.init();
     }
 
-    public EbicsSession createSession(User user, Product product) {
+    public EbicsSession createSession(SerializableEbicsUser user, Product product) {
         EbicsSession session = new EbicsSession(user, configuration);
         session.setProduct(product);
         return session;
@@ -83,7 +86,7 @@ public class EbicsModel {
     public void createUserDirectories(EbicsUser user) {
         logger.info(
                 Messages.getString("user.create.directories", Constants.APPLICATION_BUNDLE_NAME,
-                        user.getUserId()));
+                        user.getUserInfo().getUserId()));
         IOUtils.createDirectories(configuration.getUserDirectory(user));
         IOUtils.createDirectories(configuration.getTransferTraceDirectory(user));
         IOUtils.createDirectories(configuration.getKeystoreDirectory(user));
@@ -137,20 +140,21 @@ public class EbicsModel {
      * @return
      * @throws Exception
      */
-    public User createUser(URL url, EbicsVersion ebicsVersion, String bankName, String hostId, String partnerId,
-                           String userId, String name, String email, String country, String organization,
-                           boolean useCertificates, boolean saveCertificates, PasswordCallback passwordCallback)
+    public SerializableEbicsUser createUser(URL url, EbicsVersion ebicsVersion, String bankName, String hostId, String partnerId,
+                                            String userId, String name, String email, String country, String organization,
+                                            boolean useCertificates, boolean saveCertificates, PasswordCallback passwordCallback)
             throws Exception {
         logger.info(Messages.getString("user.create.info", Constants.APPLICATION_BUNDLE_NAME, userId));
 
         Bank bank = createBank(url, bankName, hostId, useCertificates);
         Partner partner = createPartner(bank, partnerId);
         try {
-            User user = new User(ebicsVersion, partner, userId, name, email, country, organization,
-                    passwordCallback);
+            SerializableEbicsUser user = SerializableEbicsUser.create(
+                    new EbicsUserInfo(ebicsVersion, userId, name, email, country, organization, new EbicsUserStatus()),
+                    partner);
             createUserDirectories(user);
             if (saveCertificates) {
-                user.saveUserCertificates(configuration.getKeystoreDirectory(user));
+                SerializableEbicsUser.saveCertificates(user.getUserInfo(), configuration.getKeystoreDirectory(user), passwordCallback);
             }
             configuration.getSerializationManager().serialize(bank);
             configuration.getSerializationManager().serialize(partner);
@@ -190,15 +194,14 @@ public class EbicsModel {
      *
      * @throws Exception
      */
-    public User loadUser(String hostId, String partnerId, String userId,
-                         PasswordCallback passwordCallback) throws Exception {
+    public SerializableEbicsUser loadUser(String hostId, String partnerId, String userId) throws Exception {
         logger.info(
                 Messages.getString("user.load.info", Constants.APPLICATION_BUNDLE_NAME, userId));
 
         try {
             Bank bank;
             Partner partner;
-            User user;
+            SerializableEbicsUser user;
             try (ObjectInputStream input = configuration.getSerializationManager().deserialize(
                     "bank-" + hostId)) {
                 bank = (Bank) input.readObject();
@@ -209,7 +212,7 @@ public class EbicsModel {
             }
             try (ObjectInputStream input = configuration.getSerializationManager().deserialize(
                     "user-" + userId)) {
-                user = new User(partner, input, passwordCallback);
+                user = SerializableEbicsUser.deserialize (input, partner);
             }
             users.put(userId, user);
             partners.put(partner.getPartnerId(), partner);
@@ -225,7 +228,7 @@ public class EbicsModel {
     }
 
     private List<String> listPersistentObjectId(final String prefix, final String extension) {
-        String [] userFiles = new File(configuration.getSerializationDirectory()).list((dir, name) -> name.startsWith(prefix) && name.endsWith("." + extension));
+        String[] userFiles = new File(configuration.getSerializationDirectory()).list((dir, name) -> name.startsWith(prefix) && name.endsWith("." + extension));
         return Arrays.stream(userFiles).map(name -> name.replaceFirst(prefix, "").replaceFirst("\\." + extension, "")).collect(Collectors.toList());
     }
 
@@ -246,13 +249,11 @@ public class EbicsModel {
      */
     public void saveAll() {
         try {
-            for (User user : users.values()) {
-                if (user.needsSave()) {
-                    logger.info(
-                            Messages.getString("user.save.info", Constants.APPLICATION_BUNDLE_NAME,
-                                    user.getUserId()));
-                    configuration.getSerializationManager().serialize(user);
-                }
+            for (SerializableEbicsUser user : users.values()) {
+                logger.info(
+                        Messages.getString("user.save.info", Constants.APPLICATION_BUNDLE_NAME,
+                                user.getUserInfo().getUserId()));
+                configuration.getSerializationManager().serialize(user);
             }
 
             for (Partner partner : partners.values()) {

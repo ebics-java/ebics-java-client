@@ -32,7 +32,8 @@ import java.util.Date;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import org.ebics.client.interfaces.EbicsUser;
+import org.ebics.client.user.base.EbicsUser;
+import org.ebics.client.user.base.EbicsUserInfoInt;
 import org.ebics.client.interfaces.PasswordCallback;
 
 /**
@@ -43,7 +44,7 @@ import org.ebics.client.interfaces.PasswordCallback;
  */
 public class CertificateManager {
 
-  public CertificateManager(EbicsUser user) {
+  public CertificateManager(EbicsUserInfoInt user) {
     this.user = user;
     generator = new X509Generator();
   }
@@ -62,20 +63,6 @@ public class CertificateManager {
     createA005Certificate(new Date(calendar.getTimeInMillis()));
     createX002Certificate(new Date(calendar.getTimeInMillis()));
     createE002Certificate(new Date(calendar.getTimeInMillis()));
-    setUserCertificates();
-  }
-
-  /**
-   * Sets the user certificates
-   */
-  private void setUserCertificates() {
-    user.setA005Certificate(a005Certificate);
-    user.setX002Certificate(x002Certificate);
-    user.setE002Certificate(e002Certificate);
-
-    user.setA005PrivateKey(a005PrivateKey);
-    user.setX002PrivateKey(x002PrivateKey);
-    user.setE002PrivateKey(e002PrivateKey);
   }
 
   /**
@@ -89,7 +76,7 @@ public class CertificateManager {
 
     keypair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE);
     a005Certificate = generator.generateA005Certificate(keypair,
-	                                                user.getDN(),
+	                                                user.getDn(),
 	                                                new Date(),
 	                                                end);
     a005PrivateKey = keypair.getPrivate();
@@ -106,7 +93,7 @@ public class CertificateManager {
 
     keypair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE);
     x002Certificate = generator.generateX002Certificate(keypair,
-	                                                user.getDN(),
+	                                                user.getDn(),
 	                                                new Date(),
 	                                                end);
     x002PrivateKey = keypair.getPrivate();
@@ -123,7 +110,7 @@ public class CertificateManager {
 
     keypair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE);
     e002Certificate = generator.generateE002Certificate(keypair,
-	                                                user.getDN(),
+	                                                user.getDn(),
 	                                                new Date(),
 	                                                end);
     e002PrivateKey = keypair.getPrivate();
@@ -164,7 +151,6 @@ public class CertificateManager {
     a005PrivateKey = loader.getPrivateKey(user.getUserId() + "-A005");
     x002PrivateKey = loader.getPrivateKey(user.getUserId() + "-X002");
     e002PrivateKey = loader.getPrivateKey(user.getUserId() + "-E002");
-    setUserCertificates();
   }
 
   /**
@@ -218,12 +204,36 @@ public class CertificateManager {
     keystore.store(fos, password);
   }
 
+  public X509Certificate getA005Certificate() {
+    return a005Certificate;
+  }
+
+  public X509Certificate getE002Certificate() {
+    return e002Certificate;
+  }
+
+  public X509Certificate getX002Certificate() {
+    return x002Certificate;
+  }
+
+  public PrivateKey getA005PrivateKey() {
+    return a005PrivateKey;
+  }
+
+  public PrivateKey getX002PrivateKey() {
+    return x002PrivateKey;
+  }
+
+  public PrivateKey getE002PrivateKey() {
+    return e002PrivateKey;
+  }
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
   private X509Generator					generator;
-  private EbicsUser					user;
+  private EbicsUserInfoInt					user;
 
   private X509Certificate				a005Certificate;
   private X509Certificate				e002Certificate;

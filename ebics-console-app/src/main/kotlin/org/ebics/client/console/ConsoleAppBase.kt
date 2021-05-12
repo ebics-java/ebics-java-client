@@ -2,7 +2,7 @@ package org.ebics.client.console
 
 import org.ebics.client.api.EbicsModel
 import org.ebics.client.api.EbicsVersion
-import org.ebics.client.api.User
+import org.ebics.client.user.SerializableEbicsUser
 import org.ebics.client.interfaces.Configuration
 import org.ebics.client.interfaces.PasswordCallback
 import org.ebics.client.session.DefaultConfiguration
@@ -20,13 +20,10 @@ import java.util.*
 class ConsoleAppBase constructor(configuration: Configuration,
                                  private val properties: ConfigProperties,
                                  val defaultProduct: Product) {
-    var defaultUser: User? = null
-        private set
     val ebicsModel: EbicsModel = EbicsModel(configuration)
 
     @Throws(Exception::class)
-    private fun createUser(properties: ConfigProperties, pwdHandler: PasswordCallback): User {
-        val ebicsVersion = EbicsVersion.valueOf(properties["ebicsVersion"])
+    private fun createUser(properties: ConfigProperties, pwdHandler: PasswordCallback, ebicsVersion: EbicsVersion): SerializableEbicsUser {
         val userId = properties["userId"]
         val partnerId = properties["partnerId"]
         val bankUrl = properties["bank.url"]
@@ -36,27 +33,24 @@ class ConsoleAppBase constructor(configuration: Configuration,
         val userEmail = properties["user.email"]
         val userCountry = properties["user.country"]
         val userOrg = properties["user.org"]
-        val useCertificates: Boolean
         //Due to missing h005.PubKeyInfoType.getPubKeyValue must be certificates used in EBICS 3.0
-        useCertificates = ebicsVersion == EbicsVersion.H005
+        val useCertificates: Boolean = ebicsVersion == EbicsVersion.H005
         return ebicsModel.createUser(URL(bankUrl), ebicsVersion, bankName, hostId, partnerId, userId, userName, userEmail,
                 userCountry, userOrg, useCertificates, true, pwdHandler)
     }
 
     @Throws(Exception::class)
-    fun createDefaultUser() {
-        defaultUser = createUser(properties, createPasswordCallback())
-    }
+    fun createDefaultUser(ebicsVersion: EbicsVersion): SerializableEbicsUser = createUser(properties, createPasswordCallback(), ebicsVersion)
 
     @Throws(Exception::class)
-    fun loadDefaultUser() {
+    fun loadDefaultUser():SerializableEbicsUser {
         val userId = properties["userId"]
         val hostId = properties["hostId"]
         val partnerId = properties["partnerId"]
-        defaultUser = ebicsModel.loadUser(hostId, partnerId, userId, createPasswordCallback())
+        return ebicsModel.loadUser(hostId, partnerId, userId)
     }
 
-    private fun createPasswordCallback(): PasswordCallback {
+    fun createPasswordCallback(): PasswordCallback {
         val password = properties["password"]
         return PasswordCallback { password.toCharArray() }
     }

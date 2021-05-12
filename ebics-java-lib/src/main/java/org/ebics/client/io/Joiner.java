@@ -24,7 +24,8 @@ import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.interfaces.EbicsUser;
+import org.ebics.client.user.base.EbicsUser;
+import org.ebics.client.user.base.EbicsUserInfoInt;
 import org.ebics.client.utils.Utils;
 
 
@@ -81,6 +82,6 @@ public class Joiner {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private EbicsUser			user;
+  private EbicsUser user;
   private ByteArrayOutputStream		buffer;
 }
