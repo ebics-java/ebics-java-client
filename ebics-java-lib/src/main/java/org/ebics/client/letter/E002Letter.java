@@ -47,7 +47,7 @@ public class E002Letter extends AbstractInitLetter {
 
     @Override
     public void create(EbicsUser user) throws GeneralSecurityException, IOException, EbicsException {
-        if (user.getPartner().getBank().useCertificate()) {
+        if (user.getPartner().getBank().getUseCertificate()) {
             build(user.getPartner().getBank().getHostId(),
                     user.getPartner().getBank().getName(),
                     user.getUserInfo().getUserId(),

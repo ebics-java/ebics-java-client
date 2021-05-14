@@ -1,34 +1,32 @@
-package org.ebics.client.user
+package org.ebics.client.user.serializable
 
-import org.ebics.client.api.EbicsVersion
-import org.ebics.client.api.Partner
 import org.ebics.client.certificate.CertificateManager
-import org.ebics.client.interfaces.EbicsPartner
 import org.ebics.client.interfaces.PasswordCallback
-import org.ebics.client.interfaces.Savable
+import org.ebics.client.user.EbicsUserStatus
+import org.ebics.client.user.EbicsVersion
 import org.ebics.client.user.base.EbicsUser
-import org.ebics.client.user.base.EbicsUserInfoInt
+import org.ebics.client.user.base.EbicsUserInfo
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.security.PrivateKey
 import java.security.cert.X509Certificate
 
-class SerializableEbicsUser(
-    override val userInfo: EbicsUserInfoInt,
+class User(
+    override val userInfo: EbicsUserInfo,
     override val a005Certificate: X509Certificate,
     override val e002Certificate: X509Certificate,
     override val x002Certificate: X509Certificate,
     override val a005PrivateKey: PrivateKey,
     override val e002PrivateKey: PrivateKey,
     override val x002PrivateKey: PrivateKey,
-    override val partner: EbicsPartner
-) : EbicsUser, Savable {
+    override val partner: Partner
+) : EbicsUser, Serializable {
     companion object {
 
         @JvmStatic
-        fun create(userInfo: EbicsUserInfoInt, partner: Partner): SerializableEbicsUser {
+        fun create(userInfo: EbicsUserInfo, partner: Partner): User {
             val manager = CertificateManager(userInfo)
-            return SerializableEbicsUser(
+            return User(
                 userInfo,
                 manager.a005Certificate,
                 manager.e002Certificate,
@@ -41,16 +39,16 @@ class SerializableEbicsUser(
         }
 
         @JvmStatic
-        fun saveCertificates(userInfo: EbicsUserInfoInt, keyStorePath: String, passwordCallback: PasswordCallback) {
+        fun saveCertificates(userInfo: EbicsUserInfo, keyStorePath: String, passwordCallback: PasswordCallback) {
             val manager = CertificateManager(userInfo)
             manager.save(keyStorePath, passwordCallback)
         }
 
         @JvmStatic
-        fun loadCertificates(userInfo: EbicsUserInfoInt, partner: Partner, keyStorePath: String, passwordCallback: PasswordCallback): SerializableEbicsUser {
+        fun loadCertificates(userInfo: EbicsUserInfo, partner: Partner, keyStorePath: String, passwordCallback: PasswordCallback): User {
             val manager = CertificateManager(userInfo)
             manager.load(keyStorePath, passwordCallback)
-            return SerializableEbicsUser(
+            return User(
                 userInfo,
                 manager.a005Certificate,
                 manager.e002Certificate,
@@ -63,8 +61,8 @@ class SerializableEbicsUser(
         }
 
         @JvmStatic
-        fun deserialize(ois: ObjectInputStream, partner: Partner): SerializableEbicsUser = SerializableEbicsUser(
-            EbicsUserInfo(
+        fun deserialize(ois: ObjectInputStream, partner: Partner): User = User(
+            org.ebics.client.user.EbicsUserInfo(
                 ois.readObject() as EbicsVersion,
                 ois.readUTF(),  //UserId
                 ois.readUTF(),  //Name
@@ -80,7 +78,7 @@ class SerializableEbicsUser(
         )
     }
 
-    fun serialize(oos: ObjectOutputStream) {
+    override fun serialize(oos: ObjectOutputStream) {
         with(userInfo) {
             oos.writeObject(ebicsVersion)
             oos.writeUTF(userId)
@@ -98,9 +96,5 @@ class SerializableEbicsUser(
         oos.close()
     }
 
-    override fun save(oos: ObjectOutputStream?) = serialize(oos!!)
-
-    override fun getSaveName(): String {
-        return "user-${userInfo.userId}.cer"
-    }
+    override val saveName: String = "user-${userInfo.userId}.cer"
 }

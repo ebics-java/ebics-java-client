@@ -25,7 +25,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.order.EbicsAdminOrderType;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h003.DataEncryptionInfoType.EncryptionPubKeyDigest;
 import org.ebics.schema.h003.DataTransferRequestType;

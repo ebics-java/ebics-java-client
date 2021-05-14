@@ -1,9 +1,7 @@
 package org.ebics.client.user
 
-import org.ebics.client.api.EbicsVersion
-import org.ebics.client.interfaces.EbicsPartner
-import org.ebics.client.user.base.EbicsUserInfoInt
-import org.ebics.client.user.base.EbicsUserInfoInt.Companion.makeDN
+import org.ebics.client.user.base.EbicsUserInfo
+import org.ebics.client.user.base.EbicsUserInfo.Companion.makeDN
 import java.io.IOException
 import java.security.GeneralSecurityException
 
@@ -13,7 +11,7 @@ class EbicsUserInfo(
     override val name: String,
     override val dn: String,
     override val userStatus: EbicsUserStatus = EbicsUserStatus()
-) : EbicsUserInfoInt {
+) : EbicsUserInfo {
 
     /**
      *

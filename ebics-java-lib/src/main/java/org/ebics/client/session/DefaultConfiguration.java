@@ -30,12 +30,12 @@ import java.util.ResourceBundle;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.Configuration;
 import org.ebics.client.user.base.EbicsUser;
-import org.ebics.client.user.base.EbicsUserInfoInt;
 import org.ebics.client.interfaces.LetterManager;
-import org.ebics.client.interfaces.SerializationManager;
+import org.ebics.client.user.serializable.SerializationManager;
 import org.ebics.client.interfaces.TraceManager;
 import org.ebics.client.io.IOUtils;
 import org.ebics.client.letter.DefaultLetterManager;
+import org.ebics.client.user.serializable.DefaultSerializationManager;
 
 
 /**

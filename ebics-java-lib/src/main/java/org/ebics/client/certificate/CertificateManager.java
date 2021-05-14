@@ -32,8 +32,7 @@ import java.util.Date;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import org.ebics.client.user.base.EbicsUser;
-import org.ebics.client.user.base.EbicsUserInfoInt;
+import org.ebics.client.user.base.EbicsUserInfo;
 import org.ebics.client.interfaces.PasswordCallback;
 
 /**
@@ -44,7 +43,7 @@ import org.ebics.client.interfaces.PasswordCallback;
  */
 public class CertificateManager {
 
-  public CertificateManager(EbicsUserInfoInt user) {
+  public CertificateManager(EbicsUserInfo user) {
     this.user = user;
     generator = new X509Generator();
   }
@@ -233,7 +232,7 @@ public class CertificateManager {
   // --------------------------------------------------------------------
 
   private X509Generator					generator;
-  private EbicsUserInfoInt					user;
+  private EbicsUserInfo user;
 
   private X509Certificate				a005Certificate;
   private X509Certificate				e002Certificate;

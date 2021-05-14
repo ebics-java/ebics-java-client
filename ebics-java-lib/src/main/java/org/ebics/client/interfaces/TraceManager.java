@@ -20,7 +20,7 @@
 package org.ebics.client.interfaces;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 
 /**
  * A mean to make EBICS transfer logged by saving

@@ -29,6 +29,7 @@ import org.ebics.client.interfaces.TraceManager;
 import org.ebics.client.interfaces.Configuration;
 import org.ebics.client.io.FileCache;
 import org.ebics.client.io.IOUtils;
+import org.ebics.client.user.EbicsSession;
 
 
 /**

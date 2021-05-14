@@ -46,7 +46,7 @@ import org.apache.http.util.EntityUtils;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.interfaces.Configuration;
 import org.ebics.client.io.ByteArrayContentFactory;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,7 +124,7 @@ public class HttpRequestSender {
         CloseableHttpClient httpClient = builder.build();
 
         InputStream input = request.getContent();
-        HttpPost method = new HttpPost(session.getUser().getPartner().getBank().getURL().toString());
+        HttpPost method = new HttpPost(session.getUser().getPartner().getBank().getBankURL().toString());
 
         HttpEntity requestEntity = EntityBuilder.create().setStream(input).build();
         method.setEntity(requestEntity);

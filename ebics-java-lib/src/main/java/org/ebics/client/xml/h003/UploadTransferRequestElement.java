@@ -21,7 +21,7 @@ package org.ebics.client.xml.h003;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.io.IOUtils;
 import org.ebics.schema.h003.DataTransferRequestType;

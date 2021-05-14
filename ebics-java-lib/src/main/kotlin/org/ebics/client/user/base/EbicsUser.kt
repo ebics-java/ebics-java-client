@@ -2,7 +2,6 @@ package org.ebics.client.user.base
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.exception.EbicsException
-import org.ebics.client.interfaces.EbicsPartner
 import org.ebics.client.utils.Utils
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -16,8 +15,7 @@ import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
 interface EbicsUser {
-
-    val userInfo: EbicsUserInfoInt
+    val userInfo: EbicsUserInfo
     val a005Certificate: X509Certificate
     val e002Certificate: X509Certificate
     val x002Certificate: X509Certificate
@@ -229,29 +227,30 @@ interface EbicsUser {
     private fun decryptData(input: ByteArray, key: ByteArray): ByteArray {
         return Utils.decrypt(input, SecretKeySpec(key, "EAS"))
     }
+
+    /**
+     * EBICS Specification 2.4.2 - 7.1 Process description:
+     *
+     *
+     * In particular, so-called “white-space characters” such as spaces, tabs, carriage
+     * returns and line feeds (“CR/LF”) are not permitted.
+     *
+     *
+     *  All white-space characters should be removed from entry buffer `buf`.
+     *
+     * @param buf the given byte buffer
+     * @return The byte buffer portion corresponding to the given length and offset
+     */
+    fun removeOSSpecificChars(buf: ByteArray): ByteArray {
+        val output = ByteArrayOutputStream()
+        for (i in buf.indices) {
+            when (buf[i]) {
+                '\r'.toByte(), '\n'.toByte(), 0x1A.toByte() -> {
+                }
+                else -> output.write(buf[i].toInt())
+            }
+        }
+        return output.toByteArray()
+    }
 }
 
-/**
- * EBICS Specification 2.4.2 - 7.1 Process description:
- *
- *
- * In particular, so-called “white-space characters” such as spaces, tabs, carriage
- * returns and line feeds (“CR/LF”) are not permitted.
- *
- *
- *  All white-space characters should be removed from entry buffer `buf`.
- *
- * @param buf the given byte buffer
- * @return The byte buffer portion corresponding to the given length and offset
- */
-fun removeOSSpecificChars(buf: ByteArray): ByteArray {
-    val output = ByteArrayOutputStream()
-    for (i in buf.indices) {
-        when (buf[i]) {
-            '\r'.toByte(), '\n'.toByte(), 0x1A.toByte() -> {
-            }
-            else -> output.write(buf[i].toInt())
-        }
-    }
-    return output.toByteArray()
-}

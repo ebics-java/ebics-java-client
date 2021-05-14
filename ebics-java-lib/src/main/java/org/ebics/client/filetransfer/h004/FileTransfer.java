@@ -30,7 +30,7 @@ import org.ebics.client.messages.Messages;
 import org.ebics.client.order.h004.EbicsDownloadOrder;
 import org.ebics.client.order.h004.EbicsUploadOrder;
 import org.ebics.client.order.EbicsAdminOrderType;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 import org.ebics.client.utils.Constants;
 import org.ebics.client.utils.Utils;
 import org.ebics.client.xml.h004.*;

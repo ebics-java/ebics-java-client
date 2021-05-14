@@ -20,7 +20,7 @@
 package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 import org.ebics.schema.s002.SignaturePubKeyInfoType;
 import org.ebics.schema.s002.SignaturePubKeyOrderDataType;
 import org.ebics.schema.xmldsig.X509DataType;

@@ -1,8 +1,8 @@
 package org.ebics.client.console.h003
 
 import org.apache.commons.cli.*
-import org.ebics.client.api.EbicsModel
-import org.ebics.client.api.EbicsVersion
+import org.ebics.client.user.EbicsModel
+import org.ebics.client.user.EbicsVersion
 import org.ebics.client.console.ConsoleAppBase
 import org.ebics.client.console.ConsoleAppBase.Companion.createConsoleApp
 import org.ebics.client.exception.EbicsException
@@ -14,10 +14,10 @@ import org.ebics.client.keymgmt.h003.KeyManagementImpl
 import org.ebics.client.messages.Messages
 import org.ebics.client.order.h003.EbicsDownloadOrder
 import org.ebics.client.order.h003.EbicsUploadOrder
-import org.ebics.client.session.EbicsSession
-import org.ebics.client.session.Product
+import org.ebics.client.user.EbicsSession
+import org.ebics.client.user.Product
 import org.ebics.client.user.EbicsUserAction
-import org.ebics.client.user.SerializableEbicsUser
+import org.ebics.client.user.serializable.User
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
@@ -44,7 +44,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
         if (cmd.hasOption("listPartners")) {
             logger.info(Messages.getString("list.partner.ids", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, ebicsModel.listPartnerId().toString()))
         }
-        val defaultUser = if (cmd.hasOption("create")) {
+        val user = if (cmd.hasOption("create")) {
             app.createDefaultUser(EbicsVersion.H003)
         } else {
             app.loadDefaultUser().apply { require(userInfo.ebicsVersion == EbicsVersion.H003)
@@ -52,18 +52,18 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
             }
         }
         if (cmd.hasOption("letters")) {
-            ebicsModel.createLetters(defaultUser, false)
+            ebicsModel.createLetters(user)
         }
-        val session = ebicsModel.createSession(defaultUser, defaultProduct)
+        val session = ebicsModel.createSession(user, defaultProduct)
 
         //Administrative order types processing
         if (cmd.hasOption("at")) {
             run {
                 when (val adminOrderType = cmd.getOptionValue("at")) {
-                    "INI" -> sendINIRequest(defaultUser, session)
-                    "HIA" -> sendHIARequest(defaultUser, session)
-                    "HPB" -> sendHPBRequest(defaultUser, session, app.createPasswordCallback())
-                    "SPR" -> revokeSubscriber(defaultUser, session)
+                    "INI" -> sendINIRequest(user, session)
+                    "HIA" -> sendHIARequest(user, session)
+                    "HPB" -> sendHPBRequest(user, session, app.createPasswordCallback())
+                    "SPR" -> revokeSubscriber(user, session)
                     else -> logger.error(Messages.getString("unknown.admin.ordertype", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, adminOrderType))
                 }
             }
@@ -84,10 +84,11 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
         if (cmd.hasOption("skip_order")) {
             var count = cmd.getOptionValue("skip_order").toInt()
             while (count-- > 0) {
-                defaultUser.partner.nextOrderId()
+                user.partner.nextOrderId()
             }
         }
-        ebicsModel.saveAll()
+        ebicsModel.saveUser(user)
+        ebicsModel.clearTraces()
     }
 
     @Throws(ParseException::class)
@@ -199,7 +200,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
      * @throws Exception
      */
     @Throws(Exception::class)
-    fun sendINIRequest(user: SerializableEbicsUser, session: EbicsSession) {
+    fun sendINIRequest(user: User, session: EbicsSession) {
         val userId = user.userInfo.userId
         logger.info(
                 Messages.getString("ini.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
@@ -223,7 +224,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
      * @throws Exception
      */
     @Throws(Exception::class)
-    fun sendHIARequest(user: SerializableEbicsUser, session: EbicsSession) {
+    fun sendHIARequest(user: User, session: EbicsSession) {
         val userId = user.userInfo.userId
         logger.info(
                 Messages.getString("hia.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
@@ -246,7 +247,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
      * @param session the EBICS session
      */
     @Throws(Exception::class)
-    fun sendHPBRequest(user: SerializableEbicsUser, session: EbicsSession, passwordCallback: PasswordCallback) {
+    fun sendHPBRequest(user: User, session: EbicsSession, passwordCallback: PasswordCallback) {
         val userId = user.userInfo.userId
         logger.info(
                 Messages.getString("hpb.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
@@ -271,7 +272,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
      * @throws Exception
      */
     @Throws(Exception::class)
-    fun revokeSubscriber(user: SerializableEbicsUser, session: EbicsSession) {
+    fun revokeSubscriber(user: User, session: EbicsSession) {
         val userId = user.userInfo.userId
         logger.info(
                 Messages.getString("spr.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))

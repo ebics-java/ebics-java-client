@@ -19,7 +19,7 @@
 package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 import org.ebics.schema.h005.AuthenticationPubKeyInfoType;
 import org.ebics.schema.h005.EncryptionPubKeyInfoType;
 import org.ebics.schema.h005.HIARequestOrderDataType;
@@ -53,13 +53,13 @@ public class HIARequestOrderDataElement extends DefaultEbicsRootElement {
     X509DataType 			authX509Data;
 
     encryptionX509Data = null;
-    if (session.getUser().getPartner().getBank().useCertificate())
+    if (session.getUser().getPartner().getBank().getUseCertificate())
         encryptionX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getUserInfo().getDn(),
 	                                                    session.getUser().getE002CertificateBytes());
     encryptionPubKeyInfo = EbicsXmlFactory.createEncryptionPubKeyInfoType(session.getConfiguration().getEncryptionVersion(),
 	                                                                  encryptionX509Data);
     authX509Data = null;
-    if (session.getUser().getPartner().getBank().useCertificate())
+    if (session.getUser().getPartner().getBank().getUseCertificate())
         authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getUserInfo().getDn(),
 	                                              session.getUser().getX002CertificateBytes());
     authenticationPubKeyInfo = EbicsXmlFactory.createAuthenticationPubKeyInfoType(session.getConfiguration().getAuthenticationVersion(),

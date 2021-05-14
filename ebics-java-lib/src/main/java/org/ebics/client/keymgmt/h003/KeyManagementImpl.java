@@ -34,7 +34,7 @@ import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.interfaces.PasswordCallback;
 import org.ebics.client.keymgmt.KeyManagement;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 import org.ebics.client.io.ByteArrayContentFactory;
 import org.ebics.client.utils.Utils;
 import org.ebics.client.xml.h003.HIARequestElement;
@@ -128,7 +128,8 @@ public class KeyManagementImpl extends KeyManagement {
    * @throws EbicsException server generated error message
    */
   @Override
-  public void sendHPB(PasswordCallback passwordCallback) throws IOException, GeneralSecurityException, EbicsException {
+  public void
+  sendHPB(PasswordCallback passwordCallback) throws IOException, GeneralSecurityException, EbicsException {
     HPBRequestElement			request;
     KeyManagementResponseElement	response;
     HttpRequestSender			sender;
@@ -159,7 +160,7 @@ public class KeyManagementImpl extends KeyManagement {
     path = session.getConfiguration().getKeystoreDirectory(session.getUser());
     keystoreManager.load("" , passwordCallback.getPassword());
 
-    if (session.getUser().getPartner().getBank().useCertificate())
+    if (session.getUser().getPartner().getBank().getUseCertificate())
     {
         e002PubKey = keystoreManager.getPublicKey(new ByteArrayInputStream(orderData.getBankE002Certificate()));
         x002PubKey = keystoreManager.getPublicKey(new ByteArrayInputStream(orderData.getBankX002Certificate()));

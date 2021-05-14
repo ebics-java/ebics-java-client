@@ -1,12 +1,12 @@
 package org.ebics.client.console
 
-import org.ebics.client.api.EbicsModel
-import org.ebics.client.api.EbicsVersion
-import org.ebics.client.user.SerializableEbicsUser
+import org.ebics.client.user.EbicsModel
+import org.ebics.client.user.EbicsVersion
+import org.ebics.client.user.serializable.User
 import org.ebics.client.interfaces.Configuration
 import org.ebics.client.interfaces.PasswordCallback
 import org.ebics.client.session.DefaultConfiguration
-import org.ebics.client.session.Product
+import org.ebics.client.user.Product
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -19,11 +19,13 @@ import java.util.*
  */
 class ConsoleAppBase constructor(configuration: Configuration,
                                  private val properties: ConfigProperties,
-                                 val defaultProduct: Product) {
-    val ebicsModel: EbicsModel = EbicsModel(configuration)
+                                 val defaultProduct: Product
+) {
+    val ebicsModel: EbicsModel =
+        EbicsModel(configuration)
 
     @Throws(Exception::class)
-    private fun createUser(properties: ConfigProperties, pwdHandler: PasswordCallback, ebicsVersion: EbicsVersion): SerializableEbicsUser {
+    private fun createUser(properties: ConfigProperties, pwdHandler: PasswordCallback, ebicsVersion: EbicsVersion): User {
         val userId = properties["userId"]
         val partnerId = properties["partnerId"]
         val bankUrl = properties["bank.url"]
@@ -40,10 +42,10 @@ class ConsoleAppBase constructor(configuration: Configuration,
     }
 
     @Throws(Exception::class)
-    fun createDefaultUser(ebicsVersion: EbicsVersion): SerializableEbicsUser = createUser(properties, createPasswordCallback(), ebicsVersion)
+    fun createDefaultUser(ebicsVersion: EbicsVersion): User = createUser(properties, createPasswordCallback(), ebicsVersion)
 
     @Throws(Exception::class)
-    fun loadDefaultUser():SerializableEbicsUser {
+    fun loadDefaultUser(): User {
         val userId = properties["userId"]
         val hostId = properties["hostId"]
         val partnerId = properties["partnerId"]

@@ -23,7 +23,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 import org.ebics.client.order.EbicsOrder;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h005.EbicsRequestDocument;

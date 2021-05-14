@@ -24,7 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h003.EbicsRequestDocument;
 import org.ebics.schema.h003.MutableHeaderType;

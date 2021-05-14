@@ -1,6 +1,6 @@
 package org.ebics.client.filetransfer;
 
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 
 public class AbstractFileTransfer {
     /**

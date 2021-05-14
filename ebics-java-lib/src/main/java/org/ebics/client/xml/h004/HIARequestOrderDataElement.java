@@ -19,7 +19,7 @@
 package org.ebics.client.xml.h004;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 import org.ebics.schema.h004.AuthenticationPubKeyInfoType;
 import org.ebics.schema.h004.EncryptionPubKeyInfoType;
 import org.ebics.schema.h004.HIARequestOrderDataType;
@@ -61,7 +61,7 @@ public class HIARequestOrderDataElement extends DefaultEbicsRootElement {
     RSAKeyValueType 			AuthRsaKeyValue;
 
     encryptionX509Data = null;
-    if (session.getUser().getPartner().getBank().useCertificate())
+    if (session.getUser().getPartner().getBank().getUseCertificate())
         encryptionX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getUserInfo().getDn(),
 	                                                    session.getUser().getE002CertificateBytes());
     encryptionRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getE002PublicKey().getPublicExponent().toByteArray(),
@@ -71,7 +71,7 @@ public class HIARequestOrderDataElement extends DefaultEbicsRootElement {
 	                                                                  encryptionPubKeyValue,
 	                                                                  encryptionX509Data);
     authX509Data = null;
-    if (session.getUser().getPartner().getBank().useCertificate())
+    if (session.getUser().getPartner().getBank().getUseCertificate())
         authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getUserInfo().getDn(),
 	                                              session.getUser().getX002CertificateBytes());
     AuthRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getX002PublicKey().getPublicExponent().toByteArray(),

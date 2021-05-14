@@ -18,18 +18,15 @@
  */
 package org.ebics.client.user.base
 
-import org.ebics.client.api.EbicsVersion
-import org.ebics.client.interfaces.EbicsPartner
-import org.ebics.client.user.EbicsUserAction
+import org.ebics.client.user.EbicsVersion
 import org.ebics.client.user.EbicsUserStatus
-import org.ebics.client.user.EbicsUserStatusEnum
 
 /**
  * Things an EBICS user must be able to perform.
  *
  * @author Hachani
  */
-interface EbicsUserInfoInt {
+interface EbicsUserInfo {
     val ebicsVersion: EbicsVersion
     val userId: String
     val name: String

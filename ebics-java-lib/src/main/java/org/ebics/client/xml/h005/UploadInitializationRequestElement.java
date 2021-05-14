@@ -24,7 +24,7 @@ import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.io.Splitter;
 import org.ebics.client.order.h005.EbicsUploadOrder;
 import org.ebics.client.order.EbicsAdminOrderType;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h005.DataEncryptionInfoType.EncryptionPubKeyDigest;
 import org.ebics.schema.h005.*;

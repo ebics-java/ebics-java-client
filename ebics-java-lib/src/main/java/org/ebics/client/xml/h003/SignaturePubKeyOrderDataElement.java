@@ -22,7 +22,7 @@ package org.ebics.client.xml.h003;
 import java.util.Calendar;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 import org.ebics.schema.s001.PubKeyValueType;
 import org.ebics.schema.s001.SignaturePubKeyInfoType;
 import org.ebics.schema.s001.SignaturePubKeyOrderDataType;
@@ -56,7 +56,7 @@ public class SignaturePubKeyOrderDataElement extends DefaultEbicsRootElement {
     SignaturePubKeyOrderDataType	signaturePubKeyOrderData;
 
     x509Data = null;
-    if (session.getUser().getPartner().getBank().useCertificate())
+    if (session.getUser().getPartner().getBank().getUseCertificate())
         x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getUserInfo().getDn(),
 	                                          session.getUser().getA005CertificateBytes());
     rsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getA005PublicKey().getPublicExponent().toByteArray(),

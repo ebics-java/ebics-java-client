@@ -40,7 +40,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.EbicsRootElement;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.user.EbicsSession;
 import org.ebics.client.order.EbicsAdminOrderType;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
