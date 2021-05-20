@@ -23,7 +23,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.user.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h004.EbicsRequestDocument;
@@ -137,7 +137,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
       Cipher			cipher;
 
       cipher = Cipher.getInstance("RSA/NONE/PKCS1Padding", BouncyCastleProvider.PROVIDER_NAME);
-      cipher.init(Cipher.ENCRYPT_MODE, session.getBankE002Key());
+      cipher.init(Cipher.ENCRYPT_MODE, session.getBankCert().getE002Key());
 
       return cipher.doFinal(nonce);
     } catch (Exception e) {

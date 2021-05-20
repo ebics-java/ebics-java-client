@@ -6,6 +6,5 @@ import org.springframework.web.bind.annotation.RestController
 @RestController("h003")
 class EbicsAPIResource (private val ebicsAPI: EbicsAPI){
     @PostMapping("sendINI")
-    fun sendINI(hostId:String, partnerId:String, userId:String, password:String) =
-        ebicsAPI.sendINI(hostId, partnerId, userId, password)
+    fun sendINI(userId:Long, password:String) = ebicsAPI.sendINI(userId, password)
 }

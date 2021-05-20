@@ -1,12 +1,13 @@
 package org.ebics.client.console
 
-import org.ebics.client.user.EbicsModel
-import org.ebics.client.user.EbicsVersion
-import org.ebics.client.user.serializable.User
-import org.ebics.client.interfaces.Configuration
+import org.ebics.client.file.EbicsFileModel
+import org.ebics.client.model.EbicsVersion
+import org.ebics.client.api.Configuration
+import org.ebics.client.certificate.CertificateManager
 import org.ebics.client.interfaces.PasswordCallback
-import org.ebics.client.session.DefaultConfiguration
-import org.ebics.client.user.Product
+import org.ebics.client.file.FileConfiguration
+import org.ebics.client.file.User
+import org.ebics.client.model.Product
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -17,15 +18,16 @@ import java.util.*
  * Ebics client app
  * This is the base part of Console App without being depended on specific EBICS h00X API.
  */
-class ConsoleAppBase constructor(configuration: Configuration,
-                                 private val properties: ConfigProperties,
-                                 val defaultProduct: Product
+class ConsoleAppBase(
+    configuration: FileConfiguration,
+    private val properties: ConfigProperties,
+    val defaultProduct: Product,
+    serializedDirectory: String
 ) {
-    val ebicsModel: EbicsModel =
-        EbicsModel(configuration)
+    val ebicsModel: EbicsFileModel = EbicsFileModel(configuration, serializedDirectory)
 
     @Throws(Exception::class)
-    private fun createUser(properties: ConfigProperties, pwdHandler: PasswordCallback, ebicsVersion: EbicsVersion): User {
+    private fun createUser(properties: ConfigProperties, pwdHandler: PasswordCallback, ebicsVersion: EbicsVersion): Pair<User, CertificateManager> {
         val userId = properties["userId"]
         val partnerId = properties["partnerId"]
         val bankUrl = properties["bank.url"]
@@ -42,14 +44,14 @@ class ConsoleAppBase constructor(configuration: Configuration,
     }
 
     @Throws(Exception::class)
-    fun createDefaultUser(ebicsVersion: EbicsVersion): User = createUser(properties, createPasswordCallback(), ebicsVersion)
+    fun createDefaultUser(ebicsVersion: EbicsVersion): Pair<User, CertificateManager> = createUser(properties, createPasswordCallback(), ebicsVersion)
 
     @Throws(Exception::class)
-    fun loadDefaultUser(): User {
+    fun loadDefaultUser(): Pair<User, CertificateManager> {
         val userId = properties["userId"]
         val hostId = properties["hostId"]
         val partnerId = properties["partnerId"]
-        return ebicsModel.loadUser(hostId, partnerId, userId)
+        return ebicsModel.loadUser(hostId, partnerId, userId, createPasswordCallback())
     }
 
     fun createPasswordCallback(): PasswordCallback {
@@ -67,13 +69,11 @@ class ConsoleAppBase constructor(configuration: Configuration,
             val language = properties["languageCode"].toLowerCase()
             val productName = properties["productName"]
             val locale = Locale(language, country)
-            val configuration: DefaultConfiguration = object : DefaultConfiguration(rootDir.absolutePath) {
-                override fun getLocale(): Locale {
-                    return locale
-                }
+            val configuration: FileConfiguration = object : FileConfiguration(rootDir.absolutePath) {
+                override val locale: Locale = locale
             }
             val product = Product(productName, language, null)
-            return ConsoleAppBase(configuration, properties, product)
+            return ConsoleAppBase(configuration, properties, product, rootDir.absolutePath + File.separator + configuration.getString("serialization.dir.name"))
         }
     }
 }

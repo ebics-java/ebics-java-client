@@ -22,7 +22,7 @@ package org.ebics.client.xml.h005;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.io.IOUtils;
-import org.ebics.client.user.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.schema.h005.DataTransferRequestType;
 import org.ebics.schema.h005.DataTransferRequestType.OrderData;

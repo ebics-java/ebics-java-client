@@ -20,7 +20,7 @@
 package org.ebics.client.xml.h004;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.user.base.EbicsUser;
+import org.ebics.client.api.EbicsUser;
 import org.ebics.schema.s001.OrderSignatureDataType;
 import org.ebics.schema.s001.UserSignatureDataSigBookType;
 

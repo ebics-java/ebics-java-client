@@ -22,7 +22,7 @@ package org.ebics.client.xml.h003;
 import java.util.Calendar;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.user.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.schema.s001.PubKeyValueType;
 import org.ebics.schema.s001.SignaturePubKeyInfoType;
 import org.ebics.schema.s001.SignaturePubKeyOrderDataType;

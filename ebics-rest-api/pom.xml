@@ -12,9 +12,6 @@
 	<packaging>jar</packaging>
 	<name>EBICS REST api</name>
 	<description>EBICS client exposed over REST API</description>
-	<properties>
-		<spring.version>2.4.4</spring.version>
-	</properties>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -29,7 +26,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.ebics.client</groupId>
-			<artifactId>ebics-java-lib</artifactId>
+			<artifactId>ebics-dbmodel</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<dependency>

@@ -23,7 +23,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.ebics.client.api.HttpRequestSender;
+import org.ebics.client.http.HttpRequestSender;
 import org.ebics.client.api.TransferState;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.filetransfer.AbstractFileTransfer;
@@ -31,7 +31,7 @@ import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.messages.Messages;
 import org.ebics.client.order.h003.EbicsDownloadOrder;
 import org.ebics.client.order.h003.EbicsUploadOrder;
-import org.ebics.client.user.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.utils.Utils;
 import org.ebics.client.xml.h003.DownloadTransferResponseElement;

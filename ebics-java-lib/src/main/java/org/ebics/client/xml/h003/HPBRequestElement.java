@@ -20,7 +20,7 @@
 package org.ebics.client.xml.h003;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.user.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 
 /**
  * The <code>HPBRequestElement</code> is the element to be sent when

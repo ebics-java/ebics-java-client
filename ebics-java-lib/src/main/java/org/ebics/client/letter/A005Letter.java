@@ -25,7 +25,7 @@ import java.util.Locale;
 
 import org.apache.commons.codec.binary.Base64;
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.user.base.EbicsUser;
+import org.ebics.client.api.EbicsUser;
 
 
 /**

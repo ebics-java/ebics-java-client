@@ -24,7 +24,7 @@ import java.util.Date;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.order.EbicsAdminOrderType;
-import org.ebics.client.user.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.schema.h003.EbicsRequestDocument.EbicsRequest;
 import org.ebics.schema.h003.EbicsRequestDocument.EbicsRequest.Body;
 import org.ebics.schema.h003.EbicsRequestDocument.EbicsRequest.Header;

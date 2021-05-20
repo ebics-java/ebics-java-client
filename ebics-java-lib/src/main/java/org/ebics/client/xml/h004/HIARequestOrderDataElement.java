@@ -19,7 +19,7 @@
 package org.ebics.client.xml.h004;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.user.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.schema.h004.AuthenticationPubKeyInfoType;
 import org.ebics.schema.h004.EncryptionPubKeyInfoType;
 import org.ebics.schema.h004.HIARequestOrderDataType;

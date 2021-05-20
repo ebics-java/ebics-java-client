@@ -21,7 +21,7 @@ package org.ebics.client.xml.h003;
 import java.util.Calendar;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.user.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.schema.h003.AuthenticationPubKeyInfoType;
 import org.ebics.schema.h003.EncryptionPubKeyInfoType;
 import org.ebics.schema.h003.HIARequestOrderDataType;

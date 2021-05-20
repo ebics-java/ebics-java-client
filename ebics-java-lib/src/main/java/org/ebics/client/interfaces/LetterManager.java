@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.user.base.EbicsUser;
+import org.ebics.client.api.EbicsUser;
 
 
 /**

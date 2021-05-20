@@ -1,0 +1,8 @@
+ssl:
+  truststore: "ssl/truststore.ts"
+ebics:
+  signatureVersion: "A005"
+  authenticationVersion: "X002"
+  encryptionVersion: "E002"
+  isTraceEnabled: "true"
+  isCompressionEnabled: "true"

@@ -20,7 +20,7 @@
 package org.ebics.client.xml.h003;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.user.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.schema.h003.MutableHeaderType;
 import org.ebics.schema.h003.StaticHeaderType;

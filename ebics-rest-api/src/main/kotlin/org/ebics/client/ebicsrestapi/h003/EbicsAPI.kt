@@ -1,17 +1,32 @@
 package org.ebics.client.ebicsrestapi.h003
 
-import org.ebics.client.ebicsrestapi.EbicsFileModel
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream
+import org.ebics.client.api.cert.UserKeyStoreRepository
+import org.ebics.client.api.user.UserInfoRepository
+import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
+import org.ebics.client.api.user.UserRepository
+import org.ebics.client.certificate.CertificateManager
 import org.ebics.client.keymgmt.h003.KeyManagementImpl
-import org.ebics.client.user.Product
+import org.ebics.client.model.EbicsSession
+import org.ebics.client.model.Product
 import org.springframework.stereotype.Component
 
 @Component
-class EbicsAPI(private val ebicsFileModel: EbicsFileModel) {
-    private val defaultProduct =
+class EbicsAPI(
+    private val userRepository: UserRepository,
+    private val userInfoRepository: UserInfoRepository,
+    private val configuration: EbicsRestConfiguration)
+{
+    private val product =
         Product("EBICS 2.4 H003 REST API Client", "en", "org.jto.ebics")
-    fun sendINI(hostId:String, partnerId:String, userId:String, password:String) {
-        val user = ebicsFileModel.loadUser(hostId, partnerId, userId, password)
-        val session = ebicsFileModel.createSession(user, defaultProduct)
-        KeyManagementImpl(session).sendINI(null)
+
+    fun sendINI(userId:Long, password:String) {
+        val user = userRepository.getOne(userId)
+        val userInfo = userInfoRepository.getOne(userId)
+        with (requireNotNull ( userInfo.keyStore ) {"User certificates must be first initialized"}) {
+            val manager = CertificateManager.load(ByteInputStream(keyStoreBytes, keyStoreBytes.size), password::toCharArray, userInfo.userId)
+            val session = EbicsSession(user, configuration, product, manager, null)
+            KeyManagementImpl(session).sendINI(null)
+        }
     }
 }

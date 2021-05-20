@@ -19,21 +19,21 @@
 
 package org.ebics.client.keymgmt.h004;
 
+import org.ebics.client.certificate.BankCertificateManager;
 import org.ebics.client.certificate.KeyStoreManager;
 import org.ebics.client.certificate.KeyUtil;
-import org.ebics.client.api.HttpRequestSender;
+import org.ebics.client.http.HttpRequestSender;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.interfaces.PasswordCallback;
 import org.ebics.client.io.ByteArrayContentFactory;
 import org.ebics.client.keymgmt.KeyManagement;
-import org.ebics.client.user.EbicsSession;
+import org.ebics.client.api.EbicsSession;
+import org.ebics.client.model.user.EbicsUserAction;
 import org.ebics.client.utils.Utils;
 import org.ebics.client.xml.h004.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
@@ -74,6 +74,7 @@ public class KeyManagementImpl extends KeyManagement {
     HttpRequestSender sender;
     int					httpCode;
 
+    session.getUser().getUserInfo().getUserStatus().check(EbicsUserAction.INI);
     sender = new HttpRequestSender(session);
     request = new INIRequestElement(session);
     request.build();
@@ -85,6 +86,7 @@ public class KeyManagementImpl extends KeyManagement {
     response.build();
     session.getConfiguration().getTraceManager().trace(response,session);
     response.report();
+    session.getUser().getUserInfo().getUserStatus().update(EbicsUserAction.INI);
   }
 
   /**
@@ -100,6 +102,7 @@ public class KeyManagementImpl extends KeyManagement {
     HttpRequestSender			sender;
     int					httpCode;
 
+    session.getUser().getUserInfo().getUserStatus().check(EbicsUserAction.HIA);
     sender = new HttpRequestSender(session);
     request = new HIARequestElement(session);
     request.build();
@@ -111,6 +114,7 @@ public class KeyManagementImpl extends KeyManagement {
     response.build();
     session.getConfiguration().getTraceManager().trace(response,session);
     response.report();
+    session.getUser().getUserInfo().getUserStatus().update(EbicsUserAction.HIA);
   }
 
   /**
@@ -122,7 +126,7 @@ public class KeyManagementImpl extends KeyManagement {
    * @throws EbicsException server generated error message
    */
   @Override
-  public void sendHPB(PasswordCallback passwordCallback) throws IOException, GeneralSecurityException, EbicsException {
+  public BankCertificateManager sendHPB(PasswordCallback passwordCallback) throws IOException, GeneralSecurityException, EbicsException {
     HPBRequestElement			request;
     KeyManagementResponseElement	response;
     HttpRequestSender			sender;
@@ -134,6 +138,7 @@ public class KeyManagementImpl extends KeyManagement {
     RSAPublicKey			x002PubKey;
     int					httpCode;
 
+    session.getUser().getUserInfo().getUserStatus().check(EbicsUserAction.HPB);
     sender = new HttpRequestSender(session);
     request = new HPBRequestElement(session);
     request.build();
@@ -149,30 +154,14 @@ public class KeyManagementImpl extends KeyManagement {
     orderData = new HPBResponseOrderDataElement(factory);
     orderData.build();
     session.getConfiguration().getTraceManager().trace(orderData,session);
-    keystoreManager = new KeyStoreManager();
-    path = session.getConfiguration().getKeystoreDirectory(session.getUser());
-    keystoreManager.load("" , passwordCallback.getPassword());
-
+    BankCertificateManager manager;
     if (session.getUser().getPartner().getBank().getUseCertificate())
-    {
-        e002PubKey = keystoreManager.getPublicKey(new ByteArrayInputStream(orderData.getBankE002Certificate()));
-        x002PubKey = keystoreManager.getPublicKey(new ByteArrayInputStream(orderData.getBankX002Certificate()));
-        session.getUser().getPartner().getBank().setBankKeys(e002PubKey, x002PubKey);
-        session.getUser().getPartner().getBank().setDigests(KeyUtil.getKeyDigest(e002PubKey), KeyUtil.getKeyDigest(x002PubKey));
-        keystoreManager.setCertificateEntry(session.getBankID() + "-E002", new ByteArrayInputStream(orderData.getBankE002Certificate()));
-        keystoreManager.setCertificateEntry(session.getBankID() + "-X002", new ByteArrayInputStream(orderData.getBankX002Certificate()));
-        keystoreManager.save(new FileOutputStream(path + File.separator + session.getBankID() + ".p12"));
-    }
+      manager = BankCertificateManager.createFromCertificates(orderData.getBankE002Certificate(), orderData.getBankX002Certificate());
     else
-    {
-        e002PubKey = keystoreManager.getPublicKey(new BigInteger(orderData.getBankE002PublicKeyExponent()), new BigInteger(orderData.getBankE002PublicKeyModulus()));
-        x002PubKey = keystoreManager.getPublicKey(new BigInteger(orderData.getBankX002PublicKeyExponent()), new BigInteger(orderData.getBankX002PublicKeyModulus()));
-        session.getUser().getPartner().getBank().setBankKeys(e002PubKey, x002PubKey);
-        session.getUser().getPartner().getBank().setDigests(KeyUtil.getKeyDigest(e002PubKey), KeyUtil.getKeyDigest(x002PubKey));
-        //keystoreManager.setCertificateEntry(session.getBankID() + "-E002", new ByteArrayInputStream(orderData.getBankE002Certificate()));
-        //keystoreManager.setCertificateEntry(session.getBankID() + "-X002", new ByteArrayInputStream(orderData.getBankX002Certificate()));
-        keystoreManager.save(new FileOutputStream(path + File.separator + session.getBankID() + ".p12"));
-    }
+      manager = BankCertificateManager.createFromPubKeyExponentAndModulus(orderData.getBankE002PublicKeyExponent(), orderData.getBankE002PublicKeyModulus(),
+              orderData.getBankX002PublicKeyExponent(), orderData.getBankX002PublicKeyModulus());
+    session.getUser().getUserInfo().getUserStatus().update(EbicsUserAction.HPB);
+    return manager;
   }
 
   /**
@@ -188,6 +177,7 @@ public class KeyManagementImpl extends KeyManagement {
     SPRResponseElement			response;
     int					httpCode;
 
+    session.getUser().getUserInfo().getUserStatus().check(EbicsUserAction.SPR);
     sender = new HttpRequestSender(session);
     request = new SPRRequestElement(session);
     request.build();
@@ -199,5 +189,6 @@ public class KeyManagementImpl extends KeyManagement {
     response.build();
     session.getConfiguration().getTraceManager().trace(response,session);
     response.report();
+    session.getUser().getUserInfo().getUserStatus().check(EbicsUserAction.SPR);
   }
 }
