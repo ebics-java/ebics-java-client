@@ -2,6 +2,7 @@ package org.ebics.client.api.user
 
 import org.ebics.client.api.EbicsPartner
 import org.ebics.client.api.EbicsUser
+import org.ebics.client.api.partner.Partner
 import java.security.PrivateKey
 import java.security.cert.X509Certificate
 import javax.persistence.*
@@ -12,6 +13,7 @@ data class User (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id:Long? = null,
 
+    @OneToOne(optional = false)
     override val userInfo: UserInfo,
     override val a005Certificate: X509Certificate,
     override val e002Certificate: X509Certificate,
@@ -22,6 +24,6 @@ data class User (
 
     @ManyToOne(optional = false)
     @JoinColumn(name="PARTNER_ID")
-    override val partner: EbicsPartner
+    override val partner: Partner
 
 ) : EbicsUser

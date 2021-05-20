@@ -7,7 +7,7 @@ import org.ebics.client.api.EbicsSession
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 
-@Component
+@Service
 class TraceService(
     private val traceRepository: TraceRepository,
     private var traceEnabled: Boolean = true

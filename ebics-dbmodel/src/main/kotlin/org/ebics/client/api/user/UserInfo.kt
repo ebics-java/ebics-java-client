@@ -16,6 +16,8 @@ data class UserInfo(
     override val userId: String,
     override val name: String,
     override val dn: String,
+
+    @Embedded
     override val userStatus: EbicsUserStatus,
 
     @OneToOne(optional = true)

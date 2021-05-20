@@ -4,7 +4,7 @@ import org.ebics.client.api.user.*
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/users")
+//@RequestMapping("users")
 class EbicsUsersResource (
     private val userInfoRepository: UserInfoRepository,
     private val userService: UserService)

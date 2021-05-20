@@ -1,6 +1,6 @@
 package org.ebics.client.model.user
 
-class EbicsUserStatus(
+open class EbicsUserStatus(
     status: EbicsUserStatusEnum = EbicsUserStatusEnum.CREATED
 ) {
     var status: EbicsUserStatusEnum = status
