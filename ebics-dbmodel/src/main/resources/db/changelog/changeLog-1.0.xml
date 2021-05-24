@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet author="honza.toegel (generated)" id="1621846209530-1">
+        <createTable tableName="Bank">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="BankPK"/>
+            </column>
+            <column name="bankURL" type="VARCHAR(255)"/>
+            <column name="e002Digest" type="BINARY(255)"/>
+            <column name="e002Key" type="BINARY(255)"/>
+            <column name="hostId" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="useCertificate" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="x002Digest" type="BINARY(255)"/>
+            <column name="x002Key" type="BINARY(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="honza.toegel (generated)" id="1621846209530-2">
+        <createTable tableName="Partner">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PartnerPK"/>
+            </column>
+            <column name="orderId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="partnerId" type="VARCHAR(255)"/>
+            <column name="bank_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="honza.toegel (generated)" id="1621846209530-3">
+        <createTable tableName="TraceEntry">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="TraceEntryPK"/>
+            </column>
+            <column name="messageBody" type="VARCHAR(255)"/>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="honza.toegel (generated)" id="1621846209530-4">
+        <createTable tableName="User">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="UserPK"/>
+            </column>
+            <column name="a005Certificate" type="BINARY(255)"/>
+            <column name="a005PrivateKey" type="BINARY(255)"/>
+            <column name="e002Certificate" type="BINARY(255)"/>
+            <column name="e002PrivateKey" type="BINARY(255)"/>
+            <column name="x002Certificate" type="BINARY(255)"/>
+            <column name="x002PrivateKey" type="BINARY(255)"/>
+            <column name="PARTNER_ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="userInfo_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="honza.toegel (generated)" id="1621846209530-5">
+        <createTable tableName="UserInfo">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="UserInfoPK"/>
+            </column>
+            <column name="dn" type="VARCHAR(255)"/>
+            <column name="ebicsVersion" type="INT"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="userId" type="VARCHAR(255)"/>
+            <column name="status" type="INT"/>
+            <column name="keyStore_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="honza.toegel (generated)" id="1621846209530-6">
+        <createTable tableName="UserKeyStore">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="UserKeyStorePK"/>
+            </column>
+            <column name="keyStoreBytes" type="BINARY(255)"/>
+            <column name="userInfo_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="honza.toegel (generated)" id="1621846209530-7">
+        <addUniqueConstraint columnNames="userInfo_id" constraintName="UK_ngl7yed4v1ma1bii26bgir5u" tableName="User"/>
+    </changeSet>
+    <changeSet author="honza.toegel (generated)" id="1621846209530-8">
+        <addForeignKeyConstraint baseColumnNames="userInfo_id" baseTableName="UserKeyStore"
+                                 constraintName="FK474q7ytanjb9vlokrvw8eba6o" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="UserInfo"
+                                 validate="true"/>
+    </changeSet>
+    <changeSet author="honza.toegel (generated)" id="1621846209530-9">
+        <addForeignKeyConstraint baseColumnNames="userInfo_id" baseTableName="User"
+                                 constraintName="FKffek1f41ph9e7ip584ttsspd3" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="UserInfo"
+                                 validate="true"/>
+    </changeSet>
+    <changeSet author="honza.toegel (generated)" id="1621846209530-10">
+        <addForeignKeyConstraint baseColumnNames="keyStore_id" baseTableName="UserInfo"
+                                 constraintName="FKfhk2gflxhmtqhg8suenqd9clt" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="UserKeyStore"
+                                 validate="true"/>
+    </changeSet>
+    <changeSet author="honza.toegel (generated)" id="1621846209530-11">
+        <addForeignKeyConstraint baseColumnNames="bank_id" baseTableName="Partner"
+                                 constraintName="FKj6ybp41t71gl84fp95u5y3a5" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Bank"
+                                 validate="true"/>
+    </changeSet>
+    <changeSet author="honza.toegel (generated)" id="1621846209530-12">
+        <addForeignKeyConstraint baseColumnNames="PARTNER_ID" baseTableName="User"
+                                 constraintName="FKriyp47pix6a4yqi6vtqqs2wen" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="Partner"
+                                 validate="true"/>
+    </changeSet>
+    <changeSet author="honza.toegel (generated)" id="1621846209530-13">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="TraceEntry"
+                                 constraintName="FKtbxdxnb92q9xbpbtwnvos7k8w" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="User"
+                                 validate="true"/>
+    </changeSet>
+</databaseChangeLog>

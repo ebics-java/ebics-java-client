@@ -7,12 +7,6 @@
     <version>${revision}</version>
     <name>EBICS client</name>
     <url>http://maven.apache.org</url>
-    <modules>
-        <module>ebics-java-lib</module>
-        <module>ebics-dbmodel</module>
-        <module>ebics-console-app</module>
-        <module>ebics-rest-api</module>
-    </modules>
     <properties>
         <revision>1.3-SNAPSHOT</revision>
         <java.version>1.8</java.version>
@@ -21,4 +15,39 @@
         <kotlin.version>${kotlin.version.short}.32</kotlin.version>
         <spring.version>2.4.4</spring.version>
     </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <modules>
+        <module>ebics-java-lib</module>
+        <module>ebics-dbmodel</module>
+        <module>ebics-console-app</module>
+        <module>ebics-rest-api</module>
+    </modules>
 </project>

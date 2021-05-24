@@ -18,8 +18,8 @@ class UserService(
     fun findUsers(): List<User> = userRepository.findAll()
 
     fun createUserInfo(user: UserInfo): Long {
-        userInfoRepository.save(user)
-        return user.id
+        userInfoRepository.saveAndFlush(user)
+        return user.id!!
     }
 
     fun getUserById(userId: Long): User =
@@ -27,7 +27,7 @@ class UserService(
 
     fun delete(userId: Long) = userRepository.deleteById(userId)
 
-    fun createUserWithCertificates(userId: Long, password:String) {
+    fun createUserCertificates(userId: Long, password:String) {
         val userInfo = userInfoRepository.getOne(userId)
         val os = ByteOutputStream()
         CertificateManager.create(userInfo.dn).save(os, password::toCharArray, userInfo.userId)

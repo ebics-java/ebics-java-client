@@ -7,9 +7,9 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
 @SpringBootApplication
-@ComponentScan("org.ebics.client.api.*")
-@EntityScan("org.ebics.client.api.*")
-@EnableJpaRepositories("org.ebics.client.api.*")
+@ComponentScan("org.ebics.client.api", "org.ebics.client.ebicsrestapi")
+@EntityScan("org.ebics.client.api")
+@EnableJpaRepositories("org.ebics.client.api")
 class EbicsRestApiApplication
 
 fun main(args: Array<String>) {

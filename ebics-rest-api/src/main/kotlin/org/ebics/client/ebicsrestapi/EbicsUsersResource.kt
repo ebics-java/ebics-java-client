@@ -4,7 +4,7 @@ import org.ebics.client.api.user.*
 import org.springframework.web.bind.annotation.*
 
 @RestController
-//@RequestMapping("users")
+@RequestMapping("users")
 class EbicsUsersResource (
     private val userInfoRepository: UserInfoRepository,
     private val userService: UserService)
@@ -15,18 +15,18 @@ class EbicsUsersResource (
             Pair("2", "Bonjour!"),
     )
 
-    @GetMapping()
+    @GetMapping("")
     fun listUserId(): List<UserInfo> = userInfoRepository.findAll()
 
-    @GetMapping()
-    fun getUserById(@RequestParam userId: Long): UserInfo = userInfoRepository.getOne(userId)
+    @GetMapping("{id}")
+    fun getUserById(@PathVariable userId: Long): UserInfo = userInfoRepository.getOne(userId)
 
-    @DeleteMapping()
-    fun deleteUserById(@RequestParam userId: Long) = userService.delete(userId)
+    @DeleteMapping("{id}")
+    fun deleteUserById(@PathVariable userId: Long) = userService.delete(userId)
 
-    @PostMapping("createUserInfo")
-    fun createUserInfo(userInfo: UserInfo) = userService.createUserInfo(userInfo)
+    @PostMapping("")
+    fun createUserInfo(@RequestBody userInfo: UserInfo) = userService.createUserInfo(userInfo)
 
-    @PostMapping("createUser")
-    fun createUserWithCertificates(@RequestParam userId: Long, password:String) = userService.createUserWithCertificates(userId, password)
+    @PostMapping("{id}/certificates")
+    fun createUserCertificates(@PathVariable userId: Long, password:String) = userService.createUserCertificates(userId, password)
 }

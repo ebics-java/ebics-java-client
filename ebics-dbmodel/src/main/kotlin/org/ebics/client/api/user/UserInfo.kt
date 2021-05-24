@@ -10,7 +10,7 @@ import javax.persistence.*
 data class UserInfo(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id:Long,
+    val id:Long?,
 
     override val ebicsVersion: EbicsVersion,
     override val userId: String,
