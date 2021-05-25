@@ -81,11 +81,26 @@
                     <args>
                         <arg>-Xjsr305=strict</arg>
                     </args>
+                    <compilerPlugins>
+                        <!-- No ARG constructor for kotlin hibernate Entity classes -->
+                        <plugin>no-arg</plugin>
+                    </compilerPlugins>
+                    <pluginOptions>
+                        <option>no-arg:annotation=org.jetbrains.kotlin.NoArgConstructor</option>
+                        <!-- Call instance initializers in the synthetic constructor -->
+                        <!-- <option>no-arg:invokeInitializers=true</option> -->
+                    </pluginOptions>
                 </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.jetbrains.kotlin</groupId>
                         <artifactId>kotlin-maven-allopen</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                    <!-- No ARG constructor for kotlin hibernate Entity classes -->
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-noarg</artifactId>
                         <version>${kotlin.version}</version>
                     </dependency>
                 </dependencies>
