@@ -9,6 +9,8 @@ data class UserKeyStore(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id:Long? = null,
 
+    @Lob
+    @Column(name = "keyStoreBytes", columnDefinition="BLOB")
     val keyStoreBytes: ByteArray,
 
     @OneToOne

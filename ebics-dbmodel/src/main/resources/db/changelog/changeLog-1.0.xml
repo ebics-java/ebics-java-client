@@ -84,7 +84,7 @@
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="UserKeyStorePK"/>
             </column>
-            <column name="keyStoreBytes" type="BINARY(255)"/>
+            <column name="keyStoreBytes" type="BLOB"/>
             <column name="userInfo_id" type="BIGINT"/>
         </createTable>
     </changeSet>

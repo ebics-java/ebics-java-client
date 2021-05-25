@@ -13,7 +13,7 @@ class UserKeyStoreService(private val userKeyStoreRepository: UserKeyStoreReposi
     }
 
     fun load(userId:Long):ByteInputStream {
-        val bytes = userKeyStoreRepository.findAll().filter { it.userInfo.id ==  userId}.single().keyStoreBytes
+        val bytes = userKeyStoreRepository.getKeyStoreByUserId(userId).keyStoreBytes
         return ByteInputStream(bytes, bytes.size)
     }
 }
