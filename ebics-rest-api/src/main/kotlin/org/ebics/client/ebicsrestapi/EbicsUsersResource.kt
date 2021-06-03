@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("users")
+@CrossOrigin(origins = ["http://localhost:8080"])
 class EbicsUsersResource (
     private val userInfoRepository: UserInfoRepository,
     private val userService: UserService)
@@ -16,7 +17,7 @@ class EbicsUsersResource (
     )
 
     @GetMapping("")
-    fun listUserId(): List<UserInfo> = userInfoRepository.findAll()
+    fun listUsers(): List<UserInfo> = userInfoRepository.findAll()
 
     @GetMapping("{id}")
     fun getUserById(@PathVariable userId: Long): UserInfo = userInfoRepository.getOne(userId)
@@ -25,7 +26,7 @@ class EbicsUsersResource (
     fun deleteUserById(@PathVariable userId: Long) = userService.delete(userId)
 
     @PostMapping("")
-    fun createUserInfo(@RequestBody userInfo: UserInfo) = userService.createUserInfo(userInfo)
+    fun createUserInfo(@RequestBody userInfo: UserInfo):Long = userService.createUserInfo(userInfo)
 
     @PostMapping("{id}/certificates")
     fun createUserCertificates(@PathVariable userId: Long, password:String) = userService.createUserCertificates(userId, password)

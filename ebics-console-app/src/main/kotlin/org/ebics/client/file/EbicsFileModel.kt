@@ -29,6 +29,7 @@ import org.ebics.client.api.EbicsUser
 import org.ebics.client.certificate.BankCertificateManager
 import org.ebics.client.certificate.CertificateManager
 import org.ebics.client.model.user.EbicsUserStatus
+import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.ebics.client.utils.Constants
 import org.slf4j.LoggerFactory
 import java.io.*
@@ -130,7 +131,7 @@ class EbicsFileModel(
         val bank = createBank(url, bankName, hostId, useCertificates)
         val partner = createPartner(bank, partnerId)
         return try {
-            val userInfo = UserInfo(ebicsVersion, userId, name, email, country, organization, EbicsUserStatus())
+            val userInfo = UserInfo(ebicsVersion, userId, name, email, country, organization, EbicsUserStatusEnum.CREATED)
             val manager = CertificateManager.create(userInfo.dn)
             val user = with(manager) {
                 val user = User(userInfo, a005Certificate, e002Certificate, x002Certificate,

@@ -5,6 +5,7 @@ import org.ebics.client.model.user.EbicsUserStatus
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.api.EbicsUserInfo
 import org.ebics.client.api.Serializable
+import org.ebics.client.model.user.EbicsUserStatusEnum
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.security.PrivateKey
@@ -28,7 +29,7 @@ class User(
                 ois.readUTF(),  //UserId
                 ois.readUTF(),  //Name
                 ois.readUTF(),  //DN
-                (ois.readObject() as EbicsUserStatus)
+                (ois.readObject() as EbicsUserStatusEnum)
             ),
             ois.readObject() as X509Certificate,
             ois.readObject() as X509Certificate,

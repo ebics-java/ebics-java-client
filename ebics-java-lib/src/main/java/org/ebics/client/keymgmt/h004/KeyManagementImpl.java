@@ -74,7 +74,7 @@ public class KeyManagementImpl extends KeyManagement {
     HttpRequestSender sender;
     int					httpCode;
 
-    session.getUser().getUserInfo().getUserStatus().check(EbicsUserAction.INI);
+    session.getUser().getUserInfo().checkAction(EbicsUserAction.INI);
     sender = new HttpRequestSender(session);
     request = new INIRequestElement(session);
     request.build();
@@ -86,7 +86,7 @@ public class KeyManagementImpl extends KeyManagement {
     response.build();
     session.getConfiguration().getTraceManager().trace(response,session);
     response.report();
-    session.getUser().getUserInfo().getUserStatus().update(EbicsUserAction.INI);
+    session.getUser().getUserInfo().updateStatus(EbicsUserAction.INI);
   }
 
   /**
@@ -102,7 +102,7 @@ public class KeyManagementImpl extends KeyManagement {
     HttpRequestSender			sender;
     int					httpCode;
 
-    session.getUser().getUserInfo().getUserStatus().check(EbicsUserAction.HIA);
+    session.getUser().getUserInfo().checkAction(EbicsUserAction.HIA);
     sender = new HttpRequestSender(session);
     request = new HIARequestElement(session);
     request.build();
@@ -114,7 +114,7 @@ public class KeyManagementImpl extends KeyManagement {
     response.build();
     session.getConfiguration().getTraceManager().trace(response,session);
     response.report();
-    session.getUser().getUserInfo().getUserStatus().update(EbicsUserAction.HIA);
+    session.getUser().getUserInfo().updateStatus(EbicsUserAction.HIA);
   }
 
   /**
@@ -138,7 +138,7 @@ public class KeyManagementImpl extends KeyManagement {
     RSAPublicKey			x002PubKey;
     int					httpCode;
 
-    session.getUser().getUserInfo().getUserStatus().check(EbicsUserAction.HPB);
+    session.getUser().getUserInfo().checkAction(EbicsUserAction.HPB);
     sender = new HttpRequestSender(session);
     request = new HPBRequestElement(session);
     request.build();
@@ -160,7 +160,7 @@ public class KeyManagementImpl extends KeyManagement {
     else
       manager = BankCertificateManager.createFromPubKeyExponentAndModulus(orderData.getBankE002PublicKeyExponent(), orderData.getBankE002PublicKeyModulus(),
               orderData.getBankX002PublicKeyExponent(), orderData.getBankX002PublicKeyModulus());
-    session.getUser().getUserInfo().getUserStatus().update(EbicsUserAction.HPB);
+    session.getUser().getUserInfo().updateStatus(EbicsUserAction.HPB);
     return manager;
   }
 
@@ -177,7 +177,7 @@ public class KeyManagementImpl extends KeyManagement {
     SPRResponseElement			response;
     int					httpCode;
 
-    session.getUser().getUserInfo().getUserStatus().check(EbicsUserAction.SPR);
+    session.getUser().getUserInfo().checkAction(EbicsUserAction.SPR);
     sender = new HttpRequestSender(session);
     request = new SPRRequestElement(session);
     request.build();
@@ -189,6 +189,6 @@ public class KeyManagementImpl extends KeyManagement {
     response.build();
     session.getConfiguration().getTraceManager().trace(response,session);
     response.report();
-    session.getUser().getUserInfo().getUserStatus().check(EbicsUserAction.SPR);
+    session.getUser().getUserInfo().checkAction(EbicsUserAction.SPR);
   }
 }

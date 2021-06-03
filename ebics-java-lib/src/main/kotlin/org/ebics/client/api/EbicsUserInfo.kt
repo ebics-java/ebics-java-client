@@ -19,7 +19,9 @@
 package org.ebics.client.api
 
 import org.ebics.client.model.EbicsVersion
+import org.ebics.client.model.user.EbicsUserAction
 import org.ebics.client.model.user.EbicsUserStatus
+import org.ebics.client.model.user.EbicsUserStatusEnum
 
 /**
  * Things an EBICS user must be able to perform.
@@ -31,7 +33,10 @@ interface EbicsUserInfo {
     val userId: String
     val name: String
     val dn: String
-    val userStatus: EbicsUserStatus
+    var userStatus: EbicsUserStatusEnum
+
+    fun checkAction(action: EbicsUserAction) = userStatus.checkAction(action)
+    fun updateStatus(action: EbicsUserAction) { userStatus = userStatus.updateStatus(action) }
 
     companion object {
 

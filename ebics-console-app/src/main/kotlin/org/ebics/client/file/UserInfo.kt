@@ -4,6 +4,7 @@ import org.ebics.client.model.user.EbicsUserStatus
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.api.EbicsUserInfo
 import org.ebics.client.api.EbicsUserInfo.Companion.makeDN
+import org.ebics.client.model.user.EbicsUserStatusEnum
 import java.io.IOException
 import java.security.GeneralSecurityException
 
@@ -12,7 +13,7 @@ class UserInfo(
     override val userId: String,
     override val name: String,
     override val dn: String,
-    override val userStatus: EbicsUserStatus = EbicsUserStatus()
+    override var userStatus: EbicsUserStatusEnum = EbicsUserStatusEnum.CREATED
 ) : EbicsUserInfo {
 
     /**
@@ -35,6 +36,6 @@ class UserInfo(
         email: String?,
         country: String?,
         organization: String?,
-        userStatus: EbicsUserStatus = EbicsUserStatus()
+        userStatus: EbicsUserStatusEnum = EbicsUserStatusEnum.CREATED
     ) : this(ebicsVersion, userId, name, makeDN(name, email, country, organization), userStatus)
 }

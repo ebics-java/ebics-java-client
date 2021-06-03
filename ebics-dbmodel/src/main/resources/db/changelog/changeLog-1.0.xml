@@ -75,7 +75,7 @@
             <column name="ebicsVersion" type="INT"/>
             <column name="name" type="VARCHAR(255)"/>
             <column name="userId" type="VARCHAR(255)"/>
-            <column name="status" type="INT"/>
+            <column name="userStatus" type="INT"/>
             <column name="keyStore_id" type="BIGINT"/>
         </createTable>
     </changeSet>

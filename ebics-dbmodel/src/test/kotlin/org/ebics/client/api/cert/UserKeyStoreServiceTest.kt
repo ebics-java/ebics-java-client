@@ -36,7 +36,7 @@ open class UserKeyStoreServiceTest (
 
     @Test
     fun createStoreAndLoad() {
-        val user = UserInfo(null, EbicsVersion.H004, "CHT1003", "Jan Toegel", "cn=jan.toegel", UserStatus(), null)
+        val user = UserInfo(null, EbicsVersion.H004, "CHT1003", "Jan Toegel", "cn=jan.toegel", keyStore =  null)
         userService.createUserInfo(user)
         val certificates = CertificateManager.create(user.dn)
         val bos = ByteOutputStream(4096)

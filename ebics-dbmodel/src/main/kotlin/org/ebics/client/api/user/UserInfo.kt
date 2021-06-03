@@ -4,6 +4,7 @@ import org.ebics.client.api.EbicsUserInfo
 import org.ebics.client.api.cert.UserKeyStore
 import org.ebics.client.model.user.EbicsUserStatus
 import org.ebics.client.model.EbicsVersion
+import org.ebics.client.model.user.EbicsUserStatusEnum
 import javax.persistence.*
 
 @Entity
@@ -16,9 +17,7 @@ data class UserInfo(
     override val userId: String,
     override val name: String,
     override val dn: String,
-
-    @Embedded
-    override val userStatus: EbicsUserStatus,
+    override var userStatus: EbicsUserStatusEnum = EbicsUserStatusEnum.CREATED,
 
     @OneToOne(optional = true)
     val keyStore: UserKeyStore?

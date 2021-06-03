@@ -96,6 +96,7 @@
                     <compilerPlugins>
                         <!-- No ARG constructor for kotlin hibernate Entity classes -->
                         <plugin>no-arg</plugin>
+                        <plugin>jpa</plugin>
                     </compilerPlugins>
                     <pluginOptions>
                         <option>no-arg:annotation=org.jetbrains.kotlin.NoArgConstructor</option>

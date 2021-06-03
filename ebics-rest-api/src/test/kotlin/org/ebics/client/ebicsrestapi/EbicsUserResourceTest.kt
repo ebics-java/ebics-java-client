@@ -24,7 +24,7 @@ class EbicsUserResourceTest (@Autowired private val restTemplate: TestRestTempla
 
     @Test
     fun addUserAndGet() {
-        val user = UserInfo(null, EbicsVersion.H005, "CHT10001", "JT", "cn=JT,org=com", EbicsUserStatus(), null)
+        val user = UserInfo(null, EbicsVersion.H005, "CHT10001", "JT", "cn=JT,org=com", keyStore =  null)
         val request: HttpEntity<UserInfo> = HttpEntity(user)
         val userId = restTemplate.postForObject("/users", request, Long::class.java)
         assertThat(userId).isEqualTo(1)
@@ -34,7 +34,7 @@ class EbicsUserResourceTest (@Autowired private val restTemplate: TestRestTempla
         with (users[0] as UserInfo) {
             assertThat(name).isEqualTo("JT")
             assertThat(dn).isEqualTo("cn=JT,org=com")
-            assertThat(userStatus.status).isEqualTo(EbicsUserStatusEnum.CREATED)
+            assertThat(userStatus).isEqualTo(EbicsUserStatusEnum.CREATED)
             assertThat(ebicsVersion).isEqualTo(EbicsVersion.H005)
         }
     }
