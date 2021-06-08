@@ -17,15 +17,15 @@ class EbicsBankResource (val bankService: BankService) {
     @GetMapping()
     fun listBanks(): List<Bank> = bankService.findBanks()
 
-    @GetMapping("{id}")
+    @GetMapping("{bankId}")
     fun getBankById(@PathVariable bankId: Long): Bank = bankService.getBankById(bankId)
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("{bankId}")
     fun deleteBankById(@PathVariable bankId: Long) = bankService.deleteBankById(bankId)
 
     @PostMapping("")
     fun createBank(@RequestBody bank: Bank):Long = bankService.createBank(bank)
 
-    @PutMapping("{id}")
+    @PutMapping("{bankId}")
     fun updateBank(@RequestBody bank: Bank, @PathVariable bankId:Long) = bankService.updateBankById(bankId, bank)
 }
