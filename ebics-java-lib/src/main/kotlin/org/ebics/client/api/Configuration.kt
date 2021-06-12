@@ -18,7 +18,6 @@
  */
 package org.ebics.client.api
 
-import org.ebics.client.interfaces.LetterManager
 import java.util.*
 
 /**

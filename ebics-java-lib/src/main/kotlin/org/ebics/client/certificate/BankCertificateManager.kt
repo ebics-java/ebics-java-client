@@ -52,7 +52,7 @@ class BankCertificateManager(
         }
 
         @JvmStatic
-        fun load(ins: InputStream) {
+        fun load(ins: InputStream): BankCertificateManager {
             TODO("Loading from stream to be implemented")
             //val publicKey: PublicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(bytes))
         }

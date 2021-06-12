@@ -27,8 +27,7 @@ import org.ebics.client.messages.Messages
 import org.ebics.client.model.*
 import org.ebics.client.api.EbicsUser
 import org.ebics.client.certificate.BankCertificateManager
-import org.ebics.client.certificate.CertificateManager
-import org.ebics.client.model.user.EbicsUserStatus
+import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.ebics.client.utils.Constants
 import org.slf4j.LoggerFactory
@@ -56,7 +55,12 @@ class EbicsFileModel(
         }
     }
 
-    fun createSession(user: User, product: Product, userCert: CertificateManager, bankCert: BankCertificateManager?): EbicsSession {
+    fun createSession(
+        user: User,
+        product: Product,
+        userCert: UserCertificateManager,
+        bankCert: BankCertificateManager?
+    ): EbicsSession {
         return EbicsSession(user, configuration, product, userCert, bankCert)
     }
 
@@ -69,7 +73,7 @@ class EbicsFileModel(
         logger.info(
             Messages.getString(
                 "user.create.directories", Constants.APPLICATION_BUNDLE_NAME,
-                user.userInfo.userId
+                user.userId
             )
         )
         IOUtils.createDirectories(configuration.getUserDirectory(user))
@@ -126,30 +130,25 @@ class EbicsFileModel(
         url: URL, ebicsVersion: EbicsVersion, bankName: String, hostId: String, partnerId: String,
         userId: String, name: String, email: String?, country: String?, organization: String?,
         useCertificates: Boolean, saveCertificates: Boolean, passwordCallback: PasswordCallback
-    ): Pair<User, CertificateManager> {
+    ): Pair<User, UserCertificateManager> {
         logger.info(Messages.getString("user.create.info", Constants.APPLICATION_BUNDLE_NAME, userId))
         val bank = createBank(url, bankName, hostId, useCertificates)
         val partner = createPartner(bank, partnerId)
         return try {
-            val userInfo = UserInfo(ebicsVersion, userId, name, email, country, organization, EbicsUserStatusEnum.CREATED)
-            val manager = CertificateManager.create(userInfo.dn)
-            val user = with(manager) {
-                val user = User(userInfo, a005Certificate, e002Certificate, x002Certificate,
-                    a005PrivateKey, e002PrivateKey, x002PrivateKey, partner)
-                if (saveCertificates) {
-                    save(configuration.getKeystoreDirectory(user), passwordCallback, userId)
-                }
-                user
+            val user = User(partner, ebicsVersion, userId, name, EbicsUser.makeDN(name, email, country, organization), EbicsUserStatusEnum.CREATED)
+            val userCert = UserCertificateManager.create(user.dn)
+            if (saveCertificates) {
+                userCert.save(configuration.getKeystoreDirectory(user), passwordCallback, userId)
             }
             createUserDirectories(user)
             serializationManager.serialize(bank)
             serializationManager.serialize(partner)
             serializationManager.serialize(user)
-            createLetters(user)
+            createLetters(user, userCert)
             logger.info(
                 Messages.getString("user.create.success", Constants.APPLICATION_BUNDLE_NAME, userId)
             )
-            user to manager
+            user to userCert
         } catch (e: Exception) {
             logger.error(
                 Messages.getString("user.create.error", Constants.APPLICATION_BUNDLE_NAME), e
@@ -159,12 +158,12 @@ class EbicsFileModel(
     }
 
     @Throws(GeneralSecurityException::class, IOException::class, EbicsException::class, FileNotFoundException::class)
-    fun createLetters(user: EbicsUser) {
+    fun createLetters(user: EbicsUser, userCert: UserCertificateManager) {
         val letters = with(configuration.letterManager) {
             listOf(
-                createA005Letter(user),
-                createE002Letter(user),
-                createX002Letter(user)
+                createA005Letter(user, userCert),
+                createE002Letter(user, userCert),
+                createX002Letter(user, userCert)
             )
         }
         val directory = File(configuration.getLettersDirectory(user))
@@ -179,7 +178,12 @@ class EbicsFileModel(
      * @throws Exception
      */
     @Throws(Exception::class)
-    fun loadUser(hostId: String, partnerId: String, userId: String, passwordCallback: PasswordCallback): Pair<User, CertificateManager> {
+    fun loadUser(
+        hostId: String,
+        partnerId: String,
+        userId: String,
+        passwordCallback: PasswordCallback
+    ): Pair<User, UserCertificateManager> {
         logger.info(
             Messages.getString("user.load.info", Constants.APPLICATION_BUNDLE_NAME, userId)
         )
@@ -189,7 +193,8 @@ class EbicsFileModel(
                 Partner.deserialize(serializationManager.getDeserializeStream("partner-$partnerId"), bank)
             val user: User =
                 User.deserialize(serializationManager.getDeserializeStream("user-$userId"), partner)
-            val manager = CertificateManager.load(configuration.getKeystoreDirectory(user), passwordCallback, userId)
+            val manager =
+                UserCertificateManager.load(configuration.getKeystoreDirectory(user), passwordCallback, userId)
             logger.info(
                 Messages.getString("user.load.success", Constants.APPLICATION_BUNDLE_NAME, userId)
             )
@@ -248,7 +253,7 @@ class EbicsFileModel(
             logger.info(
                 Messages.getString(
                     "user.save.info", Constants.APPLICATION_BUNDLE_NAME,
-                    user.userInfo.userId
+                    user.userId
                 )
             )
             serializationManager.serialize(user)

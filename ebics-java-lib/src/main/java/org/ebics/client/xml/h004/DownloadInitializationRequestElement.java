@@ -85,10 +85,10 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
     product = EbicsXmlFactory.createProduct(session.getProduct().getLanguage(), session.getProduct().getName());
     authentication = EbicsXmlFactory.createAuthentication(session.getConfiguration().getAuthenticationVersion(),
 	                                                  "http://www.w3.org/2001/04/xmlenc#sha256",
-	                                                  decodeHex(session.getUser().getPartner().getBank().getX002Digest()));
+	                                                  decodeHex(session.getBankCert().getX002Digest()));
     encryption = EbicsXmlFactory.createEncryption(session.getConfiguration().getEncryptionVersion(),
 	                                          "http://www.w3.org/2001/04/xmlenc#sha256",
-	                                          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
+	                                          decodeHex(session.getBankCert().getE002Digest()));
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
     orderType = EbicsXmlFactory.createOrderType(type.toString());
     if (type.equals(EbicsAdminOrderType.FDL)) {
@@ -130,7 +130,7 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
                                                      session.getUser().getPartner().getPartnerId(),
                                                      product,
                                                      session.getUser().getSecurityMedium(),
-                                                     session.getUser().getUserInfo().getUserId(),
+                                                     session.getUser().getUserId(),
                                                      Calendar.getInstance(),
                                                      orderDetails,
                                                      bankPubKeyDigests);

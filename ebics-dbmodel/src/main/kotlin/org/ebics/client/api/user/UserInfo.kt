@@ -19,6 +19,4 @@ data class UserInfo(
     override val dn: String,
     override var userStatus: EbicsUserStatusEnum = EbicsUserStatusEnum.CREATED,
 
-    @OneToOne(optional = true)
-    val keyStore: UserKeyStore?
 ): EbicsUserInfo

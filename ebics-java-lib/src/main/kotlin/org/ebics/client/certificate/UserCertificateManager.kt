@@ -33,15 +33,14 @@ import java.util.*
  *
  * @author hacheni
  */
-class CertificateManager(
-    val a005Certificate: X509Certificate,
-    val x002Certificate: X509Certificate,
-    val e002Certificate: X509Certificate,
-    val a005PrivateKey: PrivateKey,
-    val x002PrivateKey: PrivateKey,
-    val e002PrivateKey: PrivateKey
-    )
-{
+class UserCertificateManager(
+    override val a005Certificate: X509Certificate,
+    override val x002Certificate: X509Certificate,
+    override val e002Certificate: X509Certificate,
+    override val a005PrivateKey: PrivateKey,
+    override val x002PrivateKey: PrivateKey,
+    override val e002PrivateKey: PrivateKey
+) : org.ebics.client.api.UserCertificateManager {
     private enum class KeyType { A005, X002, E002, }
     private class CertKeyPair(val certificate: X509Certificate, val privateKey: PrivateKey)
 
@@ -53,7 +52,7 @@ class CertificateManager(
          * @throws IOException
          */
         @Throws(GeneralSecurityException::class, IOException::class)
-        fun create(userDn: String):CertificateManager {
+        fun create(userDn: String): UserCertificateManager {
             val calendar: Calendar = Calendar.getInstance()
             calendar.add(Calendar.DAY_OF_YEAR, X509Constants.DEFAULT_DURATION)
             val generator = X509Generator()
@@ -61,7 +60,7 @@ class CertificateManager(
             val a005pair = createCertificate(KeyType.A005, generator, userDn, endDate)
             val x002pair = createCertificate(KeyType.X002, generator, userDn, endDate)
             val e002pair = createCertificate(KeyType.E002, generator, userDn, endDate)
-            return CertificateManager(
+            return UserCertificateManager(
                 a005pair.certificate,
                 x002pair.certificate,
                 e002pair.certificate,
@@ -72,9 +71,14 @@ class CertificateManager(
         }
 
         @Throws(GeneralSecurityException::class, IOException::class)
-        private fun createCertificate(keyType: KeyType, generator: X509Generator, userDn:String, end: Date): CertKeyPair {
+        private fun createCertificate(
+            keyType: KeyType,
+            generator: X509Generator,
+            userDn: String,
+            end: Date
+        ): CertKeyPair {
             val keypair: KeyPair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE)
-            val cert = when(keyType) {
+            val cert = when (keyType) {
                 KeyType.A005 -> generator.generateA005Certificate(keypair, userDn, Date(), end)
                 KeyType.X002 -> generator.generateX002Certificate(keypair, userDn, Date(), end)
                 KeyType.E002 -> generator.generateE002Certificate(keypair, userDn, Date(), end)
@@ -82,67 +86,8 @@ class CertificateManager(
             return CertKeyPair(cert, keypair.private)
         }
 
-        /**
-         * Creates the signature certificate.
-         *
-         * @param end the expiration date of a the certificate.
-         * @throws GeneralSecurityException
-         * @throws IOException
-         */
-        /*@Throws(GeneralSecurityException::class, IOException::class)
-        private fun createA005Certificate(userDn:String, end: Date) {
-            val keypair: KeyPair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE)
-            a005Certificate = generator.generateA005Certificate(
-                keypair,
-                userDn,
-                Date(),
-                end
-            )
-            a005PrivateKey = keypair.private
-        }*/
-
-        /**
-         * Creates the authentication certificate.
-         *
-         * @param end the expiration date of a the certificate.
-         * @throws GeneralSecurityException
-         * @throws IOException
-         */
-        /*@Throws(GeneralSecurityException::class, IOException::class)
-        private fun createX002Certificate(userDn:String, end: Date) {
-            val keypair: KeyPair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE)
-            x002Certificate = generator.generateX002Certificate(
-                keypair,
-                userDn,
-                Date(),
-                end
-            )
-            x002PrivateKey = keypair.private
-        }*/
-
-        /**
-         * Creates the encryption certificate.
-         *
-         * @param end the expiration date of a the certificate.
-         * @throws GeneralSecurityException
-         * @throws IOException
-         */
-        /*@Throws(GeneralSecurityException::class, IOException::class)
-        private fun createE002Certificate(userDn:String, end: Date) {
-            val keypair: KeyPair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE)
-            e002Certificate = generator.generateE002Certificate(
-                keypair,
-                userDn,
-                Date(),
-                end
-            )
-            e002PrivateKey = keypair.private
-        }*/
-
-
         fun load(path: String, passwordCallback: PasswordCallback, userId: String) =
-            load(FileInputStream(path), passwordCallback, userId )
-
+            load(FileInputStream(path), passwordCallback, userId)
 
         /**
          * Loads user certificates from a given key store
@@ -153,19 +98,18 @@ class CertificateManager(
          * @throws IOException
          */
         @Throws(GeneralSecurityException::class, IOException::class)
-        fun load(ins: InputStream, passwordCallback: PasswordCallback, userId:String): CertificateManager {
+        fun load(ins: InputStream, passwordCallback: PasswordCallback, userId: String): UserCertificateManager {
             val manager = KeyStoreManager.load(ins, passwordCallback.password)
-            return CertificateManager(
-            a005Certificate = manager.getCertificate("$userId-A005"),
-            x002Certificate = manager.getCertificate("$userId-X002"),
-            e002Certificate = manager.getCertificate("$userId-E002"),
-            a005PrivateKey = manager.getPrivateKey("$userId-A005"),
-            x002PrivateKey = manager.getPrivateKey("$userId-X002"),
-            e002PrivateKey = manager.getPrivateKey("$userId-E002"),
+            return UserCertificateManager(
+                a005Certificate = manager.getCertificate("$userId-A005"),
+                x002Certificate = manager.getCertificate("$userId-X002"),
+                e002Certificate = manager.getCertificate("$userId-E002"),
+                a005PrivateKey = manager.getPrivateKey("$userId-A005"),
+                x002PrivateKey = manager.getPrivateKey("$userId-X002"),
+                e002PrivateKey = manager.getPrivateKey("$userId-E002"),
             )
         }
     }
-
 
     /**
      * Saves the certificates in PKCS12 format
@@ -179,7 +123,7 @@ class CertificateManager(
     fun save(path: String, passwordCallback: PasswordCallback, userId: String) {
         save(FileOutputStream("$path/$userId.p12"), passwordCallback, userId)
     }
-    
+
     /**
      * Writes a the generated certificates into a PKCS12 key store.
      *

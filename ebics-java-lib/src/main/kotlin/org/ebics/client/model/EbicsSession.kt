@@ -19,11 +19,10 @@
 package org.ebics.client.model
 
 import org.ebics.client.api.EbicsSession
-import org.ebics.client.exception.EbicsException
 import org.ebics.client.api.Configuration
 import org.ebics.client.api.EbicsUser
 import org.ebics.client.certificate.BankCertificateManager
-import org.ebics.client.certificate.CertificateManager
+import org.ebics.client.certificate.UserCertificateManager
 
 /**
  * The EBICS Session for EBICS API requests
@@ -50,12 +49,14 @@ class EbicsSession(
     /**
      * User key-pairs (A005, X002, E002)
      */
-    override val userCert: CertificateManager,
+    override val userCert: UserCertificateManager,
 
     /**
      * Bank public keys (X002, E002)
      * This is null for INI,HIA,HPB
-     * Result of HPB request are bank certificates, used for further
+     * Result of HPB request is BankCertificateManager,
+     *  which is then set here as member, in order to use
+     *  this for further operations like uploads / downloads / SPR
      */
     override val bankCert: BankCertificateManager?,
 ): EbicsSession {

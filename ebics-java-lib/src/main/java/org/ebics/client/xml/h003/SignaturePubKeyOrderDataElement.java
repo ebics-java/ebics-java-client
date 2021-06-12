@@ -57,17 +57,17 @@ public class SignaturePubKeyOrderDataElement extends DefaultEbicsRootElement {
 
     x509Data = null;
     if (session.getUser().getPartner().getBank().getUseCertificate())
-        x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getUserInfo().getDn(),
-	                                          session.getUser().getA005CertificateBytes());
-    rsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getA005PublicKey().getPublicExponent().toByteArray(),
-	                                                session.getUser().getA005PublicKey().getModulus().toByteArray());
+        x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDn(),
+	                                          session.getUserCert().getA005CertificateBytes());
+    rsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUserCert().getA005PublicKey().getPublicExponent().toByteArray(),
+	                                                session.getUserCert().getA005PublicKey().getModulus().toByteArray());
     pubKeyValue = EbicsXmlFactory.createPubKeyValueType(rsaKeyValue, Calendar.getInstance());
     signaturePubKeyInfo = EbicsXmlFactory.createSignaturePubKeyInfoType(x509Data,
 	                                                                pubKeyValue,
 	                                                                session.getConfiguration().getSignatureVersion());
     signaturePubKeyOrderData = EbicsXmlFactory.createSignaturePubKeyOrderData(signaturePubKeyInfo,
 									      session.getUser().getPartner().getPartnerId(),
-									      session.getUser().getUserInfo().getUserId());
+									      session.getUser().getUserId());
     document = EbicsXmlFactory.createSignaturePubKeyOrderDataDocument(signaturePubKeyOrderData);
   }
 

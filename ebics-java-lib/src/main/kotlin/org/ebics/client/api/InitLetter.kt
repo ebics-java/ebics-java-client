@@ -18,25 +18,37 @@
  */
 package org.ebics.client.api
 
-import org.ebics.client.model.EbicsVersion
-import org.ebics.client.model.user.EbicsUserAction
-import org.ebics.client.model.user.EbicsUserStatus
-import org.ebics.client.model.user.EbicsUserStatusEnum
+import org.ebics.client.exception.EbicsException
+import java.io.IOException
+import java.io.OutputStream
+import java.security.GeneralSecurityException
 
 /**
- * Basic EBICS User data fields, without keys & relations to partners/bank
+ * The `InitLetter` is an abstract initialization
+ * letter. The INI, HIA and HPB letters should be an implementation
+ * of the `InitLetter`
  *
  * @author Hachani
- * @author JTO
  */
-interface EbicsUserInfo {
-    val ebicsVersion: EbicsVersion
-    val userId: String
-    val name: String
-    val dn: String
-    var userStatus: EbicsUserStatusEnum
-    val securityMedium: String get() = "0000"
+interface InitLetter {
 
-    fun checkAction(action: EbicsUserAction) = userStatus.checkAction(action)
-    fun updateStatus(action: EbicsUserAction) { userStatus = userStatus.updateStatus(action) }
+    /**
+     * Saves the `InitLetter` to the given output stream.
+     * @param output the output stream.
+     * @throws IOException Save error.
+     */
+    @Throws(IOException::class)
+    fun writeTo(output: OutputStream)
+
+    /**
+     * Returns the initialization letter title.
+     * @return the letter title.
+     */
+    val title: String
+
+    /**
+     * Returns the letter name.
+     * @return the letter name.
+     */
+    val name: String
 }

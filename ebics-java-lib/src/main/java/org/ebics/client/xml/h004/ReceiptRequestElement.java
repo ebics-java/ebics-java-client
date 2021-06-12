@@ -75,7 +75,7 @@ public class ReceiptRequestElement extends DefaultEbicsRootElement {
     body = EbicsXmlFactory.createEbicsRequestBody(transferReceipt);
     request = EbicsXmlFactory.createEbicsRequest(header, body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
-    signedInfo = new SignedInfo(session.getUser(), getDigest());
+    signedInfo = new SignedInfo(session.getUserCert(), getDigest());
     signedInfo.build();
     ((EbicsRequestDocument)document).getEbicsRequest().setAuthSignature(signedInfo.getSignatureType());
     ((EbicsRequestDocument)document).getEbicsRequest().getAuthSignature().setSignatureValue(EbicsXmlFactory.createSignatureValueType(signedInfo.sign(toByteArray())));

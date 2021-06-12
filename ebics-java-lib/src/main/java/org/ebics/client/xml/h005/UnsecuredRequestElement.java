@@ -74,7 +74,7 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
 
     xstatic = EbicsXmlFactory.createUnsecuredRequestStaticHeaderType(session.getBankID(),
 								     session.getUser().getPartner().getPartnerId(),
-								     session.getUser().getUserInfo().getUserId(),
+								     session.getUser().getUserId(),
 	                                                             productType,
 	                                                             orderDetails,
 	                                                             session.getUser().getSecurityMedium());

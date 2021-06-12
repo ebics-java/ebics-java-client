@@ -2,11 +2,11 @@ package org.ebics.client.console
 
 import org.ebics.client.file.EbicsFileModel
 import org.ebics.client.model.EbicsVersion
-import org.ebics.client.api.Configuration
-import org.ebics.client.certificate.CertificateManager
+import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.interfaces.PasswordCallback
 import org.ebics.client.file.FileConfiguration
 import org.ebics.client.file.User
+import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.Product
 import java.io.File
 import java.io.FileNotFoundException
@@ -19,7 +19,7 @@ import java.util.*
  * This is the base part of Console App without being depended on specific EBICS h00X API.
  */
 class ConsoleAppBase(
-    configuration: FileConfiguration,
+    private val configuration: FileConfiguration,
     private val properties: ConfigProperties,
     val defaultProduct: Product,
     serializedDirectory: String
@@ -27,7 +27,7 @@ class ConsoleAppBase(
     val ebicsModel: EbicsFileModel = EbicsFileModel(configuration, serializedDirectory)
 
     @Throws(Exception::class)
-    private fun createUser(properties: ConfigProperties, pwdHandler: PasswordCallback, ebicsVersion: EbicsVersion): Pair<User, CertificateManager> {
+    private fun createUser(properties: ConfigProperties, pwdHandler: PasswordCallback, ebicsVersion: EbicsVersion): Pair<User, UserCertificateManager> {
         val userId = properties["userId"]
         val partnerId = properties["partnerId"]
         val bankUrl = properties["bank.url"]
@@ -44,14 +44,20 @@ class ConsoleAppBase(
     }
 
     @Throws(Exception::class)
-    fun createDefaultUser(ebicsVersion: EbicsVersion): Pair<User, CertificateManager> = createUser(properties, createPasswordCallback(), ebicsVersion)
+    fun createDefaultSession(ebicsVersion: EbicsVersion): EbicsSession {
+        TODO("Bank certificates needs to be loaded")
+        val user = createUser(properties, createPasswordCallback(), ebicsVersion)
+        return EbicsSession(user.first, configuration, defaultProduct, user.second, null)
+    }
 
     @Throws(Exception::class)
-    fun loadDefaultUser(): Pair<User, CertificateManager> {
+    fun loadDefaultSession(): EbicsSession {
         val userId = properties["userId"]
         val hostId = properties["hostId"]
         val partnerId = properties["partnerId"]
-        return ebicsModel.loadUser(hostId, partnerId, userId, createPasswordCallback())
+        val user = ebicsModel.loadUser(hostId, partnerId, userId, createPasswordCallback())
+        TODO("Bank certificates needs to be loaded")
+        return EbicsSession(user.first, configuration, defaultProduct, user.second, null)
     }
 
     fun createPasswordCallback(): PasswordCallback {

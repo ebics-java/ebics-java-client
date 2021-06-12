@@ -20,7 +20,7 @@ package org.ebics.client.file
 
 import org.ebics.client.api.Configuration
 import org.ebics.client.api.EbicsUser
-import org.ebics.client.interfaces.LetterManager
+import org.ebics.client.api.LetterManager
 import org.ebics.client.api.TraceManager
 import org.ebics.client.io.IOUtils
 import org.ebics.client.letter.DefaultLetterManager
@@ -113,7 +113,7 @@ open class FileConfiguration constructor(
      * @return the users directory.
      */
     fun getUserDirectory(user: EbicsUser): String {
-        return usersDirectory + File.separator + user.userInfo.userId
+        return usersDirectory + File.separator + user.userId
     }
 
     companion object {

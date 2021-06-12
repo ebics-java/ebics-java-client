@@ -49,13 +49,13 @@ public class SignaturePubKeyOrderDataElement extends DefaultEbicsRootElement {
     final X509DataType 			x509Data;
     SignaturePubKeyOrderDataType	signaturePubKeyOrderData;
 
-    x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getUserInfo().getDn(),
-	                                          session.getUser().getA005CertificateBytes());
+    x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDn(),
+	                                          session.getUserCert().getA005CertificateBytes());
     signaturePubKeyInfo = EbicsXmlFactory.createSignaturePubKeyInfoType(x509Data,
 	                                                                session.getConfiguration().getSignatureVersion());
     signaturePubKeyOrderData = EbicsXmlFactory.createSignaturePubKeyOrderData(signaturePubKeyInfo,
 									      session.getUser().getPartner().getPartnerId(),
-									      session.getUser().getUserInfo().getUserId());
+									      session.getUser().getUserId());
     document = EbicsXmlFactory.createSignaturePubKeyOrderDataDocument(signaturePubKeyOrderData);
   }
 

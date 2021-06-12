@@ -22,6 +22,7 @@ package org.ebics.client.xml.h003;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import org.ebics.client.api.UserCertificateManager;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.api.EbicsUser;
 import org.ebics.schema.s001.OrderSignatureDataType;
@@ -46,11 +47,13 @@ public class UserSignature extends DefaultEbicsRootElement {
    * @param toSign the data to be signed
    */
   public UserSignature(EbicsUser user,
+                       UserCertificateManager userCert,
                        String name,
                        String signatureVersion,
                        byte[] toSign)
   {
     this.user = user;
+    this.userCert = userCert;
     this.toSign = toSign;
     this.name = name;
     this.signatureVersion = signatureVersion;
@@ -63,7 +66,7 @@ public class UserSignature extends DefaultEbicsRootElement {
     byte[]				signature;
 
     try {
-      signature = user.sign(toSign);
+      signature = userCert.sign(toSign);
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
     } catch (GeneralSecurityException e) {
@@ -72,7 +75,7 @@ public class UserSignature extends DefaultEbicsRootElement {
 
     orderSignatureData = EbicsXmlFactory.createOrderSignatureDataType(signatureVersion,
                                                                       user.getPartner().getPartnerId(),
-                                                                      user.getUserInfo().getUserId(),
+                                                                      user.getUserId(),
                                                                       signature);
     userSignatureData = EbicsXmlFactory.createUserSignatureDataSigBookType(new OrderSignatureDataType[] {orderSignatureData});
     document = EbicsXmlFactory.createUserSignatureDataDocument(userSignatureData);
@@ -95,6 +98,7 @@ public class UserSignature extends DefaultEbicsRootElement {
   // --------------------------------------------------------------------
 
   private EbicsUser 			user;
+  private UserCertificateManager userCert;
   private String 			signatureVersion;
   private byte[]			toSign;
   private String			name;

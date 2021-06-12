@@ -68,7 +68,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
     SignedInfo			signedInfo;
 
     buildInitialization();
-    signedInfo = new SignedInfo(session.getUser(), getDigest());
+    signedInfo = new SignedInfo(session.getUserCert(), getDigest());
     signedInfo.build();
     ((EbicsRequestDocument)document).getEbicsRequest().setAuthSignature(signedInfo.getSignatureType());
     ((EbicsRequestDocument)document).getEbicsRequest().getAuthSignature().setSignatureValue(EbicsXmlFactory.createSignatureValueType(signedInfo.sign(toByteArray())));

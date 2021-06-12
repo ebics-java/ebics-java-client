@@ -62,20 +62,20 @@ public class HIARequestOrderDataElement extends DefaultEbicsRootElement {
 
     encryptionX509Data = null;
     if (session.getUser().getPartner().getBank().getUseCertificate())
-        encryptionX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getUserInfo().getDn(),
-	                                                    session.getUser().getE002CertificateBytes());
-    encryptionRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getE002PublicKey().getPublicExponent().toByteArray(),
-	                                                          session.getUser().getE002PublicKey().getModulus().toByteArray());
+        encryptionX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDn(),
+	                                                    session.getUserCert().getE002CertificateBytes());
+    encryptionRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUserCert().getE002PublicKey().getPublicExponent().toByteArray(),
+	                                                          session.getUserCert().getE002PublicKey().getModulus().toByteArray());
     encryptionPubKeyValue = EbicsXmlFactory.createh004PubKeyValueType(encryptionRsaKeyValue, Calendar.getInstance());
     encryptionPubKeyInfo = EbicsXmlFactory.createEncryptionPubKeyInfoType(session.getConfiguration().getEncryptionVersion(),
 	                                                                  encryptionPubKeyValue,
 	                                                                  encryptionX509Data);
     authX509Data = null;
     if (session.getUser().getPartner().getBank().getUseCertificate())
-        authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getUserInfo().getDn(),
-	                                              session.getUser().getX002CertificateBytes());
-    AuthRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getX002PublicKey().getPublicExponent().toByteArray(),
-							    session.getUser().getX002PublicKey().getModulus().toByteArray());
+        authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDn(),
+	                                              session.getUserCert().getX002CertificateBytes());
+    AuthRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUserCert().getX002PublicKey().getPublicExponent().toByteArray(),
+							    session.getUserCert().getX002PublicKey().getModulus().toByteArray());
     authPubKeyValue = EbicsXmlFactory.createh004PubKeyValueType(AuthRsaKeyValue, Calendar.getInstance());
     authenticationPubKeyInfo = EbicsXmlFactory.createAuthenticationPubKeyInfoType(session.getConfiguration().getAuthenticationVersion(),
 	                                                                          authPubKeyValue,
@@ -83,7 +83,7 @@ public class HIARequestOrderDataElement extends DefaultEbicsRootElement {
     request = EbicsXmlFactory.createHIARequestOrderDataType(authenticationPubKeyInfo,
 	                                                    encryptionPubKeyInfo,
 	                                                    session.getUser().getPartner().getPartnerId(),
-	                                                    session.getUser().getUserInfo().getUserId());
+	                                                    session.getUser().getUserId());
     document = EbicsXmlFactory.createHIARequestOrderDataDocument(request);
   }
 

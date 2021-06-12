@@ -1,10 +1,10 @@
 package org.ebics.client.api.user
 
-import org.ebics.client.api.EbicsPartner
 import org.ebics.client.api.EbicsUser
+import org.ebics.client.api.cert.UserKeyStore
 import org.ebics.client.api.partner.Partner
-import java.security.PrivateKey
-import java.security.cert.X509Certificate
+import org.ebics.client.model.EbicsVersion
+import org.ebics.client.model.user.EbicsUserStatusEnum
 import javax.persistence.*
 
 @Entity
@@ -13,17 +13,16 @@ data class User (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id:Long? = null,
 
-    @OneToOne(optional = false)
-    override val userInfo: UserInfo,
-    override val a005Certificate: X509Certificate,
-    override val e002Certificate: X509Certificate,
-    override val x002Certificate: X509Certificate,
-    override val a005PrivateKey: PrivateKey,
-    override val e002PrivateKey: PrivateKey,
-    override val x002PrivateKey: PrivateKey,
+    override val ebicsVersion: EbicsVersion,
+    override val userId: String,
+    override val name: String,
+    override val dn: String,
+    override var userStatus: EbicsUserStatusEnum = EbicsUserStatusEnum.CREATED,
 
     @ManyToOne(optional = false)
     @JoinColumn(name="PARTNER_ID")
-    override val partner: Partner
+    override val partner: Partner,
 
+    @OneToOne(optional = true)
+    val keyStore: UserKeyStore?
 ) : EbicsUser

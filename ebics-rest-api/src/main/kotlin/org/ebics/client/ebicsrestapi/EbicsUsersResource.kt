@@ -10,12 +10,6 @@ class EbicsUsersResource (
     private val userInfoRepository: UserInfoRepository,
     private val userService: UserService)
 {
-    @GetMapping("test")
-    fun index(): List<Pair<String, String>> = listOf(
-            Pair("1", "Hello!"),
-            Pair("2", "Bonjour!"),
-    )
-
     @GetMapping("")
     fun listUsers(): List<UserInfo> = userInfoRepository.findAll()
 

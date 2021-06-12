@@ -101,7 +101,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     OrderType 				orderType;
     FileFormatType 			fileFormat;
 
-    userSignature = new UserSignature(session.getUser(),
+    userSignature = new UserSignature(session.getUser(), session.getUserCert(),
 				      generateName("UserSignature"),
 	                              session.getConfiguration().getSignatureVersion(),
 	                              userData);
@@ -114,10 +114,10 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     product = EbicsXmlFactory.createProduct(session.getProduct().getLanguage(), session.getProduct().getName());
     authentication = EbicsXmlFactory.createAuthentication(session.getConfiguration().getAuthenticationVersion(),
 	                                                  "http://www.w3.org/2001/04/xmlenc#sha256",
-	                                                  decodeHex(session.getUser().getPartner().getBank().getX002Digest()));
+	                                                  decodeHex(session.getBankCert().getX002Digest()));
     encryption = EbicsXmlFactory.createEncryption(session.getConfiguration().getEncryptionVersion(),
 	                                          "http://www.w3.org/2001/04/xmlenc#sha256",
-	                                          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
+	                                          decodeHex(session.getBankCert().getE002Digest()));
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
     orderType = EbicsXmlFactory.createOrderType(type.toString());
     fileFormat = EbicsXmlFactory.createFileFormatType(session.getConfiguration().getLocale().getCountry().toUpperCase(),
@@ -163,14 +163,14 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
 	                                             session.getUser().getPartner().getPartnerId(),
 	                                             product,
 	                                             session.getUser().getSecurityMedium(),
-	                                             session.getUser().getUserInfo().getUserId(),
+	                                             session.getUser().getUserId(),
 	                                             Calendar.getInstance(),
 	                                             orderDetails,
 	                                             bankPubKeyDigests);
     header = EbicsXmlFactory.createEbicsRequestHeader(true, mutable, xstatic);
     encryptionPubKeyDigest = EbicsXmlFactory.createEncryptionPubKeyDigest(session.getConfiguration().getEncryptionVersion(),
 								          "http://www.w3.org/2001/04/xmlenc#sha256",
-								          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
+								          decodeHex(session.getBankCert().getE002Digest()));
     signatureData = EbicsXmlFactory.createSignatureData(true, Utils.encrypt(Utils.zip(userSignature.prettyPrint()), keySpec));
     dataEncryptionInfo = EbicsXmlFactory.createDataEncryptionInfo(true,
 	                                                          encryptionPubKeyDigest,

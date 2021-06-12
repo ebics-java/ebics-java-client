@@ -206,7 +206,7 @@ public class FileTransfer extends AbstractFileTransfer {
     response.report();
     state = new TransferState(response.getSegmentsNumber(), response.getTransactionId());
     state.setSegmentNumber(response.getSegmentNumber());
-    joiner = new Joiner(session.getUser());
+    joiner = new Joiner(session.getUserCert());
     joiner.append(response.getOrderData());
     while(state.hasNext()) {
       int		segmentNumber;

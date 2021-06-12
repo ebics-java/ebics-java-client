@@ -5,17 +5,13 @@ import org.apache.xml.security.Init
 import org.assertj.core.api.Assertions.assertThat
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.api.user.UserInfo
-import org.ebics.client.api.user.UserInfoRepository
 import org.ebics.client.api.user.UserService
-import org.ebics.client.api.user.UserStatus
-import org.ebics.client.certificate.CertificateManager
+import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.model.EbicsVersion
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.SpringBootConfiguration
 import org.springframework.boot.autoconfigure.AutoConfigurationPackage
-import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -36,16 +32,16 @@ open class UserKeyStoreServiceTest (
 
     @Test
     fun createStoreAndLoad() {
-        val user = UserInfo(null, EbicsVersion.H004, "CHT1003", "Jan Toegel", "cn=jan.toegel", keyStore =  null)
+        val user = UserInfo(null, EbicsVersion.H004, "CHT1003", "Jan Toegel", "cn=jan.toegel")
         userService.createUserInfo(user)
-        val certificates = CertificateManager.create(user.dn)
+        val certificates = UserCertificateManager.create(user.dn)
         val bos = ByteOutputStream(4096)
         val pass = "testPass"
         certificates.save(bos, pass::toCharArray, user.userId)
         keyStoreService.save(bos, user)
 
         val bis = keyStoreService.load(requireNotNull(user.id) {"User id must not be null"})
-        val loadedCertificates = CertificateManager.load(bis, pass::toCharArray, user.userId)
+        val loadedCertificates = UserCertificateManager.load(bis, pass::toCharArray, user.userId)
         with(loadedCertificates) {
             assertThat(a005Certificate.encoded).isEqualTo(certificates.a005Certificate.encoded)
             assertThat(x002Certificate.encoded).isEqualTo(certificates.x002Certificate.encoded)

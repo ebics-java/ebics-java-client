@@ -51,7 +51,7 @@ public class HPBRequestElement extends DefaultEbicsRootElement {
 
     noPubKeyDigestsRequest = new NoPubKeyDigestsRequestElement(session);
     noPubKeyDigestsRequest.build();
-    signedInfo = new SignedInfo(session.getUser(), noPubKeyDigestsRequest.getDigest());
+    signedInfo = new SignedInfo(session.getUserCert(), noPubKeyDigestsRequest.getDigest());
     signedInfo.build();
     noPubKeyDigestsRequest.setAuthSignature(signedInfo.getSignatureType());
     signature = signedInfo.sign(noPubKeyDigestsRequest.toByteArray());

@@ -27,7 +27,7 @@ import java.security.interfaces.RSAPublicKey
  *
  * @author Hachani
  */
-interface EbicsBank : EbicsBankCertificateManager, Serializable {
+interface EbicsBank : Serializable {
     /**
      * Returns the URL needed for communication to the bank.
      * @return the URL needed for communication to the bank.

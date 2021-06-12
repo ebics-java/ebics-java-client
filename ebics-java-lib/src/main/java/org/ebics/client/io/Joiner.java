@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 
+import org.ebics.client.api.UserCertificateManager;
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.api.EbicsUser;
 import org.ebics.client.utils.Utils;
 
 
@@ -39,10 +39,10 @@ public class Joiner {
 
   /**
    * Constructs a new <code>Joiner</code> object.
-   * @param user the ebics user.
+   * @param userCert the ebics user.
    */
-  public Joiner(EbicsUser user) {
-    this.user = user;
+  public Joiner(UserCertificateManager userCert) {
+    this.userCert = userCert;
     buffer = new ByteArrayOutputStream();
   }
 
@@ -68,7 +68,7 @@ public class Joiner {
       byte[]		decrypted;
 
       buffer.close();
-      decrypted = user.decrypt(buffer.toByteArray(), transactionKey);
+      decrypted = userCert.decrypt(buffer.toByteArray(), transactionKey);
       output.write(Utils.unzip(decrypted));
     } catch (GeneralSecurityException e) {
       throw new EbicsException(e.getMessage());
@@ -81,6 +81,6 @@ public class Joiner {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private EbicsUser user;
+  private UserCertificateManager userCert;
   private ByteArrayOutputStream		buffer;
 }

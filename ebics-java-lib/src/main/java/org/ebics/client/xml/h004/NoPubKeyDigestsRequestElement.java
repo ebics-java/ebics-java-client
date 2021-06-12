@@ -100,7 +100,7 @@ public class NoPubKeyDigestsRequestElement extends DefaultEbicsRootElement {
 	                                                                   Utils.generateNonce(),
 	                                                                   Calendar.getInstance(),
 	                                                                   session.getUser().getPartner().getPartnerId(),
-	                                                                   session.getUser().getUserInfo().getUserId(),
+	                                                                   session.getUser().getUserId(),
 	                                                                   product,
 	                                                                   orderDetails,
 	                                                                   session.getUser().getSecurityMedium());

@@ -82,44 +82,7 @@ class Bank
         oos.defaultWriteObject() // write the fields
     }
 
-    override fun setBankKeys(e002Key: RSAPublicKey, x002Key: RSAPublicKey) {
-        this.e002Key = e002Key
-        this.x002Key = x002Key
-    }
-
-    override fun setDigests(e002Digest: ByteArray, x002Digest: ByteArray) {
-        this.e002Digest = e002Digest
-        this.x002Digest = x002Digest
-    }
-
     override val saveName: String = "$savePrefix$hostId.cer"
-    // --------------------------------------------------------------------
-    // DATA MEMBERS
-    // --------------------------------------------------------------------
-
-    /**
-     * The bank encryption digest
-     * @serial
-     */
-    override var e002Digest: ByteArray? = null
-
-    /**
-     * The bank authentication digest
-     * @serial
-     */
-    override var x002Digest: ByteArray? = null
-
-    /**
-     * The ban encryption key
-     * @serial
-     */
-    override var e002Key: RSAPublicKey? = null
-
-    /**
-     * The ban encryption key
-     * @serial
-     */
-    override var x002Key: RSAPublicKey? = null
 
     companion object {
 

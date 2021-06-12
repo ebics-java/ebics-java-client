@@ -28,6 +28,7 @@ import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.utils.IgnoreAllErrorHandler;
 import org.apache.xpath.XPathAPI;
+import org.ebics.client.api.UserCertificateManager;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.api.EbicsUser;
 import org.ebics.client.api.EbicsUserInfo;
@@ -56,8 +57,8 @@ public class SignedInfo extends DefaultEbicsRootElement {
    * Constructs a new <code>SignedInfo</code> element
    * @param digest the digest value
    */
-  public SignedInfo(EbicsUser user, byte[] digest) {
-    this.user = user;
+  public SignedInfo(UserCertificateManager userCert, byte[] digest) {
+    this.userCert = userCert;
     this.digest = digest;
   }
 
@@ -145,7 +146,7 @@ public class SignedInfo extends DefaultEbicsRootElement {
       document = builder.parse(new ByteArrayInputStream(toSign));
       node = XPathAPI.selectSingleNode(document, "//ds:SignedInfo");
       canonicalizer = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
-      return user.authenticate(canonicalizer.canonicalizeSubtree(node));
+      return userCert.authenticate(canonicalizer.canonicalizeSubtree(node));
     } catch(Exception e) {
       throw new EbicsException(e.getMessage());
     }
@@ -169,6 +170,6 @@ public class SignedInfo extends DefaultEbicsRootElement {
   // --------------------------------------------------------------------
 
   private byte[]			digest;
-  private EbicsUser user;
+  private UserCertificateManager userCert;
   private static final long 		serialVersionUID = 4194924578678778580L;
 }

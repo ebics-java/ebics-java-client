@@ -13,7 +13,7 @@ import java.net.URL
 class BankRepositoryTest (@Autowired private val bankRepo: BankRepository) {
     @Test
     fun testAddGetDelete() {
-        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), true, null, null, null,null,"EBXUBSCH", "UBS-PROD-CH")
+        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), true,"EBXUBSCH", "UBS-PROD-CH")
         bankRepo.saveAndFlush(bank)
         assertThat(bank.id).isEqualTo(1)
         val loadedBank = bankRepo.getOne(1)

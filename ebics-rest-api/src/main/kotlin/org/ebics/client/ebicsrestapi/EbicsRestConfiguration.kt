@@ -1,7 +1,7 @@
 package org.ebics.client.ebicsrestapi
 
 import org.ebics.client.api.Configuration
-import org.ebics.client.interfaces.LetterManager
+import org.ebics.client.api.LetterManager
 import org.ebics.client.api.TraceManager
 import org.ebics.client.api.trace.TraceService
 import org.springframework.beans.factory.annotation.Value

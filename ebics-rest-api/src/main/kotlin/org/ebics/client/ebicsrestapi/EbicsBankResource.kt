@@ -8,11 +8,6 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("banks")
 @CrossOrigin(origins = ["http://localhost:8080"])
 class EbicsBankResource (val bankService: BankService) {
-    @GetMapping("test")
-    fun index(): List<Pair<String, String>> = listOf(
-        Pair("1", "Hello!"),
-        Pair("2", "Bonjour!"),
-    )
 
     @GetMapping()
     fun listBanks(): List<Bank> = bankService.findBanks()

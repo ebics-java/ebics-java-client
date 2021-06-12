@@ -19,7 +19,7 @@ class UserKeyStoreRepositoryTest (
 {
     @Test
     fun testCreateStoreAndLoad() {
-        val user = UserInfo(null, EbicsVersion.H005, "CHT10001", "Jan", "org=jto", keyStore = null)
+        val user = UserInfo(null, EbicsVersion.H005, "CHT10001", "Jan", "org=jto")
         userRepo.saveAndFlush(user)
         val userId:Long = requireNotNull(user.id) {"User id must be not null"}
         val userKeyStore = UserKeyStore(null, "abc".toByteArray(), user)

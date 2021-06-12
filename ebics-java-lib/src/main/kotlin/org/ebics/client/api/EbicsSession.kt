@@ -1,7 +1,7 @@
 package org.ebics.client.api
 
 import org.ebics.client.certificate.BankCertificateManager
-import org.ebics.client.certificate.CertificateManager
+import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.model.Product
 
@@ -22,7 +22,7 @@ interface EbicsSession {
     /**
      * User key-pairs (A005, X002, E002)
      */
-    val userCert: CertificateManager
+    val userCert: UserCertificateManager
 
     /**
      * Bank public keys (X002, E002)

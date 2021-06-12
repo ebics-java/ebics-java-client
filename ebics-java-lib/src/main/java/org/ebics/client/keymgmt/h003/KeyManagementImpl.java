@@ -80,7 +80,7 @@ public class KeyManagementImpl extends KeyManagement {
     HttpRequestSender sender;
     int					httpCode;
 
-    session.getUser().getUserInfo().checkAction(EbicsUserAction.INI);
+    session.getUser().checkAction(EbicsUserAction.INI);
     sender = new HttpRequestSender(session);
     request = new INIRequestElement(session, orderId);
     request.build();
@@ -92,7 +92,7 @@ public class KeyManagementImpl extends KeyManagement {
     response.build();
     session.getConfiguration().getTraceManager().trace(response,session);
     response.report();
-    session.getUser().getUserInfo().updateStatus(EbicsUserAction.INI);
+    session.getUser().updateStatus(EbicsUserAction.INI);
   }
 
   /**
@@ -108,7 +108,7 @@ public class KeyManagementImpl extends KeyManagement {
     HttpRequestSender			sender;
     int					httpCode;
 
-    session.getUser().getUserInfo().checkAction(EbicsUserAction.HIA);
+    session.getUser().checkAction(EbicsUserAction.HIA);
     sender = new HttpRequestSender(session);
     request = new HIARequestElement(session, orderId);
     request.build();
@@ -120,7 +120,7 @@ public class KeyManagementImpl extends KeyManagement {
     response.build();
     session.getConfiguration().getTraceManager().trace(response,session);
     response.report();
-    session.getUser().getUserInfo().updateStatus(EbicsUserAction.HIA);
+    session.getUser().updateStatus(EbicsUserAction.HIA);
   }
 
   /**
@@ -141,7 +141,7 @@ public class KeyManagementImpl extends KeyManagement {
     ContentFactory factory;
     int					httpCode;
 
-    session.getUser().getUserInfo().checkAction(EbicsUserAction.HPB);
+    session.getUser().checkAction(EbicsUserAction.HPB);
     sender = new HttpRequestSender(session);
     request = new HPBRequestElement(session);
     request.build();
@@ -153,7 +153,7 @@ public class KeyManagementImpl extends KeyManagement {
     response.build();
     session.getConfiguration().getTraceManager().trace(response,session);
     response.report();
-    factory = new ByteArrayContentFactory(Utils.unzip(session.getUser().decrypt(response.getOrderData(), response.getTransactionKey())));
+    factory = new ByteArrayContentFactory(Utils.unzip(session.getUserCert().decrypt(response.getOrderData(), response.getTransactionKey())));
     orderData = new HPBResponseOrderDataElement(factory);
     orderData.build();
     session.getConfiguration().getTraceManager().trace(orderData,session);
@@ -163,7 +163,7 @@ public class KeyManagementImpl extends KeyManagement {
     else
       manager = BankCertificateManager.createFromPubKeyExponentAndModulus(orderData.getBankE002PublicKeyExponent(), orderData.getBankE002PublicKeyModulus(),
               orderData.getBankX002PublicKeyExponent(), orderData.getBankX002PublicKeyModulus());
-    session.getUser().getUserInfo().updateStatus(EbicsUserAction.HPB);
+    session.getUser().updateStatus(EbicsUserAction.HPB);
     return manager;
   }
 
@@ -180,7 +180,7 @@ public class KeyManagementImpl extends KeyManagement {
     SPRResponseElement			response;
     int					httpCode;
 
-    session.getUser().getUserInfo().checkAction(EbicsUserAction.SPR);
+    session.getUser().checkAction(EbicsUserAction.SPR);
     sender = new HttpRequestSender(session);
     request = new SPRRequestElement(session);
     request.build();
@@ -192,6 +192,6 @@ public class KeyManagementImpl extends KeyManagement {
     response.build();
     session.getConfiguration().getTraceManager().trace(response,session);
     response.report();
-    session.getUser().getUserInfo().updateStatus(EbicsUserAction.SPR);
+    session.getUser().updateStatus(EbicsUserAction.SPR);
   }
 }
