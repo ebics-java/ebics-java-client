@@ -19,7 +19,7 @@ const routes: RouteRecordRaw[] = [
         props: (route) => {
           const id = Number.parseInt(route.params.id as string, 10);
           if (Number.isNaN(id)) {
-            return 0;
+            return undefined;
           }
           return { id };
         },
@@ -37,7 +37,7 @@ const routes: RouteRecordRaw[] = [
         props: (route) => {
           const id = Number.parseInt(route.params.id as string, 10);
           if (Number.isNaN(id)) {
-            return 0;
+            return undefined;
           }
           return { id };
         },

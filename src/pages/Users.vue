@@ -124,11 +124,7 @@ export default defineComponent({
       users: [
         {
           id: 1,
-          name: 'TestUser1'
-        } as User,
-        {
-          id: 2,
-          name: 'TestUser2'
+          name: 'TestUser1',
         } as User,
       ],
     };
@@ -207,7 +203,7 @@ export default defineComponent({
         sortable: true,
       },
       {
-        name: 'url',
+        name: 'ebicsUserId',
         required: true,
         label: 'EBICS User ID',
         align: 'left',
@@ -215,11 +211,27 @@ export default defineComponent({
         sortable: true,
       },
       {
+        name: 'ebicsPartnerId',
+        required: true,
+        label: 'EBICS Partner ID',
+        align: 'left',
+        field: (row: User) => row?.partner?.partnerId ?? '',
+        sortable: true,
+      },
+      {
+        name: 'ebicsBankName',
+        required: true,
+        label: 'Bank Name',
+        align: 'left',
+        field: (row: User) => row?.partner?.bank?.name ?? '',
+        sortable: true,
+      },
+      {
         name: 'hostId',
         required: true,
         label: 'User DN',
         align: 'left',
-        field: (row: User) => row.dn,
+        field: (row: User) => {console.log(row.dn); return row.dn;},
         sortable: true,
       },
     ];

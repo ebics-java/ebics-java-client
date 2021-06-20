@@ -182,10 +182,11 @@ export default defineComponent({
     async routeToBankPage(bankId?: number) {
       const routeParams = bankId === undefined ? undefined : { id: bankId };
       const routeName = bankId === undefined ? 'bank/create' : 'bank/edit';
+      const action = bankId === undefined ? 'create' : 'edit';
       await this.$router.push({
         name: routeName,
         params: routeParams,
-        query: { action: 'edit' },
+        query: { action: action },
       });
     },
     exportTable() {

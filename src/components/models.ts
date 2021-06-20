@@ -5,13 +5,30 @@ export interface Bank {
   hostId: string;
 }
 
-export interface User {
+export interface UserInfo {
+  ebicsVersion: string;
+  userId: string;
+  name: string;
+  dn: string;
+  userStatus: string; 
+}
+
+export interface User extends UserInfo {
   id: number;
   ebicsVersion: string;
   userId: string;
   name: string;
   dn: string;
   userStatus: string;
+  partner: Partner;
+  keyStore: string;
+  securityMedium: string;
+}
+
+export interface Partner {
+  id: number;
+  partnerId: string;
+  bank: Bank;
 }
 
 export interface DeleteConfirmDialog {

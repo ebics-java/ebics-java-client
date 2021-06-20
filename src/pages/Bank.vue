@@ -1,7 +1,7 @@
 <template>
   <q-page class=" justify-evenly">
     <div class="q-pa-md">
-      <h5 v-if="id === undefined">Edit existing bank {{ id }}</h5>
+      <h5 v-if="id !== undefined">Edit existing bank {{ id }}</h5>
       <h5 v-else>Add new bank</h5>
       
       <div class="q-pa-md" style="max-width: 400px">
@@ -58,14 +58,14 @@ import { Bank } from 'components/models';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'Banks',
+  name: 'Bank',
   components: {  },
   props: {
     id: {
       type: Number,
       required: false,
       default: undefined
-    }
+    },
   },
   data () {
     return {
