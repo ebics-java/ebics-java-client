@@ -17,7 +17,7 @@ Main differences with this fork:
 Working branch:
 - Decoupled EBICS API from console client 
 - Added EBICS REST client (spring boot & hibernate persistence for EBICS informations)
-- Some core API refactored to kotlin in order to increase readablity, encapsulation and consistence
+- Some core API refactored to kotlin in order to increase readablity, encapsulation and immutability and consistence
 
 Issues: 
 * Fat jar build seems to be not possible with standard maven plugins due to bouncy castle signed jar.
