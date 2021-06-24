@@ -1,19 +1,23 @@
 package org.ebics.client.ebicsrestapi
 
 import org.assertj.core.api.Assertions.assertThat
+import org.ebics.client.api.bank.Bank
+import org.ebics.client.api.user.User
 import org.ebics.client.api.user.UserInfo
 import org.ebics.client.model.EbicsVersion
-import org.ebics.client.model.user.EbicsUserStatus
 import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
-import org.springframework.http.ResponseEntity
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.web.util.UriComponentsBuilder
+import java.net.URI
+import java.net.URL
 
 
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class EbicsUserResourceTest (@Autowired private val restTemplate: TestRestTemplate) {
     @Test
@@ -24,20 +28,36 @@ class EbicsUserResourceTest (@Autowired private val restTemplate: TestRestTempla
 
     @Test
     fun addUserAndGet() {
-        val user = UserInfo(null, EbicsVersion.H005, "CHT10001", "JT", "cn=JT,org=com")
-        val request: HttpEntity<UserInfo> = HttpEntity(user)
-        val userId = restTemplate.postForObject("/users", request, Long::class.java)
-        assertThat(userId).isEqualTo(1)
+        //Save bank
+        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), true,"EBXUBSCH", "UBS-PROD-CH")
+        val requestBank: HttpEntity<Bank> = HttpEntity(bank)
+        val bankId = restTemplate.postForObject("/banks", requestBank, Long::class.java)
 
-        val users: UserList = restTemplate.getForObject ("/users", UserList::class.java)
-        assertThat(users.size).isEqualTo(1)
-        with (users[0] as UserInfo) {
+        //Save user + Partner
+        val userInfo = UserInfo( EbicsVersion.H005, "CHT10001", "JT", "cn=JT,org=com", EbicsUserStatusEnum.CREATED)
+        val request: HttpEntity<UserInfo> = HttpEntity(userInfo)
+        val targetUrl: URI = UriComponentsBuilder.fromUriString(restTemplate.rootUri)
+            .path("/users") // Add path
+            .queryParam("ebicsPartnerId", "CH100001")
+            .queryParam("bankId", bankId)
+            .build() // Build the URL
+            .encode() // Encode any URI items that need to be encoded
+            .toUri()
+
+        val userId = restTemplate.postForObject(targetUrl, request, Long::class.java)
+        assertThat(userId).isNotNull
+
+        val user: User = restTemplate.getForObject ("/users/{userId}", User::class.java, userId)
+        assertThat(user).isNotNull
+        with (user) {
             assertThat(name).isEqualTo("JT")
             assertThat(dn).isEqualTo("cn=JT,org=com")
+            assertThat(partner.partnerId).isEqualTo("CH100001")
+            assertThat(bank.name).isEqualTo("UBS-PROD-CH")
             assertThat(userStatus).isEqualTo(EbicsUserStatusEnum.CREATED)
             assertThat(ebicsVersion).isEqualTo(EbicsVersion.H005)
         }
     }
 
-    class UserList : MutableList<UserInfo> by ArrayList()
+    class UserList : MutableList<User> by ArrayList()
 }

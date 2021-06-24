@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface UserKeyStoreRepository : JpaRepository<UserKeyStore, Long> {
-    @Query("SELECT ks FROM UserKeyStore ks WHERE ks.userInfo.id = ?1")
+    @Query("SELECT ks FROM UserKeyStore ks WHERE ks.user.id = ?1")
     fun getKeyStoreByUserId(userId: Long):UserKeyStore
 }

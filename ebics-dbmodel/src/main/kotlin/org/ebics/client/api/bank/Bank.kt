@@ -3,12 +3,10 @@ package org.ebics.client.api.bank
 import org.ebics.client.api.EbicsBank
 import java.net.URL
 import java.security.interfaces.RSAPublicKey
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
+@Table(uniqueConstraints = [UniqueConstraint(columnNames = ["bankURL","hostId"])])
 data class Bank(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

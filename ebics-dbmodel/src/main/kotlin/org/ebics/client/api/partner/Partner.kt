@@ -5,6 +5,7 @@ import org.ebics.client.api.bank.Bank
 import javax.persistence.*
 
 @Entity
+@Table(uniqueConstraints = [UniqueConstraint(columnNames = ["partnerId", "bank_id"])])
 data class Partner(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

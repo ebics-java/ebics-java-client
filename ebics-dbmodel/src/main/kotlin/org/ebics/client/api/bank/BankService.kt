@@ -1,5 +1,6 @@
 package org.ebics.client.api.bank
 
+import org.ebics.client.api.NotFoundException
 import org.springframework.stereotype.Service
 
 @Service
@@ -13,7 +14,7 @@ class BankService (private val bankRepository: BankRepository) {
     fun updateBankById(bankId: Long, bank: Bank) {
         when(bankRepository.findById(bankId).isPresent) {
             true -> bankRepository.save(bank)
-            false -> throw BankNotFoundException(bankId)
+            false -> throw NotFoundException(bankId, "bank", null)
         }
     }
     fun deleteBankById(bankId: Long) = bankRepository.deleteById(bankId)
@@ -21,7 +22,7 @@ class BankService (private val bankRepository: BankRepository) {
         try {
             return bankRepository.getOne(bankId)
         } catch (e:Exception) {
-            throw BankNotFoundException(bankId)
+            throw NotFoundException(bankId, "bank", e)
         }
     }
 }

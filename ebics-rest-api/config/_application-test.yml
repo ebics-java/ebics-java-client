@@ -1,6 +1,7 @@
 spring:
   liquibase:
     change-log: "classpath:db/changelog/changeLog.xml"
+    url: "jdbc:h2:mem:testonly"
   jpa:
     hibernate:
       naming:

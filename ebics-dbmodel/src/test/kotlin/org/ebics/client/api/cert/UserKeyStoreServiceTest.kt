@@ -4,7 +4,9 @@ import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
 import org.apache.xml.security.Init
 import org.assertj.core.api.Assertions.assertThat
 import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.ebics.client.api.user.UserInfo
+import org.ebics.client.api.bank.Bank
+import org.ebics.client.api.partner.Partner
+import org.ebics.client.api.user.User
 import org.ebics.client.api.user.UserService
 import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.model.EbicsVersion
@@ -15,6 +17,7 @@ import org.springframework.boot.autoconfigure.AutoConfigurationPackage
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.net.URL
 import java.security.Security
 
 @ExtendWith(SpringExtension::class)
@@ -32,8 +35,10 @@ open class UserKeyStoreServiceTest (
 
     @Test
     fun createStoreAndLoad() {
-        val user = UserInfo(null, EbicsVersion.H004, "CHT1003", "Jan Toegel", "cn=jan.toegel")
-        userService.createUserInfo(user)
+        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), true,"EBXUBSCH", "UBS-PROD-CH")
+        val partner = Partner(null, bank, "CH100001", 0)
+        val user = User(null, EbicsVersion.H005, "CHT10001", "Jan", "org=jto", keyStore = null, partner = partner)
+        userService.createUser(user)
         val certificates = UserCertificateManager.create(user.dn)
         val bos = ByteOutputStream(4096)
         val pass = "testPass"

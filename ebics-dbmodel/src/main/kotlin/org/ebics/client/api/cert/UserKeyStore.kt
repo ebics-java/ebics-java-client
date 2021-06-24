@@ -1,6 +1,6 @@
 package org.ebics.client.api.cert
 
-import org.ebics.client.api.user.UserInfo
+import org.ebics.client.api.user.User
 import javax.persistence.*
 
 @Entity
@@ -14,5 +14,5 @@ data class UserKeyStore(
     val keyStoreBytes: ByteArray,
 
     @OneToOne
-    val userInfo: UserInfo
+    val user: User
 )
