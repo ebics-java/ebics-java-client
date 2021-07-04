@@ -1,6 +1,7 @@
 package org.ebics.client.api.bank
 
 import org.ebics.client.api.NotFoundException
+import org.springframework.orm.ObjectRetrievalFailureException
 import org.springframework.stereotype.Service
 
 @Service
@@ -21,7 +22,7 @@ class BankService (private val bankRepository: BankRepository) {
     fun getBankById(bankId: Long): Bank {
         try {
             return bankRepository.getOne(bankId)
-        } catch (e:Exception) {
+        } catch (e: ObjectRetrievalFailureException) {
             throw NotFoundException(bankId, "bank", e)
         }
     }

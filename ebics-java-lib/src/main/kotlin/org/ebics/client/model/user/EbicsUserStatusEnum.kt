@@ -14,7 +14,7 @@ enum class EbicsUserStatusEnum {
         return when (action) {
             EbicsUserAction.CREATE_KEYS ->
                 when (this) {
-                    CREATED -> NEW
+                    CREATED, NEW -> NEW
                     else -> error("$action action cant be executed at user state: $this")
                 }
             EbicsUserAction.INI ->
@@ -45,7 +45,7 @@ enum class EbicsUserStatusEnum {
     fun checkAction(action: EbicsUserAction) {
         when (action) {
             EbicsUserAction.CREATE_KEYS ->
-                require(this == CREATED) { "$action action cant be executed at user state: $this" }
+                require(this == CREATED || this == NEW) { "$action action cant be executed at user state: $this" }
             EbicsUserAction.INI ->
                 require(this == NEW || this == LOCKED || this == PARTLY_INITIALIZED_HIA) { "$action action cant be executed at user state: $this" }
             EbicsUserAction.HIA ->

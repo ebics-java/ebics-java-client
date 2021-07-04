@@ -1,6 +1,6 @@
 package org.ebics.client.api.partner
 
-import org.ebics.client.api.cert.UserKeyStoreService
+import org.ebics.client.api.user.cert.UserKeyStoreService
 import org.ebics.client.api.user.UserService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

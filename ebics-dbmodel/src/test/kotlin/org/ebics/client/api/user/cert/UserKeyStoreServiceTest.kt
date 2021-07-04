@@ -1,15 +1,14 @@
-package org.ebics.client.api.cert
+package org.ebics.client.api.user.cert
 
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
-import org.apache.xml.security.Init
 import org.assertj.core.api.Assertions.assertThat
-import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.api.bank.Bank
-import org.ebics.client.api.partner.Partner
-import org.ebics.client.api.user.User
+import org.ebics.client.api.bank.BankService
+import org.ebics.client.api.partner.PartnerService
+import org.ebics.client.api.user.UserInfo
 import org.ebics.client.api.user.UserService
 import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.model.EbicsVersion
+import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,35 +17,36 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URL
-import java.security.Security
 
 @ExtendWith(SpringExtension::class)
 @DataJpaTest
 @AutoConfigurationPackage(basePackages = ["org.ebics.client.api.*"])
-@ContextConfiguration(classes = [UserKeyStoreService::class, UserService::class])
+@ContextConfiguration(classes = [UserKeyStoreService::class, UserService::class, PartnerService::class, BankService::class])
 open class UserKeyStoreServiceTest (
     @Autowired private val userService: UserService,
+    @Autowired private val bankService: BankService,
     @Autowired private val keyStoreService: UserKeyStoreService)
 {
-    init {
-        Init.init()
-        Security.addProvider(BouncyCastleProvider())
-    }
-
     @Test
     fun createStoreAndLoad() {
+        //Create and store bank, partner, user
         val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), true,"EBXUBSCH", "UBS-PROD-CH")
-        val partner = Partner(null, bank, "CH100001", 0)
-        val user = User(null, EbicsVersion.H005, "CHT10001", "Jan", "org=jto", keyStore = null, partner = partner)
-        userService.createUser(user)
-        val certificates = UserCertificateManager.create(user.dn)
-        val bos = ByteOutputStream(4096)
-        val pass = "testPass"
-        certificates.save(bos, pass::toCharArray, user.userId)
-        keyStoreService.save(bos, user)
+        val bankId = bankService.createBank(bank)
+        val userInfo = UserInfo( EbicsVersion.H005, "CHT10001", "Jan", "cn=jan", EbicsUserStatusEnum.CREATED)
+        val userId = userService.createUser(userInfo, "CH100001", bankId)
+        val user = userService.getUserById(userId)
 
-        val bis = keyStoreService.load(requireNotNull(user.id) {"User id must not be null"})
-        val loadedCertificates = UserCertificateManager.load(bis, pass::toCharArray, user.userId)
+        //Create and store user certificate
+        val certificates = UserCertificateManager.create(userInfo.dn)
+        val pass = "testPass"
+        val userKeyStore = UserKeyStore.fromUserCertMgr(user,certificates, pass::toCharArray)
+        val keyStoreId = keyStoreService.save( userKeyStore )
+
+        //Load stored certificates from DB
+        val userKeyStoreLoaded = keyStoreService.loadById(keyStoreId)
+        val loadedCertificates = userKeyStoreLoaded.toUserCertMgr( pass::toCharArray )
+
+        //Compare created & loaded certs
         with(loadedCertificates) {
             assertThat(a005Certificate.encoded).isEqualTo(certificates.a005Certificate.encoded)
             assertThat(x002Certificate.encoded).isEqualTo(certificates.x002Certificate.encoded)

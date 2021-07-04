@@ -1,10 +1,15 @@
 package org.ebics.client.ebicsrestapi.h003
 
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RestController
+import org.ebics.client.ebicsrestapi.UserIdPass
+import org.springframework.web.bind.annotation.*
 
-@RestController("h003")
+@RestController()
+@RequestMapping("h003")
+@CrossOrigin(origins = ["http://localhost:8080"])
 class EbicsAPIResource (private val ebicsAPI: EbicsAPI){
     @PostMapping("sendINI")
-    fun sendINI(userId:Long, password:String) = ebicsAPI.sendINI(userId, password)
+    fun sendINI(@RequestBody userIdPass:UserIdPass) = ebicsAPI.sendINI(userIdPass)
+
+    @PostMapping("sendHIA")
+    fun sendHIA(@RequestBody userIdPass:UserIdPass) = ebicsAPI.sendHIA(userIdPass)
 }

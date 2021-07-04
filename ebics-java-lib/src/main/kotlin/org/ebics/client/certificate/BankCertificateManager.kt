@@ -4,6 +4,7 @@ import org.ebics.client.interfaces.PasswordCallback
 import sun.security.krb5.Confounder.bytes
 import java.io.ByteArrayInputStream
 import java.io.InputStream
+import java.io.ObjectOutputStream
 import java.io.OutputStream
 import java.math.BigInteger
 import java.security.KeyFactory
@@ -13,7 +14,7 @@ import java.security.interfaces.RSAPublicKey
 import java.security.spec.X509EncodedKeySpec
 
 
-class BankCertificateManager(
+open class BankCertificateManager(
     val e002Digest: ByteArray,
     val x002Digest: ByteArray,
     val e002Key: RSAPublicKey,
@@ -66,7 +67,7 @@ class BankCertificateManager(
         manager.save(os)
     }
 
-    fun save(os: OutputStream) {
+    fun save(os: ObjectOutputStream) {
         os.write(e002Digest)
         os.write(x002Digest)
         os.write(e002Key.encoded)

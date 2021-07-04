@@ -21,6 +21,7 @@ package org.ebics.client.certificate
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.interfaces.PasswordCallback
 import java.io.*
+import java.lang.IllegalArgumentException
 import java.security.GeneralSecurityException
 import java.security.KeyPair
 import java.security.KeyStore
@@ -53,21 +54,25 @@ class UserCertificateManager(
          */
         @Throws(GeneralSecurityException::class, IOException::class)
         fun create(userDn: String): UserCertificateManager {
-            val calendar: Calendar = Calendar.getInstance()
-            calendar.add(Calendar.DAY_OF_YEAR, X509Constants.DEFAULT_DURATION)
-            val generator = X509Generator()
-            val endDate = Date(calendar.timeInMillis)
-            val a005pair = createCertificate(KeyType.A005, generator, userDn, endDate)
-            val x002pair = createCertificate(KeyType.X002, generator, userDn, endDate)
-            val e002pair = createCertificate(KeyType.E002, generator, userDn, endDate)
-            return UserCertificateManager(
-                a005pair.certificate,
-                x002pair.certificate,
-                e002pair.certificate,
-                a005pair.privateKey,
-                x002pair.privateKey,
-                e002pair.privateKey,
-            )
+            try {
+                val calendar: Calendar = Calendar.getInstance()
+                calendar.add(Calendar.DAY_OF_YEAR, X509Constants.DEFAULT_DURATION)
+                val generator = X509Generator()
+                val endDate = Date(calendar.timeInMillis)
+                val a005pair = createCertificate(KeyType.A005, generator, userDn, endDate)
+                val x002pair = createCertificate(KeyType.X002, generator, userDn, endDate)
+                val e002pair = createCertificate(KeyType.E002, generator, userDn, endDate)
+                return UserCertificateManager(
+                    a005pair.certificate,
+                    x002pair.certificate,
+                    e002pair.certificate,
+                    a005pair.privateKey,
+                    x002pair.privateKey,
+                    e002pair.privateKey,
+                )
+            } catch (ex:Exception) {
+                throw IllegalArgumentException("Cant create certificate for dn='$userDn' error: ${ex.message}", ex)
+            }
         }
 
         @Throws(GeneralSecurityException::class, IOException::class)

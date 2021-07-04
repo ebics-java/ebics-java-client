@@ -132,10 +132,6 @@ public class KeyManagementImpl extends KeyManagement {
     HttpRequestSender			sender;
     HPBResponseOrderDataElement		orderData;
     ContentFactory factory;
-    KeyStoreManager keystoreManager;
-    String				path;
-    RSAPublicKey			e002PubKey;
-    RSAPublicKey			x002PubKey;
     int					httpCode;
 
     session.getUser().checkAction(EbicsUserAction.HPB);
@@ -189,6 +185,6 @@ public class KeyManagementImpl extends KeyManagement {
     response.build();
     session.getConfiguration().getTraceManager().trace(response,session);
     response.report();
-    session.getUser().checkAction(EbicsUserAction.SPR);
+    session.getUser().updateStatus(EbicsUserAction.SPR);
   }
 }

@@ -1,4 +1,4 @@
-package org.ebics.client.api.cert
+package org.ebics.client.api.user.cert
 
 import org.assertj.core.api.Assertions.assertThat
 import org.ebics.client.api.bank.Bank

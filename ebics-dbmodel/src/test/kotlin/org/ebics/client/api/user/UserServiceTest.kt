@@ -3,8 +3,7 @@ package org.ebics.client.api.user
 import org.assertj.core.api.Assertions.assertThat
 import org.ebics.client.api.bank.Bank
 import org.ebics.client.api.bank.BankService
-import org.ebics.client.api.cert.UserKeyStoreService
-import org.ebics.client.api.partner.Partner
+import org.ebics.client.api.user.cert.UserKeyStoreService
 import org.ebics.client.api.partner.PartnerService
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.user.EbicsUserStatusEnum

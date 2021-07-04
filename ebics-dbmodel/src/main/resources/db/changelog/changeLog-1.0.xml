@@ -106,4 +106,10 @@
         <addUniqueConstraint columnNames="partnerId, bank_id" constraintName="UKppir7ynhrw6qy9mipo5dc77cu"
                              tableName="Partner"/>
     </changeSet>
+    <changeSet author="honza.toegel (generated)" id="1624799368618-1">
+        <dropForeignKeyConstraint baseTableName="USERKEYSTORE" constraintName="FKR04JLT6G9JJSQ4ARR4B3FFVJS"/>
+    </changeSet>
+    <changeSet author="honza.toegel (generated)" id="1624799368618-2">
+        <dropColumn columnName="USER_ID" tableName="USERKEYSTORE"/>
+    </changeSet>
 </databaseChangeLog>

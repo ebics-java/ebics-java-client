@@ -1,4 +1,4 @@
-package org.ebics.client.api.cert
+package org.ebics.client.api.user.cert
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
