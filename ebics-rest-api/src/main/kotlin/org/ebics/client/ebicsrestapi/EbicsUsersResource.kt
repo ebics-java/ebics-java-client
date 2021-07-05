@@ -20,12 +20,15 @@ class EbicsUsersResource (
 
     @PostMapping("")
     fun createUser(@RequestBody userInfo: UserInfo, @RequestParam ebicsPartnerId:String, @RequestParam bankId:Long):Long =
-        userService.createUser(userInfo, ebicsPartnerId, bankId)
+        userService.createUserAndPartner(userInfo, ebicsPartnerId, bankId)
 
     @PutMapping("{userId}")
     fun updateUser(@PathVariable userId:Long, @RequestBody userInfo: UserInfo, @RequestParam ebicsPartnerId:String, @RequestParam bankId:Long) =
-        userService.updateUser(userId, userInfo, ebicsPartnerId, bankId)
+        userService.updateUserAndPartner(userId, userInfo, ebicsPartnerId, bankId)
 
     @PostMapping("{userId}/certificates")
-    fun createUserCertificates(@PathVariable userId: Long, @RequestBody password:String) = userService.createOrUpdateUserCertificates(userId, password)
+    fun createUserCertificates(@PathVariable userId: Long, @RequestBody userPass: UserPass):Long = userService.createOrUpdateUserCertificates(userId, userPass.password)
+
+    @PostMapping("{userId}/resetStatus")
+    fun resetStatus(@PathVariable userId: Long) = userService.resetStatus(userId)
 }

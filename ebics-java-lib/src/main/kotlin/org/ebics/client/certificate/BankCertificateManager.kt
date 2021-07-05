@@ -2,10 +2,7 @@ package org.ebics.client.certificate
 
 import org.ebics.client.interfaces.PasswordCallback
 import sun.security.krb5.Confounder.bytes
-import java.io.ByteArrayInputStream
-import java.io.InputStream
-import java.io.ObjectOutputStream
-import java.io.OutputStream
+import java.io.*
 import java.math.BigInteger
 import java.security.KeyFactory
 import java.security.PublicKey
@@ -67,7 +64,7 @@ open class BankCertificateManager(
         manager.save(os)
     }
 
-    fun save(os: ObjectOutputStream) {
+    fun save(os: FileOutputStream) {
         os.write(e002Digest)
         os.write(x002Digest)
         os.write(e002Key.encoded)

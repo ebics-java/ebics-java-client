@@ -39,6 +39,8 @@ enum class EbicsUserStatusEnum {
                     READY -> LOCKED
                     else -> error("$action action cant be executed at user state: $this")
                 }
+            //Can be reset in any status
+            EbicsUserAction.RESET -> CREATED
         }
     }
 

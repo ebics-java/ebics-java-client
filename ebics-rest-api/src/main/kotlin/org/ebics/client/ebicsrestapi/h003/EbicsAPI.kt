@@ -1,6 +1,8 @@
 package org.ebics.client.ebicsrestapi.h003
 
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream
+import org.ebics.client.api.bank.BankRepository
+import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.bank.cert.BankKeyStoreService
 import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component
 @Component
 class EbicsAPI(
     private val userRepository: UserRepository,
+    private val bankService: BankService,
     private val bankKeyStoreService: BankKeyStoreService,
     private val configuration: EbicsRestConfiguration)
 {
@@ -50,7 +53,8 @@ class EbicsAPI(
             val session = EbicsSession(user, configuration, product, userCertManager, null)
             val bankCertManager = KeyManagementImpl(session).sendHPB( userIdPass.passCb )
             val bankKeyStore = BankKeyStore.fromBankCertMgr(bankCertManager, user.partner.bank)
-            bankKeyStoreService.save(bankKeyStore)
+            bankKeyStoreService.save(bankKeyStore) //BankKeyStore must be saved
+            bankService.updateKeyStore(user.partner.bank, bankKeyStore) //BankKeyStore must be added to bank
             userRepository.saveAndFlush(user) //The state of user was changed after HPB, must be persisted
         }
     }
@@ -59,7 +63,7 @@ class EbicsAPI(
         val user = userRepository.getOne(userIdPass.id)
         with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {
             val userCertManager = toUserCertMgr(userIdPass.passCb)
-            with (requireNotNull(user.partner.bank.keyStore)) {
+            with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {
                 val bankCertManager = toBankCertMgr()
                 val session = EbicsSession(user, configuration, product, userCertManager, bankCertManager)
                 val content = null

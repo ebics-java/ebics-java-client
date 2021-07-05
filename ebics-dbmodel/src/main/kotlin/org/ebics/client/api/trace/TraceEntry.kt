@@ -9,6 +9,7 @@ data class TraceEntry(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id:Long? = null,
 
+    @Lob
     val messageBody:String,
 
     @ManyToOne(optional = false)

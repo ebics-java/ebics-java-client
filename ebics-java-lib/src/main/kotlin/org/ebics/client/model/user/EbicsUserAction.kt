@@ -5,5 +5,6 @@ enum class EbicsUserAction {
     INI,
     HIA,
     HPB,
-    SPR,
+    SPR,   //Reset user status on client & server side
+    RESET, //Reset user status without SPR request, the actual server status must be reset on server side
 }

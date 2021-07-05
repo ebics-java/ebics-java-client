@@ -29,7 +29,7 @@ class EbicsUserResourceTest (@Autowired private val restTemplate: TestRestTempla
     @Test
     fun addUserAndGet() {
         //Save bank
-        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), true,"EBXUBSCH", "UBS-PROD-CH")
+        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), true,"EBXUBSCH", "UBS-PROD-CH", null)
         val requestBank: HttpEntity<Bank> = HttpEntity(bank)
         val bankId = restTemplate.postForObject("/banks", requestBank, Long::class.java)
 

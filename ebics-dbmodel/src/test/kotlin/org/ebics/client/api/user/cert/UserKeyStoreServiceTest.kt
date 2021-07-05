@@ -30,10 +30,10 @@ open class UserKeyStoreServiceTest (
     @Test
     fun createStoreAndLoad() {
         //Create and store bank, partner, user
-        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), true,"EBXUBSCH", "UBS-PROD-CH")
+        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), true,"EBXUBSCH", "UBS-PROD-CH", null)
         val bankId = bankService.createBank(bank)
         val userInfo = UserInfo( EbicsVersion.H005, "CHT10001", "Jan", "cn=jan", EbicsUserStatusEnum.CREATED)
-        val userId = userService.createUser(userInfo, "CH100001", bankId)
+        val userId = userService.createUserAndPartner(userInfo, "CH100001", bankId)
         val user = userService.getUserById(userId)
 
         //Create and store user certificate

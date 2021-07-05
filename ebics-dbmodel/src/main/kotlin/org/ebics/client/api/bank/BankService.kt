@@ -1,6 +1,7 @@
 package org.ebics.client.api.bank
 
 import org.ebics.client.api.NotFoundException
+import org.ebics.client.api.bank.cert.BankKeyStore
 import org.springframework.orm.ObjectRetrievalFailureException
 import org.springframework.stereotype.Service
 
@@ -25,5 +26,10 @@ class BankService (private val bankRepository: BankRepository) {
         } catch (e: ObjectRetrievalFailureException) {
             throw NotFoundException(bankId, "bank", e)
         }
+    }
+
+    fun updateKeyStore(bank: Bank, bankKeyStore: BankKeyStore) {
+        bank.keyStore = bankKeyStore
+        bankRepository.saveAndFlush(bank)
     }
 }

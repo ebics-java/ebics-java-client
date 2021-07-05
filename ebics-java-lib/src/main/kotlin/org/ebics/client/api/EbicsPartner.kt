@@ -58,7 +58,7 @@ interface EbicsPartner {
     fun nextOrderId(): String {
         val chars = CharArray(4)
         orderId += 1
-        if (orderId > 36 * 36 * 36 * 36 - 1) {
+        if (orderId > 36 * 36 * 36 * 36 - 1 || orderId < 10 * 36 * 36 * 36) {
             // ensure that orderId starts with a letter
             orderId = 10 * 36 * 36 * 36
         }

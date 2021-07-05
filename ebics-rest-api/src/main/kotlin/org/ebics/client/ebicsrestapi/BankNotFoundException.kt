@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 
 @ControllerAdvice
 class ExceptionAdvice {
-    @ExceptionHandler( value =  [NotFoundException::class, AlreadyExistException::class, FunctionException::class])
+    @ExceptionHandler( value =  [NotFoundException::class, AlreadyExistException::class, FunctionException::class, Exception::class])
     fun notFoundHandler(ex: Exception): ResponseEntity<ErrorMessage> {
         val status:HttpStatus = when(ex) {
             is NotFoundException -> HttpStatus.NOT_FOUND

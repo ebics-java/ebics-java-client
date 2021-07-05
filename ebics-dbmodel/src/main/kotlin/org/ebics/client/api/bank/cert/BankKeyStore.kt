@@ -13,14 +13,19 @@ class BankKeyStore(
     val id:Long? = null,
 
     @Lob
-    @Column(name = "keyStoreBytes", columnDefinition="BLOB")
+    @Column(name = "e002Digest", columnDefinition="BLOB")
     val e002Digest: ByteArray,
 
     @Lob
-    @Column(name = "keyStoreBytes", columnDefinition="BLOB")
+    @Column(name = "x002Digest", columnDefinition="BLOB")
     val x002Digest: ByteArray,
 
+    @Lob
+    @Column(name = "e002Key", columnDefinition="BLOB")
     val e002Key: RSAPublicKey,
+
+    @Lob
+    @Column(name = "x002Key", columnDefinition="BLOB")
     val x002Key: RSAPublicKey,
 
     @JsonIgnore
