@@ -231,7 +231,7 @@ export default defineComponent({
         required: true,
         label: 'User DN',
         align: 'left',
-        field: (row: User) => {console.log(row.dn); return row.dn;},
+        field: (row: User) => row.dn,
         sortable: true,
       },
     ];

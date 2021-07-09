@@ -74,10 +74,84 @@
           />
 
           <div class="q-gutter-sm">
-            <q-radio v-model="user.ebicsVersion" val="H003" contextmenu="test" label="EBICS 2.4 (H003)" />
-            <q-radio v-model="user.ebicsVersion" val="H004" label="EBICS 2.5 (H004)" />
-            <q-radio v-model="user.ebicsVersion" val="H005" label="EBICS 3.0 (H005)" />
+            <q-radio
+              v-model="user.ebicsVersion"
+              val="H003"
+              contextmenu="test"
+              label="EBICS 2.4 (H003)"
+            />
+            <q-radio
+              v-model="user.ebicsVersion"
+              val="H004"
+              label="EBICS 2.5 (H004)"
+            />
+            <q-radio
+              v-model="user.ebicsVersion"
+              val="H005"
+              label="EBICS 3.0 (H005)"
+            />
           </div>
+
+          <q-input filled v-model="user.userStatus" label="EBICS user status" />
+
+          <q-stepper v-model="step" ref="stepper" color="primary" animated vertical>
+            <q-step
+              :name="1"
+              title="Send user keys to bank"
+              icon="forward_to_inbox"
+              :done="step > 1"
+            >
+              Continue in order to create user keys and send them to the bank using the entered
+              EBICS parameters (bank url, user, customer). For sending of the keys INI and HIA 
+              administrative ordertypes will be used.
+            </q-step>
+
+            <q-step
+              :name="2"
+              title="Signing of user letters"
+              caption="Optional"
+              icon="email"
+              :done="step > 2"
+            >
+              In order to activate the this EBICS user you have to provide bellow generated hash keys to your bank.
+              The bank will check provided hash keys and activate the EBICS user. 
+              Letter A005: XB CX 56 Letter E002: XB CX 56
+                <q-btn
+                  label="Print Letters"
+                  color="primary"
+                  class="q-ml-sm"
+                  icon="print"
+                ></q-btn>
+            </q-step>
+
+            <q-step :name="3" title="Download bank keys" icon="download" :done="step > 3">
+              Continue in order to download bank keys from your bank.
+            </q-step>
+
+            <q-step :name="4" title="Verify bank keys" icon="gpp_good">
+              Verify bellow downloaded bank keys with the one provided by your bank during onboarding. 
+              In case they not match, this connection can't be trussted - identity of the bank is not valid.
+            </q-step>
+
+            <template v-slot:navigation>
+              <q-stepper-navigation>
+                <q-btn
+                  v-if="step !== 4"
+                  @click="$refs.stepper.next()"
+                  color="primary"
+                  label="Continue"
+                ></q-btn>
+                <q-btn
+                  v-if="step > 1"
+                  flat
+                  color="primary"
+                  @click="$refs.stepper.previous()"
+                  label="Back"
+                  class="q-ml-sm"
+                ></q-btn>
+              </q-stepper-navigation>
+            </template>
+          </q-stepper>
 
           <div>
             <q-btn
@@ -119,6 +193,7 @@ export default defineComponent({
   },
   data() {
     return {
+      step: 0,
       banks: [] as Bank[],
       user: {
         name: '',
