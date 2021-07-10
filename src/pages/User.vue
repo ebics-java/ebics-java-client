@@ -6,7 +6,7 @@
 
       <div class="q-pa-md" style="max-width: 400px">
         <q-form
-          @submit="onSubmit($props.id)"
+          @submit="onSubmit()"
           @reset="onCancel"
           class="q-gutter-md"
         >
@@ -76,82 +76,35 @@
           <div class="q-gutter-sm">
             <q-radio
               v-model="user.ebicsVersion"
+              :disable="userStatusInitializing"
               val="H003"
               contextmenu="test"
               label="EBICS 2.4 (H003)"
             />
             <q-radio
               v-model="user.ebicsVersion"
+              :disable="userStatusInitializing"
               val="H004"
               label="EBICS 2.5 (H004)"
             />
             <q-radio
               v-model="user.ebicsVersion"
+              @click="updateUseCertificate()"
+              :disable="userStatusInitializing"
               val="H005"
               label="EBICS 3.0 (H005)"
             />
           </div>
 
+          <q-toggle
+            :disable="user.ebicsVersion == 'H005'"
+            v-model="user.useCertificate"
+            label="Use Certificates"
+          />
+
           <q-input filled v-model="user.userStatus" label="EBICS user status" />
 
-          <q-stepper v-model="step" ref="stepper" color="primary" animated vertical>
-            <q-step
-              :name="1"
-              title="Send user keys to bank"
-              icon="forward_to_inbox"
-              :done="step > 1"
-            >
-              Continue in order to create user keys and send them to the bank using the entered
-              EBICS parameters (bank url, user, customer). For sending of the keys INI and HIA 
-              administrative ordertypes will be used.
-            </q-step>
-
-            <q-step
-              :name="2"
-              title="Signing of user letters"
-              caption="Optional"
-              icon="email"
-              :done="step > 2"
-            >
-              In order to activate the this EBICS user you have to provide bellow generated hash keys to your bank.
-              The bank will check provided hash keys and activate the EBICS user. 
-              Letter A005: XB CX 56 Letter E002: XB CX 56
-                <q-btn
-                  label="Print Letters"
-                  color="primary"
-                  class="q-ml-sm"
-                  icon="print"
-                ></q-btn>
-            </q-step>
-
-            <q-step :name="3" title="Download bank keys" icon="download" :done="step > 3">
-              Continue in order to download bank keys from your bank.
-            </q-step>
-
-            <q-step :name="4" title="Verify bank keys" icon="gpp_good">
-              Verify bellow downloaded bank keys with the one provided by your bank during onboarding. 
-              In case they not match, this connection can't be trussted - identity of the bank is not valid.
-            </q-step>
-
-            <template v-slot:navigation>
-              <q-stepper-navigation>
-                <q-btn
-                  v-if="step !== 4"
-                  @click="$refs.stepper.next()"
-                  color="primary"
-                  label="Continue"
-                ></q-btn>
-                <q-btn
-                  v-if="step > 1"
-                  flat
-                  color="primary"
-                  @click="$refs.stepper.previous()"
-                  label="Back"
-                  class="q-ml-sm"
-                ></q-btn>
-              </q-stepper-navigation>
-            </template>
-          </q-stepper>
+          <user-ini-wizz v-model="user" />
 
           <div>
             <q-btn
@@ -177,13 +130,14 @@
 </template>
 
 <script lang="ts">
-import { api } from 'boot/axios';
-import { User, UserInfo, Partner, Bank } from 'components/models';
+import UserIniWizz from 'components/UserInitalizationWizard.vue';
 import { defineComponent } from 'vue';
+import  useUserDataAPI from 'components/user'
+import  useBanksDataAPI from 'components/banks'
 
 export default defineComponent({
   name: 'User',
-  components: {},
+  components: { UserIniWizz },
   props: {
     id: {
       type: Number,
@@ -193,127 +147,31 @@ export default defineComponent({
   },
   data() {
     return {
-      step: 0,
-      banks: [] as Bank[],
-      user: {
-        name: '',
-        userId: '',
-        partner: {
-          partnerId: '',
-          bank: {
-            id: 0,
-            name: '',
-          } as Bank,
-        } as Partner,
-        ebicsVersion: 'H005',
-        userStatus: 'CREATED',
-      } as User,
     };
   },
+  computed: {
+    userStatusInitializing(): boolean {
+      return this.user.userStatus != 'CREATED' && this.user.userStatus != 'NEW';
+    },
+  },
   methods: {
-    /**
-     * Route to Bank page
-     * bankId
-     *  - if given then will be routed with 'id' parameter to edit page
-     *  - if undefined will be routed without 'id' parameter to create page
-     */
-    async routeToCreateBankPage() {
-      await this.$router.push({
-        name: 'bank/create',
-        params: undefined,
-        query: { action: 'create' },
-      });
-    },
-    validateUrl(url: string): boolean {
-      const regex =
-        /^(http(s)?:\/\/.)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{0,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/;
-      return regex.test(url);
-    },
-    loadBanksData() {
-      api
-        .get<Bank[]>('/banks')
-        .then((response) => {
-          this.banks = response.data;
-        })
-        .catch((error: Error) => {
-          this.$q.notify({
-            color: 'negative',
-            position: 'bottom-right',
-            message: `Loading failed: ${error.message}`,
-            icon: 'report_problem',
-          });
-        });
-    },
-    loadUserData(userId: number) {
-      api
-        .get<User>(`/users/${userId}`)
-        .then((response) => {
-          this.user = response.data;
-        })
-        .catch((error: Error) => {
-          this.$q.notify({
-            color: 'negative',
-            position: 'bottom-right',
-            message: `Loading failed: ${error.message}`,
-            icon: 'report_problem',
-          });
-        });
-    },
-    onSubmit(bankId: number | undefined) {
-      if (bankId === undefined) {
-        api
-          .post<UserInfo>(
-            `/users?ebicsPartnerId=${this.user.partner.partnerId}&bankId=${this.user.partner.bank.id}`,
-            this.user as UserInfo
-          )
-          .then(() => {
-            this.$q.notify({
-              color: 'green-4',
-              textColor: 'white',
-              icon: 'cloud_done',
-              message: 'Create done',
-            });
-            this.$router.go(-1);
-          })
-          .catch((error: Error) => {
-            this.$q.notify({
-              color: 'negative',
-              position: 'bottom-right',
-              message: `Creating failed: ${error.message}`,
-              icon: 'report_problem',
-            });
-          });
-      } else {
-        api
-          .put<Bank>(`/users/${bankId}`, this.user)
-          .then(() => {
-            this.$q.notify({
-              color: 'green-4',
-              textColor: 'white',
-              icon: 'cloud_done',
-              message: 'Update done',
-            });
-            this.$router.go(-1);
-          })
-          .catch((error: Error) => {
-            this.$q.notify({
-              color: 'negative',
-              position: 'bottom-right',
-              message: `Update failed: ${error.message}`,
-              icon: 'report_problem',
-            });
-          });
-      }
+    onSubmit() {
+      this.createOrUpdateUserData()
     },
     onCancel() {
       this.$router.go(-1);
     },
+    updateUseCertificate() {
+      console.log('test11');
+      if (this.user.ebicsVersion == 'H005') {
+        this.user.useCertificate = true;
+      }
+    },
   },
-  mounted() {
-    if (this.$props.id !== undefined) {
-      this.loadUserData(this.$props.id);
-    }
-    this.loadBanksData();
+  setup(props) {
+    const { user, createOrUpdateUserData } = useUserDataAPI(props.id)
+    const { banks } = useBanksDataAPI()
+    return { banks, user, createOrUpdateUserData };
   },
 });
 </script>

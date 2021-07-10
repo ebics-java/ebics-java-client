@@ -42,6 +42,7 @@ const routes: RouteRecordRaw[] = [
           return { id };
         },
       },
+      { path: '/upload', component: () => import('pages/FileUpload.vue') },
     ],
   },
 
