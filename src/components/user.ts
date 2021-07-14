@@ -36,6 +36,7 @@ export default function useUserAPI(userId: number | undefined) {
       api
         .get<User>(`/users/${userId}`)
         .then((response) => {
+          console.log('User data refreshed')
           user.value = response.data;
         })
         .catch((error: Error) => {

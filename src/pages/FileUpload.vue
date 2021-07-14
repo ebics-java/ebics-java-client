@@ -208,7 +208,7 @@ export default defineComponent({
     onCancel() {
       this.$router.go(-1);
     },
-    onRejected(rejectedFiles: File[]) {
+    onRejected() { //rejectedFiles: File[]
       this.$q.notify({
         type: 'negative',
         message:

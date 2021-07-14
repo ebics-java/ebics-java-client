@@ -99,17 +99,14 @@ export class BtfMessage implements BtfMessageInt {
   }
 }
 
-/*
-export enum UserIniWizzStepS {
-  CreateUserKeys = 'CreateUserKeys',
-  UploadUserKeys = 'UploadUserKeys',
-  PrintUserLetters = 'PrintUserLetters',
-  DownloadBankKeys = 'DownloadBankKeys',
-  VerifyBankKeys = 'VerifyBankKeys',
-  Finish = 'Finish',
-  Unknown = 'Unknown',
+
+export enum AdminOrderType {
+  INI = 'INI',
+  HIA = 'HIA',
+  HPB = 'HPB',
+  SPR = 'SPR',
 }
-*/
+
 export interface UserPassword {
   password: string;
 }

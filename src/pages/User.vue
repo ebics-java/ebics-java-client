@@ -104,7 +104,7 @@
 
           <q-input filled v-model="user.userStatus" label="EBICS user status" />
 
-          <user-ini-wizz v-model="user" />
+          <user-ini-wizz v-if="user.id !== undefined" :id="user.id" />
 
           <div>
             <q-btn
