@@ -129,7 +129,7 @@ public class KeyManagementImpl extends KeyManagement {
     ContentFactory factory;
     int					httpCode;
 
-    if (!session.getUser().getPartner().getBank().getUseCertificate())
+    if (!session.getUser().getUseCertificate())
       throw new IllegalArgumentException("H005 allow only certificates. Please set useCertificate=true.");
 
     session.getUser().checkAction(EbicsUserAction.HPB);

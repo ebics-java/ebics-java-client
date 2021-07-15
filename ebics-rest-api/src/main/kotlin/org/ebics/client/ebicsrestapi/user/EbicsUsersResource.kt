@@ -1,4 +1,4 @@
-package org.ebics.client.ebicsrestapi
+package org.ebics.client.ebicsrestapi.user
 
 import org.ebics.client.api.user.*
 import org.springframework.web.bind.annotation.*
@@ -19,12 +19,12 @@ class EbicsUsersResource (
     fun deleteUserById(@PathVariable userId: Long) = userService.deleteUser(userId)
 
     @PostMapping("")
-    fun createUser(@RequestBody userInfo: UserInfo, @RequestParam ebicsPartnerId:String, @RequestParam bankId:Long):Long =
-        userService.createUserAndPartner(userInfo, ebicsPartnerId, bankId)
+    fun createUser(@RequestBody userPartnerBank: UserPartnerBank):Long =
+        userService.createUserAndPartner(userPartnerBank)
 
     @PutMapping("{userId}")
-    fun updateUser(@PathVariable userId:Long, @RequestBody userInfo: UserInfo, @RequestParam ebicsPartnerId:String, @RequestParam bankId:Long) =
-        userService.updateUserAndPartner(userId, userInfo, ebicsPartnerId, bankId)
+    fun updateUser(@PathVariable userId:Long, @RequestBody userPartnerBank: UserPartnerBank) =
+        userService.updateUserAndPartner(userId, userPartnerBank)
 
     @PostMapping("{userId}/certificates")
     fun createUserCertificates(@PathVariable userId: Long, @RequestBody userPass: UserPass):Long = userService.createOrUpdateUserCertificates(userId, userPass.password)

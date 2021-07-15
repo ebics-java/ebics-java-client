@@ -10,6 +10,7 @@ interface EbicsUser : EbicsUserInfo {
     override val dn: String
     override var userStatus: EbicsUserStatusEnum
     override val securityMedium: String get() = "0000"
+    override val useCertificate: Boolean
 
     companion object {
         /**

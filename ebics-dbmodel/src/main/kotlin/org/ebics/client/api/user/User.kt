@@ -19,6 +19,8 @@ data class User (
     override val name: String,
     override val dn: String,
     override var userStatus: EbicsUserStatusEnum = EbicsUserStatusEnum.CREATED,
+    override val useCertificate: Boolean,
+    val usePassword: Boolean,
 
     @ManyToOne(optional = false)
     @JoinColumn(name="PARTNER_ID")

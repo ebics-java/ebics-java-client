@@ -1,4 +1,4 @@
-package org.ebics.client.ebicsrestapi
+package org.ebics.client.ebicsrestapi.partner
 
 import org.ebics.client.api.partner.Partner
 import org.ebics.client.api.partner.PartnerService

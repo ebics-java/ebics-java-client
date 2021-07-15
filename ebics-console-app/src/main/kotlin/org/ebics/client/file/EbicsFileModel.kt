@@ -87,14 +87,11 @@ class EbicsFileModel(
      * bank.
      *
      * @param url            the bank URL
-     * @param url            the bank name
+     * @param name           the bank name
      * @param hostId         the bank host ID
-     * @param useCertificate does the bank use certificates ?
      * @return the created ebics bank
      */
-    private fun createBank(url: URL, name: String, hostId: String, useCertificate: Boolean): Bank {
-        return Bank(url, name, hostId, useCertificate)
-    }
+    private fun createBank(url: URL, name: String, hostId: String): Bank = Bank(url, name, hostId)
 
     /**
      * Creates a new ebics partner
@@ -102,9 +99,7 @@ class EbicsFileModel(
      * @param bank      the bank
      * @param partnerId the partner ID
      */
-    private fun createPartner(bank: Bank, partnerId: String): Partner {
-        return Partner(bank, partnerId)
-    }
+    private fun createPartner(bank: Bank, partnerId: String): Partner = Partner(bank, partnerId)
 
     /**
      * Creates a new ebics user and generates its certificates.
@@ -132,10 +127,10 @@ class EbicsFileModel(
         useCertificates: Boolean, saveCertificates: Boolean, passwordCallback: PasswordCallback
     ): Pair<User, UserCertificateManager> {
         logger.info(Messages.getString("user.create.info", Constants.APPLICATION_BUNDLE_NAME, userId))
-        val bank = createBank(url, bankName, hostId, useCertificates)
+        val bank = createBank(url, bankName, hostId)
         val partner = createPartner(bank, partnerId)
         return try {
-            val user = User(partner, ebicsVersion, userId, name, EbicsUser.makeDN(name, email, country, organization), EbicsUserStatusEnum.CREATED)
+            val user = User(partner, ebicsVersion, userId, name, EbicsUser.makeDN(name, email, country, organization), EbicsUserStatusEnum.CREATED, useCertificates)
             val userCert = UserCertificateManager.create(user.dn)
             if (saveCertificates) {
                 userCert.save(configuration.getKeystoreDirectory(user), passwordCallback, userId)
@@ -262,13 +257,5 @@ class EbicsFileModel(
                 Messages.getString("app.quit.error", Constants.APPLICATION_BUNDLE_NAME)
             )
         }
-    }
-
-    init {
-        Messages.setLocale(configuration.locale)
-        logger.info(
-            Messages.getString("init.configuration", Constants.APPLICATION_BUNDLE_NAME)
-        )
-        configuration.init()
     }
 }

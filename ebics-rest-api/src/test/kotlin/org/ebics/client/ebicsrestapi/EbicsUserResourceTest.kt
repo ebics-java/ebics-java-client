@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.ebics.client.api.bank.Bank
 import org.ebics.client.api.user.User
 import org.ebics.client.api.user.UserInfo
+import org.ebics.client.api.user.UserPartnerBank
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.junit.jupiter.api.Test
@@ -29,17 +30,17 @@ class EbicsUserResourceTest (@Autowired private val restTemplate: TestRestTempla
     @Test
     fun addUserAndGet() {
         //Save bank
-        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), true,"EBXUBSCH", "UBS-PROD-CH", null)
+        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), "EBXUBSCH", "UBS-PROD-CH", null)
         val requestBank: HttpEntity<Bank> = HttpEntity(bank)
         val bankId = restTemplate.postForObject("/banks", requestBank, Long::class.java)
 
         //Save user + Partner
-        val userInfo = UserInfo( EbicsVersion.H005, "CHT10001", "JT", "cn=JT,org=com", EbicsUserStatusEnum.CREATED)
-        val request: HttpEntity<UserInfo> = HttpEntity(userInfo)
+        val userInfo = UserPartnerBank( EbicsVersion.H005, "CHT10001", "JT", "cn=JT,org=com", "CH100001", bankId, true, true)
+        val request: HttpEntity<UserPartnerBank> = HttpEntity(userInfo)
         val targetUrl: URI = UriComponentsBuilder.fromUriString(restTemplate.rootUri)
             .path("/users") // Add path
-            .queryParam("ebicsPartnerId", "CH100001")
-            .queryParam("bankId", bankId)
+            //.queryParam("ebicsPartnerId", "CH100001")
+            //.queryParam("bankId", bankId)
             .build() // Build the URL
             .encode() // Encode any URI items that need to be encoded
             .toUri()
@@ -56,6 +57,8 @@ class EbicsUserResourceTest (@Autowired private val restTemplate: TestRestTempla
             assertThat(bank.name).isEqualTo("UBS-PROD-CH")
             assertThat(userStatus).isEqualTo(EbicsUserStatusEnum.CREATED)
             assertThat(ebicsVersion).isEqualTo(EbicsVersion.H005)
+            assertThat(useCertificate).isEqualTo(true)
+            assertThat(usePassword).isEqualTo(true)
         }
     }
 

@@ -1,4 +1,4 @@
-package org.ebics.client.ebicsrestapi
+package org.ebics.client.ebicsrestapi.user
 
 import org.ebics.client.interfaces.PasswordCallback
 

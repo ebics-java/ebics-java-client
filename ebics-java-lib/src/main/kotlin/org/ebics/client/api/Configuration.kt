@@ -51,12 +51,6 @@ interface Configuration {
     val letterManager: LetterManager
 
     /**
-     * Configuration initialization.
-     * Creates the necessary directories for the ebics configuration.
-     */
-    fun init()
-
-    /**
      * Returns the application locale.
      * @return the application locale.
      */

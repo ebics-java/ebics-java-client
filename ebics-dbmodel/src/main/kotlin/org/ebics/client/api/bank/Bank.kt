@@ -16,7 +16,6 @@ data class Bank(
     val id:Long? = null,
 
     override val bankURL: URL,
-    override val useCertificate: Boolean,
     override val hostId: String,
     override val name: String,
 

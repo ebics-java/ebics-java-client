@@ -26,10 +26,10 @@ class UserServiceTest(
 ) {
     @Test
     fun createAndGetUser() {
-        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), true, "EBXUBSCH", "UBS-PROD-CH", null)
+        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"),  "EBXUBSCH", "UBS-PROD-CH", null)
         val bankId = bankService.createBank(bank)
-        val userInfo = UserInfo(EbicsVersion.H004, "CHT10001", "Jan", "org=jto", EbicsUserStatusEnum.CREATED)
-        val userId = userService.createUserAndPartner(userInfo, "CH100001", bankId)
+        val userInfo = UserPartnerBank(EbicsVersion.H004, "CHT10001", "Jan", "org=jto", "CH100001", bankId, false, false)
+        val userId = userService.createUserAndPartner(userInfo)
         with( userService.getUserById(userId) ) {
             assertThat( name ).isEqualTo( userInfo.name )
             assertThat( dn ).isEqualTo( userInfo.dn )

@@ -35,11 +35,6 @@ interface EbicsBank : Serializable {
     val bankURL: URL
 
     /**
-     * Use the bank certificates (or public key exponent & modulus)
-     */
-    val useCertificate: Boolean
-
-    /**
      * Returns the bank id.
      * @return the bank id.
      */

@@ -1,4 +1,4 @@
-package org.ebics.client.ebicsrestapi
+package org.ebics.client.ebicsrestapi.bank
 
 import org.ebics.client.api.bank.Bank
 import org.ebics.client.api.bank.BankService

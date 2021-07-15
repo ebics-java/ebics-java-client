@@ -53,13 +53,13 @@ public class HIARequestOrderDataElement extends DefaultEbicsRootElement {
     X509DataType 			authX509Data;
 
     encryptionX509Data = null;
-    if (session.getUser().getPartner().getBank().getUseCertificate())
+    if (session.getUser().getUseCertificate())
         encryptionX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDn(),
 	                                                    session.getUserCert().getE002CertificateBytes());
     encryptionPubKeyInfo = EbicsXmlFactory.createEncryptionPubKeyInfoType(session.getConfiguration().getEncryptionVersion(),
 	                                                                  encryptionX509Data);
     authX509Data = null;
-    if (session.getUser().getPartner().getBank().getUseCertificate())
+    if (session.getUser().getUseCertificate())
         authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDn(),
 	                                              session.getUserCert().getX002CertificateBytes());
     authenticationPubKeyInfo = EbicsXmlFactory.createAuthenticationPubKeyInfoType(session.getConfiguration().getAuthenticationVersion(),

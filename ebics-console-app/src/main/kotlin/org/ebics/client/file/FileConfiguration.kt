@@ -24,6 +24,9 @@ import org.ebics.client.api.LetterManager
 import org.ebics.client.api.TraceManager
 import org.ebics.client.io.IOUtils
 import org.ebics.client.letter.DefaultLetterManager
+import org.ebics.client.messages.Messages
+import org.ebics.client.utils.Constants
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.*
 
@@ -51,7 +54,7 @@ open class FileConfiguration constructor(
     override val traceManager: TraceManager = FileTraceManager(isTraceEnabled)
     override val locale: Locale = Locale.ENGLISH
     override val letterManager: LetterManager = DefaultLetterManager(locale)
-    override val sslTrustedStoreFile: String = rootDirectory + File.separator + getString("ssltruststore.file.name")
+    final override val sslTrustedStoreFile: String = rootDirectory + File.separator + getString("ssltruststore.file.name")
     private val usersDirectory: String = rootDirectory + File.separator + getString("users.dir.name")
     override val signatureVersion: String = getString("signature.version")
     override val authenticationVersion: String = getString("authentication.version")
@@ -71,7 +74,10 @@ open class FileConfiguration constructor(
         }
     }
 
-    override fun init() {
+    init {
+        logger.info(
+            Messages.getString("init.configuration", Constants.APPLICATION_BUNDLE_NAME)
+        )
         //Create the root directory
         IOUtils.createDirectories(rootDirectory)
         //create the SSL trusted stores directories
@@ -118,5 +124,6 @@ open class FileConfiguration constructor(
 
     companion object {
         private const val RESOURCE_DIR = "org.ebics.client.console.default-config"
+        private val logger = LoggerFactory.getLogger(FileConfiguration::class.java)
     }
 }

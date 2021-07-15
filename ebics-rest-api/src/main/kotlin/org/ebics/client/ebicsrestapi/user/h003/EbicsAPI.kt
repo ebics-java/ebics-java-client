@@ -1,19 +1,14 @@
-package org.ebics.client.ebicsrestapi.h003
+package org.ebics.client.ebicsrestapi.user.h003
 
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream
-import org.ebics.client.api.bank.BankRepository
 import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.bank.cert.BankKeyStoreService
 import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
 import org.ebics.client.api.user.UserRepository
-import org.ebics.client.certificate.UserCertificateManager
-import org.ebics.client.ebicsrestapi.UserIdPass
-import org.ebics.client.filetransfer.h003.FileTransfer
+import org.ebics.client.ebicsrestapi.user.UserIdPass
 import org.ebics.client.keymgmt.h003.KeyManagementImpl
 import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.Product
-import org.ebics.client.order.h003.EbicsUploadOrder
 import org.springframework.stereotype.Component
 
 @Component

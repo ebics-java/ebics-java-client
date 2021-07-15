@@ -21,9 +21,9 @@ class UserKeyStoreRepositoryTest (
 {
     @Test
     fun testCreateStoreAndLoad() {
-        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), true,"EBXUBSCH", "UBS-PROD-CH", null)
+        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), "EBXUBSCH", "UBS-PROD-CH", null)
         val partner = Partner(null, bank, "CH100001", 0)
-        val user = User(null, EbicsVersion.H005, "CHT10001", "Jan", "org=jto", keyStore = null, partner = partner)
+        val user = User(null, EbicsVersion.H005, "CHT10001", "Jan", "org=jto", keyStore = null, partner = partner, usePassword = false, useCertificate = true)
         userRepo.saveAndFlush(user)
         val userId:Long = requireNotNull(user.id) {"User id must be not null"}
         val userKeyStore = UserKeyStore(null, "abc".toByteArray(), user)

@@ -36,7 +36,7 @@ class A005Letter(
     locale: Locale,
     user: EbicsUser,
     userCert: UserCertificateManager,
-    useCert: Boolean = user.partner.bank.useCertificate
+    useCert: Boolean = user.useCertificate
 ) : AbstractInitLetter(
     locale,
     user.partner.bank.hostId,

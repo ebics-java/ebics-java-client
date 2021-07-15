@@ -9,5 +9,6 @@ data class UserInfo(
     override val userId: String,
     override val name: String,
     override val dn: String,
-    override var userStatus: EbicsUserStatusEnum
+    override var userStatus: EbicsUserStatusEnum,
+    override val useCertificate: Boolean
 ) : EbicsUserInfo

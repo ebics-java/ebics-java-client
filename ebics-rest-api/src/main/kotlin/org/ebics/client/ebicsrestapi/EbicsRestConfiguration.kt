@@ -4,6 +4,7 @@ import org.ebics.client.api.Configuration
 import org.ebics.client.api.LetterManager
 import org.ebics.client.api.TraceManager
 import org.ebics.client.api.trace.TraceService
+import org.ebics.client.messages.Messages
 import org.springframework.beans.factory.annotation.Value
 import java.util.*
 
@@ -39,6 +40,9 @@ class EbicsRestConfiguration(
     @Value("\${ebics.compression:#{true}}")
     override val isCompressionEnabled: Boolean,
 
+    @Value("\${ebics.locale.language:#{en}}")
+    private val localeLanguage:String,
+
     traceService: TraceService
 ) : Configuration {
 
@@ -47,10 +51,10 @@ class EbicsRestConfiguration(
         get() = TODO("Not yet implemented")
 
 
-    override fun init() {
-        TODO("Not yet implemented")
-    }
+    final override val locale: Locale = Locale(localeLanguage)
 
-    override val locale: Locale
-        get() = TODO("Not yet implemented")
+    init {
+        //Setting default locale as well in order to set locale for Messages singleton object
+        Locale.setDefault(locale)
+    }
 }

@@ -158,7 +158,7 @@ public class KeyManagementImpl extends KeyManagement {
     orderData.build();
     session.getConfiguration().getTraceManager().trace(orderData,session);
     BankCertificateManager manager;
-    if (session.getUser().getPartner().getBank().getUseCertificate())
+    if (session.getUser().getUseCertificate())
       manager = BankCertificateManager.createFromCertificates(orderData.getBankE002Certificate(), orderData.getBankX002Certificate());
     else
       manager = BankCertificateManager.createFromPubKeyExponentAndModulus(orderData.getBankE002PublicKeyExponent(), orderData.getBankE002PublicKeyModulus(),

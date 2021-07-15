@@ -1,13 +1,14 @@
 package org.ebics.client.api.user
 
-import org.ebics.client.api.EbicsUserInfo
 import org.ebics.client.api.FunctionException
 import org.ebics.client.api.NotFoundException
 import org.ebics.client.api.user.cert.UserKeyStore
 import org.ebics.client.api.user.cert.UserKeyStoreService
 import org.ebics.client.api.partner.PartnerService
 import org.ebics.client.certificate.UserCertificateManager
+import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.user.EbicsUserAction
+import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.springframework.orm.ObjectRetrievalFailureException
 import org.springframework.stereotype.Service
 import java.lang.IllegalArgumentException
@@ -28,40 +29,88 @@ class UserService(
         }
     }
 
-    fun createUserAndPartner(userInfo: EbicsUserInfo, ebicsPartnerId: String, bankId: Long): Long {
-        val partner = partnerService.createOrGetPartner(ebicsPartnerId, bankId)
-        val user = User(
-            null, userInfo.ebicsVersion, userInfo.userId, userInfo.name, userInfo.dn,
-            partner = partner, keyStore = null
-        )
-        userRepository.saveAndFlush(user)
-        return user.id!!
+    fun checkUserPartnerBankValidity(userPartnerBank: UserPartnerBank) {
+        with(userPartnerBank) {
+            if (ebicsVersion == EbicsVersion.H005 && !useCertificate)
+                throw FunctionException("User $userId validation failed, useCertificate must be set to true for EBICS version H005", null)
+        }
     }
 
-    fun updateUserAndPartner(userId: Long, userInfo: UserInfo, ebicsPartnerId: String, bankId: Long): Long {
-        val partner = partnerService.createOrGetPartner(ebicsPartnerId, bankId)
-        try {
-            val currentUser = userRepository.getOne(userId)
-            val updatedUser = User(
-                userId,
-                userInfo.ebicsVersion,
-                userInfo.userId,
-                userInfo.name,
-                userInfo.dn,
-                currentUser.userStatus,
-                partner,
-                currentUser.keyStore
+    fun createUserAndPartner(userPartnerBank: UserPartnerBank): Long {
+        with(userPartnerBank) {
+            checkUserPartnerBankValidity(this)
+            val partner = partnerService.createOrGetPartner(partnerId, bankId)
+            val user = User(
+                null, ebicsVersion, userId, name, dn, useCertificate = useCertificate, usePassword = usePassword,
+                partner = partner, keyStore = null
             )
-            userRepository.saveAndFlush(updatedUser)
-            return userId
+            userRepository.saveAndFlush(user)
+            return user.id!!
+        }
+    }
+
+    fun updateUserAndPartner(id: Long, userPartnerBank: UserPartnerBank): Long {
+        with(userPartnerBank) {
+            checkUserPartnerBankValidity(this)
+            val partner = partnerService.createOrGetPartner(partnerId, bankId)
+            try {
+                val currentUser = userRepository.getOne(id)
+                //Depending on user status only some values are editable
+                val updatedUser = when (currentUser.userStatus) {
+                    EbicsUserStatusEnum.CREATED -> User(
+                        id,
+                        ebicsVersion,
+                        userId,
+                        name,
+                        dn,
+                        currentUser.userStatus,
+                        useCertificate,
+                        usePassword,
+                        partner,
+                        currentUser.keyStore
+                    )
+                    EbicsUserStatusEnum.NEW -> User(
+                        id,
+                        ebicsVersion,
+                        userId,
+                        name,
+                        currentUser.dn,
+                        currentUser.userStatus,
+                        useCertificate,
+                        currentUser.usePassword,
+                        partner,
+                        currentUser.keyStore
+                    )
+                    else -> User(
+                        id,
+                        currentUser.ebicsVersion,
+                        currentUser.userId,
+                        name,
+                        currentUser.dn,
+                        currentUser.userStatus,
+                        currentUser.useCertificate,
+                        currentUser.usePassword,
+                        currentUser.partner,
+                        currentUser.keyStore
+                    )
+                }
+                userRepository.saveAndFlush(updatedUser)
+                return id
+            } catch (ex: ObjectRetrievalFailureException) {
+                throw NotFoundException(id, "user", ex)
+            }
+        }
+    }
+
+    fun deleteUser(userId: Long) {
+        try {
+            userRepository.deleteById(userId)
         } catch (ex: ObjectRetrievalFailureException) {
             throw NotFoundException(userId, "user", ex)
         }
     }
 
-    fun deleteUser(userId: Long) = userRepository.deleteById(userId)
-
-    fun createOrUpdateUserCertificates(userId: Long, password: String):Long {
+    fun createOrUpdateUserCertificates(userId: Long, password: String): Long {
         try {
             val user = userRepository.getOne(userId)
             user.checkAction(EbicsUserAction.CREATE_KEYS)
@@ -82,6 +131,9 @@ class UserService(
     fun resetStatus(userId: Long): Unit {
         try {
             val user = userRepository.getOne(userId)
+            //Delete user key if available
+            user.keyStore?.let { userKeyStoreService.deleteById(it.id!!) }
+            //Set user status to CREATED
             user.updateStatus(EbicsUserAction.RESET)
             userRepository.saveAndFlush(user)
         } catch (ex: ObjectRetrievalFailureException) {

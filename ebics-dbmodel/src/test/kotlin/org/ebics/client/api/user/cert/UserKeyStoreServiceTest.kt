@@ -4,11 +4,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.ebics.client.api.bank.Bank
 import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.partner.PartnerService
-import org.ebics.client.api.user.UserInfo
+import org.ebics.client.api.user.UserPartnerBank
 import org.ebics.client.api.user.UserService
 import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.model.EbicsVersion
-import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,10 +29,13 @@ open class UserKeyStoreServiceTest (
     @Test
     fun createStoreAndLoad() {
         //Create and store bank, partner, user
-        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), true,"EBXUBSCH", "UBS-PROD-CH", null)
+        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), "EBXUBSCH", "UBS-PROD-CH", null)
         val bankId = bankService.createBank(bank)
-        val userInfo = UserInfo( EbicsVersion.H005, "CHT10001", "Jan", "cn=jan", EbicsUserStatusEnum.CREATED)
-        val userId = userService.createUserAndPartner(userInfo, "CH100001", bankId)
+        val userInfo = UserPartnerBank( EbicsVersion.H005, "CHT10001", "Jan", "cn=jan", "CH100001", bankId,
+            useCertificate = true,
+            usePassword = true
+        )
+        val userId = userService.createUserAndPartner(userInfo)
         val user = userService.getUserById(userId)
 
         //Create and store user certificate

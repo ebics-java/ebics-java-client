@@ -36,6 +36,12 @@ interface EbicsUserInfo {
     val dn: String
     var userStatus: EbicsUserStatusEnum
     val securityMedium: String get() = "0000"
+    /**
+     * Does the user use certificates (or just public key exponent & modulus)
+     * Can be used for H003, H004 only
+     * For H005 is always true per EBICS standard
+     */
+    val useCertificate: Boolean
 
     fun checkAction(action: EbicsUserAction) = userStatus.checkAction(action)
     fun updateStatus(action: EbicsUserAction) { userStatus = userStatus.updateStatus(action) }

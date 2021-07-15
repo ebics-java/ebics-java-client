@@ -17,7 +17,8 @@ class User(
     override val userId: String,
     override val name: String,
     override val dn: String,
-    override var userStatus: EbicsUserStatusEnum
+    override var userStatus: EbicsUserStatusEnum,
+    override val useCertificate: Boolean
 ) : EbicsUser, Serializable {
     companion object {
         @JvmStatic
@@ -27,7 +28,8 @@ class User(
             ois.readUTF(),  //UserId
             ois.readUTF(),  //Name
             ois.readUTF(),  //DN
-            (ois.readObject() as EbicsUserStatusEnum)
+            (ois.readObject() as EbicsUserStatusEnum),
+            ois.readBoolean()
         )
     }
 
@@ -37,7 +39,7 @@ class User(
         oos.writeUTF(name)
         oos.writeUTF(dn)
         oos.writeObject(userStatus)
-
+        oos.writeBoolean(useCertificate)
         oos.flush()
         oos.close()
     }

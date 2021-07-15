@@ -56,11 +56,7 @@ class Bank
      * @serial
      */
     override val hostId: String,
-    /**
-     * Does the bank use certificates for signing/crypting ?
-     * @serial
-     */
-    override val useCertificate: Boolean
+
 ) : EbicsBank, Serializable {
     @Throws(IOException::class)
     override fun serialize(oos: ObjectOutputStream) {
