@@ -60,7 +60,7 @@ public class ReturnCode implements Serializable {
    * @return True if the return code is OK one.
    */
   public boolean isOk() {
-    return equals(EBICS_OK);
+    return code.equals(EBICS_OK.code);
   }
 
   /**

@@ -32,7 +32,7 @@ object Messages {
 
     /**
      * Default locale are used for setting language
-     * can be overridden by @sample Locale.setDefault(...)
+     * can be overridden by Locale.setDefault(...)
      */
     val locale: Locale = Locale.getDefault()
 

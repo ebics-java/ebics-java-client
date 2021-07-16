@@ -53,7 +53,7 @@ open class FileConfiguration constructor(
     final override val isTraceEnabled: Boolean = true
     override val traceManager: TraceManager = FileTraceManager(isTraceEnabled)
     override val locale: Locale = Locale.ENGLISH
-    override val letterManager: LetterManager = DefaultLetterManager(locale)
+    override val letterManager: LetterManager = DefaultLetterManager(Locale.ENGLISH)
     final override val sslTrustedStoreFile: String = rootDirectory + File.separator + getString("ssltruststore.file.name")
     private val usersDirectory: String = rootDirectory + File.separator + getString("users.dir.name")
     override val signatureVersion: String = getString("signature.version")
