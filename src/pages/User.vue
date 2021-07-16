@@ -5,11 +5,7 @@
       <h5 v-else>Add new user</h5>
 
       <div class="q-pa-md" style="max-width: 400px">
-        <q-form
-          @submit="onSubmit()"
-          @reset="onCancel"
-          class="q-gutter-md"
-        >
+        <q-form @submit="onSubmit()" @reset="onCancel" class="q-gutter-md">
           <q-input
             filled
             v-model="user.name"
@@ -102,6 +98,11 @@
             label="Use Certificates"
           />
 
+          <q-checkbox
+            v-model="user.usePassword"
+            label="Protect your private keys with password (2FA)"
+          />
+
           <q-input filled v-model="user.userStatus" label="EBICS user status" />
 
           <user-ini-wizz v-if="user.id !== undefined" :id="user.id" />
@@ -132,8 +133,8 @@
 <script lang="ts">
 import UserIniWizz from 'components/UserInitalizationWizard.vue';
 import { defineComponent } from 'vue';
-import  useUserDataAPI from 'components/user'
-import  useBanksDataAPI from 'components/banks'
+import useUserDataAPI from 'components/user';
+import useBanksDataAPI from 'components/banks';
 
 export default defineComponent({
   name: 'User',
@@ -146,8 +147,7 @@ export default defineComponent({
     },
   },
   data() {
-    return {
-    };
+    return {};
   },
   computed: {
     userStatusInitializing(): boolean {
@@ -156,7 +156,7 @@ export default defineComponent({
   },
   methods: {
     onSubmit() {
-      this.createOrUpdateUserData()
+      this.createOrUpdateUserData();
     },
     onCancel() {
       this.$router.go(-1);
@@ -169,8 +169,8 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { user, createOrUpdateUserData } = useUserDataAPI(props.id)
-    const { banks } = useBanksDataAPI()
+    const { user, createOrUpdateUserData } = useUserDataAPI(props.id);
+    const { banks } = useBanksDataAPI();
     return { banks, user, createOrUpdateUserData };
   },
 });

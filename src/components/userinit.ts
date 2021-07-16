@@ -7,9 +7,59 @@ import {
 } from 'components/models';
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
+import { AxiosError } from 'axios';
+
+function isAxiosError(error: unknown): error is AxiosError {
+  return (error as AxiosError).isAxiosError !== undefined;
+}
 
 export default function useUserInitAPI(user: Ref<User>) {
   const q = useQuasar();
+
+  const apiOkHandler = (msg: string): void => {
+    q.notify({
+      color: 'positive',
+      position: 'bottom-right',
+      message: msg,
+      icon: 'gpp_good',
+    });
+  };
+
+  const apiErrorHandler = (msg: string, error: unknown): void => {
+    if (isAxiosError(error)) {
+      if (error.response !== null) {
+        q.notify({
+          color: 'negative',
+          position: 'bottom-right',
+          message: `${msg} '${JSON.stringify(error.response?.data)}'`,
+          closeBtn: true,
+          icon: 'report_problem',
+          timeout: 10000,
+        });
+      } else if (error.request) {
+        q.notify({
+          color: 'negative',
+          position: 'bottom-right',
+          message: `${msg} '${JSON.stringify(error.request)}'`,
+          icon: 'report_problem',
+        });
+      } else {
+        q.notify({
+          color: 'negative',
+          position: 'bottom-right',
+          message: `${msg} '${JSON.stringify(error.message)}'`,
+          icon: 'report_problem',
+        });
+      }
+    } else {
+      q.notify({
+        color: 'negative',
+        position: 'bottom-right',
+        message: `${msg} '${JSON.stringify(error)}'`,
+        icon: 'report_problem',
+      });
+    }
+  };
 
   /*
    * This computed property reflects step which is calculated from actual userStatus,
@@ -41,42 +91,28 @@ export default function useUserInitAPI(user: Ref<User>) {
     return step < actualWizardStep.value;
   };
 
-  const createUserKeysRequest = (pass: string): Promise<void> => {
-    return new Promise<void>((resolve, reject) => {
-      api
-        .post<UserPassword>(`/users/${user.value.id}/certificates`, { password: pass })
-        .then(() => {
-          q.notify({
-            color: 'positive',
-            position: 'bottom-right',
-            message: `Certificates created successfully for user name: ${user.value.name} dn: ${user.value.dn}`,
-            icon: 'gpp_good',
-          });
-          resolve();
-        })
-        .catch((error: Error) => {
-          reject(`Create certificates failed: ${error.message}`);
-        });
-    });
+  const createUserKeysRequest = async (pass: string): Promise<void> => {
+    try {
+      await api.post<UserPassword>(`/users/${user.value.id}/certificates`, {
+        password: pass,
+      });
+      apiOkHandler(
+        `Certificates created successfully for user name: ${user.value.name} dn: ${user.value.dn}`
+      );
+    } catch (error) {
+      apiErrorHandler('Create certificates failed: ', error);
+    }
   };
 
-  const resetUserStatusRequest = (): Promise<void> => {
-    return new Promise<void>((resolve, reject) => {
-      api
-        .post<UserPassword>(`/users/${user.value.id}/resetStatus`)
-        .then(() => {
-          q.notify({
-            color: 'positive',
-            position: 'bottom-right',
-            message: `Initialization status resetted successfully for user name: ${user.value.name}`,
-            icon: 'gpp_good',
-          });
-          resolve();
-        })
-        .catch((error: Error) => {
-          reject(`Initialization status reset failed: ${error.message}`);
-        });
-    });
+  const resetUserStatusRequest = async (): Promise<void> => {
+    try {
+      await api.post<UserPassword>(`/users/${user.value.id}/resetStatus`);
+      apiOkHandler(
+        `Initialization status resetted successfully for user name: ${user.value.name}`
+      );
+    } catch (error) {
+      apiErrorHandler('Initialization status reset failed: ', error);
+    }
   };
 
   /**
@@ -85,35 +121,30 @@ export default function useUserInitAPI(user: Ref<User>) {
    * @param pass
    * @returns
    */
-  const ebicsAdminTypeRequest = (
+  const ebicsAdminTypeRequest = async (
     adminOrderType: AdminOrderType,
     pass: string
   ): Promise<void> => {
-    return new Promise<void>((resolve, reject) => {
-      if (user.value.userStatus == 'PARTLY_INITIALIZED_INI') resolve();
-      else {
-        api
-          .post<UserPassword>(
-            `/users/${user.value.id}/${user.value.ebicsVersion}/send${adminOrderType}`,
-            { password: pass }
-          )
-          .then(() => {
-            q.notify({
-              color: 'positive',
-              position: 'bottom-right',
-              message: `${adminOrderType} executed successfully for user name: ${user.value.name}`,
-              icon: 'gpp_good',
-            });
-            resolve();
-          })
-          .catch((error: Error) => {
-            reject(
-              new Error(`${adminOrderType} execution failed: ${error.message}`)
-            );
-          });
+    if (user.value.userStatus != 'PARTLY_INITIALIZED_INI') {
+      try {
+        await api.post<UserPassword>(
+          `/users/${user.value.id}/${user.value.ebicsVersion}/send${adminOrderType}`,
+          { password: pass }
+        );
+        apiOkHandler(
+          `${adminOrderType} executed successfully for user name: ${user.value.name}`
+        );
+      } catch (error) {
+        apiErrorHandler(`${adminOrderType} failed: `, error);
       }
-    });
+    }
   };
 
-  return { actualWizardStep, isStepDone, createUserKeysRequest, ebicsAdminTypeRequest, resetUserStatusRequest };
+  return {
+    actualWizardStep,
+    isStepDone,
+    createUserKeysRequest,
+    ebicsAdminTypeRequest,
+    resetUserStatusRequest,
+  };
 }

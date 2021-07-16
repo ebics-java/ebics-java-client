@@ -109,13 +109,18 @@
         </q-stepper-navigation>
       </q-step>
     </q-stepper>
-
+    <q-space />
     <q-card class="my-card">
       <q-card-section>
         <q-banner inline-actions class="text-white bg-red">
           Do you want to reset the user status?
           <template v-slot:action>
-            <q-btn @click="resetUserStatus()" flat color="white" label="Reset"/>
+            <q-btn
+              @click="resetUserStatus()"
+              flat
+              color="white"
+              label="Reset"
+            />
           </template>
         </q-banner>
       </q-card-section>
@@ -149,95 +154,59 @@ export default defineComponent({
     nextStep() {
       (this.$refs.wizz as QStepper).next();
     },
-    resetUserStatus() {
-      //Get password for user certificates
-      this.resetUserStatusRequest()
-        .then(() => {
-          //Refresshing user status on success
-          this.refreshUserData();
-        })
-        .catch((error: string) => {
-          console.log(error);
-        });
+    async resetUserStatus() {
+      try {
+        //Get password for user certificates
+        await this.resetUserStatusRequest();
+        //Refresshing user status on success
+        this.refreshUserData();
+      } catch (error) {
+        console.log(error);
+      }
     },
     /*
       Create EBICS User Keys
     */
-    createUserKeys() {
-      //Get password for user certificates
-      this.promptCertPassword(true)
-        .then((pass) => {
-          //Upload user keys (INI and/or HIA) depending on user status
-          console.log(`Pass: ${pass}`);
-          return this.createUserKeysRequest(pass).catch((error: Error) => {
-            this.$q.notify({
-              color: 'negative',
-              position: 'bottom-right',
-              message: error.message,
-              icon: 'report_problem',
-            });
-          });
-        })
-        .then(() => {
-          //Refresshing user status on success
-          this.refreshUserData();
-        })
-        .catch((error: string) => {
-          console.log(error);
-        });
+    async createUserKeys() {
+      try {
+        //Get password for user certificates
+        const pass = await this.promptCertPassword(true);
+        //Upload user keys (INI and/or HIA) depending on user status
+        await this.createUserKeysRequest(pass);
+        //Refresshing user status on success
+        this.refreshUserData();
+      } catch (error) {
+        console.log(error);
+      }
     },
-    uploadUserKeys() {
-      //Get password for user certificates
-      this.promptCertPassword(false)
-        .then((pass) => {
-          //Upload user keys (INI and/or HIA) depending on user status
-          return this.ebicsAdminTypeRequest(AdminOrderType.INI, pass)
-            .then(() => {
-              return this.ebicsAdminTypeRequest(AdminOrderType.HIA, pass);
-            })
-            .catch((error: Error) => {
-              this.$q.notify({
-                color: 'negative',
-                position: 'bottom-right',
-                message: error.message,
-                icon: 'report_problem',
-              });
-            });
-        })
-        .then(() => {
-          //Refresshing user status on success
-          this.refreshUserData();
-        })
-        .catch((error: string) => {
-          console.log(error);
-        });
+    async uploadUserKeys() {
+      try {
+        //Get password for user certificates
+        const pass = await this.promptCertPassword(false);
+        //Execute INI request
+        await this.ebicsAdminTypeRequest(AdminOrderType.INI, pass);
+        //Execute HIA request
+        await this.ebicsAdminTypeRequest(AdminOrderType.HIA, pass);
+        //Refresh user data
+        this.refreshUserData();
+      } catch (error) {
+        console.log(error);
+      }
     },
     printUserLetters() {
       this.nextStep();
     },
-    downloadBankKeys() {
-      //Get password for user certificates
-      this.promptCertPassword(false)
-        .then((pass) => {
-          //Upload user keys (INI and/or HIA) depending on user status
-          return this.ebicsAdminTypeRequest(AdminOrderType.HPB, pass).catch(
-            (error: Error) => {
-              this.$q.notify({
-                color: 'negative',
-                position: 'bottom-right',
-                message: error.message,
-                icon: 'report_problem',
-              });
-            }
-          );
-        })
-        .then(() => {
-          //Refresshing user status on success
-          this.refreshUserData();
-        })
-        .catch((error: string) => {
-          console.log(error);
-        });
+    async downloadBankKeys() {
+      try {
+        //Get password for user certificates
+        const pass = await this.promptCertPassword(false);
+        //Upload user keys (INI and/or HIA) depending on user status
+        await this.ebicsAdminTypeRequest(AdminOrderType.HPB, pass);
+        //Refresshing user status on success
+        this.refreshUserData();
+      } catch (error) {
+        console.log(error);
+      }
     },
     verifyBankKeys() {
       this.nextStep();
