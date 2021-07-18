@@ -33,6 +33,7 @@ import org.apache.http.util.EntityUtils
 import org.ebics.client.interfaces.ContentFactory
 import org.ebics.client.io.ByteArrayContentFactory
 import org.ebics.client.api.EbicsSession
+import org.ebics.client.utils.Utils
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
@@ -42,7 +43,6 @@ import java.io.IOException
  * should be analyzed before proceeding ebics request response parse.
  *
  */
-class HttpRequestSender
 /**
  * Constructs a new `HttpRequestSender` with a given ebics
  * session.
@@ -50,26 +50,20 @@ class HttpRequestSender
  * @param session
  * the ebics session
  */
-    (private val session: EbicsSession) {
-    /**
-     * Returns the content factory of the response body
-     *
-     * @return the content factory of the response.
-     */
-    var responseBody: ContentFactory? = null
-        private set
+class HttpRequestSender(private val session: EbicsSession) {
 
     /**
-     * Sends the request contained in the `ContentFactory`. The
-     * `ContentFactory` will deliver the request as an
+     *  Sends the request contained in the `ContentFactory`.
+     *  The ContentFactory` will deliver the request as an
      * `InputStream`.
+     *  The response code is checked on OK
      *
      * @param request
      * the ebics request
-     * @return the HTTP return code
+     * @return the content factory of the response.
      */
     @Throws(IOException::class)
-    fun send(request: ContentFactory): Int {
+    fun send(request: ContentFactory): ByteArrayContentFactory {
         val configBuilder = RequestConfig.copy(RequestConfig.DEFAULT).setSocketTimeout(300000).setConnectTimeout(300000)
         val conf = session.configuration
 
@@ -110,10 +104,12 @@ class HttpRequestSender
         method.entity = requestEntity
         method.setHeader(HttpHeaders.CONTENT_TYPE, "text/xml; charset=ISO-8859-1")
         httpClient.execute(method).use { response ->
-            responseBody = ByteArrayContentFactory(
+            //Check the HTTP return code (must be 200)
+            Utils.checkHttpCode(response.statusLine.statusCode)
+            //If ok returning content
+            return ByteArrayContentFactory(
                 EntityUtils.toByteArray(response.entity)
             )
-            return response.statusLine.statusCode
         }
     }
 

@@ -35,7 +35,9 @@ import javax.crypto.spec.SecretKeySpec
  * @param input the input byte array
  */
 class Splitter(
-    private var input: ByteArray
+    private val input: ByteArray,
+    isCompressionEnabled: Boolean,
+    keySpec: SecretKeySpec
 ) {
     /**
      * Reads the input stream and splits it to segments of 1MB size.
@@ -62,18 +64,18 @@ class Splitter(
      * @param keySpec the secret key spec
      * @throws EbicsException
      */
-    @Throws(EbicsException::class)
-    fun readInput(isCompressionEnabled: Boolean, keySpec: SecretKeySpec?) {
-        try {
-            if (isCompressionEnabled) {
-                input = Utils.zip(input)
-            }
-            content = Utils.encrypt(input, keySpec)
-            segmentation()
-        } catch (e: Exception) {
-            throw EbicsException(e.message)
-        }
-    }
+    /**
+     * Returns the hole content.
+     * @return the input content.
+     */
+    val content: ByteArray
+    private val segmentSize: Int
+
+    /**
+     * Returns the total segment number.
+     * @return the total segment number.
+     */
+    val segmentNumber: Int
 
     /**
      * Slits the input into 1MB portions.
@@ -87,12 +89,16 @@ class Splitter(
      * transmission, irrespective of the transfer direction (upload/download).
      *
      */
-    private fun segmentation() {
-        segmentNumber = content.size / 1048576 //(1024 * 1024)
-        if (content.size % 1048576 != 0) {
-            segmentNumber++
+    init {
+        try {
+            val decompressedInput = if (isCompressionEnabled) Utils.zip(input) else input
+            content = Utils.encrypt(decompressedInput, keySpec)
+            val lastSegmentNotFull = content.size % 1048576 != 0
+            segmentNumber = content.size / 1048576 + if (lastSegmentNotFull) 1 else 0
+            segmentSize = content.size / segmentNumber
+        } catch (e: Exception) {
+            throw EbicsException(e.message)
         }
-        segmentSize = content.size / segmentNumber
     }
 
     /**
@@ -114,18 +120,5 @@ class Splitter(
         return ByteArrayContentFactory(segment)
     }
 
-    /**
-     * Returns the hole content.
-     * @return the input content.
-     */
-    lateinit var content: ByteArray
-        private set
-    private var segmentSize = 0
 
-    /**
-     * Returns the total segment number.
-     * @return the total segment number.
-     */
-    var segmentNumber = 0
-        private set
 }

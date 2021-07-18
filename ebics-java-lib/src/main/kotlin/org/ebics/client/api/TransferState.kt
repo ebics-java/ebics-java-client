@@ -18,8 +18,6 @@
  */
 package org.ebics.client.api
 
-import java.io.Serializable
-
 /**
  * State of a file transfer.
  * It may be used to continue a transfer via
@@ -28,15 +26,13 @@ import java.io.Serializable
  *
  * @author Hachani
  */
+/**
+ * @param numSegments the total number of segments used for this transfer
+ * @param transactionId the transactionID of this transfer
+ */
 class TransferState(
-    /**
-     * @param numSegments the numSegments to set
-     */
-    private var numSegments: Int,
-    /**
-     * @param transactionId the transactionID to set
-     */
-    var transactionId: ByteArray
+    private val numSegments: Int,
+    val transactionId: ByteArray
 ) {
     /**
      * Returns the next segment number to be transferred.
@@ -62,16 +58,13 @@ class TransferState(
         this.segmentNumber = segmentNumber
     }
 
-    /**
-     * @return the transactionID
-     */
+    //Actual segment number
     private var segmentNumber = 0
 
     /**
      * Is the current segment is the last one?
      * @return True if it is the last segment
      */
-    @Transient
     var isLastSegment = false
         private set
 }

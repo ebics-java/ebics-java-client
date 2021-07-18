@@ -1,11 +1,16 @@
 package org.ebics.client.api
 
+import org.bouncycastle.asn1.DERNull
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier
+import org.bouncycastle.asn1.x509.DigestInfo
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.utils.Utils
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.security.GeneralSecurityException
+import java.security.MessageDigest
 import java.security.PrivateKey
 import java.security.Signature
 import java.security.cert.CertificateEncodingException
@@ -13,6 +18,7 @@ import java.security.cert.X509Certificate
 import java.security.interfaces.RSAPublicKey
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
+
 
 interface UserCertificateManager {
     val a005Certificate: X509Certificate
@@ -159,6 +165,29 @@ interface UserCertificateManager {
         signature.initSign(a005PrivateKey)
         signature.update(removeOSSpecificChars(digest))
         return signature.sign()
+    }
+
+    /**
+     * Make SHA256 hash out of some input bytes
+     */
+    fun createSHA256hash(digest: ByteArray):ByteArray {
+        val messageDigest: MessageDigest = MessageDigest.getInstance("SHA-256")
+        messageDigest.update(digest)
+        return messageDigest.digest()
+    }
+
+    /**
+     * Sign the SHA256 hash with RSA
+     */
+    fun signSHA256hash(encodedSHA256: ByteArray): ByteArray {
+        val sha256Aid = AlgorithmIdentifier(NISTObjectIdentifiers.id_sha256, DERNull.INSTANCE)
+        val di = DigestInfo(sha256Aid, encodedSHA256)
+        //sign SHA256 with RSA
+        val rsaSignature = Signature.getInstance("RSA")
+        rsaSignature.initSign(a005PrivateKey)
+        val encodedDigestInfo: ByteArray = di.toASN1Primitive().encoded
+        rsaSignature.update(encodedDigestInfo)
+        return rsaSignature.sign()
     }
 
     /**

@@ -167,7 +167,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
      * @throws Exception
      */
     @Throws(Exception::class)
-    fun sendFile(file: File, session: EbicsSession?, uploadOrder: EbicsUploadOrder?) {
+    fun sendFile(file: File, session: EbicsSession, uploadOrder: EbicsUploadOrder) {
         val transferManager = FileTransfer(session)
         try {
             transferManager.sendFile(IOUtils.getFileContent(file), uploadOrder)
@@ -192,7 +192,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
 
     @Throws(IOException::class, EbicsException::class)
     fun fetchFile(
-        file: File?, session: EbicsSession, downloadOrder: EbicsDownloadOrder?,
+        file: File, session: EbicsSession, downloadOrder: EbicsDownloadOrder,
         isTest: Boolean
     ) {
         session.addSessionParam("FORMAT", "pain.xxx.cfonb160.dct")

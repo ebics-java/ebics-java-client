@@ -71,7 +71,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     super(session, ebicsOrder, generateName(ebicsOrder.getAdminOrderType()));
     this.userData = userData;
     keySpec = new SecretKeySpec(nonce, "EAS");
-    splitter = new Splitter(userData);
+    splitter = new Splitter(userData, session.getConfiguration().isCompressionEnabled(), keySpec);
   }
 
   @Override
@@ -98,8 +98,6 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
 	                              userData);
     userSignature.build();
     userSignature.validate();
-
-    splitter.readInput(session.getConfiguration().isCompressionEnabled(), keySpec);
 
     mutable = EbicsXmlFactory.createMutableHeaderType("Initialisation", null);
     product = EbicsXmlFactory.createProduct(session.getProduct().getLanguage(), session.getProduct().getName());

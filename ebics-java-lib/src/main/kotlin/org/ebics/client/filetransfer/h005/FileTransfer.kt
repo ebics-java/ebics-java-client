@@ -91,15 +91,13 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
             session,
             ebicsUploadOrder,
             content
-        )
-        initializer.build()
-        initializer.validate()
+        ).apply { build(); validate() }
         session.configuration.traceManager.trace(initializer.userSignature, session)
         session.configuration.traceManager.trace(initializer, session)
-        val httpCode = sender.send(ByteArrayContentFactory(initializer.prettyPrint()))
-        Utils.checkHttpCode(httpCode)
+        val responseBody = sender.send(ByteArrayContentFactory(initializer.prettyPrint()))
+        
         val response = InitializationResponseElement(
-            sender.responseBody,
+            responseBody,
             orderType,
             DefaultEbicsRootElement.generateName(orderType)
         )
@@ -147,15 +145,13 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
             lastSegment,
             transactionId,
             factory
-        )
+        ).apply { build(); validate() }
         val sender = HttpRequestSender(session)
-        uploader.build()
-        uploader.validate()
         session.configuration.traceManager.trace(uploader, session)
-        val httpCode: Int = sender.send(ByteArrayContentFactory(uploader.prettyPrint()))
-        Utils.checkHttpCode(httpCode)
+        val responseBody = sender.send(ByteArrayContentFactory(uploader.prettyPrint()))
+        
         val response = TransferResponseElement(
-            sender.responseBody,
+            responseBody,
             DefaultEbicsRootElement.generateName(orderType)
         )
         response.build()
@@ -177,7 +173,6 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         downloadOrder: EbicsDownloadOrder,
         outputFile: File
     ) {
-        var httpCode: Int
         val orderType = downloadOrder.adminOrderType
         val sender = HttpRequestSender(session)
         val initializer =
@@ -185,10 +180,10 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         initializer.build()
         initializer.validate()
         session.configuration.traceManager.trace(initializer, session)
-        httpCode = sender.send(ByteArrayContentFactory(initializer.prettyPrint()))
-        Utils.checkHttpCode(httpCode)
+        val responseBody = sender.send(ByteArrayContentFactory(initializer.prettyPrint()))
+        
         val response = DownloadInitializationResponseElement(
-            sender.responseBody,
+            responseBody,
             orderType,
             DefaultEbicsRootElement.generateName(orderType)
         )
@@ -218,10 +213,10 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         receipt.build()
         receipt.validate()
         session.configuration.traceManager.trace(receipt, session)
-        httpCode = sender.send(ByteArrayContentFactory(receipt.prettyPrint()))
-        Utils.checkHttpCode(httpCode)
+        val receiptResponseBody = sender.send(ByteArrayContentFactory(receipt.prettyPrint()))
+        
         val receiptResponse = ReceiptResponseElement(
-            sender.responseBody,
+            receiptResponseBody,
             DefaultEbicsRootElement.generateName(orderType)
         )
         receiptResponse.build()
@@ -258,10 +253,10 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         downloader.build()
         downloader.validate()
         session.configuration.traceManager.trace(downloader, session)
-        val httpCode: Int = sender.send(ByteArrayContentFactory(downloader.prettyPrint()))
-        Utils.checkHttpCode(httpCode)
+        val responseBody = sender.send(ByteArrayContentFactory(downloader.prettyPrint()))
+        
         val response = DownloadTransferResponseElement(
-            sender.responseBody,
+            responseBody,
             orderType,
             DefaultEbicsRootElement.generateName(orderType)
         )
