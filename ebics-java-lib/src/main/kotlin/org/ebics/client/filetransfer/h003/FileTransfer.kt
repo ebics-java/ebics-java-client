@@ -27,11 +27,11 @@ import org.ebics.client.interfaces.ContentFactory
 import org.ebics.client.io.ByteArrayContentFactory
 import org.ebics.client.io.Joiner
 import org.ebics.client.messages.Messages.getString
+import org.ebics.client.order.AttributeType
 import org.ebics.client.order.EbicsAdminOrderType
 import org.ebics.client.order.h003.EbicsDownloadOrder
 import org.ebics.client.order.h003.EbicsUploadOrder
 import org.ebics.client.utils.Constants
-import org.ebics.client.utils.Utils
 import org.ebics.client.xml.h003.*
 import org.ebics.schema.h003.OrderAttributeType
 import org.slf4j.LoggerFactory
@@ -89,7 +89,10 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
     fun sendFile(content: ByteArray, uploadOrder: EbicsUploadOrder) {
         val orderType = uploadOrder.adminOrderType
         val orderAttribute: OrderAttributeType.Enum =
-            if (uploadOrder.isSignatureFlag) OrderAttributeType.OZHNN else OrderAttributeType.DZHNN
+            when (uploadOrder.attributeType) {
+                AttributeType.OZHNN -> OrderAttributeType.OZHNN
+                AttributeType.DZHNN -> OrderAttributeType.DZHNN
+            }
         val sender = HttpRequestSender(session)
         val initializer = UploadInitializationRequestElement(
             session,

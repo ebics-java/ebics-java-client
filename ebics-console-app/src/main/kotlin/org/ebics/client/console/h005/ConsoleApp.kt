@@ -159,7 +159,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
 
     private fun readUploadOrder(inputFileValue: String): EbicsUploadOrder {
         val params = readParams(cmd.getOptionValues("p"))
-        return EbicsUploadOrder(readEbicsService(), !cmd.hasOption("ns"), inputFileValue, params)
+        return EbicsUploadOrder(readEbicsService(), !cmd.hasOption("ns"), true, inputFileValue, params)
     }
 
     private fun readParams(paramPairs: Array<String>?): Map<String, String> {

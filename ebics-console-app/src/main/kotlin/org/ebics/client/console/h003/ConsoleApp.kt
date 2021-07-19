@@ -17,6 +17,7 @@ import org.ebics.client.api.EbicsSession
 import org.ebics.client.api.EbicsUser
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.Product
+import org.ebics.client.order.AttributeType
 import org.ebics.client.order.h003.EbicsDownloadOrder
 import org.ebics.client.order.h003.EbicsUploadOrder
 import org.slf4j.LoggerFactory
@@ -94,7 +95,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
         val start = readDate('s')
         val end = readDate('e')
         val orderType = readOrderType()
-        return if (orderType == "FDL") EbicsDownloadOrder(start, end, params) else EbicsDownloadOrder(
+        return if (orderType == "FDL") EbicsDownloadOrder(null, start, end, params) else EbicsDownloadOrder(
             readOrderType(),
             start,
             end,
@@ -134,9 +135,13 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
     private fun readUploadOrder(): EbicsUploadOrder {
         val params = readParams(cmd.getOptionValues("p"))
         val orderType = readOrderType()
-        return if (orderType == "FUL") EbicsUploadOrder(!cmd.hasOption("ns"), params) else EbicsUploadOrder(
+        return if (orderType == "FUL") EbicsUploadOrder(
+            null,
+            if (cmd.hasOption("ns")) AttributeType.DZHNN else AttributeType.OZHNN,
+            params
+        ) else EbicsUploadOrder(
             readOrderType(),
-            !cmd.hasOption("ns"),
+            if (cmd.hasOption("ns")) AttributeType.DZHNN else AttributeType.OZHNN,
             params
         )
     }

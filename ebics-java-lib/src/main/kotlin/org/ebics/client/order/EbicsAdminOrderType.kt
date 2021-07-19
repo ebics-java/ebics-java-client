@@ -16,28 +16,18 @@
  *
  * $Id$
  */
-
-package org.ebics.client.order;
+package org.ebics.client.order
 
 /**
  * EBICS order type.
  *
  * @author Pierre Ducroquet
- *
  */
-public enum EbicsAdminOrderType {
-    HIA,
-    HAA,
-    HKD,
-    HPB,
-    HPD,
-    HTD,
-    INI,
-    SPR,
-    FUL, //EBICS 2.4/2.5 FR Upload (standard business order types)
-    FDL, //EBICS 2.4/2.5 FR Download (standard business order types)
-    UPL, //EBICS 2.4/2.5 DE Upload (standard business order types)
-    DNL, //EBICS 2.4/2.5 DE Download (standard business order types)
-    BTU, //EBICS 3.0 Upload
-    BTD  //EBICS 3.0 Download
+enum class EbicsAdminOrderType {
+    HIA, HAA, HKD, HPB, HPD, HTD, INI, SPR, FUL,  //EBICS 2.4/2.5 FR Upload (standard business order types)
+    FDL,  //EBICS 2.4/2.5 FR Download (standard business order types)
+    UPL,  //EBICS 2.4/2.5 DE Upload (standard business order types)
+    DNL,  //EBICS 2.4/2.5 DE Download (standard business order types)
+    BTU,  //EBICS 3.0 Upload
+    BTD //EBICS 3.0 Download
 }

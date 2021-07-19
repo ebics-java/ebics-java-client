@@ -39,6 +39,7 @@ import org.ebics.schema.h005.StaticHeaderType.Product;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Calendar;
+import java.util.Collections;
 
 
 /**
@@ -55,7 +56,7 @@ public class SPRRequestElement extends InitializationRequestElement {
    * @param session the current ebics session.
    */
   public SPRRequestElement(EbicsSession session) throws EbicsException {
-    super(session, new EbicsOrder(EbicsAdminOrderType.SPR), "SPRRequest.xml");
+    super(session, new EbicsOrder(EbicsAdminOrderType.SPR, Collections.emptyMap()), "SPRRequest.xml");
     keySpec = new SecretKeySpec(nonce, "EAS");
   }
 
