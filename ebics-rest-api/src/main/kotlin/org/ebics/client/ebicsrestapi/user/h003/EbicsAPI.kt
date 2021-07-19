@@ -11,8 +11,8 @@ import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.Product
 import org.springframework.stereotype.Component
 
-@Component
-class EbicsAPIH003(
+@Component("EbicsAPIH003")
+class EbicsAPI(
     private val userRepository: UserRepository,
     private val bankService: BankService,
     private val bankKeyStoreService: BankKeyStoreService,

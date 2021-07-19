@@ -124,7 +124,7 @@ public class SignedInfo extends DefaultEbicsRootElement {
    * the EBICS specification for common namespaces nomination.
    * 
    * <p> The signature is ensured using the user X002 private key. This step is done in
-   * {@link EbicsUserInfo#authenticate(byte[]) authenticate}.
+   * {@link UserCertificateManager#authenticate(byte[]) authenticate}.
    * 
    * @param toSign the input to sign
    * @return the signed input
