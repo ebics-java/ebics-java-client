@@ -1,19 +1,23 @@
-import { computed, Ref } from 'vue';
+import { computed, Ref, ref } from 'vue';
 import {
   User,
   UserIniWizzStep,
   UserPassword,
   AdminOrderType,
+  EbicsApiError,
 } from 'components/models';
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import { AxiosError } from 'axios';
 
-function isAxiosError(error: unknown): error is AxiosError {
+function isAxiosError<T>(error: unknown): error is AxiosError<T> {
   return (error as AxiosError).isAxiosError !== undefined;
 }
 
-export default function useUserInitAPI(user: Ref<User>) {
+export default function useUserInitAPI(
+  user: Ref<User>,
+  tempPassword: Ref<string | undefined>
+) {
   const q = useQuasar();
 
   const apiOkHandler = (msg: string): void => {
@@ -25,13 +29,29 @@ export default function useUserInitAPI(user: Ref<User>) {
     });
   };
 
+  /**
+   * REST API Error Handler
+   * - Log the whole error in console
+   * - Notify user with some readable error message
+   * @param msg context message, for example 'user A initialization'
+   * @param error REST API call error
+   */
   const apiErrorHandler = (msg: string, error: unknown): void => {
-    if (isAxiosError(error)) {
+    console.log(JSON.stringify(error));
+    if (isAxiosError<EbicsApiError>(error)) {
       if (error.response !== null) {
+        const ebicsApiError = error.response?.data as EbicsApiError;
+        if (ebicsApiError.message.includes('wrong password')) {
+          //In case of error 'wrong password' we have to reset temporary stored password in order to ask for new one
+          tempPassword.value = undefined;
+        }
+        let message = ebicsApiError.message;
+        if (!ebicsApiError.description.includes(message))
+          message = `message: ${message} description: ${ebicsApiError.description}`;
         q.notify({
           color: 'negative',
           position: 'bottom-right',
-          message: `${msg} '${JSON.stringify(error.response?.data)}'`,
+          message: `${msg} '${message}'`,
           closeBtn: true,
           icon: 'report_problem',
           timeout: 10000,
@@ -61,25 +81,49 @@ export default function useUserInitAPI(user: Ref<User>) {
     }
   };
 
+  //TBD: needs to be somehow persisted to user state
+  const userStatusLetterPrinted = ref<boolean>(false);
+
+  //TBD: needs to be somehow persisted to user state
+  const userStatusBankKeysVerified = ref<boolean>(false);
+
   /*
    * This computed property reflects step which is calculated from actual userStatus,
    * It is needed in order to know which steps are actually finished
    */
-  const actualWizardStep = computed<UserIniWizzStep>(() => {
-    switch (user.value.userStatus) {
-      case 'CREATED':
-        return UserIniWizzStep.CreateUserKeys;
-      case 'NEW':
-      case 'LOCKED':
-      case 'PARTLY_INITIALIZED_INI':
-      case 'PARTLY_INITIALIZED_HIA':
-        return UserIniWizzStep.UploadUserKeys;
-      case 'INITIALIZED':
-        return UserIniWizzStep.PrintUserLetters;
-      case 'READY':
-        return UserIniWizzStep.VerifyBankKeys;
-    }
-    return UserIniWizzStep.CreateUserKeys;
+  const actualWizardStep = computed<UserIniWizzStep>({
+    get() {
+      switch (user.value.userStatus) {
+        case 'CREATED':
+          return UserIniWizzStep.CreateUserKeys;
+        case 'NEW':
+        case 'LOCKED':
+        case 'PARTLY_INITIALIZED_INI':
+        case 'PARTLY_INITIALIZED_HIA':
+          return UserIniWizzStep.UploadUserKeys;
+        case 'INITIALIZED':
+          return userStatusLetterPrinted.value
+            ? UserIniWizzStep.DownloadBankKeys
+            : UserIniWizzStep.PrintUserLetters;
+        case 'READY':
+          return userStatusBankKeysVerified.value
+            ? UserIniWizzStep.Finish
+            : UserIniWizzStep.VerifyBankKeys;
+      }
+      return UserIniWizzStep.CreateUserKeys;
+    },
+    set(value) {
+      switch (value) {
+        case UserIniWizzStep.DownloadBankKeys:
+          if (user.value.userStatus == 'INITIALIZED') {
+            userStatusLetterPrinted.value = true;
+          }
+        case UserIniWizzStep.Finish:
+          if (user.value.userStatus == 'READY') {
+            userStatusBankKeysVerified.value = true;
+          }
+      }
+    },
   });
 
   /**
@@ -125,18 +169,16 @@ export default function useUserInitAPI(user: Ref<User>) {
     adminOrderType: AdminOrderType,
     pass: string
   ): Promise<void> => {
-    if (user.value.userStatus != 'PARTLY_INITIALIZED_INI') {
-      try {
-        await api.post<UserPassword>(
-          `/users/${user.value.id}/${user.value.ebicsVersion}/send${adminOrderType}`,
-          { password: pass }
-        );
-        apiOkHandler(
-          `${adminOrderType} executed successfully for user name: ${user.value.name}`
-        );
-      } catch (error) {
-        apiErrorHandler(`${adminOrderType} failed: `, error);
-      }
+    try {
+      await api.post<UserPassword>(
+        `/users/${user.value.id}/${user.value.ebicsVersion}/send${adminOrderType}`,
+        { password: pass }
+      );
+      apiOkHandler(
+        `${adminOrderType} executed successfully for user name: ${user.value.name}`
+      );
+    } catch (error) {
+      apiErrorHandler(`${adminOrderType} failed: `, error);
     }
   };
 
