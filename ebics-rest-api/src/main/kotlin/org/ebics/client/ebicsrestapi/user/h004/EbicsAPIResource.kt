@@ -1,7 +1,6 @@
 package org.ebics.client.ebicsrestapi.user.h004
 
-import org.ebics.client.ebicsrestapi.user.UserIdPass
-import org.ebics.client.ebicsrestapi.user.UserPass
+import org.ebics.client.ebicsrestapi.user.*
 import org.springframework.web.bind.annotation.*
 
 @RestController("EbicsAPIResourceH004")
@@ -16,4 +15,11 @@ class EbicsAPIResource (private val ebicsAPI: EbicsAPI){
 
     @PostMapping("sendHPB")
     fun sendHPB(@PathVariable userId:Long, @RequestBody userPass: UserPass) = ebicsAPI.sendHPB(UserIdPass(userId, userPass.password))
+
+    @PostMapping("upload")
+    fun initiateUpload(@PathVariable userId: Long, @RequestBody uploadInitRequest: UploadInitRequest): UploadInitResponse = ebicsAPI.initFileUpload(userId, uploadInitRequest)
+
+    @PostMapping("upload/{transferId}/sendSegment")
+    fun uploadFileSegment(@PathVariable userId: Long, @PathVariable transferId:String, @RequestBody uploadSegmentRequest: UploadSegmentRequest): UploadSegmentResponse =
+        ebicsAPI.uploadFileSegment(userId, transferId, uploadSegmentRequest)
 }

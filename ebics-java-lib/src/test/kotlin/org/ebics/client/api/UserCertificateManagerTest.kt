@@ -44,11 +44,16 @@ class UserCertificateManagerTest {
         //SHA256withRSA
         val signed = manager.sign(test.toByteArray())
 
+        println("Signed SHAwithRSA in one step : ${signed.toHex()}")
         //SHA256
         val sha256 = manager.createSHA256hash(test.toByteArray())
+        println("SHA256: ${sha256.toHex()}")
         //+withRSA
         val signed2 = manager.signSHA256hash(sha256)
+        println("Signed SHAwithRSA in two steps: ${signed.toHex()}")
 
         Assertions.assertArrayEquals(signed, signed2)
     }
 }
+
+fun ByteArray.toHex(): String = joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
