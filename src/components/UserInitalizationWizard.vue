@@ -214,14 +214,16 @@ export default defineComponent({
   },
   setup(props) {
     const { user, refreshUserData } = useUserDataAPI(props.id);
+
+    const { tempPassword, promptCertPassword } = usePasswordAPI(user);
+
     const {
       actualWizardStep,
       isStepDone,
       createUserKeysRequest,
       ebicsAdminTypeRequest,
       resetUserStatusRequest,
-    } = useUserInitAPI(user);
-    const { promptCertPassword } = usePasswordAPI(user);
+    } = useUserInitAPI(user, tempPassword);
 
     return {
       user,
@@ -230,8 +232,9 @@ export default defineComponent({
       isStepDone,
       createUserKeysRequest,
       ebicsAdminTypeRequest,
-      promptCertPassword,
       resetUserStatusRequest,
+      tempPassword,
+      promptCertPassword,
     };
   },
 });
