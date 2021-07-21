@@ -3,7 +3,7 @@ package org.ebics.client.console
 import org.ebics.client.file.EbicsFileModel
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.certificate.UserCertificateManager
-import org.ebics.client.interfaces.PasswordCallback
+
 import org.ebics.client.file.FileConfiguration
 import org.ebics.client.file.User
 import org.ebics.client.model.EbicsSession
@@ -27,7 +27,7 @@ class ConsoleAppBase(
     val ebicsModel: EbicsFileModel = EbicsFileModel(configuration, serializedDirectory)
 
     @Throws(Exception::class)
-    private fun createUser(properties: ConfigProperties, pwdHandler: PasswordCallback, ebicsVersion: EbicsVersion): Pair<User, UserCertificateManager> {
+    private fun createUser(properties: ConfigProperties, pwdHandler: String, ebicsVersion: EbicsVersion): Pair<User, UserCertificateManager> {
         val userId = properties["userId"]
         val partnerId = properties["partnerId"]
         val bankUrl = properties["bank.url"]
@@ -46,7 +46,7 @@ class ConsoleAppBase(
     @Throws(Exception::class)
     fun createDefaultSession(ebicsVersion: EbicsVersion): EbicsSession {
         TODO("Bank certificates needs to be loaded")
-        val user = createUser(properties, createPasswordCallback(), ebicsVersion)
+        val user = createUser(properties, getPassword(), ebicsVersion)
         return EbicsSession(user.first, configuration, defaultProduct, user.second, null)
     }
 
@@ -55,14 +55,13 @@ class ConsoleAppBase(
         val userId = properties["userId"]
         val hostId = properties["hostId"]
         val partnerId = properties["partnerId"]
-        val user = ebicsModel.loadUser(hostId, partnerId, userId, createPasswordCallback())
+        val user = ebicsModel.loadUser(hostId, partnerId, userId, getPassword())
         TODO("Bank certificates needs to be loaded")
         return EbicsSession(user.first, configuration, defaultProduct, user.second, null)
     }
 
-    fun createPasswordCallback(): PasswordCallback {
-        val password = properties["password"]
-        return PasswordCallback { password.toCharArray() }
+    fun getPassword(): String {
+        return properties["password"]
     }
 
     companion object {

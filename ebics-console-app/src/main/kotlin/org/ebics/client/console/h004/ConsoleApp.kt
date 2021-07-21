@@ -10,7 +10,7 @@ import org.ebics.client.exception.NoDownloadDataAvailableException
 import org.ebics.client.file.EbicsFileModel
 import org.ebics.client.file.FileConfiguration
 import org.ebics.client.filetransfer.h004.FileTransfer
-import org.ebics.client.interfaces.PasswordCallback
+
 import org.ebics.client.io.IOUtils
 import org.ebics.client.keymgmt.h004.KeyManagementImpl
 import org.ebics.client.messages.Messages
@@ -56,7 +56,7 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
             when (val adminOrderType = cmd.getOptionValue("at")) {
                 "INI" -> sendINIRequest(user, session)
                 "HIA" -> sendHIARequest(user, session)
-                "HPB" -> sendHPBRequest(user, session, app.createPasswordCallback())
+                "HPB" -> sendHPBRequest(user, session, app.getPassword())
                 "SPR" -> revokeSubscriber(user, session)
                 else -> logger.error(
                     Messages.getString(
@@ -276,13 +276,13 @@ class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: C
      * @param session the EBICS session
      */
     @Throws(Exception::class)
-    fun sendHPBRequest(user: User, session: EbicsSession, passwordCallback: PasswordCallback) {
+    fun sendHPBRequest(user: User, session: EbicsSession, password: String) {
         val userId = user.userId
         logger.info(
             Messages.getString("hpb.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId)
         )
         try {
-            val manager = KeyManagementImpl(session).sendHPB(passwordCallback)
+            val manager = KeyManagementImpl(session).sendHPB(password)
             manager.save(FileOutputStream((session.configuration as FileConfiguration).getKeystoreDirectory(user) + File.separator + session.getBankID() + ".p12"))
             logger.info(
                 Messages.getString("hpb.send.success", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId)

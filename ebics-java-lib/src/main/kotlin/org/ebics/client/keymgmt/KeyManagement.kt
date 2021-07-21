@@ -3,7 +3,7 @@ package org.ebics.client.keymgmt
 import org.ebics.client.api.EbicsSession
 import org.ebics.client.certificate.BankCertificateManager
 import org.ebics.client.exception.EbicsException
-import org.ebics.client.interfaces.PasswordCallback
+
 import java.io.IOException
 import java.security.GeneralSecurityException
 
@@ -43,7 +43,7 @@ abstract class KeyManagement(
      * @throws EbicsException server generated error message
      */
     @Throws(IOException::class, GeneralSecurityException::class, EbicsException::class)
-    abstract fun sendHPB(passwordCallback: PasswordCallback): BankCertificateManager
+    abstract fun sendHPB(password: String): BankCertificateManager
 
     /**
      * Sends the SPR order to the bank.

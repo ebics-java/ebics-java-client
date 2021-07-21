@@ -5,7 +5,7 @@ import com.sun.xml.internal.messaging.saaj.util.ByteInputStream
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
 import org.ebics.client.api.user.User
 import org.ebics.client.certificate.UserCertificateManager
-import org.ebics.client.interfaces.PasswordCallback
+
 import javax.persistence.*
 
 /**
@@ -26,15 +26,15 @@ data class UserKeyStore(
     @OneToOne(mappedBy = "keyStore")
     val user: User
 ) {
-    fun toUserCertMgr(passwordCallback: PasswordCallback):UserCertificateManager {
+    fun toUserCertMgr(password: String):UserCertificateManager {
         val ins = ByteInputStream(keyStoreBytes, keyStoreBytes.size)
-        return UserCertificateManager.load(ins, passwordCallback, user.userId)
+        return UserCertificateManager.load(ins, password, user.userId)
     }
 
     companion object {
-        fun fromUserCertMgr(user:User, userCertMgr:UserCertificateManager, passwordCallback: PasswordCallback):UserKeyStore {
+        fun fromUserCertMgr(user:User, userCertMgr:UserCertificateManager, password: String):UserKeyStore {
             val bos = ByteOutputStream(4096)
-            userCertMgr.save(bos, passwordCallback, user.userId)
+            userCertMgr.save(bos, password, user.userId)
             return UserKeyStore(null, bos.bytes, user)
         }
     }

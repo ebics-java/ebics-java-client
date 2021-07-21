@@ -41,12 +41,12 @@ open class UserKeyStoreServiceTest (
         //Create and store user certificate
         val certificates = UserCertificateManager.create(userInfo.dn)
         val pass = "testPass"
-        val userKeyStore = UserKeyStore.fromUserCertMgr(user,certificates, pass::toCharArray)
+        val userKeyStore = UserKeyStore.fromUserCertMgr(user,certificates, pass)
         val keyStoreId = keyStoreService.save( userKeyStore )
 
         //Load stored certificates from DB
         val userKeyStoreLoaded = keyStoreService.loadById(keyStoreId)
-        val loadedCertificates = userKeyStoreLoaded.toUserCertMgr( pass::toCharArray )
+        val loadedCertificates = userKeyStoreLoaded.toUserCertMgr( pass )
 
         //Compare created & loaded certs
         with(loadedCertificates) {

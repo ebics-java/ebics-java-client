@@ -115,7 +115,7 @@ class UserService(
             val user = userRepository.getOne(userId)
             user.checkAction(EbicsUserAction.CREATE_KEYS)
             val userCertMgr = UserCertificateManager.create(user.dn)
-            val userKeyStore = UserKeyStore.fromUserCertMgr(user, userCertMgr, password::toCharArray)
+            val userKeyStore = UserKeyStore.fromUserCertMgr(user, userCertMgr, password)
             userKeyStoreService.save(userKeyStore)
             user.keyStore = userKeyStore
             user.updateStatus(EbicsUserAction.CREATE_KEYS)

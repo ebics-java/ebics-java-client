@@ -20,11 +20,11 @@ class UserCertificateManagerTest {
         //Create and save
         val manager = UserCertificateManager.create("cn=test,o=google,c=de")
         val bos = ByteArrayOutputStream()
-        manager.save(bos, "pass"::toCharArray, "user1")
+        manager.save(bos, "pass", "user1")
 
         //Load certificates
         val ins = ByteArrayInputStream(bos.toByteArray())
-        val managerLoaded = UserCertificateManager.load(ins, "pass"::toCharArray, "user1")
+        val managerLoaded = UserCertificateManager.load(ins, "pass", "user1")
 
         Assertions.assertArrayEquals(manager.a005Certificate.encoded, managerLoaded.a005Certificate.encoded)
         Assertions.assertArrayEquals(manager.x002Certificate.encoded, managerLoaded.x002Certificate.encoded)

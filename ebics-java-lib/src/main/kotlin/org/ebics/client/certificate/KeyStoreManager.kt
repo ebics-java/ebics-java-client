@@ -49,7 +49,7 @@ class KeyStoreManager private constructor(
     // DATA MEMBERS
     // --------------------------------------------------------------------
     private val keyStore: KeyStore,
-    private val password: CharArray
+    private val password: String
 ) {
     /**
      * Loads a certificate for a given alias
@@ -72,7 +72,7 @@ class KeyStoreManager private constructor(
      */
     @Throws(GeneralSecurityException::class)
     fun getPrivateKey(alias: String): PrivateKey {
-        val key: Key? = keyStore.getKey(alias, password)
+        val key: Key? = keyStore.getKey(alias, password.toCharArray())
         requireNotNull(key) { "private key not found for alias $alias" }
         return key as PrivateKey
     }
@@ -86,7 +86,7 @@ class KeyStoreManager private constructor(
          * @throws IOException
          */
         @Throws(GeneralSecurityException::class, IOException::class)
-        fun load(path: String, password: CharArray): KeyStoreManager = load(FileInputStream(path), password)
+        fun load(path: String, password: String): KeyStoreManager = load(FileInputStream(path), password)
 
         /**
          * Loads a key store from a given path and password
@@ -96,15 +96,15 @@ class KeyStoreManager private constructor(
          * @throws IOException
          */
         @Throws(GeneralSecurityException::class, IOException::class)
-        fun load(ins: InputStream, password: CharArray): KeyStoreManager = createKeyStoreManager(password).apply { load(ins) }
+        fun load(ins: InputStream, password: String): KeyStoreManager = createKeyStoreManager(password).apply { load(ins) }
 
         /**
          * Creates a key store
          */
         @JvmStatic
-        fun create(password: CharArray) = createKeyStoreManager(password).apply { create() }
+        fun create(password: String) = createKeyStoreManager(password).apply { create() }
 
-        private fun createKeyStoreManager(password: CharArray) =
+        private fun createKeyStoreManager(password: String) =
             KeyStoreManager(KeyStore.getInstance("PKCS12", BouncyCastleProvider.PROVIDER_NAME), password)
 
         /**
@@ -164,7 +164,7 @@ class KeyStoreManager private constructor(
      */
     @Throws(GeneralSecurityException::class, IOException::class)
     private fun load(ins: InputStream) {
-        keyStore.load(ins, password)
+        keyStore.load(ins, password.toCharArray())
         readCertificates()
     }
 
@@ -210,7 +210,7 @@ class KeyStoreManager private constructor(
      */
     @Throws(GeneralSecurityException::class, IOException::class)
     fun save(output: OutputStream) {
-        keyStore.store(output, password)
+        keyStore.store(output, password.toCharArray())
     }
 
     /**

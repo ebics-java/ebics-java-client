@@ -21,7 +21,7 @@ package org.ebics.client.file
 import org.apache.xml.security.Init
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.exception.EbicsException
-import org.ebics.client.interfaces.PasswordCallback
+
 import org.ebics.client.io.IOUtils
 import org.ebics.client.messages.Messages
 import org.ebics.client.model.*
@@ -115,7 +115,7 @@ class EbicsFileModel(
      * @param organization     the user organization or company
      * @param useCertificates  does the bank use certificates ?
      * @param saveCertificates save generated certificates?
-     * @param passwordCallback a callback-handler that supplies us with the password. This
+     * @param password a callback-handler that supplies us with the password. This
      * parameter can be null, in this case no password is used.
      * @return
      * @throws Exception
@@ -124,7 +124,7 @@ class EbicsFileModel(
     fun createUser(
         url: URL, ebicsVersion: EbicsVersion, bankName: String, hostId: String, partnerId: String,
         userId: String, name: String, email: String?, country: String?, organization: String?,
-        useCertificates: Boolean, saveCertificates: Boolean, passwordCallback: PasswordCallback
+        useCertificates: Boolean, saveCertificates: Boolean, password: String
     ): Pair<User, UserCertificateManager> {
         logger.info(Messages.getString("user.create.info", Constants.APPLICATION_BUNDLE_NAME, userId))
         val bank = createBank(url, bankName, hostId)
@@ -133,7 +133,7 @@ class EbicsFileModel(
             val user = User(partner, ebicsVersion, userId, name, EbicsUser.makeDN(name, email, country, organization), EbicsUserStatusEnum.CREATED, useCertificates)
             val userCert = UserCertificateManager.create(user.dn)
             if (saveCertificates) {
-                userCert.save(configuration.getKeystoreDirectory(user), passwordCallback, userId)
+                userCert.save(configuration.getKeystoreDirectory(user), password, userId)
             }
             createUserDirectories(user)
             serializationManager.serialize(bank)
@@ -177,7 +177,7 @@ class EbicsFileModel(
         hostId: String,
         partnerId: String,
         userId: String,
-        passwordCallback: PasswordCallback
+        password: String
     ): Pair<User, UserCertificateManager> {
         logger.info(
             Messages.getString("user.load.info", Constants.APPLICATION_BUNDLE_NAME, userId)
@@ -189,7 +189,7 @@ class EbicsFileModel(
             val user: User =
                 User.deserialize(serializationManager.getDeserializeStream("user-$userId"), partner)
             val manager =
-                UserCertificateManager.load(configuration.getKeystoreDirectory(user), passwordCallback, userId)
+                UserCertificateManager.load(configuration.getKeystoreDirectory(user), password, userId)
             logger.info(
                 Messages.getString("user.load.success", Constants.APPLICATION_BUNDLE_NAME, userId)
             )

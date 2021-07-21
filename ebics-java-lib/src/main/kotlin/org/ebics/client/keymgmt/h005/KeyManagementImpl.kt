@@ -24,7 +24,7 @@ import org.ebics.client.certificate.BankCertificateManager.Companion.createFromC
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.http.HttpRequestSender
 import org.ebics.client.interfaces.ContentFactory
-import org.ebics.client.interfaces.PasswordCallback
+
 import org.ebics.client.io.ByteArrayContentFactory
 import org.ebics.client.keymgmt.KeyManagement
 import org.ebics.client.model.user.EbicsUserAction
@@ -97,7 +97,7 @@ class KeyManagementImpl(session: EbicsSession) : KeyManagement(session) {
      * @throws EbicsException server generated error message
      */
     @Throws(IOException::class, GeneralSecurityException::class, EbicsException::class)
-    override fun sendHPB(passwordCallback: PasswordCallback): BankCertificateManager {
+    override fun sendHPB(password: String): BankCertificateManager {
         require(session.user.useCertificate) { "H005 allow only certificates. Please set useCertificate=true." }
         session.user.checkAction(EbicsUserAction.HPB)
         val sender = HttpRequestSender(session)

@@ -19,7 +19,7 @@
 package org.ebics.client.certificate
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.ebics.client.interfaces.PasswordCallback
+
 import java.io.*
 import java.lang.IllegalArgumentException
 import java.security.GeneralSecurityException
@@ -91,20 +91,20 @@ class UserCertificateManager(
             return CertKeyPair(cert, keypair.private)
         }
 
-        fun load(path: String, passwordCallback: PasswordCallback, userId: String) =
-            load(FileInputStream(path), passwordCallback, userId)
+        fun load(path: String, password: String, userId: String) =
+            load(FileInputStream(path), password, userId)
 
         /**
          * Loads user certificates from a given key store
          *
          * @param path        the key store path
-         * @param passwordCallback the password call back
+         * @param password the password call back
          * @throws GeneralSecurityException
          * @throws IOException
          */
         @Throws(GeneralSecurityException::class, IOException::class)
-        fun load(ins: InputStream, passwordCallback: PasswordCallback, userId: String): UserCertificateManager {
-            val manager = KeyStoreManager.load(ins, passwordCallback.password)
+        fun load(ins: InputStream, password: String, userId: String): UserCertificateManager {
+            val manager = KeyStoreManager.load(ins, password)
             return UserCertificateManager(
                 a005Certificate = manager.getCertificate("$userId-A005"),
                 x002Certificate = manager.getCertificate("$userId-X002"),
@@ -120,13 +120,13 @@ class UserCertificateManager(
      * Saves the certificates in PKCS12 format
      *
      * @param path        the certificates path
-     * @param passwordCallback the password call back
+     * @param password the password call back
      * @throws GeneralSecurityException
      * @throws IOException
      */
     @Throws(GeneralSecurityException::class, IOException::class)
-    fun save(path: String, passwordCallback: PasswordCallback, userId: String) {
-        save(FileOutputStream("$path/$userId.p12"), passwordCallback, userId)
+    fun save(path: String, password: String, userId: String) {
+        save(FileOutputStream("$path/$userId.p12"), password, userId)
     }
 
     /**
@@ -138,14 +138,13 @@ class UserCertificateManager(
      * @throws IOException
      */
     @Throws(GeneralSecurityException::class, IOException::class)
-    fun save(fos: OutputStream, passwordCallback: PasswordCallback, userId: String) {
-        val password = passwordCallback.password
+    fun save(fos: OutputStream, password: String, userId: String) {
         with(KeyStore.getInstance("PKCS12", BouncyCastleProvider.PROVIDER_NAME)) {
             load(null, null)
-            setKeyEntry("$userId-A005", a005PrivateKey, password, arrayOf(a005Certificate))
-            setKeyEntry("$userId-X002", x002PrivateKey, password, arrayOf(x002Certificate))
-            setKeyEntry("$userId-E002", e002PrivateKey, password, arrayOf(e002Certificate))
-            store(fos, password)
+            setKeyEntry("$userId-A005", a005PrivateKey, password.toCharArray(), arrayOf(a005Certificate))
+            setKeyEntry("$userId-X002", x002PrivateKey, password.toCharArray(), arrayOf(x002Certificate))
+            setKeyEntry("$userId-E002", e002PrivateKey, password.toCharArray(), arrayOf(e002Certificate))
+            store(fos, password.toCharArray())
         }
     }
 }

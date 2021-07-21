@@ -1,14 +1,9 @@
 package org.ebics.client.certificate
 
-import org.ebics.client.interfaces.PasswordCallback
-import sun.security.krb5.Confounder.bytes
 import java.io.*
 import java.math.BigInteger
-import java.security.KeyFactory
-import java.security.PublicKey
 import java.security.cert.X509Certificate
 import java.security.interfaces.RSAPublicKey
-import java.security.spec.X509EncodedKeySpec
 
 
 open class BankCertificateManager(
@@ -56,9 +51,9 @@ open class BankCertificateManager(
         }
     }
 
-    fun saveCertificates(os:OutputStream, bankId:String, passwordCallback: PasswordCallback) {
+    fun saveCertificates(os:OutputStream, bankId:String, password: String) {
         require (e002Certificate != null && x002Certificate != null) {"No certificates found in order to be saved (Create instance with certificates)"}
-        val manager = KeyStoreManager.create(passwordCallback.password)
+        val manager = KeyStoreManager.create(password)
         manager.setCertificateEntry("$bankId-E002", e002Certificate)
         manager.setCertificateEntry("$bankId-X002", x002Certificate)
         manager.save(os)

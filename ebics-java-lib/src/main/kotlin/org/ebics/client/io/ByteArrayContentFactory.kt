@@ -33,7 +33,7 @@ import java.io.InputStream
 /**
  * Constructs a new `ByteArrayContentFactory` with
  * a given byte array content.
- * @param content the byte array content
+ * @param byteContent the byte array content
  */
 class ByteArrayContentFactory
 (
