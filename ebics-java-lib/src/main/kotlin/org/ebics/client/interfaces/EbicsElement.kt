@@ -16,34 +16,30 @@
  *
  * $Id$
  */
+package org.ebics.client.interfaces
 
-package org.ebics.client.interfaces;
+import org.ebics.client.exception.EbicsException
+import java.io.PrintStream
+import java.io.Serializable
 
-import java.io.PrintStream;
-import java.io.Serializable;
+interface EbicsElement : Serializable {
+    /**
+     * Returns the name of this `EbicsElement`
+     * @return the name of the element
+     */
+    val name: String
 
-import org.ebics.client.exception.EbicsException;
+    /**
+     * Builds the `EbicsElement` XML fragment
+     * @throws EbicsException
+     */
+    @Throws(EbicsException::class)
+    fun build()
 
-
-public interface EbicsElement extends Serializable {
-
-  /**
-   * Returns the name of this <code>EbicsElement</code>
-   * @return the name of the element
-   */
-  public String getName();
-
-  /**
-   * Builds the <code>EbicsElement</code> XML fragment
-   * @throws EbicsException
-   */
-  public void build() throws EbicsException;
-
-  /**
-   * Prints the <code>EbicsElement</code> into
-   * the given stream.
-   * @param stream the print stream
-   */
-  public void print(PrintStream stream);
-
+    /**
+     * Prints the `EbicsElement` into
+     * the given stream.
+     * @param stream the print stream
+     */
+    fun print(stream: PrintStream)
 }

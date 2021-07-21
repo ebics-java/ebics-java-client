@@ -16,46 +16,43 @@
  *
  * $Id$
  */
+package org.ebics.client.interfaces
 
-package org.ebics.client.interfaces;
-
-import java.io.OutputStream;
-
-import org.ebics.client.exception.EbicsException;
-
+import org.ebics.client.exception.EbicsException
+import java.io.OutputStream
 
 /**
  * An Ebics root element knows its name.
  *
  * @author hachani
- *
  */
-public interface EbicsRootElement extends EbicsElement {
+interface EbicsRootElement : EbicsElement {
+    /**
+     * Converts the `EbicsElement` to a byte array
+     * @return the equivalent byte array of this `EbicsElement`
+     */
+    fun toByteArray(): ByteArray
 
-  /**
-   * Converts the <code>EbicsElement</code> to a byte array
-   * @return the equivalent byte array of this <code>EbicsElement</code>
-   */
-  public byte[] toByteArray();
+    /**
+     * Validates the request element according to the
+     * EBICS XML schema specification
+     * @throws EbicsException throws an EbicsException when validation fails
+     */
+    @Throws(EbicsException::class)
+    fun validate()
 
-  /**
-   * Validates the request element according to the
-   * EBICS XML schema specification
-   * @throws EbicsException throws an EbicsException when validation fails
-   */
-  public void validate() throws EbicsException;
+    /**
+     * Adds a namespace declaration for the `EbicsRootElement`
+     * @param prefix namespace prefix
+     * @param uri namespace uri
+     */
+    fun addNamespaceDecl(prefix: String, uri: String)
 
-  /**
-   * Adds a namespace declaration for the <code>EbicsRootElement</code>
-   * @param prefix namespace prefix
-   * @param uri namespace uri
-   */
-  public void addNamespaceDecl(String prefix, String uri);
-
-  /**
-   * Saves the <code>EbicsElement</code> into a given output stream.
-   * @param out the output stream
-   * @throws EbicsException the save operation fails
-   */
-  public void save(OutputStream out) throws EbicsException;
+    /**
+     * Saves the `EbicsElement` into a given output stream.
+     * @param out the output stream
+     * @throws EbicsException the save operation fails
+     */
+    @Throws(EbicsException::class)
+    fun save(out: OutputStream)
 }
