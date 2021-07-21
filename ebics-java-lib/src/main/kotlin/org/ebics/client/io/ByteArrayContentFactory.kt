@@ -16,22 +16,29 @@
  *
  * $Id$
  */
+package org.ebics.client.io
 
-package org.ebics.client.interfaces;
+import org.ebics.client.interfaces.ContentFactory
+import java.io.ByteArrayInputStream
+import java.io.IOException
+import java.io.InputStream
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-
-public interface ContentFactory extends Serializable {
-
-  /**
-   * Returns a new data source of the data to be sent.
-   * The instance must ensure that the returned stream will
-   * deliver the identical data during the lifetime of this instance.
-   * Nevertheless how often the method will be called.
-   * @return a new data source of the data to be sent.
-   * @throws IOException
-   */
-  public InputStream getContent() throws IOException;
+/**
+ * Byte array content factory that delivers the file content
+ * as a `ByteArrayInputStream`. This object is
+ * serializable in a way to recover interrupted file transfers.
+ *
+ * @author hachani
+ */
+/**
+ * Constructs a new `ByteArrayContentFactory` with
+ * a given byte array content.
+ * @param content the byte array content
+ */
+class ByteArrayContentFactory
+(
+    private val byteContent: ByteArray
+) : ContentFactory {
+    override val content: InputStream
+        get() = ByteArrayInputStream(byteContent)
 }
