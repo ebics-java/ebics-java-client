@@ -10,5 +10,6 @@ data class UserPartnerBank(
     val partnerId: String,
     val bankId: Long,
     val useCertificate: Boolean,
-    val usePassword: Boolean
+    val usePassword: Boolean,
+    val guestAccess: Boolean,
 )

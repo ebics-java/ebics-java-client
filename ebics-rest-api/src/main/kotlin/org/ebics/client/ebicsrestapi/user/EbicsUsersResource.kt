@@ -1,7 +1,9 @@
 package org.ebics.client.ebicsrestapi.user
 
 import org.ebics.client.api.user.*
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
+import java.security.Principal
 
 @RestController
 @RequestMapping("users")

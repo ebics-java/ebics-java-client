@@ -9,7 +9,10 @@ import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.user.EbicsUserAction
 import org.ebics.client.model.user.EbicsUserStatusEnum
+import org.slf4j.LoggerFactory
 import org.springframework.orm.ObjectRetrievalFailureException
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.lang.IllegalArgumentException
 
@@ -19,7 +22,49 @@ class UserService(
     private val partnerService: PartnerService,
     private val userKeyStoreService: UserKeyStoreService,
 ) {
-    fun findUsers(): List<User> = userRepository.findAll()
+    /**
+     * Return true if the actual security context of the request is authorized for the reading of user attributes
+     */
+    private fun isAuthorizedForUserRead(
+        user: User,
+        authentication: Authentication = SecurityContextHolder.getContext().authentication
+    ): Boolean {
+        with(authentication) {
+            return when {
+                authorities.contains("ROLE_ADMIN") -> true
+                authorities.contains("ROLE_USER") -> return user.guestAccess || user.creator == name
+                else -> return user.guestAccess
+            }
+        }
+    }
+
+    /**
+     * Return true if the actual security context of the request is authorized for the changing/adding/deleting of user attributes
+     */
+    private fun isAuthorizedForUserWrite(
+        user: User,
+        authentication: Authentication = SecurityContextHolder.getContext().authentication
+    ): Boolean {
+        with(authentication) {
+            return when {
+                authorities.contains("ROLE_ADMIN") -> true
+                authorities.contains("ROLE_USER") -> return user.creator == name
+                else -> return false
+            }
+        }
+    }
+
+    private fun checkWriteAuthorization(
+        user: User,
+        authentication: Authentication = SecurityContextHolder.getContext().authentication
+    ) {
+        if (!isAuthorizedForUserWrite(user, authentication))
+            throw IllegalAccessException("Web user '${authentication.name}' is not authorized for changing of EBICS user: '${user.name}'")
+    }
+
+    fun findUsers(): List<User> {
+        return userRepository.findAll().filter { isAuthorizedForUserRead(it) }
+    }
 
     fun getUserById(userId: Long): User {
         try {
@@ -29,10 +74,13 @@ class UserService(
         }
     }
 
-    fun checkUserPartnerBankValidity(userPartnerBank: UserPartnerBank) {
+    private fun checkUserPartnerBankValidity(userPartnerBank: UserPartnerBank) {
         with(userPartnerBank) {
             if (ebicsVersion == EbicsVersion.H005 && !useCertificate)
-                throw FunctionException("User $userId validation failed, useCertificate must be set to true for EBICS version H005", null)
+                throw FunctionException(
+                    "User $userId validation failed, useCertificate must be set to true for EBICS version H005",
+                    null
+                )
         }
     }
 
@@ -40,10 +88,12 @@ class UserService(
         with(userPartnerBank) {
             checkUserPartnerBankValidity(this)
             val partner = partnerService.createOrGetPartner(partnerId, bankId)
+            val authentication = SecurityContextHolder.getContext().authentication
             val user = User(
                 null, ebicsVersion, userId, name, dn, useCertificate = useCertificate, usePassword = usePassword,
-                partner = partner, keyStore = null
+                partner = partner, keyStore = null, creator = authentication.name, guestAccess = guestAccess
             )
+            checkWriteAuthorization(user, authentication)
             userRepository.saveAndFlush(user)
             return user.id!!
         }
@@ -55,6 +105,7 @@ class UserService(
             val partner = partnerService.createOrGetPartner(partnerId, bankId)
             try {
                 val currentUser = userRepository.getOne(id)
+                checkWriteAuthorization(currentUser)
                 //Depending on user status only some values are editable
                 val updatedUser = when (currentUser.userStatus) {
                     EbicsUserStatusEnum.CREATED -> User(
@@ -67,7 +118,9 @@ class UserService(
                         useCertificate,
                         usePassword,
                         partner,
-                        currentUser.keyStore
+                        currentUser.keyStore,
+                        currentUser.name,
+                        guestAccess
                     )
                     EbicsUserStatusEnum.NEW -> User(
                         id,
@@ -79,7 +132,9 @@ class UserService(
                         useCertificate,
                         currentUser.usePassword,
                         partner,
-                        currentUser.keyStore
+                        currentUser.keyStore,
+                        currentUser.name,
+                        guestAccess
                     )
                     else -> User(
                         id,
@@ -91,7 +146,9 @@ class UserService(
                         currentUser.useCertificate,
                         currentUser.usePassword,
                         currentUser.partner,
-                        currentUser.keyStore
+                        currentUser.keyStore,
+                        currentUser.name,
+                        guestAccess
                     )
                 }
                 userRepository.saveAndFlush(updatedUser)
@@ -104,6 +161,7 @@ class UserService(
 
     fun deleteUser(userId: Long) {
         try {
+            checkWriteAuthorization(userRepository.getOne(userId))
             userRepository.deleteById(userId)
         } catch (ex: ObjectRetrievalFailureException) {
             throw NotFoundException(userId, "user", ex)
@@ -113,6 +171,7 @@ class UserService(
     fun createOrUpdateUserCertificates(userId: Long, password: String): Long {
         try {
             val user = userRepository.getOne(userId)
+            checkWriteAuthorization(user)
             user.checkAction(EbicsUserAction.CREATE_KEYS)
             val userCertMgr = UserCertificateManager.create(user.dn)
             val userKeyStore = UserKeyStore.fromUserCertMgr(user, userCertMgr, password)
@@ -131,6 +190,7 @@ class UserService(
     fun resetStatus(userId: Long): Unit {
         try {
             val user = userRepository.getOne(userId)
+            checkWriteAuthorization(user)
             //Delete user key if available
             user.keyStore?.let { userKeyStoreService.deleteById(it.id!!) }
             //Set user status to CREATED
@@ -139,5 +199,9 @@ class UserService(
         } catch (ex: ObjectRetrievalFailureException) {
             throw NotFoundException(userId, "user", ex)
         }
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(UserService::class.java)
     }
 }

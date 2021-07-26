@@ -28,5 +28,8 @@ data class User (
 
     @JsonIgnore
     @OneToOne(optional = true, cascade = [CascadeType.ALL])
-    var keyStore: UserKeyStore?
+    var keyStore: UserKeyStore?,
+
+    val creator: String,
+    val guestAccess: Boolean,
 ) : EbicsUser
