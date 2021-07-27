@@ -88,15 +88,10 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
     @Throws(IOException::class, EbicsException::class)
     fun sendFile(content: ByteArray, uploadOrder: EbicsUploadOrder) {
         val orderType = uploadOrder.adminOrderType
-        val orderAttribute: OrderAttributeType.Enum =
-            when (uploadOrder.attributeType) {
-                AttributeType.OZHNN -> OrderAttributeType.OZHNN
-                AttributeType.DZHNN -> OrderAttributeType.DZHNN
-            }
         val sender = HttpRequestSender(session)
         val initializer = UploadInitializationRequestElement(
             session,
-            orderType, orderAttribute,
+            orderType, uploadOrder.attributeType,
             content
         )
         initializer.build()

@@ -27,6 +27,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
+import org.ebics.client.order.AttributeType;
 import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.api.EbicsSession;
 import org.ebics.client.utils.Utils;
@@ -72,7 +73,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
    * @throws EbicsException
    */
   public UploadInitializationRequestElement(EbicsSession session,
-                                            EbicsAdminOrderType orderType, OrderAttributeType.Enum orderAttribute,
+                                            EbicsAdminOrderType orderType, AttributeType orderAttribute,
                                             byte[] userData)
     throws EbicsException
   {
@@ -80,7 +81,11 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     this.userData = userData;
     keySpec = new SecretKeySpec(nonce, "EAS");
     splitter = new Splitter(userData, session.getConfiguration().isCompressionEnabled(), keySpec);
-    this.orderAttribute = orderAttribute;
+    if (orderAttribute == AttributeType.OZHNN) {
+      this.orderAttribute = OrderAttributeType.OZHNN;
+    } else {
+      this.orderAttribute = OrderAttributeType.DZHNN;
+    }
   }
 
   @Override
