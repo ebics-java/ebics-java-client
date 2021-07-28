@@ -187,6 +187,10 @@ class UserService(
         }
     }
 
+    /**
+     * Resetting user status to default
+     * After such reset must be user newly initialized, including creation of user keys
+     */
     fun resetStatus(userId: Long): Unit {
         try {
             val user = userRepository.getOne(userId)
