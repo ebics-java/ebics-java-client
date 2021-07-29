@@ -1,6 +1,7 @@
-# EBICS Client (ebics-client-qs)
+# EBICS Client (ebics-web-ui)
 
 EBICS Web Client UI
+The web UI for EBICS Client in vue3/quasar.
 
 ## Install the dependencies
 ```bash
