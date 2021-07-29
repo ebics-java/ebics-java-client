@@ -23,7 +23,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.client.order.EbicsOrder;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h005.EbicsRequestDocument;
@@ -67,7 +67,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
     SignedInfo signedInfo;
 
     buildInitialization();
-    signedInfo = new SignedInfo(session.getUser(), getDigest());
+    signedInfo = new SignedInfo(session.getUserCert(), getDigest());
     signedInfo.build();
     ((EbicsRequestDocument)document).getEbicsRequest().setAuthSignature(signedInfo.getSignatureType());
     ((EbicsRequestDocument)document).getEbicsRequest().getAuthSignature().setSignatureValue(EbicsXmlFactory.createSignatureValueType(signedInfo.sign(toByteArray())));
@@ -129,7 +129,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
       Cipher			cipher;
 
       cipher = Cipher.getInstance("RSA/NONE/PKCS1Padding", BouncyCastleProvider.PROVIDER_NAME);
-      cipher.init(Cipher.ENCRYPT_MODE, session.getBankE002Key());
+      cipher.init(Cipher.ENCRYPT_MODE, session.getBankCert().getE002Key());
 
       return cipher.doFinal(nonce);
     } catch (Exception e) {

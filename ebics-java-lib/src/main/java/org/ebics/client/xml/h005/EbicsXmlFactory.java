@@ -897,8 +897,8 @@ public class EbicsXmlFactory {
     BTUParamsType btuParamsType = BTUParamsType.Factory.newInstance();
     btuParamsType.setFileName(ebicsOrder.getFileName());
     btuParamsType.setService(createRestrictedServiceType(ebicsOrder.getOrderService()));
-    if (ebicsOrder.isSignatureFlag())
-      btuParamsType.setSignatureFlag(createSignatureFlag(ebicsOrder.isRequestEDSFlag()));
+    if (ebicsOrder.getSignatureFlag())
+      btuParamsType.setSignatureFlag(createSignatureFlag(ebicsOrder.getEdsFlag()));
     return btuParamsType;
   }
 

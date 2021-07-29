@@ -19,7 +19,7 @@
 package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.schema.h005.AuthenticationPubKeyInfoType;
 import org.ebics.schema.h005.EncryptionPubKeyInfoType;
 import org.ebics.schema.h005.HIARequestOrderDataType;
@@ -53,15 +53,15 @@ public class HIARequestOrderDataElement extends DefaultEbicsRootElement {
     X509DataType 			authX509Data;
 
     encryptionX509Data = null;
-    if (session.getUser().getPartner().getBank().useCertificate())
-        encryptionX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
-	                                                    session.getUser().getE002Certificate());
+    if (session.getUser().getUseCertificate())
+        encryptionX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDn(),
+	                                                    session.getUserCert().getE002CertificateBytes());
     encryptionPubKeyInfo = EbicsXmlFactory.createEncryptionPubKeyInfoType(session.getConfiguration().getEncryptionVersion(),
 	                                                                  encryptionX509Data);
     authX509Data = null;
-    if (session.getUser().getPartner().getBank().useCertificate())
-        authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
-	                                              session.getUser().getX002Certificate());
+    if (session.getUser().getUseCertificate())
+        authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDn(),
+	                                              session.getUserCert().getX002CertificateBytes());
     authenticationPubKeyInfo = EbicsXmlFactory.createAuthenticationPubKeyInfoType(session.getConfiguration().getAuthenticationVersion(),
 	                                                                          authX509Data);
     request = EbicsXmlFactory.createHIARequestOrderDataType(authenticationPubKeyInfo,

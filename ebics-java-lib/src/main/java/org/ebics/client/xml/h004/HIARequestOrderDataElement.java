@@ -19,7 +19,7 @@
 package org.ebics.client.xml.h004;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.schema.h004.AuthenticationPubKeyInfoType;
 import org.ebics.schema.h004.EncryptionPubKeyInfoType;
 import org.ebics.schema.h004.HIARequestOrderDataType;
@@ -61,21 +61,21 @@ public class HIARequestOrderDataElement extends DefaultEbicsRootElement {
     RSAKeyValueType 			AuthRsaKeyValue;
 
     encryptionX509Data = null;
-    if (session.getUser().getPartner().getBank().useCertificate())
-        encryptionX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
-	                                                    session.getUser().getE002Certificate());
-    encryptionRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getE002PublicKey().getPublicExponent().toByteArray(),
-	                                                          session.getUser().getE002PublicKey().getModulus().toByteArray());
+    if (session.getUser().getUseCertificate())
+        encryptionX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDn(),
+	                                                    session.getUserCert().getE002CertificateBytes());
+    encryptionRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUserCert().getE002PublicKey().getPublicExponent().toByteArray(),
+	                                                          session.getUserCert().getE002PublicKey().getModulus().toByteArray());
     encryptionPubKeyValue = EbicsXmlFactory.createh004PubKeyValueType(encryptionRsaKeyValue, Calendar.getInstance());
     encryptionPubKeyInfo = EbicsXmlFactory.createEncryptionPubKeyInfoType(session.getConfiguration().getEncryptionVersion(),
 	                                                                  encryptionPubKeyValue,
 	                                                                  encryptionX509Data);
     authX509Data = null;
-    if (session.getUser().getPartner().getBank().useCertificate())
-        authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
-	                                              session.getUser().getX002Certificate());
-    AuthRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getX002PublicKey().getPublicExponent().toByteArray(),
-							    session.getUser().getX002PublicKey().getModulus().toByteArray());
+    if (session.getUser().getUseCertificate())
+        authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDn(),
+	                                              session.getUserCert().getX002CertificateBytes());
+    AuthRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUserCert().getX002PublicKey().getPublicExponent().toByteArray(),
+							    session.getUserCert().getX002PublicKey().getModulus().toByteArray());
     authPubKeyValue = EbicsXmlFactory.createh004PubKeyValueType(AuthRsaKeyValue, Calendar.getInstance());
     authenticationPubKeyInfo = EbicsXmlFactory.createAuthenticationPubKeyInfoType(session.getConfiguration().getAuthenticationVersion(),
 	                                                                          authPubKeyValue,

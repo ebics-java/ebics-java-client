@@ -20,7 +20,7 @@
 package org.ebics.client.xml.h003;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 
 /**
  * The <code>HPBRequestElement</code> is the element to be sent when
@@ -51,7 +51,7 @@ public class HPBRequestElement extends DefaultEbicsRootElement {
 
     noPubKeyDigestsRequest = new NoPubKeyDigestsRequestElement(session);
     noPubKeyDigestsRequest.build();
-    signedInfo = new SignedInfo(session.getUser(), noPubKeyDigestsRequest.getDigest());
+    signedInfo = new SignedInfo(session.getUserCert(), noPubKeyDigestsRequest.getDigest());
     signedInfo.build();
     noPubKeyDigestsRequest.setAuthSignature(signedInfo.getSignatureType());
     signature = signedInfo.sign(noPubKeyDigestsRequest.toByteArray());

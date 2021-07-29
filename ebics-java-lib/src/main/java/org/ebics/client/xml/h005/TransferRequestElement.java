@@ -20,7 +20,7 @@
 package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h005.EbicsRequestDocument;
@@ -68,7 +68,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
     SignedInfo signedInfo;
 
     buildTransfer();
-    signedInfo = new SignedInfo(session.getUser(), getDigest());
+    signedInfo = new SignedInfo(session.getUserCert(), getDigest());
     signedInfo.build();
     ((EbicsRequestDocument)document).getEbicsRequest().setAuthSignature(signedInfo.getSignatureType());
     ((EbicsRequestDocument)document).getEbicsRequest().getAuthSignature().setSignatureValue(EbicsXmlFactory.createSignatureValueType(signedInfo.sign(toByteArray())));

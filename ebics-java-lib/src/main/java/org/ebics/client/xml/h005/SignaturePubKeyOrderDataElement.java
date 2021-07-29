@@ -20,12 +20,10 @@
 package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.schema.s002.SignaturePubKeyInfoType;
 import org.ebics.schema.s002.SignaturePubKeyOrderDataType;
 import org.ebics.schema.xmldsig.X509DataType;
-
-import java.util.Calendar;
 
 
 /**
@@ -51,8 +49,8 @@ public class SignaturePubKeyOrderDataElement extends DefaultEbicsRootElement {
     final X509DataType 			x509Data;
     SignaturePubKeyOrderDataType	signaturePubKeyOrderData;
 
-    x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
-	                                          session.getUser().getA005Certificate());
+    x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDn(),
+	                                          session.getUserCert().getA005CertificateBytes());
     signaturePubKeyInfo = EbicsXmlFactory.createSignaturePubKeyInfoType(x509Data,
 	                                                                session.getConfiguration().getSignatureVersion());
     signaturePubKeyOrderData = EbicsXmlFactory.createSignaturePubKeyOrderData(signaturePubKeyInfo,

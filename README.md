@@ -15,6 +15,10 @@ Main differences with this fork:
   - EBICS 3.0 (H005 - in testing)
 - Separated EBICS API from console client
 - Support of bcprov-jdk15on
+Working branch:
+- Decoupled EBICS API from console client 
+- Added EBICS REST client (spring boot & hibernate persistence for EBICS informations)
+- Some core API refactored to kotlin in order to increase readablity, encapsulation and immutability and consistence
 
 Issues: 
 * Fat jar build seems to be not possible with standard maven plugins due to bouncy castle signed jar.

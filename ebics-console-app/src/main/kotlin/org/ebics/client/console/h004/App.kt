@@ -1,69 +1,72 @@
 package org.ebics.client.console.h004
 
 import org.apache.commons.cli.*
-import org.ebics.client.api.EbicsModel
-import org.ebics.client.api.User
+import org.ebics.client.model.EbicsVersion
+import org.ebics.client.file.User
 import org.ebics.client.console.ConsoleAppBase
 import org.ebics.client.console.ConsoleAppBase.Companion.createConsoleApp
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.exception.NoDownloadDataAvailableException
+import org.ebics.client.file.EbicsFileModel
+import org.ebics.client.file.FileConfiguration
 import org.ebics.client.filetransfer.h004.FileTransfer
+
 import org.ebics.client.io.IOUtils
 import org.ebics.client.keymgmt.h004.KeyManagementImpl
 import org.ebics.client.messages.Messages
 import org.ebics.client.order.h004.EbicsDownloadOrder
 import org.ebics.client.order.h004.EbicsUploadOrder
-import org.ebics.client.session.EbicsSession
-import org.ebics.client.session.Product
+import org.ebics.client.api.EbicsSession
+import org.ebics.client.model.Product
+import org.ebics.client.order.AttributeType
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.system.exitProcess
 
-class ConsoleApp(private val cmd: CommandLine) {
-    private val app: ConsoleAppBase = createConsoleApp()
-    private val ebicsModel: EbicsModel
+class ConsoleApp(rootDir: File, defaultEbicsConfigFile: File, private val cmd: CommandLine) {
+    private val logger = LoggerFactory.getLogger(ConsoleApp::class.java)
+    private val app: ConsoleAppBase = createConsoleApp(rootDir, defaultEbicsConfigFile)
+    private val ebicsModel: EbicsFileModel
         get() = app.ebicsModel
-    private val defaultUser: User?
-        get() = app.defaultUser
     private val defaultProduct: Product
         get() = app.defaultProduct
 
     @Throws(Exception::class)
     fun runMain() {
-        if (cmd.hasOption("listUsers")) {
-            logger.info(Messages.getString("list.user.ids", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, ebicsModel.listUserId().toString()))
-        }
-        if (cmd.hasOption("listBanks")) {
-            logger.info(Messages.getString("list.bank.ids", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, ebicsModel.listBankId().toString()))
-        }
-        if (cmd.hasOption("listPartners")) {
-            logger.info(Messages.getString("list.partner.ids", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, ebicsModel.listPartnerId().toString()))
-        }
-        if (cmd.hasOption("create")) {
-            app.createDefaultUser()
+        val session = if (cmd.hasOption("create")) {
+            app.createDefaultSession(EbicsVersion.H004)
         } else {
-            app.loadDefaultUser()
+            app.loadDefaultSession().apply {
+                require(user.ebicsVersion == EbicsVersion.H004)
+                { "User was initialized with ${user.ebicsVersion} version, but you are running H004 client" }
+            }
         }
+        val user = session.user as User
         if (cmd.hasOption("letters")) {
-            ebicsModel.createLetters(defaultUser, false)
+            ebicsModel.createLetters(user, session.userCert)
         }
-        val session = ebicsModel.createSession(defaultUser, defaultProduct)
 
         //Administrative order types processing
         if (cmd.hasOption("at")) {
-            run {
-                when (val adminOrderType = cmd.getOptionValue("at")) {
-                    "INI" -> sendINIRequest(defaultUser, session)
-                    "HIA" -> sendHIARequest(defaultUser, session)
-                    "HPB" -> sendHPBRequest(defaultUser, session)
-                    "SPR" -> revokeSubscriber(defaultUser, session)
-                    else -> logger.error(Messages.getString("unknown.admin.ordertype", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, adminOrderType))
-                }
+            when (val adminOrderType = cmd.getOptionValue("at")) {
+                "INI" -> sendINIRequest(user, session)
+                "HIA" -> sendHIARequest(user, session)
+                "HPB" -> sendHPBRequest(user, session, app.getPassword())
+                "SPR" -> revokeSubscriber(user, session)
+                else -> logger.error(
+                    Messages.getString(
+                        "unknown.admin.ordertype",
+                        ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME,
+                        adminOrderType
+                    )
+                )
             }
+
         }
 
         //Download file
@@ -75,10 +78,10 @@ class ConsoleApp(private val cmd: CommandLine) {
         //Upload file
         if (cmd.hasOption('i')) {
             val inputFileValue = cmd.getOptionValue("i")
-            val uploadOrder = readUploadOrder(inputFileValue)
+            val uploadOrder = readUploadOrder()
             sendFile(File(inputFileValue), session, uploadOrder)
         }
-        ebicsModel.saveAll()
+        ebicsModel.saveUser(user)
     }
 
     @Throws(ParseException::class)
@@ -87,7 +90,12 @@ class ConsoleApp(private val cmd: CommandLine) {
         val start = readDate('s')
         val end = readDate('e')
         val orderType = readOrderType()
-        return if (orderType == "FDL") EbicsDownloadOrder(start, end, params) else EbicsDownloadOrder(readOrderType(), start, end, params)
+        return if (orderType == "FDL") EbicsDownloadOrder(null, start, end, params) else EbicsDownloadOrder(
+            readOrderType(),
+            start,
+            end,
+            params
+        )
     }
 
     private fun readOrderType(): String {
@@ -104,7 +112,13 @@ class ConsoleApp(private val cmd: CommandLine) {
             try {
                 SimpleDateFormat("dd/MM/yyyy").parse(inputDate)
             } catch (e: ParseException) {
-                logger.error(Messages.getString("download.date.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, inputDate), e)
+                logger.error(
+                    Messages.getString(
+                        "download.date.error",
+                        ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME,
+                        inputDate
+                    ), e
+                )
                 throw e
             }
         } else {
@@ -113,10 +127,18 @@ class ConsoleApp(private val cmd: CommandLine) {
     }
 
     @Throws(Exception::class)
-    private fun readUploadOrder(inputFileValue: String): EbicsUploadOrder {
+    private fun readUploadOrder(): EbicsUploadOrder {
         val params = readParams(cmd.getOptionValues("p"))
         val orderType = readOrderType()
-        return if (orderType == "FUL") EbicsUploadOrder(!cmd.hasOption("dz"), params) else EbicsUploadOrder(readOrderType(), !cmd.hasOption("dz"), params)
+        return if (orderType == "FUL") EbicsUploadOrder(
+            null,
+            if (cmd.hasOption("ns")) AttributeType.DZHNN else AttributeType.OZHNN,
+            params
+        ) else EbicsUploadOrder(
+            readOrderType(),
+            if (cmd.hasOption("ns")) AttributeType.DZHNN else AttributeType.OZHNN,
+            params
+        )
     }
 
     private fun readParams(paramPairs: Array<String>?): Map<String, String> {
@@ -124,7 +146,12 @@ class ConsoleApp(private val cmd: CommandLine) {
             val paramMap: MutableMap<String, String> = HashMap(paramPairs.size)
             for (paramPair in paramPairs) {
                 val keyValArr = paramPair.split(":".toRegex())
-                require(keyValArr.size == 2) { String.format("The key value pair '%s' must have one separator ':'", paramPair) }
+                require(keyValArr.size == 2) {
+                    String.format(
+                        "The key value pair '%s' must have one separator ':'",
+                        paramPair
+                    )
+                }
                 paramMap[keyValArr[0]] = keyValArr[1]
             }
             paramMap
@@ -145,26 +172,34 @@ class ConsoleApp(private val cmd: CommandLine) {
      * @throws Exception
      */
     @Throws(Exception::class)
-    fun sendFile(file: File, session: EbicsSession?, uploadOrder: EbicsUploadOrder?) {
+    fun sendFile(file: File, session: EbicsSession, uploadOrder: EbicsUploadOrder) {
         val transferManager = FileTransfer(session)
         try {
             transferManager.sendFile(IOUtils.getFileContent(file), uploadOrder)
         } catch (e: IOException) {
             logger.error(
-                    Messages.getString("upload.file.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME,
-                            file.absolutePath), e)
+                Messages.getString(
+                    "upload.file.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME,
+                    file.absolutePath
+                ), e
+            )
             throw e
         } catch (e: EbicsException) {
             logger.error(
-                    Messages.getString("upload.file.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME,
-                            file.absolutePath), e)
+                Messages.getString(
+                    "upload.file.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME,
+                    file.absolutePath
+                ), e
+            )
             throw e
         }
     }
 
     @Throws(IOException::class, EbicsException::class)
-    fun fetchFile(file: File?, session: EbicsSession, downloadOrder: EbicsDownloadOrder?,
-                  isTest: Boolean) {
+    fun fetchFile(
+        file: File, session: EbicsSession, downloadOrder: EbicsDownloadOrder,
+        isTest: Boolean
+    ) {
         session.addSessionParam("FORMAT", "pain.xxx.cfonb160.dct")
         if (isTest) {
             session.addSessionParam("TEST", "true")
@@ -177,7 +212,8 @@ class ConsoleApp(private val cmd: CommandLine) {
             throw e
         } catch (e: Exception) {
             logger.error(
-                    Messages.getString("download.file.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME), e)
+                Messages.getString("download.file.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME), e
+            )
             throw e
         }
     }
@@ -190,24 +226,20 @@ class ConsoleApp(private val cmd: CommandLine) {
      * @throws Exception
      */
     @Throws(Exception::class)
-    fun sendINIRequest(user: User?, session: EbicsSession?) {
-        val userId = user!!.userId
+    fun sendINIRequest(user: User, session: EbicsSession) {
+        val userId = user.userId
         logger.info(
-                Messages.getString("ini.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
-        if (user.isInitialized) {
-            logger.info(
-                    Messages.getString("user.already.initialized", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME,
-                            userId))
-            return
-        }
+            Messages.getString("ini.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId)
+        )
         try {
             KeyManagementImpl(session).sendINI(null)
-            user.isInitialized = true
             logger.info(
-                    Messages.getString("ini.send.success", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
+                Messages.getString("ini.send.success", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId)
+            )
         } catch (e: Exception) {
             logger.error(
-                    Messages.getString("ini.send.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId), e)
+                Messages.getString("ini.send.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId), e
+            )
             throw e
         }
     }
@@ -220,26 +252,22 @@ class ConsoleApp(private val cmd: CommandLine) {
      * @throws Exception
      */
     @Throws(Exception::class)
-    fun sendHIARequest(user: User?, session: EbicsSession?) {
-        val userId = user!!.userId
+    fun sendHIARequest(user: User, session: EbicsSession) {
+        val userId = user.userId
         logger.info(
-                Messages.getString("hia.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
-        if (user.isInitializedHIA) {
-            logger.info(
-                    Messages.getString("user.already.hia.initialized",
-                            ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
-            return
-        }
+            Messages.getString("hia.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId)
+        )
         try {
             KeyManagementImpl(session).sendHIA(null)
-            user.isInitializedHIA = true
         } catch (e: Exception) {
             logger.error(
-                    Messages.getString("hia.send.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId), e)
+                Messages.getString("hia.send.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId), e
+            )
             throw e
         }
         logger.info(
-                Messages.getString("hia.send.success", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
+            Messages.getString("hia.send.success", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId)
+        )
     }
 
     /**
@@ -248,17 +276,21 @@ class ConsoleApp(private val cmd: CommandLine) {
      * @param session the EBICS session
      */
     @Throws(Exception::class)
-    fun sendHPBRequest(user: User?, session: EbicsSession?) {
-        val userId = user!!.userId
+    fun sendHPBRequest(user: User, session: EbicsSession, password: String) {
+        val userId = user.userId
         logger.info(
-                Messages.getString("hpb.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
+            Messages.getString("hpb.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId)
+        )
         try {
-            KeyManagementImpl(session).sendHPB()
+            val manager = KeyManagementImpl(session).sendHPB(password)
+            manager.save(FileOutputStream((session.configuration as FileConfiguration).getKeystoreDirectory(user) + File.separator + session.getBankID() + ".p12"))
             logger.info(
-                    Messages.getString("hpb.send.success", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
+                Messages.getString("hpb.send.success", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId)
+            )
         } catch (e: Exception) {
             logger.error(
-                    Messages.getString("hpb.send.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId), e)
+                Messages.getString("hpb.send.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId), e
+            )
             throw e
         }
     }
@@ -271,19 +303,22 @@ class ConsoleApp(private val cmd: CommandLine) {
      * @throws Exception
      */
     @Throws(Exception::class)
-    fun revokeSubscriber(user: User?, session: EbicsSession?) {
-        val userId = user!!.userId
+    fun revokeSubscriber(user: User, session: EbicsSession) {
+        val userId = user.userId
         logger.info(
-                Messages.getString("spr.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
+            Messages.getString("spr.request.send", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId)
+        )
         try {
             KeyManagementImpl(session).lockAccess()
         } catch (e: Exception) {
             logger.error(
-                    Messages.getString("spr.send.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId), e)
+                Messages.getString("spr.send.error", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId), e
+            )
             throw e
         }
         logger.info(
-                Messages.getString("spr.send.success", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId))
+            Messages.getString("spr.send.success", ConsoleAppBase.CONSOLE_APP_BUNDLE_NAME, userId)
+        )
     }
 
     companion object {
@@ -295,7 +330,12 @@ class ConsoleApp(private val cmd: CommandLine) {
 fun main(args: Array<String>) {
     val options = createCmdOptions()
     val cmd = parseArguments(options, args)
-    ConsoleApp(cmd).runMain()
+    val defaultRootDir = File(
+        System.getProperty("user.home") + File.separator + "ebics"
+                + File.separator + "client"
+    )
+    val defaultEbicsConfigFile = File(defaultRootDir, "ebics.txt")
+    ConsoleApp(defaultRootDir, defaultEbicsConfigFile, cmd).runMain()
 }
 
 private fun parseArguments(options: Options, args: Array<String>): CommandLine {
@@ -321,10 +361,20 @@ private fun createCmdOptions(): Options {
     options.addOption(null, "listBank", false, "List stored bank ids")
     options.addOption("o", "output", true, "Output file for EBICS download")
     options.addOption("i", "input", true, "Input file for EBICS upload")
-    options.addOption("p", "params", true, "key:value array of string parameters for upload or download request, example FORMAT:pain.001 TEST:TRUE EBCDIC:TRUE")
+    options.addOption(
+        "p",
+        "params",
+        true,
+        "key:value array of string parameters for upload or download request, example FORMAT:pain.001 TEST:TRUE EBCDIC:TRUE"
+    )
     options.addOption("s", "start", true, "Download request starting with date")
     options.addOption("e", "end", true, "Download request ending with date")
-    options.addOption("dz", "dzhnn", false, "Set OrderAttribute to DZHNN, for upload only (by default OZHNN - signed order)")
+    options.addOption(
+        "ns",
+        "no-signature",
+        false,
+        "Don't provide electronic signature for EBICS upload (ES flag=false, OrderAttribute=DZHNN)"
+    )
 
     //EBICS 2.4/2.5/3.0 admin order type
     options.addOption("at", "admin-type", true, "EBICS admin order type (INI, HIA, HPB, SPR)")

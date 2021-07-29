@@ -19,8 +19,9 @@
 
 package org.ebics.client.xml.h005;
 
+import org.ebics.client.api.UserCertificateManager;
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.interfaces.EbicsUser;
+import org.ebics.client.api.EbicsUser;
 import org.ebics.schema.s002.OrderSignatureDataType;
 import org.ebics.schema.s002.UserSignatureDataSigBookType;
 
@@ -46,11 +47,13 @@ public class UserSignature extends DefaultEbicsRootElement {
    * @param toSign the data to be signed
    */
   public UserSignature(EbicsUser user,
+                       UserCertificateManager userCert,
                        String name,
                        String signatureVersion,
                        byte[] toSign)
   {
     this.user = user;
+    this.userCert = userCert;
     this.toSign = toSign;
     this.name = name;
     this.signatureVersion = signatureVersion;
@@ -63,7 +66,7 @@ public class UserSignature extends DefaultEbicsRootElement {
     byte[]				signature;
 
     try {
-      signature = user.sign(toSign);
+      signature = userCert.sign(toSign);
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
     } catch (GeneralSecurityException e) {
@@ -94,7 +97,8 @@ public class UserSignature extends DefaultEbicsRootElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private EbicsUser 			user;
+  private EbicsUser user;
+  private UserCertificateManager userCert;
   private String 			signatureVersion;
   private byte[]			toSign;
   private String			name;

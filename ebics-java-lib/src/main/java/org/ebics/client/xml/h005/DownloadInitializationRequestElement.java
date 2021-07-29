@@ -22,7 +22,7 @@ package org.ebics.client.xml.h005;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.order.h005.EbicsDownloadOrder;
 import org.ebics.client.order.EbicsAdminOrderType;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Body;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Header;
@@ -77,10 +77,10 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
         product = EbicsXmlFactory.createProduct(session.getProduct().getLanguage(), session.getProduct().getName());
         authentication = EbicsXmlFactory.createAuthentication(session.getConfiguration().getAuthenticationVersion(),
                 "http://www.w3.org/2001/04/xmlenc#sha256",
-                decodeHex(session.getUser().getPartner().getBank().getX002Digest()));
+                decodeHex(session.getBankCert().getX002Digest()));
         encryption = EbicsXmlFactory.createEncryption(session.getConfiguration().getEncryptionVersion(),
                 "http://www.w3.org/2001/04/xmlenc#sha256",
-                decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
+                decodeHex(session.getBankCert().getE002Digest()));
         bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
         adminOrderType = EbicsXmlFactory.createAdminOrderType(ebicsOrder.getAdminOrderType().toString());
         if (ebicsOrder.getAdminOrderType().equals(EbicsAdminOrderType.BTD)) {

@@ -20,7 +20,7 @@
 package org.ebics.client.xml.h005;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest;
 import org.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Body;

@@ -27,8 +27,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
+import org.ebics.client.order.AttributeType;
 import org.ebics.client.order.EbicsAdminOrderType;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.client.utils.Utils;
 import org.ebics.client.io.Splitter;
 import org.ebics.schema.h003.DataEncryptionInfoType.EncryptionPubKeyDigest;
@@ -72,15 +73,19 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
    * @throws EbicsException
    */
   public UploadInitializationRequestElement(EbicsSession session,
-                                            EbicsAdminOrderType orderType, OrderAttributeType.Enum orderAttribute,
+                                            EbicsAdminOrderType orderType, AttributeType orderAttribute,
                                             byte[] userData)
     throws EbicsException
   {
     super(session, orderType, generateName(orderType));
     this.userData = userData;
     keySpec = new SecretKeySpec(nonce, "EAS");
-    splitter = new Splitter(userData);
-    this.orderAttribute = orderAttribute;
+    splitter = new Splitter(userData, session.getConfiguration().isCompressionEnabled(), keySpec);
+    if (orderAttribute == AttributeType.OZHNN) {
+      this.orderAttribute = OrderAttributeType.OZHNN;
+    } else {
+      this.orderAttribute = OrderAttributeType.DZHNN;
+    }
   }
 
   @Override
@@ -101,23 +106,21 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     OrderType 				orderType;
     FileFormatType 			fileFormat;
 
-    userSignature = new UserSignature(session.getUser(),
+    userSignature = new UserSignature(session.getUser(), session.getUserCert(),
 				      generateName("UserSignature"),
 	                              session.getConfiguration().getSignatureVersion(),
 	                              userData);
     userSignature.build();
     userSignature.validate();
 
-    splitter.readInput(session.getConfiguration().isCompressionEnabled(), keySpec);
-
     mutable = EbicsXmlFactory.createMutableHeaderType("Initialisation", null);
     product = EbicsXmlFactory.createProduct(session.getProduct().getLanguage(), session.getProduct().getName());
     authentication = EbicsXmlFactory.createAuthentication(session.getConfiguration().getAuthenticationVersion(),
 	                                                  "http://www.w3.org/2001/04/xmlenc#sha256",
-	                                                  decodeHex(session.getUser().getPartner().getBank().getX002Digest()));
+	                                                  decodeHex(session.getBankCert().getX002Digest()));
     encryption = EbicsXmlFactory.createEncryption(session.getConfiguration().getEncryptionVersion(),
 	                                          "http://www.w3.org/2001/04/xmlenc#sha256",
-	                                          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
+	                                          decodeHex(session.getBankCert().getE002Digest()));
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
     orderType = EbicsXmlFactory.createOrderType(type.toString());
     fileFormat = EbicsXmlFactory.createFileFormatType(session.getConfiguration().getLocale().getCountry().toUpperCase(),
@@ -170,7 +173,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     header = EbicsXmlFactory.createEbicsRequestHeader(true, mutable, xstatic);
     encryptionPubKeyDigest = EbicsXmlFactory.createEncryptionPubKeyDigest(session.getConfiguration().getEncryptionVersion(),
 								          "http://www.w3.org/2001/04/xmlenc#sha256",
-								          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
+								          decodeHex(session.getBankCert().getE002Digest()));
     signatureData = EbicsXmlFactory.createSignatureData(true, Utils.encrypt(Utils.zip(userSignature.prettyPrint()), keySpec));
     dataEncryptionInfo = EbicsXmlFactory.createDataEncryptionInfo(true,
 	                                                          encryptionPubKeyDigest,

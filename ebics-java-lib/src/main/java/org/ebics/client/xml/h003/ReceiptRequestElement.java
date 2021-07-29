@@ -24,7 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.session.EbicsSession;
+import org.ebics.client.api.EbicsSession;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h003.EbicsRequestDocument;
 import org.ebics.schema.h003.MutableHeaderType;
@@ -75,7 +75,7 @@ public class ReceiptRequestElement extends DefaultEbicsRootElement {
     body = EbicsXmlFactory.createEbicsRequestBody(transferReceipt);
     request = EbicsXmlFactory.createEbicsRequest(header, body);
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
-    signedInfo = new SignedInfo(session.getUser(), getDigest());
+    signedInfo = new SignedInfo(session.getUserCert(), getDigest());
     signedInfo.build();
     ((EbicsRequestDocument)document).getEbicsRequest().setAuthSignature(signedInfo.getSignatureType());
     ((EbicsRequestDocument)document).getEbicsRequest().getAuthSignature().setSignatureValue(EbicsXmlFactory.createSignatureValueType(signedInfo.sign(toByteArray())));

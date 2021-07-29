@@ -40,12 +40,10 @@ public class ReturnCode implements Serializable {
    * Constructs a new <code>ReturnCode</code> with a given
    * standard code, symbolic name and text
    * @param code the given standard code.
-   * @param symbolicName the symbolic name.
-   * @param the code text
+   * @param text the code text
    */
-  public ReturnCode(String code, String symbolicName, String text) {
+  public ReturnCode(String code, String text) {
     this.code = code;
-    this.symbolicName = symbolicName;
     this.text = text;
   }
 
@@ -62,15 +60,7 @@ public class ReturnCode implements Serializable {
    * @return True if the return code is OK one.
    */
   public boolean isOk() {
-    return equals(EBICS_OK);
-  }
-
-  /**
-   * Returns a slightly more human readable version of this return code.
-   * @return a slightly more human readable version of this return code.
-   */
-  public String getSymbolicName() {
-    return symbolicName;
+    return code.equals(EBICS_OK.code);
   }
 
   /**
@@ -96,33 +86,16 @@ public class ReturnCode implements Serializable {
    * @return the equivalent <code>ReturnCode</code>
    */
   public static ReturnCode toReturnCode(String code, String text) {
-      ReturnCode returnCode = returnCodes.get(code);
-      if (returnCode != null) {
-          return returnCode;
-      }
-      return new ReturnCode(code, text, text);
+      return new ReturnCode(code, text);
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof ReturnCode) {
-      return this.code.equals(((ReturnCode)obj).code);
-    }
 
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return code.hashCode();
-  }
 
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
   private final String			code;
-  private final String			symbolicName;
   private final String			text;
   public static final ReturnCode 	EBICS_OK;
   public static final ReturnCode 	EBICS_DOWNLOAD_POSTPROCESS_DONE;
@@ -183,13 +156,10 @@ public class ReturnCode implements Serializable {
     EBICS_X509_CERTIFICATE_NOT_VALID_YET = create("091209", "EBICS_X509_CERTIFICATE_NOT_VALID_YET");
     EBICS_SIGNATURE_VERIFICATION_FAILED = create("091301", "EBICS_SIGNATURE_VERIFICATION_FAILED");
     EBICS_INVALID_ORDER_DATA_FORMAT = create("090004", "EBICS_INVALID_ORDER_DATA_FORMAT");
-
-
   }
 
     private static ReturnCode create(String code, String symbolicName) {
-        ReturnCode returnCode = new ReturnCode(code, symbolicName, Messages.getString(code,
-            BUNDLE_NAME));
+        ReturnCode returnCode = new ReturnCode(code, symbolicName);
         returnCodes.put(code, returnCode);
         return returnCode;
     }
