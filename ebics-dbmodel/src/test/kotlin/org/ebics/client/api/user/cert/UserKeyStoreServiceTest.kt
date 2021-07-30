@@ -33,7 +33,8 @@ open class UserKeyStoreServiceTest (
         val bankId = bankService.createBank(bank)
         val userInfo = UserPartnerBank( EbicsVersion.H005, "CHT10001", "Jan", "cn=jan", "CH100001", bankId,
             useCertificate = true,
-            usePassword = true
+            usePassword = true,
+            guestAccess = true
         )
         val userId = userService.createUserAndPartner(userInfo)
         val user = userService.getUserById(userId)
