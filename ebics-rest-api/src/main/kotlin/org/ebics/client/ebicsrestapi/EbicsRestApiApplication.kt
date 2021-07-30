@@ -3,6 +3,7 @@ package org.ebics.client.ebicsrestapi
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
@@ -10,7 +11,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 @ComponentScan("org.ebics.client.api", "org.ebics.client.ebicsrestapi")
 @EntityScan("org.ebics.client.api")
 @EnableJpaRepositories("org.ebics.client.api")
-class EbicsRestApiApplication
+class EbicsRestApiApplication : SpringBootServletInitializer()
 
 fun main(args: Array<String>) {
 	runApplication<EbicsRestApiApplication>(*args)
