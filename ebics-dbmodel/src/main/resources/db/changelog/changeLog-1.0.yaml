@@ -1,0 +1,262 @@
+databaseChangeLog:
+- changeSet:
+    id: 1627782315944-1
+    author: honza.toegel (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: BankPK
+            name: id
+            type: BIGINT
+        - column:
+            name: bankURL
+            type: VARCHAR(255)
+        - column:
+            name: hostId
+            type: VARCHAR(255)
+        - column:
+            name: name
+            type: VARCHAR(255)
+        - column:
+            name: keyStore_id
+            type: BIGINT
+        tableName: Bank
+- changeSet:
+    id: 1627782315944-2
+    author: honza.toegel (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: BankKeyStorePK
+            name: id
+            type: BIGINT
+        - column:
+            name: e002Digest
+            type: BLOB
+        - column:
+            name: e002Key
+            type: BLOB
+        - column:
+            name: x002Digest
+            type: BLOB
+        - column:
+            name: x002Key
+            type: BLOB
+        tableName: BankKeyStore
+- changeSet:
+    id: 1627782315944-3
+    author: honza.toegel (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PartnerPK
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: orderId
+            type: INT
+        - column:
+            name: partnerId
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: bank_id
+            type: BIGINT
+        tableName: Partner
+- changeSet:
+    id: 1627782315944-4
+    author: honza.toegel (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: TraceEntryPK
+            name: id
+            type: BIGINT
+        - column:
+            name: messageBody
+            type: CLOB
+        - column:
+            constraints:
+              nullable: false
+            name: user_id
+            type: BIGINT
+        tableName: TraceEntry
+- changeSet:
+    id: 1627782315944-5
+    author: honza.toegel (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: UserPK
+            name: id
+            type: BIGINT
+        - column:
+            name: creator
+            type: VARCHAR(255)
+        - column:
+            name: dn
+            type: VARCHAR(255)
+        - column:
+            name: ebicsVersion
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+            name: guestAccess
+            type: BOOLEAN
+        - column:
+            name: name
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: useCertificate
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: usePassword
+            type: BOOLEAN
+        - column:
+            name: userId
+            type: VARCHAR(255)
+        - column:
+            name: userStatus
+            type: INT
+        - column:
+            name: keyStore_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: PARTNER_ID
+            type: BIGINT
+        tableName: User
+- changeSet:
+    id: 1627782315944-6
+    author: honza.toegel (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: UserKeyStorePK
+            name: id
+            type: BIGINT
+        - column:
+            name: keyStoreBytes
+            type: BLOB
+        tableName: UserKeyStore
+- changeSet:
+    id: 1627782315944-7
+    author: honza.toegel (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: bankURL, hostId
+        constraintName: UKh6um5b0myoq8kqgepgeqhudit
+        tableName: Bank
+- changeSet:
+    id: 1627782315944-8
+    author: honza.toegel (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: partnerId, bank_id
+        constraintName: UKppir7ynhrw6qy9mipo5dc77cu
+        tableName: Partner
+- changeSet:
+    id: 1627782315944-9
+    author: honza.toegel (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: keyStore_id
+        baseTableName: Bank
+        constraintName: FK2mixu6i55dkgqay45hgjustth
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: BankKeyStore
+        validate: true
+- changeSet:
+    id: 1627782315944-10
+    author: honza.toegel (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: keyStore_id
+        baseTableName: User
+        constraintName: FK8rc5ni0jnl7jls01tcxekussl
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: UserKeyStore
+        validate: true
+- changeSet:
+    id: 1627782315944-11
+    author: honza.toegel (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: bank_id
+        baseTableName: Partner
+        constraintName: FKj6ybp41t71gl84fp95u5y3a5
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: Bank
+        validate: true
+- changeSet:
+    id: 1627782315944-12
+    author: honza.toegel (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PARTNER_ID
+        baseTableName: User
+        constraintName: FKriyp47pix6a4yqi6vtqqs2wen
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: Partner
+        validate: true
+- changeSet:
+    id: 1627782315944-13
+    author: honza.toegel (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: user_id
+        baseTableName: TraceEntry
+        constraintName: FKtbxdxnb92q9xbpbtwnvos7k8w
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: User
+        validate: true
+
