@@ -25,13 +25,13 @@ class EbicsRestConfiguration(
     @Value("\${ssl.truststore:#{null}}")
     override val sslTrustedStoreFile: String?,
 
-    @Value("\${ebics.signatureVersion:#{A005}}")
+    @Value("\${ebics.signatureVersion:A005}")
     override val signatureVersion: String,
 
-    @Value("\${ebics.authenticationVersion:#{X002}}")
+    @Value("\${ebics.authenticationVersion:X002}")
     override val authenticationVersion: String,
 
-    @Value("\${ebics.encryptionVersion:#{E002}}")
+    @Value("\${ebics.encryptionVersion:E002}")
     override val encryptionVersion: String,
 
     @Value("\${ebics.trace:#{true}}")
@@ -40,7 +40,7 @@ class EbicsRestConfiguration(
     @Value("\${ebics.compression:#{true}}")
     override val isCompressionEnabled: Boolean,
 
-    @Value("\${ebics.locale.language:#{en}}")
+    @Value("\${ebics.locale.language:en}")
     private val localeLanguage:String,
 
     traceService: TraceService

@@ -1,5 +1,6 @@
 server:
   port : 8081
+  servlet.context-path: "/EbicsWebClient"
 ssl:
   truststore: "ssl/truststore.ts"
 ebics:
@@ -11,9 +12,6 @@ ebics:
   locale:
     language: "en"
 spring:
-  liquibase:
-    url: "jdbc:h2:file:/Users/honza.toegel/IdeaProjects/ebics-java-client/ebics-rest-api/data/testdb"
-    change-log: "classpath:db/changelog/changeLog.xml"
   jpa:
     hibernate:
       #In order to stop spring boot from maintaining DB updates (done by liquibase itself)

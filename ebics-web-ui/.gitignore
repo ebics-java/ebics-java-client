@@ -2,6 +2,12 @@
 .thumbs.db
 node_modules
 
+#Maven build
+node
+target
+.flattened-pom.xml
+*.iml
+
 # Quasar core related directories
 .quasar
 /dist
