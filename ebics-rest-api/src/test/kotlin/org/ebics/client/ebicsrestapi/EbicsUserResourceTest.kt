@@ -3,8 +3,7 @@ package org.ebics.client.ebicsrestapi
 import org.assertj.core.api.Assertions.assertThat
 import org.ebics.client.api.bank.Bank
 import org.ebics.client.api.user.User
-import org.ebics.client.api.user.UserInfo
-import org.ebics.client.api.user.UserPartnerBank
+import org.ebics.client.api.user.BankConnection
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.junit.jupiter.api.Test
@@ -35,8 +34,8 @@ class EbicsUserResourceTest (@Autowired private val restTemplate: TestRestTempla
         val bankId = restTemplate.postForObject("/banks", requestBank, Long::class.java)
 
         //Save user + Partner
-        val userInfo = UserPartnerBank( EbicsVersion.H005, "CHT10001", "JT", "cn=JT,org=com", "CH100001", bankId, true, true, true)
-        val request: HttpEntity<UserPartnerBank> = HttpEntity(userInfo)
+        val userInfo = BankConnection( EbicsVersion.H005, "CHT10001", "JT", "cn=JT,org=com", "CH100001", bankId, true, true, true)
+        val request: HttpEntity<BankConnection> = HttpEntity(userInfo)
         val targetUrl: URI = UriComponentsBuilder.fromUriString(restTemplate.rootUri)
             .path("/users") // Add path
             //.queryParam("ebicsPartnerId", "CH100001")

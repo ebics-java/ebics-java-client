@@ -1,12 +1,12 @@
-package org.ebics.client.ebicsrestapi.user.h003
+package org.ebics.client.ebicsrestapi.bankconnection.h005
 
-import org.ebics.client.ebicsrestapi.user.UserIdPass
-import org.ebics.client.ebicsrestapi.user.UserPass
+import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
+import org.ebics.client.ebicsrestapi.bankconnection.UserPass
 import org.springframework.web.bind.annotation.*
 
-@RestController("EbicsAPIResourceH003")
-@RequestMapping("users/{userId}/H003")
-@CrossOrigin(origins = ["http://localhost:8080"])
+@RestController("EbicsAPIResourceH005")
+@RequestMapping("users/{userId}/H005")
+@CrossOrigin(origins = ["http://localhost:8081"])
 class EbicsAPIResource (private val ebicsAPI: EbicsAPI){
     @PostMapping("sendINI")
     fun sendINI(@PathVariable userId:Long, @RequestBody userPass: UserPass) = ebicsAPI.sendINI(UserIdPass(userId, userPass.password))

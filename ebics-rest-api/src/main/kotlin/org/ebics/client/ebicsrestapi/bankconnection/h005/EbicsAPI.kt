@@ -1,17 +1,17 @@
-package org.ebics.client.ebicsrestapi.user.h003
+package org.ebics.client.ebicsrestapi.bankconnection.h005
 
 import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.bank.cert.BankKeyStoreService
 import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
 import org.ebics.client.api.user.UserRepository
-import org.ebics.client.ebicsrestapi.user.UserIdPass
-import org.ebics.client.keymgmt.h003.KeyManagementImpl
+import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
+import org.ebics.client.keymgmt.h005.KeyManagementImpl
 import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.Product
 import org.springframework.stereotype.Component
 
-@Component("EbicsAPIH003")
+@Component("EbicsAPIH005")
 class EbicsAPI(
     private val userRepository: UserRepository,
     private val bankService: BankService,
@@ -19,7 +19,7 @@ class EbicsAPI(
     private val configuration: EbicsRestConfiguration)
 {
     private val product =
-        Product("EBICS 2.4 H003 REST API Client", "en", "org.jto.ebics")
+        Product("EBICS 2.5 H004 REST API Client", "en", "org.jto.ebics")
 
     fun sendINI(userIdPass: UserIdPass) {
         val user = userRepository.getOne(userIdPass.id)

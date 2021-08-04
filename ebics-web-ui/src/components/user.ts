@@ -34,7 +34,7 @@ export default function useUserAPI(userId: number | undefined) {
   const refreshUserData = () => {
     if (userId !== undefined) {
       api
-        .get<User>(`/users/${userId}`)
+        .get<User>(`/bankconnections/${userId}`)
         .then((response) => {
           console.log('User data refreshed')
           user.value = response.data;
@@ -89,7 +89,7 @@ export default function useUserAPI(userId: number | undefined) {
         });
     } else {
       api
-        .put<UserPartnerBank>(`/users/${userId}`, userPartnerBank.value)
+        .put<UserPartnerBank>(`/bankconnections/${userId}`, userPartnerBank.value)
         .then(() => {
           q.notify({
             color: 'green-4',

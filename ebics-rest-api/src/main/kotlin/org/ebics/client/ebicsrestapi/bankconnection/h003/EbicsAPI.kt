@@ -1,22 +1,17 @@
-package org.ebics.client.ebicsrestapi.user.h004
+package org.ebics.client.ebicsrestapi.bankconnection.h003
 
 import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.bank.cert.BankKeyStoreService
 import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
 import org.ebics.client.api.user.UserRepository
-import org.ebics.client.ebicsrestapi.user.UploadInitResponse
-import org.ebics.client.ebicsrestapi.user.UploadSegmentRequest
-import org.ebics.client.ebicsrestapi.user.UploadSegmentResponse
-import org.ebics.client.ebicsrestapi.user.UserIdPass
-import org.ebics.client.filetransfer.h004.FileTransfer
-import org.ebics.client.keymgmt.h004.KeyManagementImpl
+import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
+import org.ebics.client.keymgmt.h003.KeyManagementImpl
 import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.Product
-import org.ebics.client.order.h004.EbicsUploadOrder
 import org.springframework.stereotype.Component
 
-@Component("EbicsAPIH004")
+@Component("EbicsAPIH003")
 class EbicsAPI(
     private val userRepository: UserRepository,
     private val bankService: BankService,
@@ -24,7 +19,7 @@ class EbicsAPI(
     private val configuration: EbicsRestConfiguration)
 {
     private val product =
-        Product("EBICS 2.5 H004 REST API Client", "en", "org.jto.ebics")
+        Product("EBICS 2.4 H003 REST API Client", "en", "org.jto.ebics")
 
     fun sendINI(userIdPass: UserIdPass) {
         val user = userRepository.getOne(userIdPass.id)
@@ -59,22 +54,17 @@ class EbicsAPI(
         }
     }
 
-    fun initFileUpload(userId: Long, uploadInitRequest: UploadInitRequest): UploadInitResponse {
-        val user = userRepository.getOne(userId)
+    fun uploadFile(userIdPass: UserIdPass) {
+        val user = userRepository.getOne(userIdPass.id)
         with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {
-            val userCertManager = toUserCertMgr(uploadInitRequest.password)
+            val userCertManager = toUserCertMgr(userIdPass.password)
             with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {
                 val bankCertManager = toBankCertMgr()
                 val session = EbicsSession(user, configuration, product, userCertManager, bankCertManager)
                 val content = null
-                val order = EbicsUploadOrder(uploadInitRequest.orderType, uploadInitRequest.attributeType, uploadInitRequest.params)
+                //val order = EbicsUploadOrder()
                 //FileTransfer(session).sendFile(content, order)
-                return UploadInitResponse("transferId...", 512, "A0Z9")
             }
         }
-    }
-
-    fun uploadFileSegment(userId: Long, transferId: String, uploadSegmentRequest: UploadSegmentRequest): UploadSegmentResponse {
-        return UploadSegmentResponse()
     }
 }

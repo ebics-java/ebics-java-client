@@ -1,4 +1,4 @@
-package org.ebics.client.ebicsrestapi.user
+package org.ebics.client.ebicsrestapi.bankconnection
 
 /**
  * REST request object to initialize EBICS upload transfer

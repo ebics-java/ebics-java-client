@@ -6,7 +6,6 @@ import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.user.cert.UserKeyStoreService
 import org.ebics.client.api.partner.PartnerService
 import org.ebics.client.model.EbicsVersion
-import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,7 +27,7 @@ class UserServiceTest(
     fun createAndGetUser() {
         val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"),  "EBXUBSCH", "UBS-PROD-CH", null)
         val bankId = bankService.createBank(bank)
-        val userInfo = UserPartnerBank(EbicsVersion.H004, "CHT10001", "Jan", "org=jto", "CH100001", bankId, false, false, true)
+        val userInfo = BankConnection(EbicsVersion.H004, "CHT10001", "Jan", "org=jto", "CH100001", bankId, false, false, true)
         val userId = userService.createUserAndPartner(userInfo)
         with( userService.getUserById(userId) ) {
             assertThat( name ).isEqualTo( userInfo.name )

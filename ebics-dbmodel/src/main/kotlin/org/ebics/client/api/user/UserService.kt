@@ -74,8 +74,8 @@ class UserService(
         }
     }
 
-    private fun checkUserPartnerBankValidity(userPartnerBank: UserPartnerBank) {
-        with(userPartnerBank) {
+    private fun checkUserPartnerBankValidity(bankConnection: BankConnection) {
+        with(bankConnection) {
             if (ebicsVersion == EbicsVersion.H005 && !useCertificate)
                 throw FunctionException(
                     "User $userId validation failed, useCertificate must be set to true for EBICS version H005",
@@ -84,8 +84,8 @@ class UserService(
         }
     }
 
-    fun createUserAndPartner(userPartnerBank: UserPartnerBank): Long {
-        with(userPartnerBank) {
+    fun createUserAndPartner(bankConnection: BankConnection): Long {
+        with(bankConnection) {
             checkUserPartnerBankValidity(this)
             val partner = partnerService.createOrGetPartner(partnerId, bankId)
             val authentication = SecurityContextHolder.getContext().authentication
@@ -99,8 +99,8 @@ class UserService(
         }
     }
 
-    fun updateUserAndPartner(id: Long, userPartnerBank: UserPartnerBank): Long {
-        with(userPartnerBank) {
+    fun updateUserAndPartner(id: Long, bankConnection: BankConnection): Long {
+        with(bankConnection) {
             checkUserPartnerBankValidity(this)
             val partner = partnerService.createOrGetPartner(partnerId, bankId)
             try {

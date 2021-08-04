@@ -132,7 +132,7 @@ export default defineComponent({
   methods: {
     loadData() {
       api
-        .get<User[]>('/users')
+        .get<User[]>('/bankconnections')
         .then((response) => {
           this.users = response.data;
         })
@@ -147,7 +147,7 @@ export default defineComponent({
     },
     deleteUser(userId: number) {
       api
-        .delete<User>(`/users/${userId}`)
+        .delete<User>(`/bankconnections/${userId}`)
         .then(() => {
           this.$q.notify({
             color: 'positive',

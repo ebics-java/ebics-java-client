@@ -2,7 +2,7 @@ package org.ebics.client.api.user
 
 import org.ebics.client.model.EbicsVersion
 
-data class UserPartnerBank(
+data class BankConnection(
     val ebicsVersion: EbicsVersion,
     val userId: String,
     val name: String,

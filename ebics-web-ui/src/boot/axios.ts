@@ -15,7 +15,8 @@ declare module '@vue/runtime-core' {
 // for each client)
 const api = axios.create(
   { 
-    baseURL: 'http://localhost:8081/EbicsWebClient',
+    baseURL: 'http://localhost:8080/EbicsWebClient',
+    //baseURL: 'http://localhost',
     auth: { username: 'admin', password: 'pass'} 
   });
 

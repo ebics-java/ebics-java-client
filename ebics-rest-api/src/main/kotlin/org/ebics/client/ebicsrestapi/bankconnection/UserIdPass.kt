@@ -1,4 +1,4 @@
-package org.ebics.client.ebicsrestapi.user
+package org.ebics.client.ebicsrestapi.bankconnection
 
 
 

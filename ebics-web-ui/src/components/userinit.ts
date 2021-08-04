@@ -137,7 +137,7 @@ export default function useUserInitAPI(
 
   const createUserKeysRequest = async (pass: string): Promise<void> => {
     try {
-      await api.post<UserPassword>(`/users/${user.value.id}/certificates`, {
+      await api.post<UserPassword>(`/bankconnections/${user.value.id}/certificates`, {
         password: pass,
       });
       apiOkHandler(
@@ -150,7 +150,7 @@ export default function useUserInitAPI(
 
   const resetUserStatusRequest = async (): Promise<void> => {
     try {
-      await api.post<UserPassword>(`/users/${user.value.id}/resetStatus`);
+      await api.post<UserPassword>(`/bankconnections/${user.value.id}/resetStatus`);
       apiOkHandler(
         `Initialization status resetted successfully for user name: ${user.value.name}`
       );
@@ -171,7 +171,7 @@ export default function useUserInitAPI(
   ): Promise<void> => {
     try {
       await api.post<UserPassword>(
-        `/users/${user.value.id}/${user.value.ebicsVersion}/send${adminOrderType}`,
+        `/bankconnections/${user.value.id}/${user.value.ebicsVersion}/send${adminOrderType}`,
         { password: pass }
       );
       apiOkHandler(

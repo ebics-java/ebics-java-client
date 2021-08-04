@@ -1,6 +1,6 @@
-package org.ebics.client.ebicsrestapi.user.h005
+package org.ebics.client.ebicsrestapi.bankconnection.h005
 
-import org.ebics.client.ebicsrestapi.user.AbstractUploadInitRequest
+import org.ebics.client.ebicsrestapi.bankconnection.AbstractUploadInitRequest
 import org.ebics.client.order.EbicsService
 
 /**

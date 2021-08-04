@@ -162,7 +162,6 @@ export default defineComponent({
       this.$router.go(-1);
     },
     updateUseCertificate() {
-      console.log('test11');
       if (this.user.ebicsVersion == 'H005') {
         this.user.useCertificate = true;
       }

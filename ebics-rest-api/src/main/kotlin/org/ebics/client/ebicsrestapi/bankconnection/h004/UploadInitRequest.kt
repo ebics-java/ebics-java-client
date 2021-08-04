@@ -1,9 +1,7 @@
-package org.ebics.client.ebicsrestapi.user.h004
+package org.ebics.client.ebicsrestapi.bankconnection.h004
 
-import org.ebics.client.ebicsrestapi.user.AbstractUploadInitRequest
+import org.ebics.client.ebicsrestapi.bankconnection.AbstractUploadInitRequest
 import org.ebics.client.order.AttributeType
-import org.ebics.client.order.EbicsService
-import org.ebics.client.order.h004.EbicsUploadOrder
 
 /**
  * REST request object to initialize EBICS upload transfer
