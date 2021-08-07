@@ -21,9 +21,4 @@ spring:
         physical-strategy: "org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl"
         implicit-strategy: "org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl"
   datasource:
-    #url: "jdbc:h2:mem:testonly"
-    driver-class-name: "org.h2.Driver"
-    url: "jdbc:h2:file:/Users/honza.toegel/IdeaProjects/ebics-java-client/ebics-rest-api/data/testdb"
-    username: "sa"
-    password: "password"
     initialization-mode: "never"
