@@ -191,7 +191,7 @@ export default defineComponent({
     },
     loadUsersData() {
       api
-        .get<User[]>('/users')
+        .get<User[]>('/bankconnections')
         .then((response) => {
           this.users = response.data;
         })

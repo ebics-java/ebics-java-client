@@ -46,6 +46,12 @@ export interface User extends UserWizz {
   securityMedium: string;
 }
 
+export interface UserContext {
+  name: string;
+  roles: Array<string>;
+  time: string;
+}
+
 export interface Partner {
   id: number;
   partnerId: string;

@@ -15,7 +15,7 @@
           EBICS Web Client
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <q-btn unelevated to="/userctx">{{userLoginButtonText}}</q-btn>
       </q-toolbar>
     </q-header>
 
@@ -94,21 +94,24 @@
 
 <script lang="ts">
 
-
-
 import { defineComponent, ref } from 'vue'
+import useUserContextAPI from 'components/usercontext';
 
 export default defineComponent({
   name: 'MainLayout',
 
-  components: {
-    
+  computed: {
+    userLoginButtonText(): string {
+      return (this.userContext) == undefined ? 'Login' : `User: ${this.userContext.name}`;
+    }
   },
 
   setup () {
     const leftDrawerOpen = ref(false)
+    const { userContext } = useUserContextAPI();
 
     return {
+      userContext,
       leftDrawerOpen,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value

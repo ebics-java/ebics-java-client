@@ -43,7 +43,14 @@ const routes: RouteRecordRaw[] = [
         },
       },
       { path: '/upload', component: () => import('pages/FileUpload.vue') },
+      { path: '/userctx', component: () => import('pages/UserContext.vue') },
+      { path: '/userlogin', component: () => import('pages/UserLogin.vue') },
     ],
+  },
+
+  {
+    path: '/login',
+    component: () => import('pages/UserLogin.vue'),
   },
 
   // Always leave this as last one,
