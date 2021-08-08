@@ -56,6 +56,11 @@ export default function useUserContextAPI() {
     }
   };
 
+  //Check if the user has specific role
+  const hasRole = (userRoleName: string): boolean => {
+    return userContext.value !== undefined && userContext.value.roles.some(roleName => roleName.includes(userRoleName));
+  };
+
   const onCredentialsChanged = () => {
     api.defaults.auth = basicCredentials.value
   };
@@ -66,5 +71,5 @@ export default function useUserContextAPI() {
   //User data is refreshed by mounting
   onMounted(refreshUserContextData);
 
-  return { userContext, basicCredentials, resetUserContextData, refreshUserContextData };
+  return { userContext, basicCredentials, hasRole, resetUserContextData, refreshUserContextData };
 }

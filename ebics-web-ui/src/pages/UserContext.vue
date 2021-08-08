@@ -96,12 +96,9 @@ import useUserContextAPI from 'components/usercontext';
 export default defineComponent({
   name: 'UserContext',
   methods: {
-    onLogout() {
-      this.resetUserContextData()
+    async onLogout() {
+      await this.resetUserContextData()
     },
-    hasRole(userRoleName: string): boolean {
-      return this.userContext !== undefined && this.userContext.roles.some(roleName => roleName.includes(userRoleName));
-    }
   },
   computed: {
     roleGuest(): boolean { return this.hasRole('GUEST'); },
@@ -109,8 +106,8 @@ export default defineComponent({
     roleAdmin(): boolean { return this.hasRole('ADMIN'); },
   },
   setup() {
-    const { basicCredentials, userContext, resetUserContextData, refreshUserContextData } = useUserContextAPI();
-    return { basicCredentials, userContext, resetUserContextData, refreshUserContextData };
+    const { basicCredentials, userContext, hasRole, resetUserContextData, refreshUserContextData } = useUserContextAPI();
+    return { basicCredentials, userContext, hasRole, resetUserContextData, refreshUserContextData };
   },
 });
 </script>

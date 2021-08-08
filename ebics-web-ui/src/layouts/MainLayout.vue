@@ -14,8 +14,8 @@
         <q-toolbar-title>
           EBICS Web Client
         </q-toolbar-title>
-
-        <q-btn unelevated to="/userctx">{{userLoginButtonText}}</q-btn>
+        <q-btn v-if="userContext" unelevated to="/userctx">User: '{{userContext.name}}'</q-btn>
+        <q-btn v-else unelevated to="/login">Login</q-btn>
       </q-toolbar>
     </q-header>
 
