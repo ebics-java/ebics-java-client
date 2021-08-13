@@ -29,8 +29,8 @@ import javax.crypto.spec.SecretKeySpec
  * big file uploading.
  *
  * @author Hachani
- */
-/**
+ * @author Jan Toegel
+ *
  * Constructs a new `FileSplitter` with a given file.
  * @param input the input byte array
  */
@@ -91,8 +91,8 @@ class Splitter(
      */
     init {
         try {
-            val decompressedInput = if (isCompressionEnabled) Utils.zip(input) else input
-            content = Utils.encrypt(decompressedInput, keySpec)
+            val compressedInput = if (isCompressionEnabled) Utils.zip(input) else input
+            content = Utils.encrypt(compressedInput, keySpec)
             val lastSegmentNotFull = content.size % 1048576 != 0
             segmentNumber = content.size / 1048576 + if (lastSegmentNotFull) 1 else 0
             segmentSize = content.size / segmentNumber

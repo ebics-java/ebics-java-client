@@ -1,19 +1,25 @@
 package org.ebics.client.ebicsrestapi.bankconnection.h004
 
+import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
 import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.bank.cert.BankKeyStoreService
 import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
 import org.ebics.client.api.user.UserRepository
-import org.ebics.client.ebicsrestapi.bankconnection.UploadInitResponse
-import org.ebics.client.ebicsrestapi.bankconnection.UploadSegmentRequest
-import org.ebics.client.ebicsrestapi.bankconnection.UploadSegmentResponse
+import org.ebics.client.ebicsrestapi.bankconnection.UploadResponse
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
+import org.ebics.client.filetransfer.h004.FileTransfer
 import org.ebics.client.keymgmt.h004.KeyManagementImpl
 import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.Product
+import org.ebics.client.order.h004.EbicsDownloadOrder
 import org.ebics.client.order.h004.EbicsUploadOrder
+import org.ebics.client.utils.toDate
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.core.io.Resource
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
+import org.springframework.web.multipart.MultipartFile
 
 @Component("EbicsAPIH004")
 class EbicsAPI(
@@ -58,22 +64,33 @@ class EbicsAPI(
         }
     }
 
-    fun initFileUpload(userId: Long, uploadInitRequest: UploadInitRequest): UploadInitResponse {
+    fun uploadFile(userId: Long, uploadRequest: UploadRequest, uploadFile: MultipartFile): UploadResponse {
         val user = userRepository.getOne(userId)
         with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {
-            val userCertManager = toUserCertMgr(uploadInitRequest.password)
+            val userCertManager = toUserCertMgr(uploadRequest.password)
             with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {
                 val bankCertManager = toBankCertMgr()
                 val session = EbicsSession(user, configuration, product, userCertManager, bankCertManager)
-                val content = null
-                val order = EbicsUploadOrder(uploadInitRequest.orderType, uploadInitRequest.attributeType, uploadInitRequest.params)
-                //FileTransfer(session).sendFile(content, order)
-                return UploadInitResponse("transferId...", 512, "A0Z9")
+                val order = EbicsUploadOrder(uploadRequest.orderType, uploadRequest.attributeType, uploadRequest.params)
+                FileTransfer(session).sendFile(uploadFile.bytes, order)
+                return UploadResponse("ordernummer")
             }
         }
     }
 
-    fun uploadFileSegment(userId: Long, transferId: String, uploadSegmentRequest: UploadSegmentRequest): UploadSegmentResponse {
-        return UploadSegmentResponse()
+    fun downloadFile(userId: Long, downloadRequest: DownloadRequest): ResponseEntity<Resource> {
+        val user = userRepository.getOne(userId)
+        with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {
+            val userCertManager = toUserCertMgr(downloadRequest.password)
+            with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {
+                val bankCertManager = toBankCertMgr()
+                val session = EbicsSession(user, configuration, product, userCertManager, bankCertManager)
+                val order = EbicsDownloadOrder(downloadRequest.orderType, downloadRequest.startDate?.toDate(), downloadRequest.endDate?.toDate(), downloadRequest.params)
+                val outputStream = ByteOutputStream()
+                FileTransfer(session).fetchFile(order, outputStream)
+                val resource = ByteArrayResource(outputStream.bytes)
+                return ResponseEntity.ok().contentLength(resource.contentLength()).body(resource)
+            }
+        }
     }
 }

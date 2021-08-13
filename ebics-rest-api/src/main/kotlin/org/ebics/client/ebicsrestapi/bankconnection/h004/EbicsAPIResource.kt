@@ -1,10 +1,14 @@
 package org.ebics.client.ebicsrestapi.bankconnection.h004
 
 import org.ebics.client.ebicsrestapi.bankconnection.*
+import org.springframework.core.io.Resource
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController("EbicsAPIResourceH004")
-@RequestMapping("users/{userId}/H004")
+@RequestMapping("bankconnections/{userId}/H004")
 @CrossOrigin(origins = ["http://localhost:8081"])
 class EbicsAPIResource (private val ebicsAPI: EbicsAPI){
     @PostMapping("sendINI")
@@ -16,10 +20,9 @@ class EbicsAPIResource (private val ebicsAPI: EbicsAPI){
     @PostMapping("sendHPB")
     fun sendHPB(@PathVariable userId:Long, @RequestBody userPass: UserPass) = ebicsAPI.sendHPB(UserIdPass(userId, userPass.password))
 
-    @PostMapping("upload")
-    fun initiateUpload(@PathVariable userId: Long, @RequestBody uploadInitRequest: UploadInitRequest): UploadInitResponse = ebicsAPI.initFileUpload(userId, uploadInitRequest)
+    @PostMapping("upload", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun uploadFile(@PathVariable userId: Long, @RequestPart uploadRequest: UploadRequest, @RequestPart uploadFile: MultipartFile): UploadResponse = ebicsAPI.uploadFile(userId, uploadRequest, uploadFile)
 
-    @PostMapping("upload/{transferId}/sendSegment")
-    fun uploadFileSegment(@PathVariable userId: Long, @PathVariable transferId:String, @RequestBody uploadSegmentRequest: UploadSegmentRequest): UploadSegmentResponse =
-        ebicsAPI.uploadFileSegment(userId, transferId, uploadSegmentRequest)
+    @GetMapping("download")
+    fun downloadFile(@PathVariable userId: Long, @RequestBody downloadRequest: DownloadRequest): ResponseEntity<Resource> = ebicsAPI.downloadFile(userId, downloadRequest)
 }

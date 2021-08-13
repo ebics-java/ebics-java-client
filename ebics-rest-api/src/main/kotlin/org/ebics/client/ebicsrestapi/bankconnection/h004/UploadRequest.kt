@@ -1,6 +1,6 @@
 package org.ebics.client.ebicsrestapi.bankconnection.h004
 
-import org.ebics.client.ebicsrestapi.bankconnection.AbstractUploadInitRequest
+import org.ebics.client.ebicsrestapi.bankconnection.AbstractUploadRequest
 import org.ebics.client.order.AttributeType
 
 /**
@@ -9,16 +9,12 @@ import org.ebics.client.order.AttributeType
  * @param orderType EBICS 2.4/2.5 order type (specification of the order format)
  * @param attributeType EBICS Attribute Type (DZHNN without signature, OZHNN with signature)
  * @param params additional key-value pair params for EBICS request
- * @param sha256digest SHA256 of the whole input file, in HEX form (NO BASE64)
- * @param fileSizeBytes total number bytes of input file, used for segmentation
  */
-class UploadInitRequest(
+class UploadRequest(
     password: String,
     val orderType: String? = null,
     val attributeType: AttributeType,
     params: Map<String, String>,
-    sha256digest: String,
-    fileSizeBytes: Long,
-) : AbstractUploadInitRequest(password, params, sha256digest, fileSizeBytes)
+) : AbstractUploadRequest(password, params)
 
 

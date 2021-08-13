@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
 
 /**
  * Handling of file transfers.
@@ -176,10 +177,9 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
     @Throws(IOException::class, EbicsException::class)
     fun fetchFile(
         downloadOrder: EbicsDownloadOrder,
-        outputFile: File
+        outputStream: OutputStream
     ) {
         val orderType = downloadOrder.adminOrderType
-        var httpCode: Int
         val sender = HttpRequestSender(session)
         val initializer = DownloadInitializationRequestElement(
             session,
@@ -214,7 +214,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
                 joiner
             )
         }
-        FileOutputStream(outputFile).use { dest -> joiner.writeTo(dest, response.transactionKey) }
+        outputStream.use { dest -> joiner.writeTo(dest, response.transactionKey) }
         val receipt = ReceiptRequestElement(
             session,
             state.transactionId,

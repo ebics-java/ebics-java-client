@@ -2,6 +2,7 @@ package org.ebics.client.api
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.certificate.UserCertificateManager
+import org.ebics.client.utils.toHexString
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
@@ -44,16 +45,14 @@ class UserCertificateManagerTest {
         //SHA256withRSA
         val signed = manager.sign(test.toByteArray())
 
-        println("Signed SHAwithRSA in one step : ${signed.toHex()}")
+        println("Signed SHAwithRSA in one step : ${signed.toHexString()}")
         //SHA256
         val sha256 = manager.createSHA256hash(test.toByteArray())
-        println("SHA256: ${sha256.toHex()}")
+        println("SHA256: ${sha256.toHexString()}")
         //+withRSA
         val signed2 = manager.signSHA256hash(sha256)
-        println("Signed SHAwithRSA in two steps: ${signed.toHex()}")
+        println("Signed SHAwithRSA in two steps: ${signed.toHexString()}")
 
         Assertions.assertArrayEquals(signed, signed2)
     }
 }
-
-fun ByteArray.toHex(): String = joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
