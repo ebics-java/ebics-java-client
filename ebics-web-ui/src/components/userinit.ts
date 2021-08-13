@@ -9,16 +9,17 @@ import {
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import { AxiosError } from 'axios';
+import usePasswordAPI from './password';
 
 function isAxiosError<T>(error: unknown): error is AxiosError<T> {
   return (error as AxiosError).isAxiosError !== undefined;
 }
 
 export default function useUserInitAPI(
-  user: Ref<User>,
-  tempPassword: Ref<string | undefined>
+  user: Ref<User>
 ) {
   const q = useQuasar();
+  const { resetCertPassword } = usePasswordAPI();
 
   const apiOkHandler = (msg: string): void => {
     q.notify({
@@ -43,7 +44,7 @@ export default function useUserInitAPI(
         const ebicsApiError = error.response?.data as EbicsApiError;
         if (ebicsApiError.message.includes('wrong password')) {
           //In case of error 'wrong password' we have to reset temporary stored password in order to ask for new one
-          tempPassword.value = undefined;
+          resetCertPassword(user.value)
         }
         let message = ebicsApiError.message;
         if (!ebicsApiError.description.includes(message))

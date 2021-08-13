@@ -17,7 +17,6 @@ const api = axios.create(
   { 
     baseURL: 'http://localhost:8080/EbicsWebClient',
     //baseURL: 'http://localhost',
-    auth: { username: 'admin', password: 'pass'} 
   });
 
 export default boot(({ app }) => {

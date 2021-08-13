@@ -125,6 +125,18 @@ export interface UserPassword {
   password: string;
 }
 
+export interface UploadRequest {
+  password: string;
+  params: Map<string, string>;
+}
+
+export interface UploadRequestH004 extends UploadRequest {
+  password: string;
+  orderType: string;
+  attributeType: string;
+  params: Map<string, string>;
+}
+
 export enum UserIniWizzStep {
   CreateUserKeys = 1,
   UploadUserKeys,
@@ -133,4 +145,9 @@ export enum UserIniWizzStep {
   VerifyBankKeys,
   Finish,
   Unknown,
+}
+
+export enum AuthenticationType {
+  SSO = 'Single sign on',
+  HTTP_BASIC = 'HTTP Basic (username + password)',
 }

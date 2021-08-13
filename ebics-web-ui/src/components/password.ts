@@ -1,18 +1,19 @@
 import { ref, Ref } from 'vue';
-import { User } from 'components/models';
 import { useQuasar } from 'quasar';
+import { User } from 'components/models'
 
-export default function usePasswordAPI(user: Ref<User>) {
+/**
+ * Passwords entered on actual session for the given @param user.id
+ * @returns 
+ *  promptCertPassword getting the certificate password, if not yet entered in this session by user, then asking for it via dialog
+ *  resetCertPassword resetting the actual certificate password for given user in this session (used if is wrong password used)
+ */
+const tempPasswords: Ref<Map<number, string | undefined>> = ref<Map<number, string | undefined>>(new Map());
+
+export default function usePasswordAPI() {
   const q = useQuasar();
 
-  /**
-   * Password entered on actual session for the @param user
-   */
-  const tempPassword: Ref<string | undefined> = ref<string | undefined>(
-    undefined
-  );
-
-  const passwordDialog = (createPass: boolean): Promise<string> => {
+  const passwordDialog = (userId: number, createPass: boolean): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
       q.dialog({
         title: createPass ? 'Create new password' : 'Enter password',
@@ -21,16 +22,16 @@ export default function usePasswordAPI(user: Ref<User>) {
           : 'Enter password for your user certificate',
         prompt: {
           model: '',
-          //isValid: val => (val as string).length > 2,
           type: 'password',
         },
         cancel: true,
         persistent: true,
       })
         .onOk((data: unknown) => {
-            tempPassword.value = data as string
-          console.log(`Entered password: ${tempPassword.value}`);
-          resolve(tempPassword.value);
+            const pwd = data as string
+            tempPasswords.value.set(userId, pwd)
+          console.log(`Entered password: ${pwd}`);
+          resolve(pwd);
         })
         .onCancel(() => {
           reject('Password entry canceled');
@@ -46,23 +47,28 @@ export default function usePasswordAPI(user: Ref<User>) {
    * createPass=true in order to ask for new password
    * createPass=false in order to ask for existing password
    */
-  const promptCertPassword = (createPass: boolean): Promise<string> => {
+  const promptCertPassword = (user: User, createPass: boolean): Promise<string> => {
     return new Promise<string>((resolve) => {
-      if (!user.value.usePassword) {
+      if (!user.usePassword) {
         console.log('No pass required');
         resolve(''); //No password required
       } else {
         //Password required, did we stored some already?
-        if (tempPassword.value !== undefined) {
-          console.log(`Temp pass used ${tempPassword.value}`);
-          resolve(tempPassword.value);
+        const pwd = tempPasswords.value.get(user.id);
+        if (pwd !== undefined) {
+          console.log(`Temp pass used ${pwd}`);
+          resolve(pwd);
         } else {
           //We will ask user for password
-          resolve(passwordDialog(createPass));
+          resolve(passwordDialog(user.id, createPass));
         }
       }
     });
   };
 
-  return { tempPassword, promptCertPassword };
+  const resetCertPassword = (user: User): void => {
+    tempPasswords.value.set(user.id, undefined)
+  }
+
+  return { resetCertPassword, promptCertPassword };
 }

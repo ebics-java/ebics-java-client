@@ -17,7 +17,7 @@
           />
 
           <q-select
-            v-if="user.ebicsVersion != 'H005'"
+            v-if="user.ebicsVersion == 'H003' || user.ebicsVersion == 'H004'"
             filled
             v-model="orderType"
             :options="orderTypes"
@@ -45,7 +45,7 @@
           />
 
           <!-- DZHNN / OZHNN -->
-          <q-toggle v-if="user.ebicsVersion != 'H005'" v-model="signatureOZHNN" :label="signatureOZHNN ? 'Signature (OZHNN)' : 'No Signature (DZHNN)'"/>
+          <q-toggle v-if="user.ebicsVersion == 'H003' || user.ebicsVersion == 'H004'" v-model="signatureOZHNN" :label="signatureOZHNN ? 'Signature (OZHNN)' : 'No Signature (DZHNN)'"/>
           <!-- signature flag, request EDS -->
           
           <q-toggle v-if="user.ebicsVersion == 'H005'" v-model="signatureFlag" label="Signature flag"/>
@@ -85,9 +85,10 @@
 
 <script lang="ts">
 import { api } from 'boot/axios';
-import { User, Btf, BtfMessage } from 'components/models';
+import { User, Btf, BtfMessage, UploadRequestH004 } from 'components/models';
 import { defineComponent } from 'vue';
 import { ref } from 'vue';
+import useFileTransferAPI from 'components/filetransfer';
 
 export default defineComponent({
   name: 'FileUpload',
@@ -95,7 +96,7 @@ export default defineComponent({
   props: {},
   data() {
     return {
-      file: ref(null),
+      file: ref<File | null>(null),
       fileText: 'text of the file',
       binary: false,
       users: [] as User[],
@@ -145,6 +146,7 @@ export default defineComponent({
      */
     onUpdateInputFile(file: File) {
       console.log(file.name);
+      this.file = file;
       file
         .text()
         .then((text) => {
@@ -204,7 +206,18 @@ export default defineComponent({
           });
         });
     },
-    onSubmit() { console.log(this.file); },
+    async onSubmit() { 
+      console.log(this.file); 
+      const uploadRequest = {} as UploadRequestH004;
+      if (this.binary && this.file) {
+        await this.ebicsUploadRequest(this.user, uploadRequest, this.file)
+      } else if (!this.binary && this.fileText) {
+        const content = new Blob([this.fileText], {type: 'text/html'});
+        await this.ebicsUploadRequest(this.user, uploadRequest, content)
+      } else {
+        console.error('Invalid input combination, no file content available to upload')
+      }
+    },
     onCancel() {
       this.$router.go(-1);
     },
@@ -219,5 +232,9 @@ export default defineComponent({
   mounted() {
     this.loadUsersData();
   },
+  setup() {
+    const {ebicsUploadRequest} = useFileTransferAPI();
+    return {ebicsUploadRequest}
+  }
 });
 </script>

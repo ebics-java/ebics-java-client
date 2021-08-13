@@ -170,7 +170,7 @@ export default defineComponent({
     async createUserKeys() {
       try {
         //Get password for user certificates
-        const pass = await this.promptCertPassword(true);
+        const pass = await this.promptCertPassword(this.user, true);
         //Upload user keys (INI and/or HIA) depending on user status
         await this.createUserKeysRequest(pass);
         //Refresshing user status on success
@@ -182,7 +182,7 @@ export default defineComponent({
     async uploadUserKeys() {
       try {
         //Get password for user certificates
-        const pass = await this.promptCertPassword(false);
+        const pass = await this.promptCertPassword(this.user, false);
         //Execute INI request
         await this.ebicsAdminTypeRequest(AdminOrderType.INI, pass);
         //Execute HIA request
@@ -199,7 +199,7 @@ export default defineComponent({
     async downloadBankKeys() {
       try {
         //Get password for user certificates
-        const pass = await this.promptCertPassword(false);
+        const pass = await this.promptCertPassword(this.user, false);
         //Upload user keys (INI and/or HIA) depending on user status
         await this.ebicsAdminTypeRequest(AdminOrderType.HPB, pass);
         //Refresshing user status on success
@@ -215,7 +215,7 @@ export default defineComponent({
   setup(props) {
     const { user, refreshUserData } = useUserDataAPI(props.id);
 
-    const { tempPassword, promptCertPassword } = usePasswordAPI(user);
+    const { promptCertPassword } = usePasswordAPI();
 
     const {
       actualWizardStep,
@@ -223,7 +223,7 @@ export default defineComponent({
       createUserKeysRequest,
       ebicsAdminTypeRequest,
       resetUserStatusRequest,
-    } = useUserInitAPI(user, tempPassword);
+    } = useUserInitAPI(user);
 
     return {
       user,
@@ -233,7 +233,6 @@ export default defineComponent({
       createUserKeysRequest,
       ebicsAdminTypeRequest,
       resetUserStatusRequest,
-      tempPassword,
       promptCertPassword,
     };
   },

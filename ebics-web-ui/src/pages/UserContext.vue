@@ -40,6 +40,25 @@
               </q-item-section>
             </q-item>
 
+            <q-item clickable v-ripple>
+              <q-item-section>
+                <q-item-label caption>Authentication type</q-item-label>
+                <q-item-label>
+                  {{authenticationType}}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-item v-if="authenticationType == AuthenticationType.SSO && ssoDevOverBasic" clickable v-ripple>
+              <q-item-section>
+                <q-item-label>SSO via BASIC</q-item-label>
+                <q-item-label caption>only for dev purposes</q-item-label>
+              </q-item-section>
+              <q-item-section side >
+                <q-toggle color="blue" disable v-model="ssoDevOverBasic"/>
+              </q-item-section>
+            </q-item>
+
             <q-separator spaced></q-separator>
             <q-item-label header>User roles</q-item-label>
 
@@ -83,7 +102,10 @@
             </q-item>
           </q-list>
         </div>
-        <div v-else>No user context available, try to log in</div>
+        <div v-else>
+          <p>No user context available, try to log in</p>
+          <q-btn color="primary" to="/login">Login</q-btn>
+        </div>
       </div>
     </div>
   </q-page>
@@ -92,9 +114,16 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import useUserContextAPI from 'components/usercontext';
+import { AuthenticationType } from 'components/models';
 
 export default defineComponent({
   name: 'UserContext',
+  data() {
+    return {
+      //'importing enum' in order to be used in template
+      AuthenticationType
+    };
+  },
   methods: {
     async onLogout() {
       await this.resetUserContextData()
@@ -106,8 +135,8 @@ export default defineComponent({
     roleAdmin(): boolean { return this.hasRole('ADMIN'); },
   },
   setup() {
-    const { basicCredentials, userContext, hasRole, resetUserContextData, refreshUserContextData } = useUserContextAPI();
-    return { basicCredentials, userContext, hasRole, resetUserContextData, refreshUserContextData };
+    const { authenticationType, ssoDevOverBasic, basicCredentials, userContext, hasRole, resetUserContextData, refreshUserContextData } = useUserContextAPI();
+    return { authenticationType, ssoDevOverBasic, basicCredentials, userContext, hasRole, resetUserContextData, refreshUserContextData };
   },
 });
 </script>
