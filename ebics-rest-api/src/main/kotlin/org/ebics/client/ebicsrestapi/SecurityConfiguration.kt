@@ -33,17 +33,17 @@ class SecurityConfiguration() : WebSecurityConfigurerAdapter(true) {
     }
 
     override fun configure(http: HttpSecurity) {
-        //http.httpBasic().and().authorizeRequests().antMatchers("/users", "/").permitAll().anyRequest().authenticated()
         http
             .httpBasic()
             .and()
             .authorizeRequests()
-            .antMatchers(HttpMethod.GET, "/bankconnections").hasAnyRole("USER", "GUEST")
+            .antMatchers(HttpMethod.GET, "/bankconnections").hasAnyRole("ADMIN", "USER", "GUEST")
             .antMatchers(HttpMethod.POST, "/bankconnections/{\\d+}/H00{\\d+}/**").hasAnyRole("USER", "GUEST")
             .antMatchers(HttpMethod.GET, "/bankconnections/{\\d+}/H00{\\d+}/**").hasAnyRole("USER", "GUEST")
             .antMatchers(HttpMethod.POST, "/bankconnections").hasRole("USER")
-            .antMatchers(HttpMethod.PUT, "/bankconnections").hasRole("USER")
-            .antMatchers(HttpMethod.DELETE, "/bankconnections").hasRole("USER")
+            .antMatchers(HttpMethod.PUT, "/bankconnections/{\\d+}").hasRole("USER")
+            .antMatchers(HttpMethod.DELETE, "/bankconnections/{\\d+}").hasAnyRole("ADMIN", "USER")
+            .antMatchers(HttpMethod.GET, "/banks/**").hasAnyRole("ADMIN", "USER")
             .antMatchers(HttpMethod.POST, "/banks/**").hasRole("ADMIN")
             .antMatchers(HttpMethod.PUT, "/banks/**").hasRole("ADMIN")
             .antMatchers(HttpMethod.PATCH, "/banks/**").hasRole("ADMIN")
@@ -53,6 +53,7 @@ class SecurityConfiguration() : WebSecurityConfigurerAdapter(true) {
             .cors().and()
             .csrf().disable()
             .formLogin().disable();
+        //http.httpBasic().and().authorizeRequests().antMatchers("/users", "/").permitAll().anyRequest().authenticated()
 
     }
 }

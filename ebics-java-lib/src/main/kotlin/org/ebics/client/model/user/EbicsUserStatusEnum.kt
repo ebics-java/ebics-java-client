@@ -41,6 +41,8 @@ enum class EbicsUserStatusEnum {
                 }
             //Can be reset in any status
             EbicsUserAction.RESET -> CREATED
+            //Creating letters doesn't change state
+            EbicsUserAction.CREATE_LETTERS -> this
         }
     }
 
@@ -48,6 +50,8 @@ enum class EbicsUserStatusEnum {
         when (action) {
             EbicsUserAction.CREATE_KEYS ->
                 require(this == CREATED || this == NEW) { "$action action cant be executed at user state: $this" }
+            EbicsUserAction.CREATE_LETTERS ->
+                require(this != CREATED) { "$action action cant be executed at user state: $this" }
             EbicsUserAction.INI ->
                 require(this == NEW || this == LOCKED || this == PARTLY_INITIALIZED_HIA) { "$action action cant be executed at user state: $this" }
             EbicsUserAction.HIA ->

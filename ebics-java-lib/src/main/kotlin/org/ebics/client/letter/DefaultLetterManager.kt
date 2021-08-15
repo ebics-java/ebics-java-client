@@ -35,14 +35,14 @@ import java.util.*
  */
 class DefaultLetterManager(private val locale: Locale) : LetterManager {
     @Throws(GeneralSecurityException::class, IOException::class, EbicsException::class)
-    override fun createA005Letter(user: EbicsUser, userCert: UserCertificateManager): InitLetter =
+    override fun createA005Letter(user: EbicsUser, userCert: UserCertificateManager): AbstractInitLetter =
         A005Letter(locale, user, userCert)
 
     @Throws(GeneralSecurityException::class, IOException::class, EbicsException::class)
-    override fun createE002Letter(user: EbicsUser, userCert: UserCertificateManager): InitLetter =
+    override fun createE002Letter(user: EbicsUser, userCert: UserCertificateManager): AbstractInitLetter =
         E002Letter(locale, user, userCert)
 
     @Throws(GeneralSecurityException::class, IOException::class, EbicsException::class)
-    override fun createX002Letter(user: EbicsUser, userCert: UserCertificateManager): InitLetter =
+    override fun createX002Letter(user: EbicsUser, userCert: UserCertificateManager): AbstractInitLetter =
         X002Letter(locale, user, userCert)
 }

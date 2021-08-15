@@ -19,6 +19,7 @@
 package org.ebics.client.api
 
 import org.ebics.client.exception.EbicsException
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.OutputStream
 import java.security.GeneralSecurityException
@@ -39,6 +40,13 @@ interface InitLetter {
      */
     @Throws(IOException::class)
     fun writeTo(output: OutputStream)
+
+    fun toStr(): String {
+        ByteArrayOutputStream().use { out ->
+            writeTo(out)
+            return out.toString("UTF-8")
+        }
+    }
 
     /**
      * Returns the initialization letter title.

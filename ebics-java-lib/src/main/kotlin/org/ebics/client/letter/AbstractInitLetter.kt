@@ -39,7 +39,7 @@ abstract class AbstractInitLetter(
     certTitle: String,
     certificate: ByteArray?,
     hashTitle: String,
-    hash: ByteArray
+    val hash: ByteArray
 ) : InitLetter {
 
     private val letter: Letter = Letter(

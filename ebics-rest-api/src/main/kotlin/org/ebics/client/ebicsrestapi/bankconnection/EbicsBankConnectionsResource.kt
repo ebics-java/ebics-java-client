@@ -26,9 +26,6 @@ class EbicsBankConnectionsResource (
     fun updateBankConnection(@PathVariable userId:Long, @RequestBody bankConnection: BankConnection) =
         userService.updateUserAndPartner(userId, bankConnection)
 
-    @PostMapping("{userId}/certificates")
-    fun createBankConnectionUserCertificates(@PathVariable userId: Long, @RequestBody userPass: UserPass):Long = userService.createOrUpdateUserCertificates(userId, userPass.password)
-
     @PostMapping("{userId}/resetStatus")
     fun resetBankConnectionStatus(@PathVariable userId: Long) = userService.resetStatus(userId)
 }
