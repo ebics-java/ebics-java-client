@@ -69,7 +69,7 @@ export default function useUserAPI(userId: number | undefined) {
   const createOrUpdateUserData = () => {
     if (userId === undefined) {
       api
-        .post<UserPartnerBank>('/users', userPartnerBank.value)
+        .post<UserPartnerBank>('/bankconnections', userPartnerBank.value)
         .then(() => {
           q.notify({
             color: 'green-4',

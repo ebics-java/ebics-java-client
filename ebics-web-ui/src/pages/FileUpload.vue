@@ -208,7 +208,11 @@ export default defineComponent({
     },
     async onSubmit() { 
       console.log(this.file); 
-      const uploadRequest = {} as UploadRequestH004;
+      const uploadRequest = {
+        orderType: this.orderType, 
+        attributeType: this.signatureOZHNN ? 'OZHNN' : 'DZHNN',
+        params: new Map(),
+      } as UploadRequestH004;
       if (this.binary && this.file) {
         await this.ebicsUploadRequest(this.user, uploadRequest, this.file)
       } else if (!this.binary && this.fileText) {

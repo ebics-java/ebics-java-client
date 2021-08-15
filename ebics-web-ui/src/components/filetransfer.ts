@@ -1,4 +1,3 @@
-import { ref } from 'vue';
 import {
   User,
   EbicsApiError,
@@ -7,12 +6,12 @@ import {
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import { isAxiosError } from 'components/utils';
+import usePasswordAPI from './password';
 
-
-export default function useUserInitAPI() {
+export default function useFileTransferAPI() {
   const q = useQuasar();
 
-  const tempPassword = ref<string | undefined>('');
+  const { promptCertPassword, resetCertPassword } = usePasswordAPI();
 
   const apiOkHandler = (msg: string): void => {
     q.notify({
@@ -27,17 +26,18 @@ export default function useUserInitAPI() {
    * REST API Error Handler
    * - Log the whole error in console
    * - Notify user with some readable error message
+   * @param user the related user 
    * @param msg context message, for example 'user A initialization'
    * @param error REST API call error
    */
-  const apiErrorHandler = (msg: string, error: unknown): void => {
+  const apiErrorHandler = (user: User, msg: string, error: unknown): void => {
     console.log(JSON.stringify(error));
     if (isAxiosError<EbicsApiError>(error)) {
       if (error.response !== null) {
         const ebicsApiError = error.response?.data as EbicsApiError;
         if (ebicsApiError.message.includes('wrong password')) {
           //In case of error 'wrong password' we have to reset temporary stored password in order to ask for new one
-          tempPassword.value = undefined;
+          resetCertPassword(user);
         }
         let message = ebicsApiError.message;
         if (!ebicsApiError.description.includes(message))
@@ -88,8 +88,10 @@ export default function useUserInitAPI() {
        uploadFile: Blob,
     ): Promise<void> => {
       try {
+        uploadRequest.password  = await promptCertPassword(user, false);
+        console.log(JSON.stringify(uploadRequest));
         const formData = new FormData();
-        formData.append('uploadRequest', JSON.stringify(uploadRequest));
+        formData.append('uploadRequest', new Blob([JSON.stringify(uploadRequest)], {type:'application/json'}));
         formData.append('uploadFile', uploadFile);
         await api.post<UploadRequest>(
           `/bankconnections/${user.id}/${user.ebicsVersion}/upload`,
@@ -99,7 +101,7 @@ export default function useUserInitAPI() {
           `Upload executed successfully for user name: ${user.name}`
         );
       } catch (error) {
-        apiErrorHandler('Upload Request failed: ', error);
+        apiErrorHandler(user, 'Upload Request failed: ', error);
       }
     };
 
