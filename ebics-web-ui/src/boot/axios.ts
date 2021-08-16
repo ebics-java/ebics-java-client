@@ -15,8 +15,8 @@ declare module '@vue/runtime-core' {
 // for each client)
 const api = axios.create(
   { 
-    baseURL: 'http://localhost:8080/EbicsWebClient',
-    //baseURL: 'http://localhost',
+    //For dev purposes only (otherwise comment for production, because the ContextPath, port, protocol can be changed)
+    baseURL: 'https://localhost/EbicsWebClient',
   });
 
 export default boot(({ app }) => {
