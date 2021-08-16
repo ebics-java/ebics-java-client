@@ -82,7 +82,7 @@ export default function useUserContextAPI() {
       );
       //We have credential, we do login API call to get principal and roles from backend
       try {
-        const response = await api.get<UserContext>('/user');
+        const response = await api.get<UserContext>('user');
         q.notify({
           color: 'positive',
           position: 'bottom-right',

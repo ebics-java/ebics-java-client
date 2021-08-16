@@ -140,7 +140,7 @@ export default defineComponent({
   methods: {
     loadData() {
       api
-        .get<Bank[]>('/banks')
+        .get<Bank[]>('banks')
         .then((response) => {
           this.banks = response.data;
         })
@@ -155,7 +155,7 @@ export default defineComponent({
     },
     deleteBank(bankId: number) {
       api
-        .delete<Bank[]>(`/banks/${bankId}`)
+        .delete<Bank[]>(`banks/${bankId}`)
         .then(() => {
           this.$q.notify({
             color: 'positive',

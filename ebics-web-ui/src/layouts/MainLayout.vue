@@ -100,12 +100,6 @@ import useUserContextAPI from 'components/usercontext';
 export default defineComponent({
   name: 'MainLayout',
 
-  computed: {
-    userLoginButtonText(): string {
-      return (this.userContext) == undefined ? 'Login' : `User: ${this.userContext.name}`;
-    }
-  },
-
   setup () {
     const leftDrawerOpen = ref(false)
     const { userContext } = useUserContextAPI();

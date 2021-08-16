@@ -16,7 +16,7 @@ export default function useBanksAPI() {
     //Function to refresh banks data
     const refreshBanksData = () => {
         api
-          .get<Bank[]>('/banks')
+          .get<Bank[]>('banks')
           .then((response) => {
             banks.value = response.data;
           })

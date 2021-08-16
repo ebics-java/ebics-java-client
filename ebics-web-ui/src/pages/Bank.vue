@@ -83,7 +83,7 @@ export default defineComponent({
       return regex.test(url)
     },
     loadData (bankId: number) {
-      api.get<Bank>(`/banks/${bankId}`)
+      api.get<Bank>(`banks/${bankId}`)
         .then((response) => {
           this.bank = response.data
         })
@@ -98,7 +98,7 @@ export default defineComponent({
     },
     onSubmit (bankId: number | undefined) {  
       if (bankId === undefined) {
-        api.post<Bank>('/banks', this.bank)
+        api.post<Bank>('banks', this.bank)
           .then(() => {
             this.$q.notify({
               color: 'green-4',
@@ -117,7 +117,7 @@ export default defineComponent({
             })
           })
       } else {
-        api.put<Bank>(`/banks/${bankId}`, this.bank)
+        api.put<Bank>(`banks/${bankId}`, this.bank)
           .then(() => {
             this.$q.notify({
               color: 'green-4',

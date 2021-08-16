@@ -76,34 +76,34 @@ export default function useFileTransferAPI() {
   };
 
  
-    /**
+  /**
    * Executest EBICS Admin Ordertype requests like INI, HIA, HPB, SPR,..
    * @param adminOrderType
    * @param pass
    * @returns
    */
-     const ebicsUploadRequest = async (
-       user: User,
-       uploadRequest: UploadRequest,
-       uploadFile: Blob,
-    ): Promise<void> => {
-      try {
-        uploadRequest.password  = await promptCertPassword(user, false);
-        console.log(JSON.stringify(uploadRequest));
-        const formData = new FormData();
-        formData.append('uploadRequest', new Blob([JSON.stringify(uploadRequest)], {type:'application/json'}));
-        formData.append('uploadFile', uploadFile);
-        await api.post<UploadRequest>(
-          `/bankconnections/${user.id}/${user.ebicsVersion}/upload`,
-          formData, {headers: {'Content-Type': 'multipart/form-data'}}
-        );
-        apiOkHandler(
-          `Upload executed successfully for user name: ${user.name}`
-        );
-      } catch (error) {
-        apiErrorHandler(user, 'Upload Request failed: ', error);
-      }
-    };
+  const ebicsUploadRequest = async (
+      user: User,
+      uploadRequest: UploadRequest,
+      uploadFile: Blob,
+  ): Promise<void> => {
+    try {
+      uploadRequest.password  = await promptCertPassword(user, false);
+      console.log(JSON.stringify(uploadRequest));
+      const formData = new FormData();
+      formData.append('uploadRequest', new Blob([JSON.stringify(uploadRequest)], {type:'application/json'}));
+      formData.append('uploadFile', uploadFile);
+      await api.post<UploadRequest>(
+        `bankconnections/${user.id}/${user.ebicsVersion}/upload`,
+        formData, {headers: {'Content-Type': 'multipart/form-data'}}
+      );
+      apiOkHandler(
+        `Upload executed successfully for user name: ${user.name}`
+      );
+    } catch (error) {
+      apiErrorHandler(user, 'Upload Request failed: ', error);
+    }
+  };
 
   return {
     ebicsUploadRequest,
