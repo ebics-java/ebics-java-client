@@ -41,9 +41,9 @@ class UserCertificateService(val userRepository: UserRepository, val userKeyStor
             val encryption = createE002Letter(user, userCert)
             val authentication = createX002Letter(user, userCert)
             return CertificateLetters(
-                Letter(signature.toStr(), signature.hash.toHexString()),
-                Letter(encryption.toStr(), encryption.hash.toHexString()),
-                Letter(authentication.toStr(), authentication.hash.toHexString())
+                Letter(signature.toStr(), String(signature.hash)),
+                Letter(encryption.toStr(), String(encryption.hash)),
+                Letter(authentication.toStr(), String(authentication.hash))
             )
         }
     }

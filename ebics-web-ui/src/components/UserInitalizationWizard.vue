@@ -59,9 +59,40 @@
       >
         In order to activate the this EBICS user you have to provide bellow
         generated hash keys to your bank. The bank will check provided hash keys
-        and activate the EBICS user. Letter A005: XB CX 56 Letter E002: XB CX 56
-        <q-btn
-          label="Print Letters"
+        and activate the EBICS user. 
+        <q-list v-if="letters" bordered padding class="rounded-borders">
+          <q-item  v-ripple>
+            <q-item-section>
+              <q-item-label lines="1">Signature (A005)</q-item-label>
+              <q-item-label caption>{{letters.signature.hash}}</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-btn class="gt-xs" size="15px" flat dense  icon="content_copy"></q-btn>
+            </q-item-section>
+          </q-item>
+          <q-item  v-ripple>
+            <q-item-section>
+              <q-item-label lines="1">Encryption (E002)</q-item-label>
+              <q-item-label caption>{{letters.encryption.hash}}</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-btn class="gt-xs" size="15px" flat dense  icon="content_copy"></q-btn>
+            </q-item-section>
+          </q-item>
+          <q-item  v-ripple>
+            <q-item-section>
+              <q-item-label lines="1">Authentication (X002)</q-item-label>
+              <q-item-label caption>{{letters.authentication.hash}}</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-btn class="gt-xs" size="15px" flat dense  icon="content_copy"></q-btn>
+            </q-item-section>
+          </q-item>
+        </q-list>
+        
+        <q-btn v-else
+          @click="refreshUserLetters()"
+          label="Refresh User Letters"
           color="primary"
           class="q-ml-sm"
           icon="print"
@@ -130,7 +161,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { UserIniWizzStep, AdminOrderType } from 'components/models';
+import { UserIniWizzStep, AdminOrderType, UserLettersResponse } from 'components/models';
 import { QStepper } from 'quasar';
 import useUserDataAPI from 'components/user';
 import useUserInitAPI from 'components/userinit';
@@ -148,6 +179,7 @@ export default defineComponent({
     return {
       //'importing enum' in order to be used in template
       UserIniWizzStep,
+      letters: undefined as (UserLettersResponse | undefined)
     };
   },
   methods: {
@@ -169,10 +201,8 @@ export default defineComponent({
     */
     async createUserKeys() {
       try {
-        //Get password for user certificates
-        const pass = await this.promptCertPassword(this.user, true);
         //Upload user keys (INI and/or HIA) depending on user status
-        await this.createUserKeysRequest(pass);
+        await this.createUserKeysRequest();
         //Refresshing user status on success
         this.refreshUserData();
       } catch (error) {
@@ -181,12 +211,12 @@ export default defineComponent({
     },
     async uploadUserKeys() {
       try {
-        //Get password for user certificates
-        const pass = await this.promptCertPassword(this.user, false);
+        //Create user letters
+        this.letters = await this.getUserLetters();
         //Execute INI request
-        await this.ebicsAdminTypeRequest(AdminOrderType.INI, pass);
+        await this.ebicsAdminTypeRequest(AdminOrderType.INI);
         //Execute HIA request
-        await this.ebicsAdminTypeRequest(AdminOrderType.HIA, pass);
+        await this.ebicsAdminTypeRequest(AdminOrderType.HIA);
         //Refresh user data
         this.refreshUserData();
       } catch (error) {
@@ -196,12 +226,13 @@ export default defineComponent({
     printUserLetters() {
       this.nextStep();
     },
+    async refreshUserLetters() {
+      this.letters = await this.getUserLetters();
+    },
     async downloadBankKeys() {
       try {
-        //Get password for user certificates
-        const pass = await this.promptCertPassword(this.user, false);
-        //Upload user keys (INI and/or HIA) depending on user status
-        await this.ebicsAdminTypeRequest(AdminOrderType.HPB, pass);
+        //Download bank keys using HPB order type
+        await this.ebicsAdminTypeRequest(AdminOrderType.HPB);
         //Refresshing user status on success
         this.refreshUserData();
       } catch (error) {
@@ -223,6 +254,7 @@ export default defineComponent({
       createUserKeysRequest,
       ebicsAdminTypeRequest,
       resetUserStatusRequest,
+      getUserLetters,
     } = useUserInitAPI(user);
 
     return {
@@ -233,6 +265,7 @@ export default defineComponent({
       createUserKeysRequest,
       ebicsAdminTypeRequest,
       resetUserStatusRequest,
+      getUserLetters,
       promptCertPassword,
     };
   },

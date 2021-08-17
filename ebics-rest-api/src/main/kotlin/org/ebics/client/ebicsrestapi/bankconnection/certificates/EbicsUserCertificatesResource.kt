@@ -14,6 +14,6 @@ class EbicsUserCertificatesResource (
     @PostMapping("")
     fun createUserCertificates(@PathVariable userId: Long, @RequestBody userPass: UserPass):Long = certificateService.createOrUpdateUserCertificates(userId, userPass.password)
 
-    @GetMapping("letters")
+    @PostMapping("letters")
     fun getUserLetters(@PathVariable userId: Long, @RequestBody userPass: UserPass) = certificateService.getUserLetters(userId, userPass.password)
 }

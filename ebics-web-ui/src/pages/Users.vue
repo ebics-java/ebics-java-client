@@ -23,7 +23,7 @@
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               {{ col.value }}
             </q-td>
-            <q-td :style="{ width: '220px' }">
+            <q-td :style="{ width: '330px' }">
               <div class="q-gutter-sm">
                 <q-btn
                   size="sm"
@@ -32,6 +32,14 @@
                   icon-right="edit"
                   no-caps
                   @click="routeToUserPage(Number(props.key))"
+                />
+                <q-btn
+                  size="sm"
+                  color="primary"
+                  label="Initialize"
+                  icon-right="rotate_right"
+                  no-caps
+                  @click="routeToInitPage(Number(props.key))"
                 />
                 <q-btn
                   size="sm"
@@ -179,6 +187,14 @@ export default defineComponent({
         params: routeParams,
       });
     },
+    async routeToInitPage(userId: number) {
+      const routeParams = { id: userId };
+      const routeName = 'user/init';
+      await this.$router.push({
+        name: routeName,
+        params: routeParams,
+      });
+    },
     exportTable() {
       // naive encoding to csv format
       this.$q.notify({
@@ -224,14 +240,6 @@ export default defineComponent({
         label: 'Bank Name',
         align: 'left',
         field: (row: User) => row?.partner?.bank?.name ?? '',
-        sortable: true,
-      },
-      {
-        name: 'hostId',
-        required: true,
-        label: 'User DN',
-        align: 'left',
-        field: (row: User) => row.dn,
         sortable: true,
       },
     ];

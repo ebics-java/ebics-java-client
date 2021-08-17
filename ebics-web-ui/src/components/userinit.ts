@@ -5,6 +5,7 @@ import {
   UserPassword,
   AdminOrderType,
   EbicsApiError,
+  UserLettersResponse,
 } from 'components/models';
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
@@ -19,7 +20,7 @@ export default function useUserInitAPI(
   user: Ref<User>
 ) {
   const q = useQuasar();
-  const { resetCertPassword } = usePasswordAPI();
+  const { promptCertPassword, resetCertPassword } = usePasswordAPI();
 
   const apiOkHandler = (msg: string): void => {
     q.notify({
@@ -136,14 +137,30 @@ export default function useUserInitAPI(
     return step < actualWizardStep.value;
   };
 
-  const createUserKeysRequest = async (pass: string): Promise<void> => {
+  const createUserKeysRequest = async (): Promise<void> => {
     try {
+      const pass = await promptCertPassword(user.value, true);
       await api.post<UserPassword>(`bankconnections/${user.value.id}/certificates`, {
         password: pass,
       });
       apiOkHandler(
         `Certificates created successfully for user name: ${user.value.name} dn: ${user.value.dn}`
       );
+    } catch (error) {
+      apiErrorHandler('Create certificates failed: ', error);
+    }
+  };
+
+  const getUserLetters = async (): Promise<UserLettersResponse | undefined> => {
+    try {
+      const pass = await promptCertPassword(user.value, false);
+      const response = await api.post<UserLettersResponse>(`bankconnections/${user.value.id}/certificates/letters`, { 
+        password: pass
+      });
+      apiOkHandler(
+        `Certificates created successfully for user name: ${user.value.name} dn: ${user.value.dn}`
+      );
+      return response.data;
     } catch (error) {
       apiErrorHandler('Create certificates failed: ', error);
     }
@@ -167,10 +184,10 @@ export default function useUserInitAPI(
    * @returns
    */
   const ebicsAdminTypeRequest = async (
-    adminOrderType: AdminOrderType,
-    pass: string
+    adminOrderType: AdminOrderType
   ): Promise<void> => {
     try {
+      const pass = await promptCertPassword(user.value, false);
       await api.post<UserPassword>(
         `bankconnections/${user.value.id}/${user.value.ebicsVersion}/send${adminOrderType}`,
         { password: pass }
@@ -187,6 +204,7 @@ export default function useUserInitAPI(
     actualWizardStep,
     isStepDone,
     createUserKeysRequest,
+    getUserLetters,
     ebicsAdminTypeRequest,
     resetUserStatusRequest,
   };

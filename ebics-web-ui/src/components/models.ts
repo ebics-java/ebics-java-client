@@ -137,6 +137,17 @@ export interface UploadRequestH004 extends UploadRequest {
   params: Map<string, string>;
 }
 
+interface Letter {
+  letterText: string;
+  hash: string;
+}
+
+export interface UserLettersResponse {
+  signature: Letter;
+  encryption: Letter;
+  authentication: Letter;
+}
+
 export enum UserIniWizzStep {
   CreateUserKeys = 1,
   UploadUserKeys,

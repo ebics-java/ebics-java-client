@@ -42,6 +42,18 @@ const routes: RouteRecordRaw[] = [
           return { id };
         },
       },
+      {
+        path: '/user/:id/init',
+        name: 'user/init',
+        component: () => import('pages/UserInitWizz.vue'),
+        props: (route) => {
+          const id = Number.parseInt(route.params.id as string, 10);
+          if (Number.isNaN(id)) {
+            return undefined;
+          }
+          return { id };
+        },
+      },
       { path: '/upload', component: () => import('pages/FileUpload.vue') },
       { path: '/userctx', component: () => import('pages/UserContext.vue') },
       { path: '/userlogin', component: () => import('pages/UserLogin.vue') },
