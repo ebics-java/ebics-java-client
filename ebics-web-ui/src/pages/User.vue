@@ -1,8 +1,8 @@
 <template>
   <q-page class="justify-evenly">
     <div class="q-pa-md">
-      <h5 v-if="id !== undefined">Edit existing user {{ id }}</h5>
-      <h5 v-else>Add new user</h5>
+      <h5 v-if="id !== undefined">Edit existing bank connection {{ user.name }}</h5>
+      <h5 v-else>Add new bank connection</h5>
 
       <div class="q-pa-md" style="max-width: 400px">
         <q-form @submit="onSubmit()" @reset="onCancel" class="q-gutter-md">
@@ -105,8 +105,6 @@
 
           <q-input filled v-model="user.userStatus" label="EBICS user status" />
 
-          <user-ini-wizz v-if="user.id !== undefined" :id="user.id" />
-
           <div>
             <q-btn
               v-if="id === undefined"
@@ -131,14 +129,13 @@
 </template>
 
 <script lang="ts">
-import UserIniWizz from 'components/UserInitalizationWizard.vue';
 import { defineComponent } from 'vue';
-import useUserDataAPI from 'components/user';
-import useBanksDataAPI from 'components/banks';
+import useUserDataAPI from 'components/bankconnection';
+import useBanksDataAPI from 'src/components/bank-api';
 
 export default defineComponent({
   name: 'User',
-  components: { UserIniWizz },
+  components: { },
   props: {
     id: {
       type: Number,

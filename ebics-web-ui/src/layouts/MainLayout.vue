@@ -51,7 +51,7 @@
             </q-item-section>
 
             <q-item-section>
-              Users
+              Bank connections
             </q-item-section>
           </q-item>
 

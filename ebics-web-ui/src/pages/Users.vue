@@ -1,9 +1,9 @@
 <template>
   <q-page class="justify-evenly">
     <div class="q-pa-md">
-      <h5>Users</h5>
+      <h5>Bank connections</h5>
       <q-table
-        title="Users"
+        title="Bank connections"
         :filter="filter"
         :rows="users"
         :columns="columns"

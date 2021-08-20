@@ -10,8 +10,8 @@
             v-model="user"
             :options="users"
             :option-label="userLabel"
-            label="EBICS User"
-            hint="Select EBICS User"
+            label="EBICS Bank connection"
+            hint="Select EBICS bank connection"
             lazy-rules
             :rules="[(val) => val.id != 0 || 'Please select valid EBICS User']"
           />
@@ -73,6 +73,8 @@
             type="textarea"
             label="Input file content"
           />
+
+          <q-btn label="IDs" @click="setUniqueIds()" color="primary" />
 
           <div>
             <q-btn label="Upload" type="submit" color="primary" />
@@ -136,6 +138,10 @@ export default defineComponent({
     };
   },
   methods: {
+    setUniqueIds() {
+
+    },
+
     btfLabel(btf: Btf | undefined):string {
       return (btf instanceof Btf) ? btf.label() : ''
     },

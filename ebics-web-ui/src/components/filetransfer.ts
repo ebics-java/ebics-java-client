@@ -6,7 +6,7 @@ import {
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import { isAxiosError } from 'components/utils';
-import usePasswordAPI from './password';
+import usePasswordAPI from './password-api';
 
 export default function useFileTransferAPI() {
   const q = useQuasar();
