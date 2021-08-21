@@ -194,7 +194,7 @@ export default defineComponent({
         //Get password for user certificates
         await this.resetUserStatusRequest();
         //Refresshing user status on success
-        this.refreshUserData();
+        await this.refreshUserData();
       } catch (error) {
         console.log(error);
       }
@@ -207,7 +207,7 @@ export default defineComponent({
         //Upload user keys (INI and/or HIA) depending on user status
         await this.createUserKeysRequest();
         //Refresshing user status on success
-        this.refreshUserData();
+        await this.refreshUserData();
       } catch (error) {
         console.log(error);
       }
@@ -221,7 +221,7 @@ export default defineComponent({
         //Execute HIA request
         await this.ebicsAdminTypeRequest(AdminOrderType.HIA);
         //Refresh user data
-        this.refreshUserData();
+        await this.refreshUserData();
       } catch (error) {
         console.log(error);
       }
@@ -237,7 +237,7 @@ export default defineComponent({
         //Download bank keys using HPB order type
         await this.ebicsAdminTypeRequest(AdminOrderType.HPB);
         //Refresshing user status on success
-        this.refreshUserData();
+        await this.refreshUserData();
       } catch (error) {
         console.log(error);
       }

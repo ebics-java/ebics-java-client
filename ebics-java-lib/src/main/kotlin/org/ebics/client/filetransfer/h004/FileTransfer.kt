@@ -87,11 +87,10 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
      */
     @Throws(IOException::class, EbicsException::class)
     fun sendFile(content: ByteArray, uploadOrder: EbicsUploadOrder) {
-        val orderType = uploadOrder.adminOrderType
         val sender = HttpRequestSender(session)
         val initializer = UploadInitializationRequestElement(
             session,
-            orderType, uploadOrder.attributeType,
+            uploadOrder.adminOrderType, uploadOrder.orderType, uploadOrder.attributeType,
             content
         )
         initializer.build()
@@ -102,8 +101,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         
         val response = InitializationResponseElement(
             responseBody,
-            orderType,
-            DefaultEbicsRootElement.generateName(orderType)
+            DefaultEbicsRootElement.generateName(uploadOrder.orderType)
         )
         response.build()
         session.configuration.traceManager.trace(response, session)
@@ -112,7 +110,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
             val segmentNumber = state.next()
             sendFileSegment(
                 initializer.getContent(segmentNumber), segmentNumber, state.isLastSegment,
-                state.transactionId, orderType
+                state.transactionId, uploadOrder.orderType ?: "FUL"
             )
         }
     }
@@ -133,7 +131,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         segmentNumber: Int,
         lastSegment: Boolean,
         transactionId: ByteArray,
-        orderType: EbicsAdminOrderType
+        orderType: String
     ) {
         logger.info(
             getString(
@@ -194,7 +192,6 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         
         val response = DownloadInitializationResponseElement(
             responseBody,
-            orderType,
             DefaultEbicsRootElement.generateName(orderType)
         )
         response.build()

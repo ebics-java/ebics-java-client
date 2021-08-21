@@ -58,12 +58,6 @@ export interface Partner {
   bank: Bank;
 }
 
-export interface DeleteConfirmDialog {
-  show: boolean;
-  id: number;
-  name: string;
-}
-
 export interface BtfInt {
   serviceName: string;
   serviceOption: string;

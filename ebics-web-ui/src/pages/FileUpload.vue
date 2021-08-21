@@ -139,7 +139,7 @@ export default defineComponent({
   },
   methods: {
     setUniqueIds() {
-
+      console.log('Unique')
     },
 
     btfLabel(btf: Btf | undefined):string {

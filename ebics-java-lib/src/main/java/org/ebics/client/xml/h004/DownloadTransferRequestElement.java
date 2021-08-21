@@ -52,7 +52,7 @@ public class DownloadTransferRequestElement extends TransferRequestElement {
                                         boolean lastSegment,
                                         byte[] transactionId)
   {
-    super(session, generateName(type), type, segmentNumber, lastSegment, transactionId);
+    super(session, generateName(type), segmentNumber, lastSegment, transactionId);
   }
 
   @Override

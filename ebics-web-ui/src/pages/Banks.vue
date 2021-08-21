@@ -38,11 +38,7 @@
                   label="Delete"
                   color="accent"
                   icon-right="delete"
-                  @click="
-                    deleteBankDialog.show = true;
-                    deleteBankDialog.id = Number(props.key);
-                    deleteBankDialog.name = props.cols[0].value;
-                  "
+                  @click="deleteBank(Number(props.key),props.cols[0].value);"
                 />
               </div>
             </q-td>
@@ -80,35 +76,13 @@
           </div>
         </template>
       </q-table>
-      <q-dialog v-model="deleteBankDialog.show" persistent>
-        <q-card>
-          <q-card-section class="row items-center">
-            <q-avatar icon="delete" color="primary" text-color="white" />
-            <span class="q-ml-sm">
-              Do you want to delete selected bank:
-              {{ deleteBankDialog.name }}.
-            </span>
-          </q-card-section>
-
-          <q-card-actions align="right">
-            <q-btn flat label="Cancel" color="primary" v-close-popup />
-            <q-btn
-              flat
-              label="Delete"
-              color="primary"
-              v-close-popup
-              @click="deleteBank(this.deleteBankDialog.id)"
-            />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
     </div>
   </q-page>
 </template>
 
 <script lang="ts">
-import { api } from 'boot/axios';
-import { Bank, DeleteConfirmDialog } from 'components/models';
+import { Bank } from 'components/models';
+import useBanksAPI from 'src/components/banks';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -116,63 +90,10 @@ export default defineComponent({
   components: {},
   data() {
     return {
-      confirmDelete: false,
-      deleteBankDialog: {
-        show: false,
-      } as DeleteConfirmDialog,
       filter: '',
-      banks: [
-        {
-          id: 1,
-          bankURL: 'http://ubs.com/ebics',
-          name: 'UBC CH PROD',
-          hostId: 'EXUBSCH',
-        } as Bank,
-        {
-          id: 2,
-          bankURL: 'http://zkb.ch/ebics',
-          name: 'ZKB PROD',
-          hostId: 'EXZKBCH',
-        } as Bank,
-      ],
     };
   },
   methods: {
-    loadData() {
-      api
-        .get<Bank[]>('banks')
-        .then((response) => {
-          this.banks = response.data;
-        })
-        .catch((error: Error) => {
-          this.$q.notify({
-            color: 'negative',
-            position: 'bottom-right',
-            message: `Loading failed: ${error.message}`,
-            icon: 'report_problem',
-          });
-        });
-    },
-    deleteBank(bankId: number) {
-      api
-        .delete<Bank[]>(`banks/${bankId}`)
-        .then(() => {
-          this.$q.notify({
-            color: 'positive',
-            position: 'bottom-right',
-            message: 'Delete bank done',
-            icon: 'report_info',
-          });
-          this.loadData()
-        }).catch((error: Error) => {
-          this.$q.notify({
-            color: 'negative',
-            position: 'bottom-right',
-            message: `Delete failed: ${error.message}`,
-            icon: 'report_info',
-          });
-        });
-    },
     /**
      * Route to Bank page
      * bankId
@@ -198,9 +119,6 @@ export default defineComponent({
         icon: 'report_info',
       });
     },
-  },
-  mounted() {
-    this.loadData();
   },
   setup() {
     const columns = [
@@ -229,7 +147,8 @@ export default defineComponent({
         sortable: true,
       },
     ];
-    return { columns };
+    const  { banks, deleteBank } = useBanksAPI()
+    return { columns, banks, deleteBank };
   },
 });
 </script>

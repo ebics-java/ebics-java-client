@@ -37,14 +37,12 @@ public class DownloadInitializationResponseElement extends InitializationRespons
   /**
    * Constructs a new <code>DInitializationResponseElement</code> object
    * @param factory the content factory
-   * @param orderType the order type
    * @param name the element name
    */
   public DownloadInitializationResponseElement(ContentFactory factory,
-                                               EbicsAdminOrderType orderType,
                                                String name)
   {
-    super(factory, orderType, name);
+    super(factory, name);
   }
 
   @Override

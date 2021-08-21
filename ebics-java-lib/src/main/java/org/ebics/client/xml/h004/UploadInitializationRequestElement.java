@@ -60,17 +60,18 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
   /**
    * Constructs a new <code>UInitializationRequestElement</code> for uploads initializations.
    * @param session the current ebics session.
-   * @param orderType the upload order type
+   * @param adminOrderType the upload order type
    * @param userData the user data to be uploaded
    * @throws EbicsException
    */
   public UploadInitializationRequestElement(EbicsSession session,
-                                            EbicsAdminOrderType orderType, AttributeType orderAttribute,
+                                            EbicsAdminOrderType adminOrderType, String orderType, AttributeType orderAttribute,
                                             byte[] userData)
     throws EbicsException
   {
-    super(session, orderType, generateName(orderType));
+    super(session, adminOrderType, generateName(adminOrderType));
     this.userData = userData;
+    this.orderType = orderType;
     keySpec = new SecretKeySpec(nonce, "EAS");
     splitter = new Splitter(userData, session.getConfiguration().isCompressionEnabled(), keySpec);
     if (orderAttribute == AttributeType.OZHNN) {
@@ -114,7 +115,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
 	                                          "http://www.w3.org/2001/04/xmlenc#sha256",
 	                                          decodeHex(session.getBankCert().getE002Digest()));
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
-    orderType = EbicsXmlFactory.createOrderType(type.toString());
+    orderType = EbicsXmlFactory.createOrderType(this.orderType);
     fileFormat = EbicsXmlFactory.createFileFormatType(session.getConfiguration().getLocale().getCountry().toUpperCase(),
 	                                              session.getSessionParam("FORMAT"));
 
@@ -211,6 +212,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
   // --------------------------------------------------------------------
 
   private final OrderAttributeType.Enum orderAttribute;
+  private final String orderType;
   private byte[]			userData;
   private UserSignature userSignature;
   private SecretKeySpec			keySpec;

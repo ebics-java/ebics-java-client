@@ -52,13 +52,13 @@ public class UploadTransferRequestElement extends TransferRequestElement {
    * @param content the content factory
    */
   public UploadTransferRequestElement(EbicsSession session,
-                                      EbicsAdminOrderType orderType,
+                                      String orderType,
                                       int segmentNumber,
                                       boolean lastSegment,
                                       byte[] transactionId,
                                       ContentFactory content)
   {
-    super(session, generateName(orderType), orderType, segmentNumber, lastSegment, transactionId);
+    super(session, generateName(orderType), segmentNumber, lastSegment, transactionId);
     this.content = content;
   }
 

@@ -131,7 +131,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import useUserDataAPI from 'components/bankconnection';
-import useBanksDataAPI from 'src/components/bank-api';
+import useBanksDataAPI from 'src/components/banks';
 
 export default defineComponent({
   name: 'User',
@@ -152,8 +152,8 @@ export default defineComponent({
     },
   },
   methods: {
-    onSubmit() {
-      this.createOrUpdateUserData();
+    async onSubmit() {
+      await this.createOrUpdateUserData();
     },
     onCancel() {
       this.$router.go(-1);

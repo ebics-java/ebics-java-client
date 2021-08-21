@@ -43,20 +43,17 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
    * Constructs a new <code>TransferRequestElement</code> element.
    * @param session the current ebics session
    * @param name the element name
-   * @param type the order type
    * @param segmentNumber the segment number to be sent
    * @param lastSegment is it the last segment?
    * @param transactionId the transaction ID
    */
   public TransferRequestElement(EbicsSession session,
                                 String name,
-                                EbicsAdminOrderType type,
                                 int segmentNumber,
                                 boolean lastSegment,
                                 byte[] transactionId)
   {
     super(session);
-    this.type = type;
     this.name = name;
     this.segmentNumber = segmentNumber;
     this.lastSegment = lastSegment;
@@ -96,13 +93,6 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
     }
   }
 
-  /**
-   * Returns the order type of the element.
-   * @return the order type element.
-   */
-  public String getOrderType() {
-    return type.toString();
-  }
 
   @Override
   public byte[] toByteArray() {
@@ -124,7 +114,6 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
   protected int				segmentNumber;
   protected boolean			lastSegment;
   protected byte[]			transactionId;
-  private EbicsAdminOrderType type;
   private String 			name;
   private static final long 		serialVersionUID = -4212072825371398259L;
 }

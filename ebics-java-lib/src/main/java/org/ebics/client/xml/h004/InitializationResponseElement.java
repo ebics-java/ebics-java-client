@@ -38,15 +38,12 @@ public class InitializationResponseElement extends DefaultResponseElement {
   /**
    * Constructs a new <code>InitializationResponseElement</code> element.
    * @param factory the content factory
-   * @param orderType the order type
    * @param name the element name
    */
   public InitializationResponseElement(ContentFactory factory,
-                                       EbicsAdminOrderType orderType,
                                        String name)
   {
     super(factory, name);
-    this.orderType = orderType;
   }
 
   @Override
@@ -76,20 +73,11 @@ public class InitializationResponseElement extends DefaultResponseElement {
     return transactionId;
   }
 
-  /**
-   * Returns the order type.
-   * @return the order type.
-   */
-  public String getOrderType() {
-    return orderType.toString();
-  }
-
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
   protected EbicsResponse			response;
-  private EbicsAdminOrderType orderType;
   private byte[]				transactionId;
   private static final long 			serialVersionUID = 7684048385353175772L;
 }

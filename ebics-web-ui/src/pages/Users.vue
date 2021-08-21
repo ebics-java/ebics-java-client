@@ -5,7 +5,7 @@
       <q-table
         title="Bank connections"
         :filter="filter"
-        :rows="users"
+        :rows="bankConnections"
         :columns="columns"
         row-key="id"
         selection="single"
@@ -46,11 +46,7 @@
                   label="Delete"
                   color="accent"
                   icon-right="delete"
-                  @click="
-                    deleteUserDialog.show = true;
-                    deleteUserDialog.id = Number(props.key);
-                    deleteUserDialog.name = props.cols[0].value;
-                  "
+                  @click="deleteBankConnection(Number(props.key), props.cols[0].value);"
                 />
               </div>
             </q-td>
@@ -88,36 +84,14 @@
           </div>
         </template>
       </q-table>
-      <q-dialog v-model="deleteUserDialog.show" persistent>
-        <q-card>
-          <q-card-section class="row items-center">
-            <q-avatar icon="delete" color="primary" text-color="white" />
-            <span class="q-ml-sm">
-              Do you want to delete selected user:
-              {{ deleteUserDialog.name }}.
-            </span>
-          </q-card-section>
-
-          <q-card-actions align="right">
-            <q-btn flat label="Cancel" color="primary" v-close-popup />
-            <q-btn
-              flat
-              label="Delete"
-              color="primary"
-              v-close-popup
-              @click="deleteUser(this.deleteUserDialog.id)"
-            />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
     </div>
   </q-page>
 </template>
 
 <script lang="ts">
-import { api } from 'boot/axios';
-import { User, DeleteConfirmDialog } from 'components/models';
+import { User } from 'components/models';
 import { defineComponent } from 'vue';
+import useBankConnectionsAPI from 'components/bankconnections'
 
 export default defineComponent({
   name: 'Users',
@@ -125,54 +99,10 @@ export default defineComponent({
   data() {
     return {
       confirmDelete: false,
-      deleteUserDialog: {
-        show: false,
-      } as DeleteConfirmDialog,
       filter: '',
-      users: [
-        {
-          id: 1,
-          name: 'TestUser1',
-        } as User,
-      ],
     };
   },
   methods: {
-    loadData() {
-      api
-        .get<User[]>('bankconnections')
-        .then((response) => {
-          this.users = response.data;
-        })
-        .catch((error: Error) => {
-          this.$q.notify({
-            color: 'negative',
-            position: 'bottom-right',
-            message: `Loading failed: ${error.message}`,
-            icon: 'report_problem',
-          });
-        });
-    },
-    deleteUser(userId: number) {
-      api
-        .delete<User>(`bankconnections/${userId}`)
-        .then(() => {
-          this.$q.notify({
-            color: 'positive',
-            position: 'bottom-right',
-            message: 'Delete user done',
-            icon: 'report_info',
-          });
-          this.loadData()
-        }).catch((error: Error) => {
-          this.$q.notify({
-            color: 'negative',
-            position: 'bottom-right',
-            message: `Delete failed: ${error.message}`,
-            icon: 'report_info',
-          });
-        });
-    },
     /**
      * Route to User page
      * userId
@@ -204,9 +134,6 @@ export default defineComponent({
         icon: 'report_info',
       });
     },
-  },
-  mounted() {
-    this.loadData();
   },
   setup() {
     const columns = [
@@ -243,7 +170,9 @@ export default defineComponent({
         sortable: true,
       },
     ];
-    return { columns };
+    const {bankConnections, deleteBankConnection} = useBankConnectionsAPI();
+
+    return { columns, bankConnections, deleteBankConnection };
   },
 });
 </script>
