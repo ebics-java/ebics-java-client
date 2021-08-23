@@ -5,11 +5,16 @@ import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.bank.cert.BankKeyStoreService
 import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
 import org.ebics.client.api.user.UserRepository
+import org.ebics.client.ebicsrestapi.bankconnection.UploadResponse
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
+import org.ebics.client.ebicsrestapi.bankconnection.h005.UploadRequest
+import org.ebics.client.filetransfer.h005.FileTransfer
 import org.ebics.client.keymgmt.h005.KeyManagementImpl
 import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.Product
+import org.ebics.client.order.h005.EbicsUploadOrder
 import org.springframework.stereotype.Component
+import org.springframework.web.multipart.MultipartFile
 
 @Component("EbicsAPIH005")
 class EbicsAPI(
@@ -19,7 +24,7 @@ class EbicsAPI(
     private val configuration: EbicsRestConfiguration)
 {
     private val product =
-        Product("EBICS 2.5 H004 REST API Client", "en", "org.jto.ebics")
+        Product("EBICS 3.0 H005 REST API Client", "en", "org.jto.ebics")
 
     fun sendINI(userIdPass: UserIdPass) {
         val user = userRepository.getOne(userIdPass.id)
@@ -54,16 +59,16 @@ class EbicsAPI(
         }
     }
 
-    fun uploadFile(userIdPass: UserIdPass) {
-        val user = userRepository.getOne(userIdPass.id)
+    fun uploadFile(userId: Long, uploadRequest: UploadRequest, uploadFile: MultipartFile): UploadResponse {
+        val user = userRepository.getOne(userId)
         with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {
-            val userCertManager = toUserCertMgr(userIdPass.password)
+            val userCertManager = toUserCertMgr(uploadRequest.password)
             with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {
                 val bankCertManager = toBankCertMgr()
                 val session = EbicsSession(user, configuration, product, userCertManager, bankCertManager)
-                val content = null
-                //val order = EbicsUploadOrder()
-                //FileTransfer(session).sendFile(content, order)
+                val order = EbicsUploadOrder(uploadRequest.orderService, uploadRequest.signatureFlag, uploadRequest.edsFlag, uploadRequest.fileName, uploadRequest.params ?: emptyMap())
+                FileTransfer(session).sendFile(uploadFile.bytes, order)
+                return UploadResponse("ordernummer")
             }
         }
     }

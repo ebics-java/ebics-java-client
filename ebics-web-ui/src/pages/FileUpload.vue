@@ -74,6 +74,13 @@
             label="Input file content"
           />
 
+          <q-input v-if="user.ebicsVersion == 'H005'" 
+            filled
+            v-model="fileName"
+            label="Uploaded filename"
+            hint="For support purposes only"
+          />
+
           <q-btn label="IDs" @click="setUniqueIds()" color="primary" />
 
           <div>
@@ -87,7 +94,7 @@
 
 <script lang="ts">
 import { api } from 'boot/axios';
-import { User, Btf, BtfMessage, UploadRequestH004 } from 'components/models';
+import { User, Btf, BtfMessage, UploadRequest, UploadRequestH004, UploadRequestH005 } from 'components/models';
 import { defineComponent } from 'vue';
 import { ref } from 'vue';
 import useFileTransferAPI from 'components/filetransfer';
@@ -100,6 +107,7 @@ export default defineComponent({
     return {
       file: ref<File | null>(null),
       fileText: 'text of the file',
+      fileName: '',
       binary: false,
       users: [] as User[],
       user: {
@@ -111,25 +119,25 @@ export default defineComponent({
       btfType: undefined as Btf | undefined,
       btfTypes: [
         new Btf(
-          'GLB',
-          '',
+          'PSR',
+          undefined,
           'CH',
-          'zip',
-          new BtfMessage('camt.054', '001', '03', 'XML')
+          'ZIP',
+          new BtfMessage('pain.002')
         ),
         new Btf(
-          'BTC',
-          '',
+          'MCT',
+          undefined,
           'CH',
-          'xml',
-          new BtfMessage('pain.001', '001', '09', 'XML')
+          undefined,
+          new BtfMessage('pain.001')
         ),
         new Btf(
-          'BTC',
-          'URG',
-          'DE',
-          'xml',
-          new BtfMessage('pain.001', '001', '09', 'XML')
+          'MCT',
+          'XCH',
+          'CGI',
+          undefined,
+          new BtfMessage('pain.001')
         ),
       ],
       signatureFlag: true,
@@ -139,6 +147,7 @@ export default defineComponent({
   },
   methods: {
     setUniqueIds() {
+      this.fileText = this.fileText.replace('a', 'aa');
       console.log('Unique')
     },
 
@@ -153,6 +162,8 @@ export default defineComponent({
     onUpdateInputFile(file: File) {
       console.log(file.name);
       this.file = file;
+      this.fileName = file.name;
+      this.user.ebicsVersion = 'H005';
       file
         .text()
         .then((text) => {
@@ -214,11 +225,21 @@ export default defineComponent({
     },
     async onSubmit() { 
       console.log(this.file); 
-      const uploadRequest = {
-        orderType: this.orderType, 
-        attributeType: this.signatureOZHNN ? 'OZHNN' : 'DZHNN',
-        params: new Map(),
-      } as UploadRequestH004;
+      var uploadRequest: UploadRequest;
+      if (this.user.ebicsVersion == 'H005') {
+        uploadRequest = {
+          orderService: this.btfType,
+          signatureFlag: this.signatureFlag,
+          edsFlag: this.requestEDS,
+          fileName: this.file ? this.file.name : 'Filename_not_provided',
+        } as UploadRequestH005;
+      } else { //H004, H003
+        uploadRequest = {
+          orderType: this.orderType, 
+          attributeType: this.signatureOZHNN ? 'OZHNN' : 'DZHNN',
+          params: new Map(),
+        } as UploadRequestH004;
+      } 
       if (this.binary && this.file) {
         await this.ebicsUploadRequest(this.user, uploadRequest, this.file)
       } else if (!this.binary && this.fileText) {

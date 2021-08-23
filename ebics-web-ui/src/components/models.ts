@@ -60,21 +60,27 @@ export interface Partner {
 
 export interface BtfInt {
   serviceName: string;
-  serviceOption: string;
-  scope: string;
-  containerType: string;
+  serviceOption?: string;
+  scope?: string;
+  containerType?: string;
   message: BtfMessageInt;
 }
 
 export interface BtfMessageInt {
   messageName: string;
-  messageNameVariant: string;
-  messageNameVersion: string;
-  messageNameFormat: string;  
+  messageNameVariant?: string;
+  messageNameVersion?: string;
+  messageNameFormat?: string;
 }
 
 export class Btf implements BtfInt {
-  constructor(serviceName: string = '' as string, serviceOption: string = '' as string,scope: string = '' as string,containerType: string = '' as string,message: BtfMessage = new BtfMessage()) {
+  constructor(
+    serviceName: string,
+    serviceOption: string | undefined = undefined,
+    scope: string | undefined = undefined,
+    containerType: string | undefined = undefined,
+    message: BtfMessage
+  ) {
     this.serviceName = serviceName;
     this.serviceOption = serviceOption;
     this.scope = scope;
@@ -82,31 +88,41 @@ export class Btf implements BtfInt {
     this.message = message;
   }
   serviceName: string;
-  serviceOption: string;
-  scope: string;
-  containerType: string;
+  serviceOption?: string;
+  scope?: string;
+  containerType?: string;
   message: BtfMessage;
   label(): string {
-    return `${this.serviceName}|${this.serviceOption}|${this.scope}|${this.containerType}|${this.message.label()}`;
+    return `${this.serviceName}|${s(this.serviceOption)}|${s(this.scope)}|${
+      s(this.containerType)
+    }|${this.message.label()}`;
   }
 }
 
+function s(txt: string | undefined): string {
+  return txt ? txt : '-'
+}
+
 export class BtfMessage implements BtfMessageInt {
-  constructor(messageName: string = '' as string, messageNameVariant: string = '' as string,messageNameVersion: string = '' as string, messageNameFormat: string = '' as string) {
+  constructor(
+    messageName: string,
+    messageNameVariant: string | undefined = undefined,
+    messageNameVersion: string | undefined = undefined,
+    messageNameFormat: string | undefined = undefined,
+  ) {
     this.messageName = messageName;
     this.messageNameFormat = messageNameFormat;
     this.messageNameVariant = messageNameVariant;
     this.messageNameVersion = messageNameVersion;
   }
   messageName: string;
-  messageNameVariant: string;
-  messageNameVersion: string;
-  messageNameFormat: string;
+  messageNameVariant?: string;
+  messageNameVersion?: string;
+  messageNameFormat?: string;
   label(): string {
-    return `${this.messageName}.${this.messageNameVariant}.${this.messageNameVersion}.${this.messageNameFormat}`;
+    return `${this.messageName}.${s(this.messageNameVariant)}.${s(this.messageNameVersion)}.${s(this.messageNameFormat)}`;
   }
 }
-
 
 export enum AdminOrderType {
   INI = 'INI',
@@ -124,10 +140,23 @@ export interface UploadRequest {
   params: Map<string, string>;
 }
 
+export interface UploadResponse {
+  orderNumber: string;
+}
+
 export interface UploadRequestH004 extends UploadRequest {
   password: string;
   orderType: string;
   attributeType: string;
+  params: Map<string, string>;
+}
+
+export interface UploadRequestH005 extends UploadRequest {
+  password: string;
+  orderService: Btf;
+  signatureFlag: boolean;
+  edsFlag: boolean;
+  fileName: string;
   params: Map<string, string>;
 }
 

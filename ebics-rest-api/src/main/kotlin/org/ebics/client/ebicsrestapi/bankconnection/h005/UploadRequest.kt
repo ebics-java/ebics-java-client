@@ -19,7 +19,7 @@ class UploadRequest(
     val signatureFlag: Boolean,
     val edsFlag: Boolean,
     val fileName: String,
-    params: Map<String, String>,
+    params: Map<String, String>? = emptyMap(),
 ) : AbstractUploadRequest(password, params)
 
 

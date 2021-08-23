@@ -14,7 +14,7 @@ class UploadRequest(
     password: String,
     val orderType: String? = null,
     val attributeType: AttributeType,
-    params: Map<String, String>,
+    params: Map<String, String>? = emptyMap(),
 ) : AbstractUploadRequest(password, params)
 
 

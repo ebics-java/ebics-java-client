@@ -71,7 +71,7 @@ class EbicsAPI(
             with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {
                 val bankCertManager = toBankCertMgr()
                 val session = EbicsSession(user, configuration, product, userCertManager, bankCertManager)
-                val order = EbicsUploadOrder(uploadRequest.orderType, uploadRequest.attributeType, uploadRequest.params)
+                val order = EbicsUploadOrder(uploadRequest.orderType, uploadRequest.attributeType, uploadRequest.params ?: emptyMap())
                 FileTransfer(session).sendFile(uploadFile.bytes, order)
                 return UploadResponse("ordernummer")
             }

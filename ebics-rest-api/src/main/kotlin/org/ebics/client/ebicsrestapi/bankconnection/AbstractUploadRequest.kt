@@ -7,7 +7,7 @@ package org.ebics.client.ebicsrestapi.bankconnection
  */
 abstract class AbstractUploadRequest(
     val password: String,
-    val params: Map<String, String>,
+    val params: Map<String, String>? = emptyMap(),
 )
 
 /**

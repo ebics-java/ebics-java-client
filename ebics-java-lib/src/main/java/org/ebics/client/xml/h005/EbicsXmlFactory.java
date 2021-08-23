@@ -857,21 +857,21 @@ public class EbicsXmlFactory {
     }
 
 
-    public static MessageType createMessageType(EbicsService ebicsService) {
+    public static MessageType createMessageType(EbicsMessage ebicsMessage) {
       MessageType messageType = MessageType.Factory.newInstance();
-      messageType.setStringValue(ebicsService.getMessageName());
-      if (ebicsService.getMessageNameFormat() != null)
-        messageType.setFormat(ebicsService.getMessageNameFormat());
-      if (ebicsService.getMessageNameVariant() != null)
-        messageType.setVariant(ebicsService.getMessageNameVariant());
-      if (ebicsService.getMessageNameVersion() != null)
-        messageType.setVersion(ebicsService.getMessageNameVersion());
+      messageType.setStringValue(ebicsMessage.getMessageName());
+      if (ebicsMessage.getMessageNameFormat() != null)
+        messageType.setFormat(ebicsMessage.getMessageNameFormat());
+      if (ebicsMessage.getMessageNameVariant() != null)
+        messageType.setVariant(ebicsMessage.getMessageNameVariant());
+      if (ebicsMessage.getMessageNameVersion() != null)
+        messageType.setVersion(ebicsMessage.getMessageNameVersion());
       return messageType;
     }
 
   public static RestrictedServiceType createRestrictedServiceType(EbicsService ebicsService) {
     RestrictedServiceType serviceType = RestrictedServiceType.Factory.newInstance();
-    serviceType.setMsgName(createMessageType(ebicsService));
+    serviceType.setMsgName(createMessageType(ebicsService.getMessage()));
     serviceType.setServiceName(ebicsService.getServiceName());
     if (ebicsService.getScope() != null)
       serviceType.setScope(ebicsService.getScope());
@@ -884,7 +884,12 @@ public class EbicsXmlFactory {
 
   private static ContainerFlagType createMessageContainer(EbicsService ebicsService) {
     ContainerFlagType containerType = ContainerFlagType.Factory.newInstance();
-    containerType.setContainerType(ContainerStringType.Enum.forString(ebicsService.getContainerType()));
+    ContainerStringType.Enum containerTypeVal = ContainerStringType.Enum.forString(ebicsService.getContainerType());
+    if (containerTypeVal != null) {
+      containerType.setContainerType(ContainerStringType.Enum.forString(ebicsService.getContainerType()));
+    } else {
+      throw new IllegalArgumentException(String.format("Unknown container type: '%s' Allowed types 'SVC', 'XML', 'ZIP'", ebicsService.getContainerType()));
+    }
     return containerType;
   }
 
