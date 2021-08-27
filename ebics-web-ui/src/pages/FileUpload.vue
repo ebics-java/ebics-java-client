@@ -3,7 +3,8 @@
     <div class="q-pa-md">
       <h5>Upload File</h5>
 
-      <div class="q-pa-md" style="max-width: 400px">
+      <!-- style="max-width: 400px" -->
+      <div class="q-pa-md" >
         <q-form @submit="onSubmit" @reset="onCancel" class="q-gutter-md">
           <q-select
             filled
@@ -15,6 +16,24 @@
             lazy-rules
             :rules="[(val) => val.id != 0 || 'Please select valid EBICS User']"
           />
+
+          <div class="q-gutter-sm">
+            <q-radio
+              v-model="user.ebicsVersion"
+              val="H003"
+              label="EBICS 2.4 (H003)"
+            />
+            <q-radio
+              v-model="user.ebicsVersion"
+              val="H004"
+              label="EBICS 2.5 (H004)"
+            />
+            <q-radio
+              v-model="user.ebicsVersion"
+              val="H005"
+              label="EBICS 3.0 (H005)"
+            />
+          </div>
 
           <q-select
             v-if="user.ebicsVersion == 'H003' || user.ebicsVersion == 'H004'"
@@ -34,7 +53,7 @@
             filled
             v-model="btfType"
             :options="btfTypes"
-            :option-label="t => btfLabel(t)"
+            :option-label="(t) => btfLabel(t)"
             label="BTF Message Type"
             hint="Select EBICS BTF Message Type"
             lazy-rules
@@ -45,19 +64,32 @@
           />
 
           <!-- DZHNN / OZHNN -->
-          <q-toggle v-if="user.ebicsVersion == 'H003' || user.ebicsVersion == 'H004'" v-model="signatureOZHNN" :label="signatureOZHNN ? 'Signature (OZHNN)' : 'No Signature (DZHNN)'"/>
+          <q-toggle
+            v-if="user.ebicsVersion == 'H003' || user.ebicsVersion == 'H004'"
+            v-model="signatureOZHNN"
+            :label="
+              signatureOZHNN ? 'Signature (OZHNN)' : 'No Signature (DZHNN)'
+            "
+          />
           <!-- signature flag, request EDS -->
-          
-          <q-toggle v-if="user.ebicsVersion == 'H005'" v-model="signatureFlag" label="Signature flag"/>
-          <q-toggle v-if="user.ebicsVersion == 'H005' && signatureFlag" v-model="requestEDS" label="Request EDS"/>
-          
+
+          <q-toggle
+            v-if="user.ebicsVersion == 'H005'"
+            v-model="signatureFlag"
+            label="Signature flag"
+          />
+          <q-toggle
+            v-if="user.ebicsVersion == 'H005' && signatureFlag"
+            v-model="requestEDS"
+            label="Request EDS"
+          />
 
           <q-file
             style="max-width: 300px"
             v-model="file"
             outlined
-            label="Max file size (20k)"
-            max-file-size="20480"
+            label="Max file size (20MB)"
+            max-file-size="21000000"
             @rejected="onRejected"
             @update:model-value="onUpdateInputFile"
           >
@@ -66,15 +98,27 @@
             </template>
           </q-file>
 
-          <q-input
+          <!-- q-input
             v-if="file && !binary"
             v-model="fileText"
             filled
             type="textarea"
             label="Input file content"
+          /-->
+
+          <v-ace-editor
+            ref="contentEditor"
+            v-if="file && !binary"
+            v-model:value="fileText"
+            lang="xml"
+            theme="clouds"
+            style="height: 300px"
+            :printMargin='false'
+            @init="initEditor"
           />
 
-          <q-input v-if="user.ebicsVersion == 'H005'" 
+          <q-input
+            v-if="user.ebicsVersion == 'H005'"
             filled
             v-model="fileName"
             label="Uploaded filename"
@@ -94,19 +138,31 @@
 
 <script lang="ts">
 import { api } from 'boot/axios';
-import { User, Btf, BtfMessage, UploadRequest, UploadRequestH004, UploadRequestH005 } from 'components/models';
+import {
+  User,
+  Btf,
+  BtfMessage,
+  UploadRequest,
+  UploadRequestH004,
+  UploadRequestH005,
+} from 'components/models';
 import { defineComponent } from 'vue';
 import { ref } from 'vue';
 import useFileTransferAPI from 'components/filetransfer';
+import { VAceEditor } from 'vue3-ace-editor';
+import 'ace-builds/src-noconflict/mode-xml';
+import 'ace-builds/src-noconflict/theme-clouds';
+import { VAceEditorInstance } from 'vue3-ace-editor/types';
+import useTextUtils from 'components/text-utils' 
 
 export default defineComponent({
   name: 'FileUpload',
-  components: {},
+  components: { VAceEditor },
   props: {},
   data() {
     return {
       file: ref<File | null>(null),
-      fileText: 'text of the file',
+      //fileText: ref<string>('text of the file'),
       fileName: '',
       binary: false,
       users: [] as User[],
@@ -118,27 +174,9 @@ export default defineComponent({
       orderTypes: ['XE2', 'XE3', 'XL3', 'XG1', 'CCT'],
       btfType: undefined as Btf | undefined,
       btfTypes: [
-        new Btf(
-          'PSR',
-          undefined,
-          'CH',
-          'ZIP',
-          new BtfMessage('pain.002')
-        ),
-        new Btf(
-          'MCT',
-          undefined,
-          'CH',
-          undefined,
-          new BtfMessage('pain.001')
-        ),
-        new Btf(
-          'MCT',
-          'XCH',
-          'CGI',
-          undefined,
-          new BtfMessage('pain.001')
-        ),
+        new Btf('PSR', undefined, 'CH', 'ZIP', new BtfMessage('pain.002')),
+        new Btf('MCT', undefined, 'CH', undefined, new BtfMessage('pain.001')),
+        new Btf('MCT', 'XCH', 'CGI', undefined, new BtfMessage('pain.001')),
       ],
       signatureFlag: true,
       requestEDS: true,
@@ -146,13 +184,16 @@ export default defineComponent({
     };
   },
   methods: {
-    setUniqueIds() {
-      this.fileText = this.fileText.replace('a', 'aa');
-      console.log('Unique')
+    initEditor(editor: VAceEditorInstance) {
+      console.log(`Initialize ace editor: ${JSON.stringify(editor.$options)}`);
+    },
+    async setUniqueIds() {
+      //await this.findAndReplaceMsgIds(this.$refs.contentEditor as VAceEditorInstance)
+      await this.findAndReplaceMsgIds(true, true, true, true, true, true, true, true, 'prefix')
     },
 
-    btfLabel(btf: Btf | undefined):string {
-      return (btf instanceof Btf) ? btf.label() : ''
+    btfLabel(btf: Btf | undefined): string {
+      return btf instanceof Btf ? btf.label() : '';
     },
 
     /**
@@ -163,12 +204,11 @@ export default defineComponent({
       console.log(file.name);
       this.file = file;
       this.fileName = file.name;
-      this.user.ebicsVersion = 'H005';
       file
         .text()
         .then((text) => {
-          //Detect binary - open binary data in a normal way (without using a hex editor), 
-          //it will encounter some rendering problems which translate to you as a succession 
+          //Detect binary - open binary data in a normal way (without using a hex editor),
+          //it will encounter some rendering problems which translate to you as a succession
           //of this weird character � called "Replacement character" == ufffd
           if (/\ufffd/.test(text) === true) {
             this.binary = true;
@@ -223,8 +263,8 @@ export default defineComponent({
           });
         });
     },
-    async onSubmit() { 
-      console.log(this.file); 
+    async onSubmit() {
+      console.log(this.file);
       var uploadRequest: UploadRequest;
       if (this.user.ebicsVersion == 'H005') {
         uploadRequest = {
@@ -233,30 +273,34 @@ export default defineComponent({
           edsFlag: this.requestEDS,
           fileName: this.file ? this.file.name : 'Filename_not_provided',
         } as UploadRequestH005;
-      } else { //H004, H003
+      } else {
+        //H004, H003
         uploadRequest = {
-          orderType: this.orderType, 
+          orderType: this.orderType,
           attributeType: this.signatureOZHNN ? 'OZHNN' : 'DZHNN',
           params: new Map(),
         } as UploadRequestH004;
-      } 
+      }
       if (this.binary && this.file) {
-        await this.ebicsUploadRequest(this.user, uploadRequest, this.file)
+        await this.ebicsUploadRequest(this.user, uploadRequest, this.file);
       } else if (!this.binary && this.fileText) {
-        const content = new Blob([this.fileText], {type: 'text/html'});
-        await this.ebicsUploadRequest(this.user, uploadRequest, content)
+        const content = new Blob([this.fileText], { type: 'text/html' });
+        await this.ebicsUploadRequest(this.user, uploadRequest, content);
       } else {
-        console.error('Invalid input combination, no file content available to upload')
+        console.error(
+          'Invalid input combination, no file content available to upload'
+        );
       }
     },
     onCancel() {
       this.$router.go(-1);
     },
-    onRejected() { //rejectedFiles: File[]
+    onRejected() {
+      //rejectedFiles: File[]
       this.$q.notify({
         type: 'negative',
         message:
-          'File must smaller than 20kB, for bigger files use upload without editor',
+          'File must smaller than 20MB, for bigger files use upload without editor',
       });
     },
   },
@@ -264,8 +308,10 @@ export default defineComponent({
     this.loadUsersData();
   },
   setup() {
-    const {ebicsUploadRequest} = useFileTransferAPI();
-    return {ebicsUploadRequest}
-  }
+    const fileText = ref('');
+    const { ebicsUploadRequest } = useFileTransferAPI();
+    const { findAndReplaceMsgIds } = useTextUtils(fileText);
+    return { fileText, ebicsUploadRequest, findAndReplaceMsgIds };
+  },
 });
 </script>
