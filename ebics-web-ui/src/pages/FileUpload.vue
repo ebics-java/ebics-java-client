@@ -4,7 +4,7 @@
       <h5>Upload File</h5>
 
       <!-- style="max-width: 400px" -->
-      <div class="q-pa-md" >
+      <div class="q-pa-md">
         <q-form @submit="onSubmit" @reset="onCancel" class="q-gutter-md">
           <q-select
             filled
@@ -113,7 +113,7 @@
             lang="xml"
             theme="clouds"
             style="height: 300px"
-            :printMargin='false'
+            :printMargin="false"
             @init="initEditor"
           />
 
@@ -125,9 +125,16 @@
             hint="For support purposes only"
           />
 
-          <q-btn label="IDs" @click="setUniqueIds()" color="primary" />
-
           <div>
+            <q-btn-dropdown
+              split
+              color="primary"
+              label="Smart Adjust"
+              @click="setUniqueIds()"
+            >
+              <user-preferences section-filter='ContentOptions.Pain.00x'/>
+            </q-btn-dropdown>
+
             <q-btn label="Upload" type="submit" color="primary" />
           </div>
         </q-form>
@@ -145,24 +152,29 @@ import {
   UploadRequest,
   UploadRequestH004,
   UploadRequestH005,
+  AutoAdjustmentsPain00x,
 } from 'components/models';
 import { defineComponent } from 'vue';
 import { ref } from 'vue';
-import useFileTransferAPI from 'components/filetransfer';
+
 import { VAceEditor } from 'vue3-ace-editor';
 import 'ace-builds/src-noconflict/mode-xml';
 import 'ace-builds/src-noconflict/theme-clouds';
 import { VAceEditorInstance } from 'vue3-ace-editor/types';
-import useTextUtils from 'components/text-utils' 
+
+import useFileTransferAPI from 'components/filetransfer';
+import useTextUtils from 'components/text-utils';
+import useUserSettings from 'components/user-settings';
+import UserPreferences from 'components/UserPreferences.vue'
 
 export default defineComponent({
   name: 'FileUpload',
-  components: { VAceEditor },
+  components: { VAceEditor, UserPreferences },
   props: {},
   data() {
     return {
       file: ref<File | null>(null),
-      //fileText: ref<string>('text of the file'),
+      fileText: ref<string>('text of the file'),
       fileName: '',
       binary: false,
       users: [] as User[],
@@ -188,8 +200,10 @@ export default defineComponent({
       console.log(`Initialize ace editor: ${JSON.stringify(editor.$options)}`);
     },
     async setUniqueIds() {
-      //await this.findAndReplaceMsgIds(this.$refs.contentEditor as VAceEditorInstance)
-      await this.findAndReplaceMsgIds(true, true, true, true, true, true, true, true, 'prefix')
+      this.fileText = await this.applySmartAdjustmentsPain00x(
+        this.fileText,
+        this.userSettings?.adjustmentOptions.pain001 as AutoAdjustmentsPain00x,
+      );
     },
 
     btfLabel(btf: Btf | undefined): string {
@@ -308,10 +322,11 @@ export default defineComponent({
     this.loadUsersData();
   },
   setup() {
-    const fileText = ref('');
+    const replaceMsgId = ref(true);
     const { ebicsUploadRequest } = useFileTransferAPI();
-    const { findAndReplaceMsgIds } = useTextUtils(fileText);
-    return { fileText, ebicsUploadRequest, findAndReplaceMsgIds };
+    const { applySmartAdjustmentsPain00x } = useTextUtils();
+    const { userSettings } = useUserSettings();
+    return { userSettings, replaceMsgId, ebicsUploadRequest, applySmartAdjustmentsPain00x };
   },
 });
 </script>

@@ -185,3 +185,31 @@ export enum AuthenticationType {
   SSO = 'Single sign on',
   HTTP_BASIC = 'HTTP Basic (username + password)',
 }
+
+export interface AutoAdjustmentsPain00x {
+  msgId: boolean;
+  pmtInfId: boolean;
+  instrId: boolean;
+  endToEndId: boolean;
+  uetr: boolean;
+  reqdExctnDt: boolean;
+  creDtTm: boolean;
+  nbOfTrxsCalc: boolean;
+  ctrlSumCalc: boolean;
+  idPrefix: string;
+}
+
+export interface AutoAdjustmentsSwift {
+  uetr: boolean;
+  f20: boolean;
+  f21: boolean;
+}
+
+export interface UserSettings {
+  testerSettings: boolean;
+  adjustmentOptions: {
+    applyAuthomatically: boolean;
+    pain001: AutoAdjustmentsPain00x;
+    mt101: AutoAdjustmentsSwift;
+  },
+}

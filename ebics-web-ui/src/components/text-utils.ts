@@ -1,94 +1,33 @@
-import { Ref } from 'vue';
-import { VAceEditorInstance } from 'vue3-ace-editor/types';
-import { Ace } from 'ace-builds';
-import { Range } from 'ace-builds';
+import { AutoAdjustmentsPain00x } from './models';
 /**
  * Text Utils composition API
  * @returns
  *  findAndReplace generic replacement function for aceEditor
  *  findAndReplaceMsgIds function replacing MsgIds
  */
-export default function useTextUtils(text: Ref<string>) {
+export default function useTextUtils() {
+  
+  /**
+   * Generic find & replace
+   * @param input input string
+   * @param regExp reg expression which is to be searched
+   * @param replaceWith function
+   * @returns the @param input with all replacements applied
+   */
   const findAndReplace = (
+    input: string,
     regExp: RegExp,
     replaceWith: (match: string) => string
-  ): Promise<number> => {
-    return new Promise<number>((resolve) => {
-      let occurences = 0;
-      const replaceWithIndex = (match: string): string => {
-        occurences++;
-        return replaceWith(match);
-      };
-
-      text.value = text.value.replace(regExp, replaceWithIndex);
-      resolve(occurences);
+  ): Promise<string> => {
+    return new Promise<string>((resolve) => {
+      resolve(input.replace(regExp, replaceWith));
     });
   };
 
-  const findAndReplaceEditor = (
-    editorInstance: VAceEditorInstance,
-    regExp: RegExp,
-    replaceWith: (index: number) => string
-  ): Promise<number> => {
-    return new Promise<number>((resolve, reject) => {
-      const editor = editorInstance._editor;
-      if (!editor) reject('Editor is not mouted');
-      else {
-        const needle: string = regExp as unknown as string;
-        let index = 0;
-        editor.find(needle, {
-          start: new Range(0, 0, 0, 0),
-          range: new Range(0, 0, editor.session.getLength(), 100),
-        });
-
-        //Until we have found something
-        while (!editor.selection.isEmpty()) {
-          //Let's replace and increase index
-          editor.replace(replaceWith(index++));
-
-          //We must remove selection and move to next
-          //otherwise the same occurence would be found
-          editor.selection.clearSelection();
-          editor.selection.moveCursorRight();
-          console.log(
-            `Current selection: ${JSON.stringify(editor.selection.getRange())}`
-          );
-
-          const nextRange = Range.fromPoints(editor.selection.getRange().end, {
-            row: editor.session.getLength(),
-            column: 100,
-          } as Ace.Point);
-
-          const startRange = Range.fromPoints(
-            editor.selection.getRange().end,
-            editor.selection.getRange().end
-          );
-          console.log(`Next range: ${JSON.stringify(nextRange)}`);
-          console.log(`Start range: ${JSON.stringify(startRange)}`);
-          //Lets find the next occurence
-          editor.findNext({ start: startRange, range: nextRange });
-          console.log(
-            'Search completed, found: ' +
-              (!editor.selection.isEmpty() ? 'true' : 'false')
-          );
-        }
-        resolve(index);
-      }
-    });
-  };
-
-  const findAndReplaceMsgIdsEditor = async (
-    editorInstance: VAceEditorInstance
-  ): Promise<number> => {
-    return await findAndReplaceEditor(
-      editorInstance,
-      new RegExp('<PmtInfId>.*</PmtInfId>'),
-      (index) => {
-        return `<PmtInfId>${index}</PmtInfId>`;
-      }
-    );
-  };
-
+  /**
+   * 
+   * @returns current date in YYYY-MM-DD format
+   */
   const currentDate = () => {
     const date = new Date();
     return `${date.getFullYear()}-${date
@@ -97,54 +36,56 @@ export default function useTextUtils(text: Ref<string>) {
       .padStart(2, '0')}-${date.getUTCDate().toString().padStart(2, '0')}`;
   };
 
-  const findAndReplaceMsgIds = async (
-    msgId: boolean,
-    pmtInfId: boolean,
-    instrId: boolean,
-    endToEndId: boolean,
-    reqdExctnDt: boolean,
-    creDtTm: boolean,
-    nbOfTrxsCalc: boolean,
-    ctrlSumCals: boolean,
-    idPrefix: string
-  ): Promise<number> => {
+  /*const applySmartAdjustmentsSwift = async (
+    fileText: string,
+    settings: AutoAdjustmentsSwift,
+  ): Promise<string> => {
+    return '';
+  }*/
+
+  const applySmartAdjustmentsPain00x = async (
+    fileText: string,
+    settings: AutoAdjustmentsPain00x,
+  ): Promise<string> => {
+    const s = settings;
+    const idPrefix = s.idPrefix + '-' + new Date().toDateString() + new Date().toTimeString();
     let bLevel = 0;
     let cLevel = 0;
     let nbOfTrxs = 0;
     let ctrlSum = 0;
     const regExp = new RegExp(
-      (pmtInfId || instrId || endToEndId ? '(<PmtInfId>.*</PmtInfId>)' : '') +
-        (instrId ? '|(<InstrId>.*</InstrId>)' : '') +
-        (endToEndId || nbOfTrxsCalc ? '|(<EndToEndId>.*</EndToEndId>)' : '') +
-        (ctrlSumCals
+      (s.pmtInfId || s.instrId || s.endToEndId ? '(<PmtInfId>.*</PmtInfId>)' : '') +
+        (s.instrId ? '|(<InstrId>.*</InstrId>)' : '') +
+        (s.endToEndId || s.nbOfTrxsCalc ? '|(<EndToEndId>.*</EndToEndId>)' : '') +
+        (s.ctrlSumCalc
           ? '|(<InstdAmt Ccy="\\w{3}">.*<\\/InstdAmt>)|(<Amt Ccy="\\w{3}">.*<\\/Amt>)'
           : '') +
-        (creDtTm ? '|(<CreDtTm>.*<\\/CreDtTm>)' : '') +
-        (reqdExctnDt ? '|(<ReqdExctnDt>.*<\\/ReqdExctnDt>)' : '') +
-        (msgId ? '|(<MsgId>.*</MsgId>)' : ''),
+        (s.creDtTm ? '|(<CreDtTm>.*<\\/CreDtTm>)' : '') +
+        (s.reqdExctnDt ? '|(<ReqdExctnDt>.*<\\/ReqdExctnDt>)' : '') +
+        (s.msgId ? '|(<MsgId>.*</MsgId>)' : ''),
       'g'
     );
     console.log('Source regexp: ' + regExp.source);
-    let occurences = await findAndReplace(regExp, (match) => {
-      if (msgId && match.startsWith('<MsgId>')) {
+    const output = await findAndReplace(fileText, regExp, (match) => {
+      if (s.msgId && match.startsWith('<MsgId>')) {
         return `<MsgId>${idPrefix}</MsgId>`;
       } else if (match.startsWith('<PmtInfId>')) {
         cLevel = 0;
         bLevel++;
-        return pmtInfId ? `<PmtInfId>${idPrefix}-B${bLevel}</PmtInfId>` : match;
-      } else if (instrId && match.startsWith('<InstrId>')) {
+        return s.pmtInfId ? `<PmtInfId>${idPrefix}-B${bLevel}</PmtInfId>` : match;
+      } else if (s.instrId && match.startsWith('<InstrId>')) {
         return `<InstrId>${idPrefix}-B${bLevel}-C${cLevel + 1}</InstrId>`;
       } else if (
-        (endToEndId || nbOfTrxsCalc) &&
+        (s.endToEndId || s.nbOfTrxsCalc) &&
         match.startsWith('<EndToEndId>')
       ) {
         cLevel++;
         nbOfTrxs++;
-        return endToEndId
+        return s.endToEndId
           ? `<EndToEndId>${idPrefix}-B${bLevel}-C${cLevel}</EndToEndId>`
           : match;
       } else if (
-        ctrlSumCals &&
+        s.ctrlSumCalc &&
         (match.startsWith('<InstdAmt') || match.startsWith('<Amt'))
       ) {
         const amt = Number(
@@ -152,31 +93,32 @@ export default function useTextUtils(text: Ref<string>) {
         );
         ctrlSum += amt;
         return match;
-      } else if (reqdExctnDt && match.startsWith('<ReqdExctnDt>')) {
+      } else if (s.reqdExctnDt && match.startsWith('<ReqdExctnDt>')) {
         return `<ReqdExctnDt>${currentDate()}</ReqdExctnDt>`;
-      } else if (creDtTm && match.startsWith('<CreDtTm>')) {
+      } else if (s.creDtTm && match.startsWith('<CreDtTm>')) {
         return `<CreDtTm>${new Date().toISOString()}</CreDtTm>`;
       } else return 'Unknown match';
     });
-    if (nbOfTrxsCalc || ctrlSumCals) {
-      occurences += await findAndReplace(
+    if (s.nbOfTrxsCalc || s.ctrlSumCalc) {
+      return await findAndReplace(output,
         new RegExp(
-          (nbOfTrxsCalc ? '(<NbOfTxs>.*</NbOfTxs>)' : '') +
-            (nbOfTrxsCalc && ctrlSumCals ? '|' : '') +
-            (ctrlSumCals ? '(<CtrlSum>.*</CtrlSum>)' : ''),
+          (s.nbOfTrxsCalc ? '(<NbOfTxs>.*</NbOfTxs>)' : '') +
+            (s.nbOfTrxsCalc && s.ctrlSumCalc ? '|' : '') +
+            (s.ctrlSumCalc ? '(<CtrlSum>.*</CtrlSum>)' : ''),
           'g'
         ),
         (match) => {
-          if (nbOfTrxsCalc && match.startsWith('<NbOfTxs>')) {
+          if (s.nbOfTrxsCalc && match.startsWith('<NbOfTxs>')) {
             return `<NbOfTxs>${nbOfTrxs}</NbOfTxs>`;
-          } else if (ctrlSumCals && match.startsWith('<CtrlSum>')) {
-            return `<CtrlSum>${ctrlSum}</CtrlSum>`;
+          } else if (s.ctrlSumCalc && match.startsWith('<CtrlSum>')) {
+            return `<CtrlSum>${ctrlSum.toFixed(5).replace(new RegExp('(\\.)?0+$'), '')}</CtrlSum>`;
           } else return 'Unknown match';
         }
       );
+    } else {
+      return output;
     }
-    return occurences;
   };
 
-  return { findAndReplaceMsgIdsEditor, findAndReplaceMsgIds };
+  return { currentDate, applySmartAdjustmentsPain00x };
 }

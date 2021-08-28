@@ -40,7 +40,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import useUserContextAPI from 'components/usercontext';
+import useUserContextAPI from 'src/components/user-context';
 
 export default defineComponent({
   name: 'UserLogin',

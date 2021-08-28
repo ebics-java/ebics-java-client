@@ -95,7 +95,7 @@
 <script lang="ts">
 
 import { defineComponent, ref } from 'vue'
-import useUserContextAPI from 'components/usercontext';
+import useUserContextAPI from 'src/components/user-context';
 
 export default defineComponent({
   name: 'MainLayout',
