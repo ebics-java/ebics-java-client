@@ -1,4 +1,4 @@
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { User } from 'components/models';
 import { api } from 'boot/axios';
 import useBaseAPI from './base-api';
@@ -25,6 +25,14 @@ export default function useBankConnectionsAPI() {
       apiErrorHandler('Loading of bank data failed', error);
     }
   };
+
+  const activeBankConnections = computed<User[] | undefined>(() => {
+    return bankConnections.value?.filter(bc => bc.userStatus == 'READY')
+  });
+
+  const hasActiveConnections = computed<boolean>(() => {
+    return activeBankConnections.value != null && activeBankConnections.value?.length > 0;
+  });
 
   const confirmDialog = (title: string, message: string): Promise<boolean> => {
     return new Promise<boolean>((resolve, reject) => {
@@ -60,5 +68,5 @@ export default function useBankConnectionsAPI() {
 
   onMounted(loadBankConnections);
 
-  return { bankConnections, loadBankConnections, deleteBankConnection };
+  return { bankConnections, activeBankConnections, hasActiveConnections, loadBankConnections, deleteBankConnection };
 }

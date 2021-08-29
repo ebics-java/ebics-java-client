@@ -31,10 +31,10 @@ export default function useBaseAPI() {
     error: unknown,
     apiErrorCallback: undefined | ((errorMessage: string) => void) = undefined
   ): void => {
-    console.log(JSON.stringify(error));
+    console.error('Handling error: ' + JSON.stringify(error));
     if (isAxiosError<EbicsApiError>(error)) {
-      if (error.response !== null) {
-        const ebicsApiError = error.response?.data as EbicsApiError;
+      if (error.response) {
+        const ebicsApiError = error.response?.data;
         if (apiErrorCallback) apiErrorCallback(ebicsApiError.message);
         let message = ebicsApiError.message;
         if (ebicsApiError.description && !ebicsApiError.description.includes(message))
@@ -51,7 +51,7 @@ export default function useBaseAPI() {
         q.notify({
           color: 'negative',
           position: 'bottom-right',
-          message: `${msg} '${JSON.stringify(error.request)}'`,
+          message: `${msg} '${JSON.stringify(error.message)}'`,
           icon: 'report_problem',
         });
       } else {

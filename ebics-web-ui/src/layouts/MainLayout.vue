@@ -33,7 +33,7 @@
             clickable 
             v-ripple>
             <q-item-section avatar>
-              <q-icon name="bank" />
+              <q-icon name="account_balance" />
             </q-item-section>
 
             <q-item-section>
@@ -42,12 +42,12 @@
           </q-item>
 
           <q-item 
-            to="/users"
+            to="/bankconnections"
             exact
             clickable 
             v-ripple>
             <q-item-section avatar>
-              <q-icon name="user" />
+              <q-icon name="electrical_services" />
             </q-item-section>
 
             <q-item-section>
@@ -56,7 +56,7 @@
           </q-item>
 
           <q-item 
-            to="/upload"
+            to="/upload/type=simple"
             exact
             clickable 
             v-ripple>
@@ -65,7 +65,21 @@
             </q-item-section>
 
             <q-item-section>
-              Upload file
+              Simple file upload
+            </q-item-section>
+          </q-item>
+
+          <q-item 
+            to="/upload/type=edit"
+            exact
+            clickable 
+            v-ripple>
+            <q-item-section avatar>
+              <q-icon name="edit" />
+            </q-item-section>
+
+            <q-item-section>
+              Edit &amp; Upload file
             </q-item-section>
           </q-item>
 

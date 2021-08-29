@@ -69,17 +69,10 @@
           <div class="q-pa-md q-gutter-sm">
             <q-btn
               color="primary"
-              label="Add User"
+              label="Add Bank Connection"
               icon-right="add"
               no-caps
               @click="routeToUserPage()"
-            />
-            <q-btn
-              color="primary"
-              icon-right="archive"
-              label="Export to csv"
-              no-caps
-              @click="exportTable"
             />
           </div>
         </template>
@@ -111,7 +104,7 @@ export default defineComponent({
      */
     async routeToUserPage(userId?: number) {
       const routeParams = userId === undefined ? undefined : { id: userId };
-      const routeName = userId === undefined ? 'user/create' : 'user/edit';
+      const routeName = userId === undefined ? 'bankconnection/create' : 'bankconnection/edit';
       await this.$router.push({
         name: routeName,
         params: routeParams,
@@ -119,7 +112,7 @@ export default defineComponent({
     },
     async routeToInitPage(userId: number) {
       const routeParams = { id: userId };
-      const routeName = 'user/init';
+      const routeName = 'bankconnection/init';
       await this.$router.push({
         name: routeName,
         params: routeParams,
@@ -140,7 +133,7 @@ export default defineComponent({
       {
         name: 'name',
         required: true,
-        label: 'User name',
+        label: 'Name',
         align: 'left',
         field: (row: User) => row.name,
         sortable: true,

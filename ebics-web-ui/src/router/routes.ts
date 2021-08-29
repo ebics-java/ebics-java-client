@@ -24,16 +24,16 @@ const routes: RouteRecordRaw[] = [
           return { id };
         },
       },
-      { path: '/users', component: () => import('pages/Users.vue') },
+      { path: '/bankconnections', component: () => import('pages/BankConnections.vue') },
       {
-        path: '/user',
-        name: 'user/create',
-        component: () => import('pages/User.vue'),
+        path: '/bankconnection',
+        name: 'bankconnection/create',
+        component: () => import('src/pages/BankConnection.vue'),
       },
       {
-        path: '/user/:id',
-        name: 'user/edit',
-        component: () => import('pages/User.vue'),
+        path: '/bankconnection/:id',
+        name: 'bankconnection/edit',
+        component: () => import('pages/BankConnection.vue'),
         props: (route) => {
           const id = Number.parseInt(route.params.id as string, 10);
           if (Number.isNaN(id)) {
@@ -43,9 +43,9 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: '/user/:id/init',
-        name: 'user/init',
-        component: () => import('pages/UserInitWizz.vue'),
+        path: '/bankconnection/:id/init',
+        name: 'bankconnection/init',
+        component: () => import('pages/BankConnectionInitWizz.vue'),
         props: (route) => {
           const id = Number.parseInt(route.params.id as string, 10);
           if (Number.isNaN(id)) {
@@ -54,7 +54,12 @@ const routes: RouteRecordRaw[] = [
           return { id };
         },
       },
-      { path: '/upload', component: () => import('pages/FileUpload.vue') },
+      { path: '/upload/type=:type', name: 'upload', component: () => import('pages/FileUpload.vue'),
+        props: (route) => {
+          const fileEditor = route.params.type == 'edit'
+          return { fileEditor };
+        },
+      },
       { path: '/userctx', component: () => import('pages/UserContext.vue') },
       { path: '/userlogin', component: () => import('pages/UserLogin.vue') },
     ],

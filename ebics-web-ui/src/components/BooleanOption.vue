@@ -1,5 +1,5 @@
 <template>
-  <q-item tag="label" v-ripple>
+  <q-item tag="label" v-ripple :disable="disable">
     <q-item-section>
       <q-item-label>{{ label }}</q-item-label>
       <q-item-label caption>{{ hint }}</q-item-label>
@@ -16,6 +16,10 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'BooleanOption',
   props: {
+    disable: {
+      type: Boolean,
+      default: false,
+    },
     label: {
       type: String,
       required: true,

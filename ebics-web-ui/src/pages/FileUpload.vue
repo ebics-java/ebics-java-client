@@ -1,7 +1,8 @@
 <template>
   <q-page class="justify-evenly">
-    <div class="q-pa-md">
-      <h5>Upload File</h5>
+    <div v-if="hasActiveConnections" class="q-pa-md">
+      <h5 v-if="fileEditor">Edit &amp; upload File</h5>
+      <h5 v-else>Simple file upload</h5>
 
       <!-- style="max-width: 400px" -->
       <div class="q-pa-md">
@@ -9,7 +10,7 @@
           <q-select
             filled
             v-model="user"
-            :options="users"
+            :options="activeBankConnections"
             :option-label="userLabel"
             label="EBICS Bank connection"
             hint="Select EBICS bank connection"
@@ -85,11 +86,29 @@
           />
 
           <q-file
+            v-if="fileEditor"
             style="max-width: 300px"
             v-model="file"
             outlined
-            label="Max file size (20MB)"
+            label="Drop file here"
+            hint="Max file size (20MB)"
             max-file-size="21000000"
+            @rejected="onRejected"
+            @update:model-value="onUpdateInputFile"
+          >
+            <template v-slot:prepend>
+              <q-icon name="attach_file" />
+            </template>
+          </q-file>
+
+          <q-file
+            v-else
+            style="max-width: 300px"
+            v-model="file"
+            outlined
+            multiple
+            label="Max file size (1GB)"
+            max-file-size="1200000000"
             @rejected="onRejected"
             @update:model-value="onUpdateInputFile"
           >
@@ -108,7 +127,7 @@
 
           <v-ace-editor
             ref="contentEditor"
-            v-if="file && !binary"
+            v-if="fileEditor"
             v-model:value="fileText"
             lang="xml"
             theme="clouds"
@@ -125,14 +144,14 @@
             hint="For support purposes only"
           />
 
-          <div>
+          <div class="q-pa-md q-gutter-sm">
             <q-btn-dropdown
               split
               color="primary"
               label="Smart Adjust"
               @click="setUniqueIds()"
             >
-              <user-preferences section-filter='ContentOptions.Pain.00x'/>
+              <user-preferences section-filter="ContentOptions.Pain.00x" />
             </q-btn-dropdown>
 
             <q-btn label="Upload" type="submit" color="primary" />
@@ -140,11 +159,21 @@
         </q-form>
       </div>
     </div>
+    <div v-else class="q-pa-md">
+      <q-banner class="bg-grey-3">
+        <template v-slot:avatar>
+          <q-icon name="signal_wifi_off" color="primary" />
+        </template>
+        You have no initialized bank connection. Create and initialize one bank connection in order to upload files.
+        <template v-slot:action>
+          <q-btn flat color="primary" label="Manage bank connections" to="/bankconnections" />
+        </template>
+      </q-banner>
+    </div>
   </q-page>
 </template>
 
 <script lang="ts">
-import { api } from 'boot/axios';
 import {
   User,
   Btf,
@@ -162,19 +191,26 @@ import 'ace-builds/src-noconflict/mode-xml';
 import 'ace-builds/src-noconflict/theme-clouds';
 import { VAceEditorInstance } from 'vue3-ace-editor/types';
 
+import useBankConnectionsAPI from 'components/bankconnections';
 import useFileTransferAPI from 'components/filetransfer';
 import useTextUtils from 'components/text-utils';
 import useUserSettings from 'components/user-settings';
-import UserPreferences from 'components/UserPreferences.vue'
+import UserPreferences from 'components/UserPreferences.vue';
 
 export default defineComponent({
   name: 'FileUpload',
   components: { VAceEditor, UserPreferences },
-  props: {},
+  props: {
+    fileEditor: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+  },
   data() {
     return {
       file: ref<File | null>(null),
-      fileText: ref<string>('text of the file'),
+      fileText: ref<string>('<document>paste document here</document>'),
       fileName: '',
       binary: false,
       users: [] as User[],
@@ -202,7 +238,7 @@ export default defineComponent({
     async setUniqueIds() {
       this.fileText = await this.applySmartAdjustmentsPain00x(
         this.fileText,
-        this.userSettings?.adjustmentOptions.pain001 as AutoAdjustmentsPain00x,
+        this.userSettings?.adjustmentOptions.pain001 as AutoAdjustmentsPain00x
       );
     },
 
@@ -262,21 +298,6 @@ export default defineComponent({
         return '';
       }
     },
-    loadUsersData() {
-      api
-        .get<User[]>('bankconnections')
-        .then((response) => {
-          this.users = response.data;
-        })
-        .catch((error: Error) => {
-          this.$q.notify({
-            color: 'negative',
-            position: 'bottom-right',
-            message: `Loading failed: ${error.message}`,
-            icon: 'report_problem',
-          });
-        });
-    },
     async onSubmit() {
       console.log(this.file);
       var uploadRequest: UploadRequest;
@@ -318,15 +339,21 @@ export default defineComponent({
       });
     },
   },
-  mounted() {
-    this.loadUsersData();
-  },
   setup() {
     const replaceMsgId = ref(true);
+    const { activeBankConnections, hasActiveConnections } =
+      useBankConnectionsAPI();
     const { ebicsUploadRequest } = useFileTransferAPI();
     const { applySmartAdjustmentsPain00x } = useTextUtils();
     const { userSettings } = useUserSettings();
-    return { userSettings, replaceMsgId, ebicsUploadRequest, applySmartAdjustmentsPain00x };
+    return {
+      activeBankConnections,
+      hasActiveConnections,
+      userSettings,
+      replaceMsgId,
+      ebicsUploadRequest,
+      applySmartAdjustmentsPain00x,
+    };
   },
 });
 </script>

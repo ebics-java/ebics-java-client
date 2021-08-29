@@ -1,27 +1,29 @@
 <template>
-  <q-list bordered padding>
+  <q-list>
     <div v-if="displaySection('General')">
       <q-item-label header>General Settings</q-item-label>
+      <boolean-option
+        label="Edit before upload"
+        hint="Enable by default file editor for non-binary files"
+        v-model="userSettings.fileEditor"
+      />
       <boolean-option
         label="Tester settings"
         hint="Enable smart adjustments of uploaded files"
         v-model="userSettings.testerSettings"
       />
       <boolean-option
-        v-if="userSettings.testerSettings"
+        :disable="!userSettings.testerSettings"
         label="Adjust file authomatically"
         hint="Apply smart adjustmets as bellow for every uploaded file authomatically, if disabled you can still apply adjustmets explicitelly"
         v-model="userSettings.adjustmentOptions.applyAuthomatically"
       />
       <q-separator spaced />
     </div>
-    <div
-      v-if="
-        userSettings.testerSettings && displaySection('ContentOptions.Pain.00x')
-      "
-    >
+    <div v-if="displaySection('ContentOptions.Pain.00x')">
       <q-item-label header>Smart adjustments for Pain.00x</q-item-label>
       <boolean-option
+        :disable="!userSettings.testerSettings"
         label="msgId"
         hint="unique id based on current timestamp and user id"
         v-model="userSettings.adjustmentOptions.pain001.msgId"
@@ -109,6 +111,7 @@ export default defineComponent({
   setup() {
     const { currentDate } = useTextUtils();
     const userSettings = ref<UserSettings>({
+      fileEditor: true,
       testerSettings: true,
       adjustmentOptions: {
         applyAuthomatically: true,

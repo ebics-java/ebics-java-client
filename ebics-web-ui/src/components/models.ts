@@ -206,6 +206,7 @@ export interface AutoAdjustmentsSwift {
 }
 
 export interface UserSettings {
+  fileEditor: boolean;
   testerSettings: boolean;
   adjustmentOptions: {
     applyAuthomatically: boolean;
