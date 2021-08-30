@@ -3,9 +3,9 @@
     <div v-if="displaySection('General')">
       <q-item-label header>General Settings</q-item-label>
       <boolean-option
-        label="Edit before upload"
-        hint="Enable by default file editor for non-binary files"
-        v-model="userSettings.fileEditor"
+        label="Upload on drop"
+        hint="Enable uploading of files after dropping for 'Simple file upload'"
+        v-model="userSettings.uploadOnDrop"
       />
       <boolean-option
         label="Tester settings"
@@ -90,6 +90,7 @@ import { ref, defineComponent } from 'vue';
 import BooleanOption from 'src/components/BooleanOption.vue';
 import { UserSettings } from 'components/models';
 import useTextUtils from './text-utils';
+import useUserSettingsAPI from './user-settings';
 
 export default defineComponent({
   name: 'ContentAdjustmenOption',
@@ -109,31 +110,8 @@ export default defineComponent({
     },
   },
   setup() {
+    const { userSettings } = useUserSettingsAPI();
     const { currentDate } = useTextUtils();
-    const userSettings = ref<UserSettings>({
-      fileEditor: true,
-      testerSettings: true,
-      adjustmentOptions: {
-        applyAuthomatically: true,
-        pain001: {
-          msgId: true,
-          pmtInfId: false,
-          instrId: true,
-          endToEndId: true,
-          uetr: true,
-          nbOfTrxsCalc: true,
-          ctrlSumCalc: true,
-          reqdExctnDt: true,
-          creDtTm: true,
-          idPrefix: 't51246',
-        },
-        mt101: {
-          uetr: true,
-          f20: true,
-          f21: false,
-        },
-      },
-    });
     return { currentDate, userSettings };
   },
 });

@@ -3,7 +3,30 @@ import { Bank, UserSettings } from 'components/models';
 import { api } from 'boot/axios';
 import useBaseAPI from './base-api';
 
-const userSettings = ref<UserSettings>();
+const userSettings = ref<UserSettings>({
+  uploadOnDrop: true,
+  testerSettings: true,
+  adjustmentOptions: {
+    applyAuthomatically: true,
+    pain001: {
+      msgId: true,
+      pmtInfId: false,
+      instrId: true,
+      endToEndId: true,
+      uetr: true,
+      nbOfTrxsCalc: true,
+      ctrlSumCalc: true,
+      reqdExctnDt: true,
+      creDtTm: true,
+      idPrefix: 't51246',
+    },
+    mt101: {
+      uetr: true,
+      f20: true,
+      f21: false,
+    },
+  },
+});
 
 /**
  * 

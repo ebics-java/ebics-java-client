@@ -186,6 +186,13 @@ export enum AuthenticationType {
   HTTP_BASIC = 'HTTP Basic (username + password)',
 }
 
+export enum FileFormat {
+  XML,
+  SWIFT,
+  TEXT,
+  BINARY,
+}
+
 export interface AutoAdjustmentsPain00x {
   msgId: boolean;
   pmtInfId: boolean;
@@ -206,7 +213,7 @@ export interface AutoAdjustmentsSwift {
 }
 
 export interface UserSettings {
-  fileEditor: boolean;
+  uploadOnDrop: boolean;
   testerSettings: boolean;
   adjustmentOptions: {
     applyAuthomatically: boolean;

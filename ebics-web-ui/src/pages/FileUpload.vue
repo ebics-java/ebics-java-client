@@ -9,35 +9,38 @@
         <q-form @submit="onSubmit" @reset="onCancel" class="q-gutter-md">
           <q-select
             filled
-            v-model="user"
+            v-model="bankConnection"
             :options="activeBankConnections"
             :option-label="userLabel"
             label="EBICS Bank connection"
             hint="Select EBICS bank connection"
             lazy-rules
-            :rules="[(val) => val.id != 0 || 'Please select valid EBICS User']"
+            :rules="[(val) => bankConnection || 'Please select valid EBICS bank connection']"
           />
 
-          <div class="q-gutter-sm">
+          <div v-if="bankConnection" class="q-gutter-sm">
             <q-radio
-              v-model="user.ebicsVersion"
+              v-model="bankConnection.ebicsVersion"
               val="H003"
               label="EBICS 2.4 (H003)"
             />
             <q-radio
-              v-model="user.ebicsVersion"
+              v-model="bankConnection.ebicsVersion"
               val="H004"
               label="EBICS 2.5 (H004)"
             />
             <q-radio
-              v-model="user.ebicsVersion"
+              v-model="bankConnection.ebicsVersion"
               val="H005"
               label="EBICS 3.0 (H005)"
             />
           </div>
 
           <q-select
-            v-if="user.ebicsVersion == 'H003' || user.ebicsVersion == 'H004'"
+            v-if="
+              bankConnection?.ebicsVersion == 'H003' ||
+              bankConnection?.ebicsVersion == 'H004'
+            "
             filled
             v-model="orderType"
             :options="orderTypes"
@@ -45,12 +48,12 @@
             hint="Select EBICS Order Type"
             lazy-rules
             :rules="[
-              (val) => val.id != 0 || 'Please select valid EBICS Order Type',
+              (val) => (val && val.length > 0) || 'Please select valid EBICS Order Type',
             ]"
           />
 
           <q-select
-            v-if="user.ebicsVersion == 'H005'"
+            v-if="bankConnection?.ebicsVersion == 'H005'"
             filled
             v-model="btfType"
             :options="btfTypes"
@@ -59,14 +62,16 @@
             hint="Select EBICS BTF Message Type"
             lazy-rules
             :rules="[
-              (val) =>
-                val.id != 0 || 'Please select valid EBICS BTF Message Type',
+              (val) => val || 'Please select valid EBICS BTF Message Type',
             ]"
           />
 
           <!-- DZHNN / OZHNN -->
           <q-toggle
-            v-if="user.ebicsVersion == 'H003' || user.ebicsVersion == 'H004'"
+            v-if="
+              bankConnection?.ebicsVersion == 'H003' ||
+              bankConnection?.ebicsVersion == 'H004'
+            "
             v-model="signatureOZHNN"
             :label="
               signatureOZHNN ? 'Signature (OZHNN)' : 'No Signature (DZHNN)'
@@ -75,12 +80,12 @@
           <!-- signature flag, request EDS -->
 
           <q-toggle
-            v-if="user.ebicsVersion == 'H005'"
+            v-if="bankConnection?.ebicsVersion == 'H005'"
             v-model="signatureFlag"
             label="Signature flag"
           />
           <q-toggle
-            v-if="user.ebicsVersion == 'H005' && signatureFlag"
+            v-if="bankConnection?.ebicsVersion == 'H005' && signatureFlag"
             v-model="requestEDS"
             label="Request EDS"
           />
@@ -107,10 +112,15 @@
             v-model="file"
             outlined
             multiple
-            label="Max file size (1GB)"
+            use-chips
+            :label="
+              'Drop file(s) here' +
+              (userSettings.uploadOnDrop ? ' to upload' : '')
+            "
+            hint="Max file size (1GB)"
             max-file-size="1200000000"
             @rejected="onRejected"
-            @update:model-value="onUpdateInputFile"
+            @update:model-value="onUpdateInputFiles"
           >
             <template v-slot:prepend>
               <q-icon name="attach_file" />
@@ -127,7 +137,7 @@
 
           <v-ace-editor
             ref="contentEditor"
-            v-if="fileEditor"
+            v-if="fileEditor && fileFormat != FileFormat.BINARY"
             v-model:value="fileText"
             lang="xml"
             theme="clouds"
@@ -137,7 +147,7 @@
           />
 
           <q-input
-            v-if="user.ebicsVersion == 'H005'"
+            v-if="bankConnection?.ebicsVersion == 'H005'"
             filled
             v-model="fileName"
             label="Uploaded filename"
@@ -146,15 +156,20 @@
 
           <div class="q-pa-md q-gutter-sm">
             <q-btn-dropdown
-              split
+              :split="fileEditor"
               color="primary"
               label="Smart Adjust"
-              @click="setUniqueIds()"
+              @click="applySmartAdjustmentsForSingleFile()"
             >
               <user-preferences section-filter="ContentOptions.Pain.00x" />
             </q-btn-dropdown>
 
-            <q-btn label="Upload" type="submit" color="primary" />
+            <q-btn
+              v-if="fileEditor || !userSettings.uploadOnDrop"
+              label="Upload"
+              type="submit"
+              color="primary"
+            />
           </div>
         </q-form>
       </div>
@@ -164,9 +179,15 @@
         <template v-slot:avatar>
           <q-icon name="signal_wifi_off" color="primary" />
         </template>
-        You have no initialized bank connection. Create and initialize one bank connection in order to upload files.
+        You have no initialized bank connection. Create and initialize one bank
+        connection in order to upload files.
         <template v-slot:action>
-          <q-btn flat color="primary" label="Manage bank connections" to="/bankconnections" />
+          <q-btn
+            flat
+            color="primary"
+            label="Manage bank connections"
+            to="/bankconnections"
+          />
         </template>
       </q-banner>
     </div>
@@ -181,7 +202,7 @@ import {
   UploadRequest,
   UploadRequestH004,
   UploadRequestH005,
-  AutoAdjustmentsPain00x,
+  FileFormat,
 } from 'components/models';
 import { defineComponent } from 'vue';
 import { ref } from 'vue';
@@ -209,15 +230,13 @@ export default defineComponent({
   },
   data() {
     return {
+      FileFormat,
       file: ref<File | null>(null),
       fileText: ref<string>('<document>paste document here</document>'),
       fileName: '',
-      binary: false,
+      fileFormat: undefined as FileFormat | undefined,
       users: [] as User[],
-      user: {
-        userId: '',
-        name: '',
-      } as User,
+      bankConnection: undefined as User | undefined,
       orderType: '',
       orderTypes: ['XE2', 'XE3', 'XL3', 'XG1', 'CCT'],
       btfType: undefined as Btf | undefined,
@@ -235,10 +254,11 @@ export default defineComponent({
     initEditor(editor: VAceEditorInstance) {
       console.log(`Initialize ace editor: ${JSON.stringify(editor.$options)}`);
     },
-    async setUniqueIds() {
-      this.fileText = await this.applySmartAdjustmentsPain00x(
+    async applySmartAdjustmentsForSingleFile() {
+      this.fileText = await this.applySmartAdjustments(
         this.fileText,
-        this.userSettings?.adjustmentOptions.pain001 as AutoAdjustmentsPain00x
+        this.fileFormat as FileFormat,
+        this.userSettings
       );
     },
 
@@ -246,85 +266,98 @@ export default defineComponent({
       return btf instanceof Btf ? btf.label() : '';
     },
 
+    onUpdateInputFiles(files: File[]) {
+      console.log(files);
+    },
+
     /**
      * Load text of the input file into text area
      * (only for text files, binary cant be edited)
      */
-    onUpdateInputFile(file: File) {
+    async onUpdateInputFile(file: File) {
       console.log(file.name);
       this.file = file;
       this.fileName = file.name;
-      file
-        .text()
-        .then((text) => {
-          //Detect binary - open binary data in a normal way (without using a hex editor),
-          //it will encounter some rendering problems which translate to you as a succession
-          //of this weird character � called "Replacement character" == ufffd
-          if (/\ufffd/.test(text) === true) {
-            this.binary = true;
-            this.$q.notify({
-              color: 'positive',
-              position: 'bottom-right',
-              message:
-                "Binary files can't be edited, although you can still upload the file",
-              icon: 'warning',
-            });
-          } else {
-            this.binary = false;
-            this.fileText = text;
-          }
-        })
-        .catch((error: Error) => {
+      try {
+        const text = await file.text();
+        this.fileFormat = this.detectFileFormat(text);
+        if (this.fileFormat == FileFormat.BINARY) {
           this.$q.notify({
-            color: 'negative',
+            color: 'positive',
             position: 'bottom-right',
-            message: `Loading file failed: ${error.message}`,
-            icon: 'report_problem',
+            message:
+              "Binary files can't be edited, although you can still upload the file",
+            icon: 'warning',
           });
+        } else {
+          if (this.userSettings.adjustmentOptions.applyAuthomatically)
+            this.fileText = await this.applySmartAdjustments(
+              text,
+              this.fileFormat,
+              this.userSettings
+            );
+          else this.fileText = text;
+        }
+      } catch (error) {
+        this.$q.notify({
+          color: 'negative',
+          position: 'bottom-right',
+          message: `Loading file failed: ${JSON.stringify(error)}`,
+          icon: 'report_problem',
         });
+      }
     },
 
     /**
-     * Display label of the user
+     * Display label of the bankConnection
      */
-    userLabel(user: User | null): string {
+    userLabel(bankConnection: User | undefined): string {
       if (
-        user !== null &&
-        user.userId.trim().length > 0 &&
-        user.name.trim().length > 0
+        bankConnection &&
+        bankConnection.userId.trim().length > 0 &&
+        bankConnection.name.trim().length > 0
       ) {
-        return `${user.userId} | ${user.name}`;
+        return `${bankConnection.userId} | ${bankConnection.name}`;
       } else {
         return '';
       }
     },
     async onSubmit() {
-      console.log(this.file);
-      var uploadRequest: UploadRequest;
-      if (this.user.ebicsVersion == 'H005') {
-        uploadRequest = {
-          orderService: this.btfType,
-          signatureFlag: this.signatureFlag,
-          edsFlag: this.requestEDS,
-          fileName: this.file ? this.file.name : 'Filename_not_provided',
-        } as UploadRequestH005;
-      } else {
-        //H004, H003
-        uploadRequest = {
-          orderType: this.orderType,
-          attributeType: this.signatureOZHNN ? 'OZHNN' : 'DZHNN',
-          params: new Map(),
-        } as UploadRequestH004;
-      }
-      if (this.binary && this.file) {
-        await this.ebicsUploadRequest(this.user, uploadRequest, this.file);
-      } else if (!this.binary && this.fileText) {
-        const content = new Blob([this.fileText], { type: 'text/html' });
-        await this.ebicsUploadRequest(this.user, uploadRequest, content);
-      } else {
-        console.error(
-          'Invalid input combination, no file content available to upload'
-        );
+      if (this.bankConnection) {
+        var uploadRequest: UploadRequest;
+        if (this.bankConnection.ebicsVersion == 'H005') {
+          uploadRequest = {
+            orderService: this.btfType,
+            signatureFlag: this.signatureFlag,
+            edsFlag: this.requestEDS,
+            fileName: this.file ? this.file.name : 'Filename_not_provided',
+          } as UploadRequestH005;
+        } else {
+          //H004, H003
+          uploadRequest = {
+            orderType: this.orderType,
+            attributeType: this.signatureOZHNN ? 'OZHNN' : 'DZHNN',
+            params: new Map(),
+          } as UploadRequestH004;
+        }
+        if (this.fileFormat == FileFormat.BINARY && this.file) {
+          await this.ebicsUploadRequest(
+            this.bankConnection,
+            uploadRequest,
+            this.file
+          );
+        } else if (this.fileFormat != FileFormat.BINARY && this.fileText) {
+          const content = new Blob([this.fileText], { type: 'text/html' });
+          await this.ebicsUploadRequest(
+            this.bankConnection,
+            uploadRequest,
+            content
+          );
+        } else {
+          console.error(
+            'Invalid input combination, no file content available to upload'
+          );
+        }
       }
     },
     onCancel() {
@@ -344,7 +377,7 @@ export default defineComponent({
     const { activeBankConnections, hasActiveConnections } =
       useBankConnectionsAPI();
     const { ebicsUploadRequest } = useFileTransferAPI();
-    const { applySmartAdjustmentsPain00x } = useTextUtils();
+    const { applySmartAdjustments, detectFileFormat } = useTextUtils();
     const { userSettings } = useUserSettings();
     return {
       activeBankConnections,
@@ -352,7 +385,8 @@ export default defineComponent({
       userSettings,
       replaceMsgId,
       ebicsUploadRequest,
-      applySmartAdjustmentsPain00x,
+      applySmartAdjustments,
+      detectFileFormat,
     };
   },
 });

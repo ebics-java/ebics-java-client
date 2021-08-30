@@ -1,4 +1,4 @@
-import { AutoAdjustmentsPain00x } from './models';
+import { AutoAdjustmentsPain00x, FileFormat, UserSettings } from './models';
 /**
  * Text Utils composition API
  * @returns
@@ -6,7 +6,6 @@ import { AutoAdjustmentsPain00x } from './models';
  *  findAndReplaceMsgIds function replacing MsgIds
  */
 export default function useTextUtils() {
-  
   /**
    * Generic find & replace
    * @param input input string
@@ -25,15 +24,72 @@ export default function useTextUtils() {
   };
 
   /**
-   * 
+   *
    * @returns current date in YYYY-MM-DD format
    */
   const currentDate = () => {
     const date = new Date();
-    return `${date.getFullYear()}-${date
-      .getUTCMonth()
+    return `${date.getFullYear()}-${(date.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${date.getUTCDate().toString().padStart(2, '0')}`;
+      .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+  };
+
+  /**
+   *
+   * @returns unique timestamp within 1 year in MMDD-hhmmss format
+   */
+  const uniqueTimeStamp = () => {
+    const date = new Date();
+    return `${(date.getMonth() + 1).toString().padStart(2, '0')}${date
+      .getDate()
+      .toString()
+      .padStart(2, '0')}-${date.getHours().toString().padStart(2, '0')}${date
+      .getMinutes()
+      .toString()
+      .padStart(2, '0')}${date.getSeconds().toString().padStart(2, '0')}`;
+  };
+
+  const detectFileFormat = (fileContent: string): FileFormat => {
+    //Detect binary - open binary data in a normal way (without using a hex editor),
+    //it will encounter some rendering problems which translate to you as a succession
+    //of this weird character � called "Replacement character" == ufffd
+    if (/\ufffd/.test(fileContent) === true) {
+      return FileFormat.BINARY;
+    } else {
+      if (
+        fileContent.includes('xmlns') ||
+        fileContent.includes('<?xml') ||
+        fileContent.includes('<Document')
+      )
+        return FileFormat.XML;
+      else if (
+        fileContent.includes('{1:') ||
+        fileContent.includes('{2:') ||
+        fileContent.includes('{3:') ||
+        fileContent.includes('{4:')
+      )
+        return FileFormat.SWIFT;
+      else return FileFormat.TEXT;
+    }
+  };
+
+  const applySmartAdjustments = async (
+    fileText: string,
+    fileFormat: FileFormat,
+    settings: UserSettings
+  ): Promise<string> => {
+    switch (fileFormat) {
+      case FileFormat.BINARY:
+      case FileFormat.TEXT:
+      case FileFormat.SWIFT:
+        return fileText;
+        break;
+      case FileFormat.XML:
+        return await applySmartAdjustmentsPain00x(
+          fileText,
+          settings.adjustmentOptions.pain001
+        );
+    }
   };
 
   /*const applySmartAdjustmentsSwift = async (
@@ -45,18 +101,22 @@ export default function useTextUtils() {
 
   const applySmartAdjustmentsPain00x = async (
     fileText: string,
-    settings: AutoAdjustmentsPain00x,
+    settings: AutoAdjustmentsPain00x
   ): Promise<string> => {
     const s = settings;
-    const idPrefix = s.idPrefix + '-' + new Date().toDateString() + new Date().toTimeString();
+    const idPrefix = s.idPrefix + '-' + uniqueTimeStamp();
     let bLevel = 0;
     let cLevel = 0;
     let nbOfTrxs = 0;
     let ctrlSum = 0;
     const regExp = new RegExp(
-      (s.pmtInfId || s.instrId || s.endToEndId ? '(<PmtInfId>.*</PmtInfId>)' : '') +
+      (s.pmtInfId || s.instrId || s.endToEndId
+        ? '(<PmtInfId>.*</PmtInfId>)'
+        : '') +
         (s.instrId ? '|(<InstrId>.*</InstrId>)' : '') +
-        (s.endToEndId || s.nbOfTrxsCalc ? '|(<EndToEndId>.*</EndToEndId>)' : '') +
+        (s.endToEndId || s.nbOfTrxsCalc
+          ? '|(<EndToEndId>.*</EndToEndId>)'
+          : '') +
         (s.ctrlSumCalc
           ? '|(<InstdAmt Ccy="\\w{3}">.*<\\/InstdAmt>)|(<Amt Ccy="\\w{3}">.*<\\/Amt>)'
           : '') +
@@ -72,7 +132,9 @@ export default function useTextUtils() {
       } else if (match.startsWith('<PmtInfId>')) {
         cLevel = 0;
         bLevel++;
-        return s.pmtInfId ? `<PmtInfId>${idPrefix}-B${bLevel}</PmtInfId>` : match;
+        return s.pmtInfId
+          ? `<PmtInfId>${idPrefix}-B${bLevel}</PmtInfId>`
+          : match;
       } else if (s.instrId && match.startsWith('<InstrId>')) {
         return `<InstrId>${idPrefix}-B${bLevel}-C${cLevel + 1}</InstrId>`;
       } else if (
@@ -100,7 +162,8 @@ export default function useTextUtils() {
       } else return 'Unknown match';
     });
     if (s.nbOfTrxsCalc || s.ctrlSumCalc) {
-      return await findAndReplace(output,
+      return await findAndReplace(
+        output,
         new RegExp(
           (s.nbOfTrxsCalc ? '(<NbOfTxs>.*</NbOfTxs>)' : '') +
             (s.nbOfTrxsCalc && s.ctrlSumCalc ? '|' : '') +
@@ -111,7 +174,9 @@ export default function useTextUtils() {
           if (s.nbOfTrxsCalc && match.startsWith('<NbOfTxs>')) {
             return `<NbOfTxs>${nbOfTrxs}</NbOfTxs>`;
           } else if (s.ctrlSumCalc && match.startsWith('<CtrlSum>')) {
-            return `<CtrlSum>${ctrlSum.toFixed(5).replace(new RegExp('(\\.)?0+$'), '')}</CtrlSum>`;
+            return `<CtrlSum>${ctrlSum
+              .toFixed(5)
+              .replace(new RegExp('(\\.)?0+$'), '')}</CtrlSum>`;
           } else return 'Unknown match';
         }
       );
@@ -120,5 +185,10 @@ export default function useTextUtils() {
     }
   };
 
-  return { currentDate, applySmartAdjustmentsPain00x };
+  return {
+    detectFileFormat,
+    currentDate,
+    uniqueTimeStamp,
+    applySmartAdjustments,
+  };
 }
