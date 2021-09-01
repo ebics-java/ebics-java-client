@@ -23,11 +23,7 @@ class UserKeyStoreService(private val userKeyStoreRepository: UserKeyStoreReposi
     }
 
     fun loadById(id: Long): UserKeyStore {
-        try {
-            return userKeyStoreRepository.getOne(id)
-        } catch (ex: ObjectRetrievalFailureException) {
-            throw NotFoundException(id, "UserKeyStore", ex)
-        }
+        return userKeyStoreRepository.getById(id, "UserKeyStore")
     }
 
     fun deleteById(id: Long) {

@@ -16,7 +16,7 @@ class UserResource {
     fun user(): UserRoles
     {
         with(
-            SecurityContextHolder.getContext().authentication
+            SecutiryCtxHelper.getAuthentication()
         ) {
             return UserRoles(name, authorities.map { it.toString() })
         }

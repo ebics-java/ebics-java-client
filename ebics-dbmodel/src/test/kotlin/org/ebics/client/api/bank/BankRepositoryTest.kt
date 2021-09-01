@@ -16,7 +16,7 @@ class BankRepositoryTest (@Autowired private val bankRepo: BankRepository) {
         val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), "EBXUBSCH", "UBS-PROD-CH", null)
         bankRepo.saveAndFlush(bank)
         assertThat(bank.id).isEqualTo(1)
-        val loadedBank = bankRepo.getOne(1)
+        val loadedBank = bankRepo.getById(1, "bank")
         assertThat(loadedBank.name).isEqualTo(bank.name)
         bankRepo.deleteById(1)
         assertThat(bankRepo.count()).isEqualTo(0)

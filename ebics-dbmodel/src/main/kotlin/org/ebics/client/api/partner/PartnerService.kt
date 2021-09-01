@@ -28,7 +28,7 @@ class PartnerService(
         return partner.id!!
     }
 
-    fun getPartnerById(partnerId: Long): Partner = partnerRepository.getOne(partnerId)
+    fun getPartnerById(partnerId: Long): Partner = partnerRepository.getById(partnerId, "partner")
 
     fun deletePartnerById(partnerId: Long) = partnerRepository.deleteById(partnerId)
 

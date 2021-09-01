@@ -10,6 +10,6 @@ class BankKeyStoreService(private val bankKeyStoreRepository: BankKeyStoreReposi
     }
 
     fun load(bankKeyStoreId:Long): BankKeyStore {
-        return bankKeyStoreRepository.getOne(bankKeyStoreId)
+        return bankKeyStoreRepository.getById(bankKeyStoreId, "BankKeyStore")
     }
 }

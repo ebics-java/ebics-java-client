@@ -1,7 +1,7 @@
 package org.ebics.client.api.user
 
-import org.springframework.data.jpa.repository.JpaRepository
+import org.ebics.client.api.CustomJpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface UserRepository : JpaRepository<User, Long>
+interface UserRepository : CustomJpaRepository<User, Long>
