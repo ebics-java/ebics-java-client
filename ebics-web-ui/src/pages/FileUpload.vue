@@ -6,7 +6,12 @@
 
       <!-- style="max-width: 400px" -->
       <div class="q-pa-md">
-        <q-form @submit="onSubmit" @reset="onCancel" class="q-gutter-md">
+        <q-form
+          ref="uploadForm"
+          @submit="onSubmit"
+          @reset="onCancel"
+          class="q-gutter-md"
+        >
           <q-select
             filled
             v-model="bankConnection"
@@ -15,7 +20,10 @@
             label="EBICS Bank connection"
             hint="Select EBICS bank connection"
             lazy-rules
-            :rules="[(val) => bankConnection || 'Please select valid EBICS bank connection']"
+            :rules="[
+              (val) =>
+                bankConnection || 'Please select valid EBICS bank connection',
+            ]"
           />
 
           <div v-if="bankConnection" class="q-gutter-sm">
@@ -48,7 +56,9 @@
             hint="Select EBICS Order Type"
             lazy-rules
             :rules="[
-              (val) => (val && val.length > 0) || 'Please select valid EBICS Order Type',
+              (val) =>
+                (val && val.length > 0) ||
+                'Please select valid EBICS Order Type',
             ]"
           />
 
@@ -90,6 +100,15 @@
             label="Request EDS"
           />
 
+          <q-btn-dropdown
+              v-if="!fileEditor && userSettings.uploadOnDrop"
+              :split="fileEditor"
+              color="primary"
+              label="Smart Adjustment Settings"
+            >
+              <user-preferences section-filter="ContentOptions" />
+            </q-btn-dropdown>
+
           <q-file
             v-if="fileEditor"
             style="max-width: 300px"
@@ -109,7 +128,7 @@
           <q-file
             v-else
             style="max-width: 300px"
-            v-model="file"
+            v-model="files"
             outlined
             multiple
             use-chips
@@ -156,6 +175,7 @@
 
           <div class="q-pa-md q-gutter-sm">
             <q-btn-dropdown
+              v-if="fileEditor || !userSettings.uploadOnDrop"
               :split="fileEditor"
               color="primary"
               label="Smart Adjust"
@@ -206,6 +226,7 @@ import {
 } from 'components/models';
 import { defineComponent } from 'vue';
 import { ref } from 'vue';
+import { QForm } from 'quasar';
 
 import { VAceEditor } from 'vue3-ace-editor';
 import 'ace-builds/src-noconflict/mode-xml';
@@ -266,8 +287,26 @@ export default defineComponent({
       return btf instanceof Btf ? btf.label() : '';
     },
 
-    onUpdateInputFiles(files: File[]) {
+    async onUpdateInputFiles(files: File[]) {
       console.log(files);
+      this.files = files;
+
+      if (this.userSettings.uploadOnDrop) {
+        const validationResult = await (
+          this.$refs.uploadForm as QForm
+        ).validate();
+        if (!validationResult) {
+          this.files = [];
+          this.$q.notify({
+            color: 'warning',
+            position: 'bottom-right',
+            message: 'File will be not uploaded',
+            caption:
+              'Please correct validation issues before uploading the file',
+            icon: 'warning',
+          });
+        }
+      }
     },
 
     /**
@@ -324,6 +363,8 @@ export default defineComponent({
     },
     async onSubmit() {
       if (this.bankConnection) {
+        if (!this.fileEditor) {
+        }
         var uploadRequest: UploadRequest;
         if (this.bankConnection.ebicsVersion == 'H005') {
           uploadRequest = {
@@ -373,6 +414,10 @@ export default defineComponent({
     },
   },
   setup() {
+    const files = ref<File[]>([]);
+    const resetFiles = () => {
+      files.value = [];
+    };
     const replaceMsgId = ref(true);
     const { activeBankConnections, hasActiveConnections } =
       useBankConnectionsAPI();
@@ -380,6 +425,8 @@ export default defineComponent({
     const { applySmartAdjustments, detectFileFormat } = useTextUtils();
     const { userSettings } = useUserSettings();
     return {
+      resetFiles,
+      files,
       activeBankConnections,
       hasActiveConnections,
       userSettings,

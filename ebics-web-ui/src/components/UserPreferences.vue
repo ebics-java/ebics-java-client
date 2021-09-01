@@ -44,6 +44,11 @@
         v-model="userSettings.adjustmentOptions.pain001.instrId"
       />
       <boolean-option
+        label="UETR for GPI"
+        :hint="`unique UETR id based on random seed: ${this.uetr()}`"
+        v-model="userSettings.adjustmentOptions.pain001.uetr"
+      />
+      <boolean-option
         label="creDtTm"
         :hint="`actual date-time in ISO format: ${new Date().toISOString()}`"
         v-model="userSettings.adjustmentOptions.pain001.creDtTm"
@@ -63,8 +68,10 @@
         hint="recalculates control sum based on C-Level amouths"
         v-model="userSettings.adjustmentOptions.pain001.ctrlSumCalc"
       />
-      <q-separator spaced />
     </div>
+    <!--
+    <q-separator spaced v-if="displaySection('ContentOptions.Pain.00x') && displaySection('ContentOptions.Swift')"/>
+    -->
     <div
       v-if="
         userSettings.testerSettings && displaySection('ContentOptions.Swift')
@@ -86,11 +93,11 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent } from 'vue';
+import { defineComponent } from 'vue';
 import BooleanOption from 'src/components/BooleanOption.vue';
-import { UserSettings } from 'components/models';
 import useTextUtils from './text-utils';
 import useUserSettingsAPI from './user-settings';
+import { uuid } from 'vue-uuid';
 
 export default defineComponent({
   name: 'ContentAdjustmenOption',
@@ -103,10 +110,12 @@ export default defineComponent({
     },
   },
   methods: {
-    displaySection(sectionName: string) {
-      return (
-        this.sectionFilter == '' || this.sectionFilter.includes(sectionName)
-      );
+    displaySection(sectionName: string): boolean {
+      console.log(`sectionName: ${sectionName}, sectionFilter: ${this.sectionFilter}, includes: ${sectionName.includes(this.sectionFilter) ? '1': '0'}`)
+      return (this.sectionFilter == '' || sectionName.includes(this.sectionFilter));
+    },
+    uetr(): string {
+      return uuid.v4();
     },
   },
   setup() {

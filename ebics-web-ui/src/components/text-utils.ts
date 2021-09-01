@@ -1,4 +1,6 @@
 import { AutoAdjustmentsPain00x, FileFormat, UserSettings } from './models';
+import { uuid } from 'vue-uuid';
+
 /**
  * Text Utils composition API
  * @returns
@@ -117,6 +119,7 @@ export default function useTextUtils() {
         (s.endToEndId || s.nbOfTrxsCalc
           ? '|(<EndToEndId>.*</EndToEndId>)'
           : '') +
+        (s.uetr ? '|(<InstrInf>UETR/.*</InstrInf>)' : '') +
         (s.ctrlSumCalc
           ? '|(<InstdAmt Ccy="\\w{3}">.*<\\/InstdAmt>)|(<Amt Ccy="\\w{3}">.*<\\/Amt>)'
           : '') +
@@ -146,6 +149,8 @@ export default function useTextUtils() {
         return s.endToEndId
           ? `<EndToEndId>${idPrefix}-B${bLevel}-C${cLevel}</EndToEndId>`
           : match;
+      } else if (s.uetr && match.startsWith('<InstrInf>')) {
+          return `<InstrInf>UETR/${uuid.v4()}</InstrInf>`;
       } else if (
         s.ctrlSumCalc &&
         (match.startsWith('<InstdAmt') || match.startsWith('<Amt'))
