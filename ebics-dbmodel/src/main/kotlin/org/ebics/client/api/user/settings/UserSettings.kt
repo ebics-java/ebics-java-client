@@ -1,12 +1,11 @@
 package org.ebics.client.api.user.settings
 
-import javax.persistence.Embeddable
-import javax.persistence.Embedded
-import javax.persistence.Id
+import javax.persistence.*
 
 /**
     User Settings class
  */
+@Entity
 class UserSettings(
     @Id
     val userId: String,

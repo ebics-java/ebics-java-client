@@ -3,6 +3,7 @@ package org.ebics.client.api.user.cert
 import org.apache.xml.security.Init
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.api.NotFoundException
+import org.ebics.client.api.getById
 import org.springframework.orm.ObjectRetrievalFailureException
 import org.springframework.stereotype.Service
 import java.security.Security

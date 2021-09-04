@@ -7,8 +7,8 @@ const userSettings = ref<UserSettings>({
   uploadOnDrop: true,
   testerSettings: true,
   adjustmentOptions: {
-    applyAuthomatically: true,
-    pain001: {
+    applyAutomatically: true,
+    pain00x: {
       msgId: true,
       pmtInfId: false,
       instrId: true,
@@ -20,7 +20,7 @@ const userSettings = ref<UserSettings>({
       creDtTm: true,
       idPrefix: 't51246',
     },
-    mt101: {
+    swift: {
       uetr: true,
       f20: true,
       f21: false,
@@ -39,6 +39,7 @@ export default function useUserSettingsAPI() {
     try {
       const response = await api.get<UserSettings>('user/settings');
       userSettings.value = response.data;
+      console.log('User settings loaded: ' + JSON.stringify(userSettings.value))
     } catch (error) {
       apiErrorHandler('Loading of user settings failed', error);
     }

@@ -1,9 +1,7 @@
 package org.ebics.client.api.partner
 
-import org.ebics.client.api.NotFoundException
-import org.ebics.client.api.bank.BankRepository
 import org.ebics.client.api.bank.BankService
-import org.springframework.orm.ObjectRetrievalFailureException
+import org.ebics.client.api.getById
 import org.springframework.stereotype.Service
 
 @Service

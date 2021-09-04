@@ -1,5 +1,6 @@
 package org.ebics.client.api.bank.cert
 
+import org.ebics.client.api.getById
 import org.springframework.stereotype.Service
 
 @Service

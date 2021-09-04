@@ -1,17 +1,12 @@
 <template>
-  <q-page class="justify-evenly">
+  <q-page class="justify-evenly" ref="testInput">
     <div v-if="hasActiveConnections" class="q-pa-md">
       <h5 v-if="fileEditor">Edit &amp; upload File</h5>
       <h5 v-else>Simple file upload</h5>
 
       <!-- style="max-width: 400px" -->
       <div class="q-pa-md">
-        <q-form
-          ref="uploadForm"
-          @submit="onSubmit"
-          @reset="onCancel"
-          class="q-gutter-md"
-        >
+        <q-form ref="uploadForm" @submit="onSubmit" class="q-gutter-md">
           <q-select
             filled
             v-model="bankConnection"
@@ -101,13 +96,13 @@
           />
 
           <q-btn-dropdown
-              v-if="!fileEditor && userSettings.uploadOnDrop"
-              :split="fileEditor"
-              color="primary"
-              label="Smart Adjustment Settings"
-            >
-              <user-preferences section-filter="ContentOptions" />
-            </q-btn-dropdown>
+            v-if="!fileEditor && userSettings.uploadOnDrop"
+            :split="fileEditor"
+            color="primary"
+            label="Smart Adjustment Settings"
+          >
+            <user-preferences section-filter="ContentOptions" />
+          </q-btn-dropdown>
 
           <q-file
             v-if="fileEditor"
@@ -140,19 +135,16 @@
             max-file-size="1200000000"
             @rejected="onRejected"
             @update:model-value="onUpdateInputFiles"
+            lazy-rules
+            :rules="[
+              (val) =>
+                val.length > 0 || 'Please drop or select file(s) for upload',
+            ]"
           >
             <template v-slot:prepend>
               <q-icon name="attach_file" />
             </template>
           </q-file>
-
-          <!-- q-input
-            v-if="file && !binary"
-            v-model="fileText"
-            filled
-            type="textarea"
-            label="Input file content"
-          /-->
 
           <v-ace-editor
             ref="contentEditor"
@@ -162,10 +154,11 @@
             theme="clouds"
             style="height: 300px"
             :printMargin="false"
-            @init="initEditor"
           />
+          <!-- @init="initEditor" -->
 
           <q-input
+            
             v-if="bankConnection?.ebicsVersion == 'H005'"
             filled
             v-model="fileName"
@@ -181,7 +174,11 @@
               label="Smart Adjust"
               @click="applySmartAdjustmentsForSingleFile()"
             >
-              <user-preferences section-filter="ContentOptions.Pain.00x" />
+              <user-preferences
+                :section-filter="
+                  fileEditor ? contentOptionsFilter : 'ContentOptions'
+                "
+              />
             </q-btn-dropdown>
 
             <q-btn
@@ -225,7 +222,7 @@ import {
   FileFormat,
 } from 'components/models';
 import { defineComponent } from 'vue';
-import { ref } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { QForm } from 'quasar';
 
 import { VAceEditor } from 'vue3-ace-editor';
@@ -250,26 +247,7 @@ export default defineComponent({
     },
   },
   data() {
-    return {
-      FileFormat,
-      file: ref<File | null>(null),
-      fileText: ref<string>('<document>paste document here</document>'),
-      fileName: '',
-      fileFormat: undefined as FileFormat | undefined,
-      users: [] as User[],
-      bankConnection: undefined as User | undefined,
-      orderType: '',
-      orderTypes: ['XE2', 'XE3', 'XL3', 'XG1', 'CCT'],
-      btfType: undefined as Btf | undefined,
-      btfTypes: [
-        new Btf('PSR', undefined, 'CH', 'ZIP', new BtfMessage('pain.002')),
-        new Btf('MCT', undefined, 'CH', undefined, new BtfMessage('pain.001')),
-        new Btf('MCT', 'XCH', 'CGI', undefined, new BtfMessage('pain.001')),
-      ],
-      signatureFlag: true,
-      requestEDS: true,
-      signatureOZHNN: true,
-    };
+    return {};
   },
   methods: {
     initEditor(editor: VAceEditorInstance) {
@@ -278,7 +256,7 @@ export default defineComponent({
     async applySmartAdjustmentsForSingleFile() {
       this.fileText = await this.applySmartAdjustments(
         this.fileText,
-        this.fileFormat as FileFormat,
+        this.fileFormat,
         this.userSettings
       );
     },
@@ -318,8 +296,7 @@ export default defineComponent({
       this.file = file;
       this.fileName = file.name;
       try {
-        const text = await file.text();
-        this.fileFormat = this.detectFileFormat(text);
+        this.fileRawText = await file.text();
         if (this.fileFormat == FileFormat.BINARY) {
           this.$q.notify({
             color: 'positive',
@@ -329,13 +306,13 @@ export default defineComponent({
             icon: 'warning',
           });
         } else {
-          if (this.userSettings.adjustmentOptions.applyAuthomatically)
+          if (this.userSettings.adjustmentOptions.applyAutomatically)
             this.fileText = await this.applySmartAdjustments(
-              text,
+              this.fileRawText,
               this.fileFormat,
               this.userSettings
             );
-          else this.fileText = text;
+          else this.fileText = this.fileRawText;
         }
       } catch (error) {
         this.$q.notify({
@@ -362,48 +339,9 @@ export default defineComponent({
       }
     },
     async onSubmit() {
-      if (this.bankConnection) {
-        if (!this.fileEditor) {
-        }
-        var uploadRequest: UploadRequest;
-        if (this.bankConnection.ebicsVersion == 'H005') {
-          uploadRequest = {
-            orderService: this.btfType,
-            signatureFlag: this.signatureFlag,
-            edsFlag: this.requestEDS,
-            fileName: this.file ? this.file.name : 'Filename_not_provided',
-          } as UploadRequestH005;
-        } else {
-          //H004, H003
-          uploadRequest = {
-            orderType: this.orderType,
-            attributeType: this.signatureOZHNN ? 'OZHNN' : 'DZHNN',
-            params: new Map(),
-          } as UploadRequestH004;
-        }
-        if (this.fileFormat == FileFormat.BINARY && this.file) {
-          await this.ebicsUploadRequest(
-            this.bankConnection,
-            uploadRequest,
-            this.file
-          );
-        } else if (this.fileFormat != FileFormat.BINARY && this.fileText) {
-          const content = new Blob([this.fileText], { type: 'text/html' });
-          await this.ebicsUploadRequest(
-            this.bankConnection,
-            uploadRequest,
-            content
-          );
-        } else {
-          console.error(
-            'Invalid input combination, no file content available to upload'
-          );
-        }
-      }
+      await this.processUpload();
     },
-    onCancel() {
-      this.$router.go(-1);
-    },
+
     onRejected() {
       //rejectedFiles: File[]
       this.$q.notify({
@@ -413,20 +351,130 @@ export default defineComponent({
       });
     },
   },
-  setup() {
-    const files = ref<File[]>([]);
-    const resetFiles = () => {
-      files.value = [];
-    };
+  setup(props) {
     const replaceMsgId = ref(true);
     const { activeBankConnections, hasActiveConnections } =
       useBankConnectionsAPI();
     const { ebicsUploadRequest } = useFileTransferAPI();
     const { applySmartAdjustments, detectFileFormat } = useTextUtils();
     const { userSettings } = useUserSettings();
+
+    //Selected bank connection
+    const bankConnection = ref<User>();
+
+    //Single file setup
+    const contentEditor = ref<VAceEditorInstance | null>(null);
+    const testInput = ref(null);
+    const file = ref<File>();
+    const fileRawText = ref<string>(''); //Original text of input file
+    const fileText = ref<string>('<document>paste document here</document>'); //Text displayed in editor (in case of no binary)
+    const fileName = ref('');
+    const orderType = ref('');
+    const orderTypes = ref(['XE2', 'XE3', 'XL3', 'XG1', 'CCT']);
+    const btfType = ref<Btf>();
+    const btfTypes = ref<Btf[]>([
+      new Btf('PSR', undefined, 'CH', 'ZIP', new BtfMessage('pain.002')),
+      new Btf('MCT', undefined, 'CH', undefined, new BtfMessage('pain.001')),
+      new Btf('MCT', 'XCH', 'CGI', undefined, new BtfMessage('pain.001')),
+    ]);
+    const signatureFlag = ref(true);
+    const requestEDS = ref(true);
+    const signatureOZHNN = ref(true);
+    onMounted(() => {
+      console.log('Editor ref: ' + JSON.stringify(contentEditor.value));
+      console.log('Test input ref: ' + JSON.stringify(testInput.value));
+    });
+
+    //Multiple file setup
+    const files = ref<File[]>([]);
+    const resetFiles = () => {
+      files.value = [];
+    };
+
+    const fileFormat = computed((): FileFormat => {
+      return detectFileFormat(fileRawText.value);
+    });
+
+    const contentOptionsFilter = computed((): string => {
+      if (fileFormat.value == FileFormat.XML) return 'ContentOptions.Pain.00x';
+      else if (fileFormat.value == FileFormat.SWIFT)
+        return 'ContentOptions.Swift';
+      else return 'ContentOptions';
+    });
+
+    const changeEditorLang = () => {
+      if (contentEditor.value) {
+        switch (fileFormat.value) {
+          case FileFormat.XML:
+            contentEditor.value?._editor.getSession().setMode('ace/mode/xml');
+            break;
+          default:
+            contentEditor.value?._editor.getSession().setMode('ace/mode/text');
+            break;
+          //contentEditor.value?._editor.setOption<string>('lang','xml');
+        }
+      } else
+        console.error(
+          'Reference to editor not set, cant change language to ' +
+            fileFormat.value.toString()
+        );
+    };
+
+    const getUploadRequest = (): UploadRequest => {
+      if (bankConnection.value?.ebicsVersion == 'H005') {
+        return {
+          orderService: btfType.value,
+          signatureFlag: signatureFlag.value,
+          edsFlag: requestEDS.value,
+          fileName: fileName.value,
+        } as UploadRequestH005;
+      } else {
+        //H004, H003
+        return {
+          orderType: orderType.value,
+          attributeType: signatureOZHNN.value ? 'OZHNN' : 'DZHNN',
+          params: new Map(),
+        } as UploadRequestH004;
+      }
+    };
+
+    const getUploadContent = (): Blob => {
+      if (fileFormat.value == FileFormat.BINARY && file.value) {
+        return file.value;
+      } else if (fileFormat.value != FileFormat.BINARY && fileText.value) {
+        return new Blob([fileText.value], { type: 'text/html' });
+      } else {
+        throw new Error(
+          'Invalid input combination, no file content available to upload'
+        );
+      }
+    };
+
+    const processUpload = async (): Promise<void> => {
+      if (bankConnection.value) {
+        if (!props.fileEditor) {
+          for (let file of files.value) {
+            await ebicsUploadRequest(
+              bankConnection.value,
+              getUploadRequest(),
+              file
+            )
+          }
+        } else {
+          //Single file upload
+          await ebicsUploadRequest(
+            bankConnection.value,
+            getUploadRequest(),
+            getUploadContent()
+          );
+        }
+      }
+    };
+
+    watch(fileFormat, changeEditorLang);
+
     return {
-      resetFiles,
-      files,
+      bankConnection,
       activeBankConnections,
       hasActiveConnections,
       userSettings,
@@ -434,6 +482,32 @@ export default defineComponent({
       ebicsUploadRequest,
       applySmartAdjustments,
       detectFileFormat,
+      contentOptionsFilter,
+
+      //Multiple files
+      files,
+      resetFiles,
+
+      //Sigle file
+      file,
+      fileRawText,
+      fileText,
+      fileName,
+      contentEditor,
+      fileFormat,
+
+      testInput,
+
+      //Commons
+      orderType,
+      orderTypes,
+      btfType,
+      btfTypes,
+      signatureFlag,
+      requestEDS,
+      signatureOZHNN,
+      FileFormat,
+      processUpload,
     };
   },
 });

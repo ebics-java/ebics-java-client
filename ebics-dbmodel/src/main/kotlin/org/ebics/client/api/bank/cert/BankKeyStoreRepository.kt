@@ -1,7 +1,7 @@
 package org.ebics.client.api.bank.cert
 
-import org.ebics.client.api.CustomJpaRepository
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface BankKeyStoreRepository : CustomJpaRepository<BankKeyStore, Long>
+interface BankKeyStoreRepository : JpaRepository<BankKeyStore, Long>

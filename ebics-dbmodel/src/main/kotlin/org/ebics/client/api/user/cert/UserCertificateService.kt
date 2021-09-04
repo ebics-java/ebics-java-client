@@ -2,13 +2,12 @@ package org.ebics.client.api.user.cert
 
 import org.ebics.client.api.EbicsUser
 import org.ebics.client.api.FunctionException
-import org.ebics.client.api.NotFoundException
+import org.ebics.client.api.getById
 import org.ebics.client.api.user.SecurityCtxHelper
 import org.ebics.client.api.user.UserRepository
 import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.letter.DefaultLetterManager
 import org.ebics.client.model.user.EbicsUserAction
-import org.springframework.orm.ObjectRetrievalFailureException
 import org.springframework.stereotype.Service
 import java.lang.IllegalArgumentException
 import java.util.*

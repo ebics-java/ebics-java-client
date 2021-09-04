@@ -1,5 +1,5 @@
 package org.ebics.client.api.user.settings
 
-import org.ebics.client.api.CustomJpaRepository
+import org.springframework.data.jpa.repository.JpaRepository
 
-interface UserSettingsRepository : CustomJpaRepository<UserSettings, String>
+interface UserSettingsRepository : JpaRepository<UserSettings, String>

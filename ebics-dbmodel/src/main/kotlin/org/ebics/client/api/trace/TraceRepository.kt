@@ -1,5 +1,5 @@
 package org.ebics.client.api.trace
 
-import org.ebics.client.api.CustomJpaRepository
+import org.springframework.data.jpa.repository.JpaRepository
 
-interface TraceRepository : CustomJpaRepository<TraceEntry, Long>
+interface TraceRepository : JpaRepository<TraceEntry, Long>

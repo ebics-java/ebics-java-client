@@ -126,7 +126,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     fileFormat = EbicsXmlFactory.createFileFormatType(session.getConfiguration().getLocale().getCountry().toUpperCase(),
 	                                              session.getSessionParam("FORMAT"));
 
-    String nextOrderId = session.getUser().getPartner().nextOrderId();
+    orderId = session.getUser().getPartner().nextOrderId();
 
     StaticHeaderOrderDetailsType orderDetails;
     if (type == EbicsAdminOrderType.FUL) {
@@ -148,13 +148,13 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
         if (parameters.size() > 0) {
           fULOrderParams.setParameterArray(parameters.toArray(new Parameter[parameters.size()]));
         }
-        orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(nextOrderId,
+        orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(orderId,
             orderAttribute,
             orderType,
             fULOrderParams);
     } else {
         StandardOrderParamsType standardOrderParamsType = EbicsXmlFactory.createStandardOrderParamsType();
-        orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(nextOrderId,
+        orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(orderId,
             orderAttribute,
             orderType,
             standardOrderParamsType);
@@ -216,6 +216,8 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
     return splitter.getSegmentNumber();
   }
 
+  public String getOrderId() { return orderId; }
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
@@ -225,5 +227,6 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
   private UserSignature			userSignature;
   private SecretKeySpec			keySpec;
   private Splitter			splitter;
+  private String            orderId;
   private static final long 		serialVersionUID = -8083183483311283608L;
 }

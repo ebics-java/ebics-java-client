@@ -83,6 +83,7 @@
             </q-item-section>
           </q-item>
 
+          <!--
           <q-item 
             to="/help"
             exact
@@ -96,6 +97,7 @@
               Help
             </q-item-section>
           </q-item>            
+          -->
         </q-list>
       </q-scroll-area>
     </q-drawer>

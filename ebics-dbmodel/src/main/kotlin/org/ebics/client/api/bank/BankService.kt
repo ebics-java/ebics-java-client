@@ -2,7 +2,7 @@ package org.ebics.client.api.bank
 
 import org.ebics.client.api.NotFoundException
 import org.ebics.client.api.bank.cert.BankKeyStore
-import org.springframework.orm.ObjectRetrievalFailureException
+import org.ebics.client.api.getById
 import org.springframework.stereotype.Service
 
 @Service

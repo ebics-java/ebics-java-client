@@ -31,7 +31,9 @@ import org.ebics.client.order.AttributeType
 import org.ebics.client.order.EbicsAdminOrderType
 import org.ebics.client.order.h003.EbicsDownloadOrder
 import org.ebics.client.order.h003.EbicsUploadOrder
+import org.ebics.client.order.h003.EbicsUploadOrderResponse
 import org.ebics.client.utils.Constants
+import org.ebics.client.utils.toHexString
 import org.ebics.client.xml.h003.*
 import org.ebics.schema.h003.OrderAttributeType
 import org.slf4j.LoggerFactory
@@ -86,7 +88,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
      * @throws EbicsException
      */
     @Throws(IOException::class, EbicsException::class)
-    fun sendFile(content: ByteArray, uploadOrder: EbicsUploadOrder) {
+    fun sendFile(content: ByteArray, uploadOrder: EbicsUploadOrder): EbicsUploadOrderResponse {
         val orderType = uploadOrder.adminOrderType
         val sender = HttpRequestSender(session)
         val initializer = UploadInitializationRequestElement(
@@ -115,6 +117,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
                 state.transactionId, orderType
             )
         }
+        return EbicsUploadOrderResponse(initializer.orderId, response.transactionId)
     }
 
     /**

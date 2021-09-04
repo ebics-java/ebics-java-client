@@ -1,15 +1,12 @@
 package org.ebics.client.api.user
 
-import org.ebics.client.api.FunctionException
-import org.ebics.client.api.NotFoundException
+import org.ebics.client.api.getById
 import org.ebics.client.api.user.cert.UserKeyStoreService
 import org.ebics.client.api.partner.PartnerService
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.user.EbicsUserAction
 import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.slf4j.LoggerFactory
-import org.springframework.orm.ObjectRetrievalFailureException
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 
 @Service

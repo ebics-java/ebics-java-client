@@ -18,7 +18,7 @@ class UserSettingsResource(private val userSettingsService: UserSettingsService)
     }
 
     @PutMapping
-    fun updateUserSettings(userSettings: UserSettings) {
+    fun updateUserSettings(@RequestBody userSettings: UserSettings) {
         userSettingsService.updateUserSettings(userSettings)
     }
 }

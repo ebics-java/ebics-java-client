@@ -259,4 +259,96 @@ databaseChangeLog:
         referencedColumnNames: id
         referencedTableName: User
         validate: true
+- changeSet:
+    id: 1630473091362-1
+    author: honza.toegel (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: UserSettingsPK
+            name: userId
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_applyAutomatically
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_pain00x_creDtTm
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_pain00x_ctrlSumCalc
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_pain00x_endToEndId
+            type: BOOLEAN
+        - column:
+            name: adjustmentOptions_pain00x_idPrefix
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_pain00x_instrId
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_pain00x_msgId
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_pain00x_nbOfTrxsCalc
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_pain00x_pmtInfId
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_pain00x_reqdExctnDt
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_pain00x_uetr
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_swift_f20
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_swift_f21
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_swift_uetr
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: testerSettings
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: uploadOnDrop
+            type: BOOLEAN
+        tableName: UserSettings
 

@@ -1,6 +1,7 @@
 package org.ebics.client.api.bank
 
 import org.assertj.core.api.Assertions.assertThat
+import org.ebics.client.api.getById
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired

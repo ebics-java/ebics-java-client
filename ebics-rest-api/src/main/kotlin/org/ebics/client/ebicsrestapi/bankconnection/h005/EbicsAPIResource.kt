@@ -3,8 +3,9 @@ package org.ebics.client.ebicsrestapi.bankconnection.h005
 import org.ebics.client.ebicsrestapi.bankconnection.UploadResponse
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
 import org.ebics.client.ebicsrestapi.bankconnection.UserPass
-import org.ebics.client.ebicsrestapi.bankconnection.h005.UploadRequest
+import org.springframework.core.io.Resource
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
@@ -23,4 +24,7 @@ class EbicsAPIResource (private val ebicsAPI: EbicsAPI){
 
     @PostMapping("upload", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun uploadFile(@PathVariable userId: Long, @RequestPart uploadRequest: UploadRequest, @RequestPart uploadFile: MultipartFile): UploadResponse = ebicsAPI.uploadFile(userId, uploadRequest, uploadFile)
+
+    @GetMapping("download")
+    fun downloadFile(@PathVariable userId: Long, @RequestBody downloadRequest: DownloadRequest): ResponseEntity<Resource> = ebicsAPI.downloadFile(userId, downloadRequest)
 }

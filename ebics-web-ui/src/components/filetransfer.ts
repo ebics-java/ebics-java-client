@@ -1,6 +1,7 @@
 import { User, UploadRequest, UploadResponse } from 'components/models';
 import { api } from 'boot/axios';
 import usePasswordAPI from './password-api';
+import { AxiosResponse } from 'axios';
 
 export default function useFileTransferAPI() {
   const { pwdApiOkHandler, pwdApiErrorHandler, promptCertPassword } =
@@ -26,15 +27,16 @@ export default function useFileTransferAPI() {
         new Blob([JSON.stringify(uploadRequest)], { type: 'application/json' })
       );
       formData.append('uploadFile', uploadFile);
-      const response = await api.post<UploadRequest, UploadResponse>(
+      const response = await api.post<UploadRequest, AxiosResponse<UploadResponse>>(
         `bankconnections/${user.id}/${user.ebicsVersion}/upload`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
+      console.log('Upload response: ' + JSON.stringify(response))
       pwdApiOkHandler(
-        `File uploaded successfully for user name: ${user.name}, order number: ${response.orderNumber}`
+        `File uploaded successfully for bank connection: ${user.name}, order number: ${response.data.orderNumber}`
       );
-      return response;
+      return response.data;
     } catch (error) {
       pwdApiErrorHandler(user, 'File upload failed: ', error);
     }

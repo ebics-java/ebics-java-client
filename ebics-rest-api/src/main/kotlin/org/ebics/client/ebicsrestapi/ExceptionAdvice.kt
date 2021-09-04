@@ -21,7 +21,7 @@ class ExceptionAdvice {
             is AlreadyExistException -> HttpStatus.CONFLICT //EXISTING RESOURCE
             is FunctionException -> HttpStatus.BAD_REQUEST
             is EbicsException -> HttpStatus.BAD_REQUEST
-            is IllegalAccessException -> HttpStatus.UNAUTHORIZED
+            is IllegalAccessException -> HttpStatus.FORBIDDEN
             else -> HttpStatus.INTERNAL_SERVER_ERROR
         }
         return ResponseEntity<ErrorMessage>(

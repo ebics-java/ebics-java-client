@@ -58,6 +58,7 @@ public class InitializationResponseElement extends DefaultResponseElement {
     returnCode = ReturnCode.toReturnCode(code, text);
     checkReturnCode(returnCode);
     processBodyReturnCode();
+    orderNumber = response.getHeader().getMutable().getOrderID();
     transactionId = response.getHeader().getStatic().getTransactionID();
   }
 
@@ -76,6 +77,8 @@ public class InitializationResponseElement extends DefaultResponseElement {
     return transactionId;
   }
 
+  public String getOrderNumber() { return orderNumber; }
+
   /**
    * Returns the order type.
    * @return the order type.
@@ -91,5 +94,6 @@ public class InitializationResponseElement extends DefaultResponseElement {
   protected EbicsResponse			response;
   private EbicsAdminOrderType orderType;
   private byte[]				transactionId;
+  private String                orderNumber;
   private static final long 			serialVersionUID = 7684048385353175772L;
 }

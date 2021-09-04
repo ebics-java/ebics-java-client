@@ -56,6 +56,7 @@ public class InitializationResponseElement extends DefaultResponseElement {
     checkReturnCode(returnCode);
     processBodyReturnCode();
     transactionId = response.getHeader().getStatic().getTransactionID();
+    orderNumber = response.getHeader().getMutable().getOrderID();
   }
 
   protected void processBodyReturnCode() throws EbicsException {
@@ -73,11 +74,14 @@ public class InitializationResponseElement extends DefaultResponseElement {
     return transactionId;
   }
 
+  public String getOrderNumber() { return orderNumber; }
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
   protected EbicsResponse			response;
   private byte[]				transactionId;
+  private String                orderNumber;
   private static final long 			serialVersionUID = 7684048385353175772L;
 }

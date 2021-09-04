@@ -5,7 +5,7 @@
       <q-item-label caption>{{ hint }}</q-item-label>
     </q-item-section>
     <q-item-section side>
-      <q-toggle v-model="value" />
+      <q-toggle :disable="disable" v-model="value" />
     </q-item-section>
   </q-item>
 </template>

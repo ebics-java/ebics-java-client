@@ -15,6 +15,7 @@ import org.ebics.client.model.Product
 import org.ebics.client.order.h004.EbicsDownloadOrder
 import org.ebics.client.order.h004.EbicsUploadOrder
 import org.ebics.client.utils.toDate
+import org.ebics.client.utils.toHexString
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
@@ -72,8 +73,8 @@ class EbicsAPI(
                 val bankCertManager = toBankCertMgr()
                 val session = EbicsSession(user, configuration, product, userCertManager, bankCertManager)
                 val order = EbicsUploadOrder(uploadRequest.orderType, uploadRequest.attributeType, uploadRequest.params ?: emptyMap())
-                FileTransfer(session).sendFile(uploadFile.bytes, order)
-                return UploadResponse("ordernummer")
+                val response = FileTransfer(session).sendFile(uploadFile.bytes, order)
+                return UploadResponse(response.orderNumber, response.transactionId.toHexString())
             }
         }
     }
@@ -85,7 +86,7 @@ class EbicsAPI(
             with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {
                 val bankCertManager = toBankCertMgr()
                 val session = EbicsSession(user, configuration, product, userCertManager, bankCertManager)
-                val order = EbicsDownloadOrder(downloadRequest.orderType, downloadRequest.startDate?.toDate(), downloadRequest.endDate?.toDate(), downloadRequest.params)
+                val order = EbicsDownloadOrder(downloadRequest.orderType, downloadRequest.startDate?.toDate(), downloadRequest.endDate?.toDate(), downloadRequest.params ?: emptyMap())
                 val outputStream = ByteOutputStream()
                 FileTransfer(session).fetchFile(order, outputStream)
                 val resource = ByteArrayResource(outputStream.bytes)

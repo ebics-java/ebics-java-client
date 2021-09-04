@@ -216,8 +216,8 @@ export interface UserSettings {
   uploadOnDrop: boolean;
   testerSettings: boolean;
   adjustmentOptions: {
-    applyAuthomatically: boolean;
-    pain001: AutoAdjustmentsPain00x;
-    mt101: AutoAdjustmentsSwift;
+    applyAutomatically: boolean;
+    pain00x: AutoAdjustmentsPain00x;
+    swift: AutoAdjustmentsSwift;
   },
 }

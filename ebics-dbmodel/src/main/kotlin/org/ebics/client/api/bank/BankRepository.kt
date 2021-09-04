@@ -1,5 +1,5 @@
 package org.ebics.client.api.bank
 
-import org.ebics.client.api.CustomJpaRepository
+import org.springframework.data.jpa.repository.JpaRepository
 
-interface BankRepository : CustomJpaRepository<Bank, Long>
+interface BankRepository : JpaRepository<Bank, Long>

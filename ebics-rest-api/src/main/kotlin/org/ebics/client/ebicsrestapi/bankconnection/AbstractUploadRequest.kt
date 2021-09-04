@@ -16,4 +16,5 @@ abstract class AbstractUploadRequest(
  */
 data class UploadResponse (
     val orderNumber: String,
+    val transactionId: String,
 )

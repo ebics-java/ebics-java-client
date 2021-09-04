@@ -95,7 +95,8 @@ class HttpRequestSender(private val session: EbicsSession) {
                     logger.error("Error loading truststore: " + e.message)
                     e.printStackTrace()
                 }
-            }
+            } else
+                logger.error("Provided truststore file name doesn't exist: " + conf.sslTrustedStoreFile)
         }
         val httpClient = builder.build()
         val input = request.content

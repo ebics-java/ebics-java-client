@@ -34,7 +34,7 @@ class EbicsUserResourceTest (@Autowired private val restTemplate: TestRestTempla
         val bankId = restTemplate.postForObject("/banks", requestBank, Long::class.java)
 
         //Save user + Partner
-        val userInfo = BankConnection( EbicsVersion.H005, "CHT10001", "JT", "cn=JT,org=com", "CH100001", bankId, true, true, true)
+        val userInfo = BankConnection( EbicsVersion.H005, "CHT10001", "JT", "cn=JT,org=com", "CH100001", bankId, true, true)
         val request: HttpEntity<BankConnection> = HttpEntity(userInfo)
         val targetUrl: URI = UriComponentsBuilder.fromUriString(restTemplate.rootUri)
             .path("/users") // Add path

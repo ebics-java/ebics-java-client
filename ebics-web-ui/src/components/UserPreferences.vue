@@ -1,12 +1,13 @@
 <template>
-  <q-list>
+  <q-list bordered padding>
     <div v-if="displaySection('General')">
       <q-item-label header>General Settings</q-item-label>
-      <boolean-option
+      <!--boolean-option
+        :disable="true"
         label="Upload on drop"
         hint="Enable uploading of files after dropping for 'Simple file upload'"
         v-model="userSettings.uploadOnDrop"
-      />
+      /-->
       <boolean-option
         label="Tester settings"
         hint="Enable smart adjustments of uploaded files"
@@ -15,8 +16,8 @@
       <boolean-option
         :disable="!userSettings.testerSettings"
         label="Adjust file authomatically"
-        hint="Apply smart adjustmets as bellow for every uploaded file authomatically, if disabled you can still apply adjustmets explicitelly"
-        v-model="userSettings.adjustmentOptions.applyAuthomatically"
+        hint="Apply smart adjustmets as bellow for every uploaded file automatically, if disabled you can still apply adjustmets explicitelly"
+        v-model="userSettings.adjustmentOptions.applyAutomatically"
       />
       <q-separator spaced />
     </div>
@@ -26,67 +27,73 @@
         :disable="!userSettings.testerSettings"
         label="msgId"
         hint="unique id based on current timestamp and user id"
-        v-model="userSettings.adjustmentOptions.pain001.msgId"
+        v-model="userSettings.adjustmentOptions.pain00x.msgId"
       />
       <boolean-option
+        :disable="!userSettings.testerSettings"
         label="pmtInfId"
         hint="unique id based on current timestamp, user id and B-Level"
-        v-model="userSettings.adjustmentOptions.pain001.pmtInfId"
+        v-model="userSettings.adjustmentOptions.pain00x.pmtInfId"
       />
       <boolean-option
+        :disable="!userSettings.testerSettings"
         label="endToEndId"
         hint="unique id based on current timestamp, user id and B/C-Level"
-        v-model="userSettings.adjustmentOptions.pain001.endToEndId"
+        v-model="userSettings.adjustmentOptions.pain00x.endToEndId"
       />
       <boolean-option
+        :disable="!userSettings.testerSettings"
         label="instrId"
         hint="unique id based on current timestamp, user id and B/C-Level"
-        v-model="userSettings.adjustmentOptions.pain001.instrId"
+        v-model="userSettings.adjustmentOptions.pain00x.instrId"
       />
       <boolean-option
+        :disable="!userSettings.testerSettings"
         label="UETR for GPI"
         :hint="`unique UETR id based on random seed: ${this.uetr()}`"
-        v-model="userSettings.adjustmentOptions.pain001.uetr"
+        v-model="userSettings.adjustmentOptions.pain00x.uetr"
       />
       <boolean-option
+        :disable="!userSettings.testerSettings"
         label="creDtTm"
         :hint="`actual date-time in ISO format: ${new Date().toISOString()}`"
-        v-model="userSettings.adjustmentOptions.pain001.creDtTm"
+        v-model="userSettings.adjustmentOptions.pain00x.creDtTm"
       />
       <boolean-option
+        :disable="!userSettings.testerSettings"
         label="reqdExctnDt"
         :hint="`actual date in YYYY-MM-DD format: ${this.currentDate()}`"
-        v-model="userSettings.adjustmentOptions.pain001.reqdExctnDt"
+        v-model="userSettings.adjustmentOptions.pain00x.reqdExctnDt"
       />
       <boolean-option
+        :disable="!userSettings.testerSettings"
         label="nbOfTrxs"
         hint="recalculates number of transaction based on C-Levels"
-        v-model="userSettings.adjustmentOptions.pain001.nbOfTrxsCalc"
+        v-model="userSettings.adjustmentOptions.pain00x.nbOfTrxsCalc"
       />
       <boolean-option
+        :disable="!userSettings.testerSettings"
         label="ctrlSum"
         hint="recalculates control sum based on C-Level amouths"
-        v-model="userSettings.adjustmentOptions.pain001.ctrlSumCalc"
+        v-model="userSettings.adjustmentOptions.pain00x.ctrlSumCalc"
       />
     </div>
-    <!--
     <q-separator spaced v-if="displaySection('ContentOptions.Pain.00x') && displaySection('ContentOptions.Swift')"/>
-    -->
     <div
-      v-if="
-        userSettings.testerSettings && displaySection('ContentOptions.Swift')
-      "
+      v-if="displaySection('ContentOptions.Swift')"
     >
       <q-item-label header>Smart adjustments for MT101</q-item-label>
       <boolean-option
+        :disable="!userSettings.testerSettings"
         label=":20 (Message ID)"
         hint="unique id based on current timestamp and random"
-        v-model="userSettings.adjustmentOptions.mt101.f20"
+        v-model="userSettings.adjustmentOptions.swift.f20"
       />
       <boolean-option
+        :disable="!userSettings.testerSettings"
         label=":21 (Transaction ID)"
         hint="unique id based on current timestamp and random"
-        v-model="userSettings.adjustmentOptions.mt101.f21"
+        v-model="userSettings.adjustmentOptions.swift.f21"
       />
     </div>
   </q-list>
@@ -111,7 +118,6 @@ export default defineComponent({
   },
   methods: {
     displaySection(sectionName: string): boolean {
-      console.log(`sectionName: ${sectionName}, sectionFilter: ${this.sectionFilter}, includes: ${sectionName.includes(this.sectionFilter) ? '1': '0'}`)
       return (this.sectionFilter == '' || sectionName.includes(this.sectionFilter));
     },
     uetr(): string {

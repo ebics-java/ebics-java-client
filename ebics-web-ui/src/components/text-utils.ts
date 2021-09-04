@@ -89,7 +89,7 @@ export default function useTextUtils() {
       case FileFormat.XML:
         return await applySmartAdjustmentsPain00x(
           fileText,
-          settings.adjustmentOptions.pain001
+          settings.adjustmentOptions.pain00x
         );
     }
   };

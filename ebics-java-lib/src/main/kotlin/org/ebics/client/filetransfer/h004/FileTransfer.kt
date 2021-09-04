@@ -27,16 +27,13 @@ import org.ebics.client.interfaces.ContentFactory
 import org.ebics.client.io.ByteArrayContentFactory
 import org.ebics.client.io.Joiner
 import org.ebics.client.messages.Messages.getString
-import org.ebics.client.order.AttributeType
 import org.ebics.client.order.EbicsAdminOrderType
 import org.ebics.client.order.h004.EbicsDownloadOrder
 import org.ebics.client.order.h004.EbicsUploadOrder
+import org.ebics.client.order.h004.EbicsUploadOrderResponse
 import org.ebics.client.utils.Constants
 import org.ebics.client.xml.h004.*
-import org.ebics.schema.h004.OrderAttributeType
 import org.slf4j.LoggerFactory
-import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 
@@ -86,7 +83,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
      * @throws EbicsException
      */
     @Throws(IOException::class, EbicsException::class)
-    fun sendFile(content: ByteArray, uploadOrder: EbicsUploadOrder) {
+    fun sendFile(content: ByteArray, uploadOrder: EbicsUploadOrder): EbicsUploadOrderResponse {
         val sender = HttpRequestSender(session)
         val initializer = UploadInitializationRequestElement(
             session,
@@ -113,6 +110,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
                 state.transactionId, uploadOrder.orderType ?: "FUL"
             )
         }
+        return EbicsUploadOrderResponse(response.orderNumber, response.transactionId)
     }
 
     /**
@@ -177,11 +175,11 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         downloadOrder: EbicsDownloadOrder,
         outputStream: OutputStream
     ) {
-        val orderType = downloadOrder.adminOrderType
         val sender = HttpRequestSender(session)
         val initializer = DownloadInitializationRequestElement(
             session,
-            orderType,
+            downloadOrder.adminOrderType,
+            downloadOrder.orderType,
             downloadOrder.startDate,
             downloadOrder.endDate
         )
@@ -192,7 +190,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         
         val response = DownloadInitializationResponseElement(
             responseBody,
-            DefaultEbicsRootElement.generateName(orderType)
+            DefaultEbicsRootElement.generateName(downloadOrder.adminOrderType)
         )
         response.build()
         session.configuration.traceManager.trace(response, session)
@@ -204,7 +202,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         while (state.hasNext()) {
             val segmentNumber: Int = state.next()
             fetchFileSegment(
-                orderType,
+                downloadOrder.adminOrderType,
                 segmentNumber,
                 state.isLastSegment,
                 state.transactionId,
@@ -215,7 +213,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         val receipt = ReceiptRequestElement(
             session,
             state.transactionId,
-            DefaultEbicsRootElement.generateName(orderType)
+            DefaultEbicsRootElement.generateName(downloadOrder.adminOrderType)
         )
         receipt.build()
         receipt.validate()
@@ -224,7 +222,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         
         val receiptResponse = ReceiptResponseElement(
             receiptResponseBody,
-            DefaultEbicsRootElement.generateName(orderType)
+            DefaultEbicsRootElement.generateName(downloadOrder.adminOrderType)
         )
         receiptResponse.build()
         session.configuration.traceManager.trace(receiptResponse, session)
@@ -233,7 +231,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
 
     /**
      * Fetches a given portion of a file.
-     * @param orderType the order type
+     * @param adminOrderType the order type
      * @param segmentNumber the segment number
      * @param lastSegment is it the last segment?
      * @param transactionId the transaction ID
@@ -243,16 +241,16 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
      */
     @Throws(IOException::class, EbicsException::class)
     protected fun fetchFileSegment(
-        orderType: EbicsAdminOrderType?,
+        adminOrderType: EbicsAdminOrderType,
         segmentNumber: Int,
         lastSegment: Boolean,
-        transactionId: ByteArray?,
+        transactionId: ByteArray,
         joiner: Joiner
     ) {
         val sender = HttpRequestSender(session)
         val downloader = DownloadTransferRequestElement(
             session,
-            orderType,
+            adminOrderType,
             segmentNumber,
             lastSegment,
             transactionId
@@ -264,8 +262,8 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         
         val response = DownloadTransferResponseElement(
             responseBody,
-            orderType,
-            DefaultEbicsRootElement.generateName(orderType)
+            adminOrderType,
+            DefaultEbicsRootElement.generateName(adminOrderType)
         )
         response.build()
         session.configuration.traceManager.trace(response, session)
