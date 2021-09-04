@@ -90,7 +90,7 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
                 "http://www.w3.org/2001/04/xmlenc#sha256",
                 decodeHex(session.getBankCert().getE002Digest()));
         bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
-        orderType = EbicsXmlFactory.createOrderType(this.orderType);
+        orderType = EbicsXmlFactory.createOrderType(this.orderType != null ? this.orderType : type.toString());
         if (type.equals(EbicsAdminOrderType.FDL)) {
             FDLOrderParamsType fDLOrderParamsType;
             FileFormatType fileFormat;

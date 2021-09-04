@@ -22,6 +22,7 @@ package org.ebics.client.exception;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.ebics.client.messages.Messages;
 
@@ -89,7 +90,18 @@ public class ReturnCode implements Serializable {
       return new ReturnCode(code, text);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ReturnCode that = (ReturnCode) o;
+    return code.equals(that.code);
+  }
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(code);
+  }
 
   // --------------------------------------------------------------------
   // DATA MEMBERS

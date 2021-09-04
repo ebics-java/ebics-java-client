@@ -12,5 +12,5 @@ import java.util.*
  * @param endDate end date (for historical downloads only)
  */
 class EbicsDownloadOrder
-(val orderService: EbicsService, startDate: Date?, endDate: Date?, params: Map<String, String>) :
-    AbstractEbicsDownloadOrder(EbicsAdminOrderType.BTD, startDate, endDate, params)
+(adminOrderType: EbicsAdminOrderType = EbicsAdminOrderType.BTD, val orderService: EbicsService?, startDate: Date?, endDate: Date?, params: Map<String, String>) :
+    AbstractEbicsDownloadOrder(adminOrderType, startDate, endDate, params)

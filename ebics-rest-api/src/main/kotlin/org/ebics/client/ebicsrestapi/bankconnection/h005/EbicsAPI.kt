@@ -87,7 +87,7 @@ class EbicsAPI(
             with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {
                 val bankCertManager = toBankCertMgr()
                 val session = EbicsSession(user, configuration, product, userCertManager, bankCertManager)
-                val order = EbicsDownloadOrder(downloadRequest.orderService, downloadRequest.startDate?.toDate(), downloadRequest.endDate?.toDate(), downloadRequest.params ?: emptyMap())
+                val order = EbicsDownloadOrder(downloadRequest.adminOrderType, downloadRequest.orderService, downloadRequest.startDate?.toDate(), downloadRequest.endDate?.toDate(), downloadRequest.params)
                 val outputStream = ByteOutputStream()
                 FileTransfer(session).fetchFile(order, outputStream)
                 val resource = ByteArrayResource(outputStream.bytes)
