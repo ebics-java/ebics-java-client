@@ -10,7 +10,7 @@ import java.util.*
  * @param startDate start date (for historical downloads only)
  * @param endDate end date (for historical downloads only)
  */
-class EbicsDownloadOrder(val orderType: String?, startDate: Date?, endDate: Date?, params: Map<String, String>) : AbstractEbicsDownloadOrder(
+class EbicsDownloadOrder(val orderType: String?, startDate: Date?, endDate: Date?, params: Map<String, String> = emptyMap()) : AbstractEbicsDownloadOrder(
         if (orderType == null) EbicsAdminOrderType.FDL else EbicsAdminOrderType.DNL,
         startDate,
         endDate,

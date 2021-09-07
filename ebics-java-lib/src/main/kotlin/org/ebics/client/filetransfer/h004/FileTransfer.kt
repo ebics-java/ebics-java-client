@@ -18,6 +18,7 @@
  */
 package org.ebics.client.filetransfer.h004
 
+import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
 import org.ebics.client.api.EbicsSession
 import org.ebics.client.api.TransferState
 import org.ebics.client.exception.EbicsException
@@ -31,8 +32,10 @@ import org.ebics.client.order.EbicsAdminOrderType
 import org.ebics.client.order.h004.EbicsDownloadOrder
 import org.ebics.client.order.h004.EbicsUploadOrder
 import org.ebics.client.order.h004.EbicsUploadOrderResponse
+import org.ebics.client.order.h004.OrderType
 import org.ebics.client.utils.Constants
 import org.ebics.client.xml.h004.*
+import org.ebics.client.xml.h004.HTDResponseOrderDataElement
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.io.OutputStream
@@ -159,6 +162,20 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         response.build()
         session.configuration.traceManager.trace(response, session)
     }
+
+    fun getHTD(): HTDResponseOrderDataElement {
+        val bos = ByteOutputStream()
+        fetchFile(EbicsDownloadOrder(EbicsAdminOrderType.HTD, null, null, null), bos)
+        return HTDResponseOrderDataElement(ByteArrayContentFactory(bos.bytes)).apply {
+            build()
+            validate()
+        }
+    }
+
+    /**
+     * Shortcut to ordertypes from HTD xml, for further processing
+     */
+    fun getOrderTypes(): List<OrderType> = getHTD().getOrderTypes()
 
     /**
      * Fetches a file of the given order type from the bank.

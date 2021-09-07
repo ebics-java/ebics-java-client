@@ -1,6 +1,7 @@
 package org.ebics.client.ebicsrestapi.bankconnection.h004
 
 import org.ebics.client.ebicsrestapi.bankconnection.*
+import org.ebics.client.order.h004.OrderType
 import org.springframework.core.io.Resource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -23,6 +24,9 @@ class EbicsAPIResource (private val ebicsAPI: EbicsAPI){
     @PostMapping("upload", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun uploadFile(@PathVariable userId: Long, @RequestPart uploadRequest: UploadRequest, @RequestPart uploadFile: MultipartFile): UploadResponse = ebicsAPI.uploadFile(userId, uploadRequest, uploadFile)
 
-    @GetMapping("download")
+    @PostMapping("download")
     fun downloadFile(@PathVariable userId: Long, @RequestBody downloadRequest: DownloadRequest): ResponseEntity<Resource> = ebicsAPI.downloadFile(userId, downloadRequest)
+
+    @PostMapping("orderTypes")
+    fun getOrderTypes(@PathVariable userId: Long, @RequestBody userPass: UserPass): List<OrderType> = ebicsAPI.getOrderTypes(userId, userPass.password)
 }

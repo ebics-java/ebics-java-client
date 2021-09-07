@@ -15,6 +15,7 @@ import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.Product
 import org.ebics.client.order.h004.EbicsDownloadOrder
 import org.ebics.client.order.h004.EbicsUploadOrder
+import org.ebics.client.order.h004.OrderType
 import org.ebics.client.utils.toDate
 import org.ebics.client.utils.toHexString
 import org.springframework.core.io.ByteArrayResource
@@ -92,6 +93,18 @@ class EbicsAPI(
                 FileTransfer(session).fetchFile(order, outputStream)
                 val resource = ByteArrayResource(outputStream.bytes)
                 return ResponseEntity.ok().contentLength(resource.contentLength()).body(resource)
+            }
+        }
+    }
+
+    fun getOrderTypes(userId: Long, password: String): List<OrderType> {
+        val user = userRepository.getById(userId, "bankconnection")
+        with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {
+            val userCertManager = toUserCertMgr(password)
+            with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {
+                val bankCertManager = toBankCertMgr()
+                val session = EbicsSession(user, configuration, product, userCertManager, bankCertManager)
+                return FileTransfer(session).getOrderTypes()
             }
         }
     }

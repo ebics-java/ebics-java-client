@@ -1,5 +1,6 @@
 package org.ebics.client.utils
 
+import org.apache.xmlbeans.XmlObject
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
@@ -31,3 +32,5 @@ fun LocalDate.toDate(): Date {
     // converting ZonedDateTime to Date using Date.from() and ZonedDateTime.toInstant()
     return Date.from(zonedDateTime.toInstant())
 }
+
+fun XmlObject.equalXml(xmlObject: XmlObject): Boolean = this.xmlText().equals(xmlObject.xmlText())

@@ -1,6 +1,7 @@
 package org.ebics.client.ebicsrestapi.bankconnection.h005
 
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
+import org.apache.xmlbeans.XmlObject
 import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.bank.cert.BankKeyStoreService
@@ -13,10 +14,19 @@ import org.ebics.client.filetransfer.h005.FileTransfer
 import org.ebics.client.keymgmt.h005.KeyManagementImpl
 import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.Product
+import org.ebics.client.order.AuthorisationLevel
+import org.ebics.client.order.EbicsAdminOrderType
+import org.ebics.client.order.EbicsMessage
+import org.ebics.client.order.EbicsService
+import org.ebics.client.order.h005.ContainerType
 import org.ebics.client.order.h005.EbicsDownloadOrder
 import org.ebics.client.order.h005.EbicsUploadOrder
+import org.ebics.client.order.h005.OrderType
 import org.ebics.client.utils.toDate
 import org.ebics.client.utils.toHexString
+import org.ebics.schema.h005.AuthOrderInfoType
+import org.ebics.schema.h005.HTDReponseOrderDataType
+import org.ebics.schema.h005.UserPermissionType
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
@@ -92,6 +102,18 @@ class EbicsAPI(
                 FileTransfer(session).fetchFile(order, outputStream)
                 val resource = ByteArrayResource(outputStream.bytes)
                 return ResponseEntity.ok().contentLength(resource.contentLength()).body(resource)
+            }
+        }
+    }
+
+    fun getOrderTypes(userId: Long, password: String): List<OrderType> {
+        val user = userRepository.getById(userId, "bankconnection")
+        with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {
+            val userCertManager = toUserCertMgr(password)
+            with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {
+                val bankCertManager = toBankCertMgr()
+                val session = EbicsSession(user, configuration, product, userCertManager, bankCertManager)
+                return FileTransfer(session).getOrderTypes()
             }
         }
     }
