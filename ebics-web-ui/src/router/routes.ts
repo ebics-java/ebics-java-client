@@ -60,6 +60,7 @@ const routes: RouteRecordRaw[] = [
           return { fileEditor };
         },
       },
+      { path: '/download', component: () => import('pages/FileDownload.vue') },
       { path: '/userctx', component: () => import('pages/UserContext.vue') },
       { path: '/userlogin', component: () => import('pages/UserLogin.vue') },
     ],

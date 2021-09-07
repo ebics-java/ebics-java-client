@@ -11,7 +11,7 @@
             filled
             v-model="bankConnection"
             :options="activeBankConnections"
-            :option-label="userLabel"
+            :option-label="bankConnectionLabel"
             label="EBICS Bank connection"
             hint="Select EBICS bank connection"
             lazy-rules
@@ -47,29 +47,48 @@
             filled
             v-model="orderType"
             :options="orderTypes"
+            :option-label="(t) => orderTypeLabel(t)"
             label="EBICS Order Type"
             hint="Select EBICS Order Type"
             lazy-rules
-            :rules="[
-              (val) =>
-                (val && val.length > 0) ||
-                'Please select valid EBICS Order Type',
-            ]"
-          />
+            :rules="[(val) => val || 'Please select valid EBICS Order Type']"
+          >
+            <template v-slot:option="scope">
+              <q-item v-bind="scope.itemProps">
+                <q-item-section>
+                  <q-item-label v-html="orderTypeLabel(scope.opt)" />
+                  <q-item-label caption>{{
+                    scope.opt.description
+                  }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
 
           <q-select
             v-if="bankConnection?.ebicsVersion == 'H005'"
             filled
             v-model="btfType"
             :options="btfTypes"
-            :option-label="(t) => btfLabel(t)"
+            :option-label="(t) => btfTypeLabel(t)"
             label="BTF Message Type"
             hint="Select EBICS BTF Message Type"
             lazy-rules
             :rules="[
               (val) => val || 'Please select valid EBICS BTF Message Type',
             ]"
-          />
+          >
+            <template v-slot:option="scope">
+              <q-item v-bind="scope.itemProps">
+                <q-item-section>
+                  <q-item-label v-html="btfTypeLabel(scope.opt)" />
+                  <q-item-label caption>{{
+                    scope.opt.description
+                  }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
 
           <!-- DZHNN / OZHNN -->
           <q-toggle
@@ -150,20 +169,27 @@
             ref="contentEditor"
             v-if="fileEditor && fileFormat != FileFormat.BINARY"
             v-model:value="fileText"
-            lang="xml"
+            :lang="editorLang"
             theme="clouds"
             style="height: 300px"
             :printMargin="false"
           />
-          <!-- @init="initEditor" -->
+
+          <!--
+          <div>Format: {{fileFormat}}</div>
+          <div>EditorLang: {{editorLang}}</div>
+          -->
 
           <q-input
-            
-            v-if="bankConnection?.ebicsVersion == 'H005'"
+            v-if="fileEditor && bankConnection?.ebicsVersion == 'H005'"
             filled
             v-model="fileName"
             label="Uploaded filename"
             hint="For support purposes only"
+            lazy-rules
+            :rules="[
+              (val) => val.length > 0 || 'Please provide input file name',
+            ]"
           />
 
           <div class="q-pa-md q-gutter-sm">
@@ -214,27 +240,31 @@
 <script lang="ts">
 import {
   User,
-  Btf,
-  BtfMessage,
   UploadRequest,
   UploadRequestH004,
   UploadRequestH005,
   FileFormat,
+  BTFType,
+  OrderTypeFilter,
+  OrderType,
 } from 'components/models';
 import { defineComponent } from 'vue';
-import { ref, computed, watch, onMounted } from 'vue';
-import { QForm } from 'quasar';
+import { ref, computed } from 'vue';
 
+//Components
+import { QForm } from 'quasar';
 import { VAceEditor } from 'vue3-ace-editor';
 import 'ace-builds/src-noconflict/mode-xml';
 import 'ace-builds/src-noconflict/theme-clouds';
 import { VAceEditorInstance } from 'vue3-ace-editor/types';
+import UserPreferences from 'components/UserPreferences.vue';
 
+//Composition APIs
 import useBankConnectionsAPI from 'components/bankconnections';
 import useFileTransferAPI from 'components/filetransfer';
 import useTextUtils from 'components/text-utils';
 import useUserSettings from 'components/user-settings';
-import UserPreferences from 'components/UserPreferences.vue';
+import useOrderTypesAPI from 'components/order-types';
 
 export default defineComponent({
   name: 'FileUpload',
@@ -250,19 +280,12 @@ export default defineComponent({
     return {};
   },
   methods: {
-    initEditor(editor: VAceEditorInstance) {
-      console.log(`Initialize ace editor: ${JSON.stringify(editor.$options)}`);
-    },
     async applySmartAdjustmentsForSingleFile() {
       this.fileText = await this.applySmartAdjustments(
         this.fileText,
         this.fileFormat,
         this.userSettings
       );
-    },
-
-    btfLabel(btf: Btf | undefined): string {
-      return btf instanceof Btf ? btf.label() : '';
     },
 
     async onUpdateInputFiles(files: File[]) {
@@ -297,12 +320,12 @@ export default defineComponent({
       this.fileName = file.name;
       try {
         this.fileRawText = await file.text();
-        if (this.fileFormat == FileFormat.BINARY) {
+        if (this.detectFileFormat(this.fileRawText) == FileFormat.BINARY) {
           this.$q.notify({
             color: 'positive',
             position: 'bottom-right',
             message:
-              "Binary files can't be edited, although you can still upload the file",
+              "Binary files can't be edited, but you can still upload them",
             icon: 'warning',
           });
         } else {
@@ -324,20 +347,7 @@ export default defineComponent({
       }
     },
 
-    /**
-     * Display label of the bankConnection
-     */
-    userLabel(bankConnection: User | undefined): string {
-      if (
-        bankConnection &&
-        bankConnection.userId.trim().length > 0 &&
-        bankConnection.name.trim().length > 0
-      ) {
-        return `${bankConnection.userId} | ${bankConnection.name}`;
-      } else {
-        return '';
-      }
-    },
+
     async onSubmit() {
       await this.processUpload();
     },
@@ -352,38 +362,29 @@ export default defineComponent({
     },
   },
   setup(props) {
+    //Selected bank connection
+    const bankConnection = ref<User>();
     const replaceMsgId = ref(true);
-    const { activeBankConnections, hasActiveConnections } =
+    const { activeBankConnections, hasActiveConnections, bankConnectionLabel } =
       useBankConnectionsAPI();
     const { ebicsUploadRequest } = useFileTransferAPI();
     const { applySmartAdjustments, detectFileFormat } = useTextUtils();
     const { userSettings } = useUserSettings();
-
-    //Selected bank connection
-    const bankConnection = ref<User>();
+    const { btfTypes, orderTypes, orderTypeLabel, btfTypeLabel } =
+      useOrderTypesAPI(bankConnection, ref(OrderTypeFilter.UploadOnly));
 
     //Single file setup
-    const contentEditor = ref<VAceEditorInstance | null>(null);
     const testInput = ref(null);
     const file = ref<File>();
     const fileRawText = ref<string>(''); //Original text of input file
     const fileText = ref<string>('<document>paste document here</document>'); //Text displayed in editor (in case of no binary)
     const fileName = ref('');
-    const orderType = ref('');
-    const orderTypes = ref(['XE2', 'XE3', 'XL3', 'XG1', 'CCT']);
-    const btfType = ref<Btf>();
-    const btfTypes = ref<Btf[]>([
-      new Btf('PSR', undefined, 'CH', 'ZIP', new BtfMessage('pain.002')),
-      new Btf('MCT', undefined, 'CH', undefined, new BtfMessage('pain.001')),
-      new Btf('MCT', 'XCH', 'CGI', undefined, new BtfMessage('pain.001')),
-    ]);
+    const orderType = ref<OrderType>();
+    const btfType = ref<BTFType>();
+
     const signatureFlag = ref(true);
     const requestEDS = ref(true);
     const signatureOZHNN = ref(true);
-    onMounted(() => {
-      console.log('Editor ref: ' + JSON.stringify(contentEditor.value));
-      console.log('Test input ref: ' + JSON.stringify(testInput.value));
-    });
 
     //Multiple file setup
     const files = ref<File[]>([]);
@@ -392,7 +393,7 @@ export default defineComponent({
     };
 
     const fileFormat = computed((): FileFormat => {
-      return detectFileFormat(fileRawText.value);
+      return detectFileFormat(fileText.value);
     });
 
     const contentOptionsFilter = computed((): string => {
@@ -402,36 +403,25 @@ export default defineComponent({
       else return 'ContentOptions';
     });
 
-    const changeEditorLang = () => {
-      if (contentEditor.value) {
-        switch (fileFormat.value) {
-          case FileFormat.XML:
-            contentEditor.value?._editor.getSession().setMode('ace/mode/xml');
-            break;
-          default:
-            contentEditor.value?._editor.getSession().setMode('ace/mode/text');
-            break;
-          //contentEditor.value?._editor.setOption<string>('lang','xml');
-        }
-      } else
-        console.error(
-          'Reference to editor not set, cant change language to ' +
-            fileFormat.value.toString()
-        );
-    };
+    const editorLang = computed((): string => {
+      console.log('File format detected: ' + fileFormat.value.toString());
+      if (fileFormat.value == FileFormat.XML) return 'xml';
+      if (fileFormat.value == FileFormat.SWIFT) return 'text';
+      else return 'xml';
+    });
 
-    const getUploadRequest = (): UploadRequest => {
+    const getUploadRequest = (fileNameOverload?: string): UploadRequest => {
       if (bankConnection.value?.ebicsVersion == 'H005') {
         return {
-          orderService: btfType.value,
+          orderService: btfType.value?.service,
           signatureFlag: signatureFlag.value,
           edsFlag: requestEDS.value,
-          fileName: fileName.value,
+          fileName: fileNameOverload ? fileNameOverload : fileName.value,
         } as UploadRequestH005;
       } else {
         //H004, H003
         return {
-          orderType: orderType.value,
+          orderType: orderType.value?.orderType,
           attributeType: signatureOZHNN.value ? 'OZHNN' : 'DZHNN',
           params: new Map(),
         } as UploadRequestH004;
@@ -456,9 +446,9 @@ export default defineComponent({
           for (let file of files.value) {
             await ebicsUploadRequest(
               bankConnection.value,
-              getUploadRequest(),
+              getUploadRequest(file.name),
               file
-            )
+            );
           }
         } else {
           //Single file upload
@@ -471,12 +461,12 @@ export default defineComponent({
       }
     };
 
-    watch(fileFormat, changeEditorLang);
-
     return {
       bankConnection,
       activeBankConnections,
       hasActiveConnections,
+      bankConnectionLabel,
+
       userSettings,
       replaceMsgId,
       ebicsUploadRequest,
@@ -493,16 +483,22 @@ export default defineComponent({
       fileRawText,
       fileText,
       fileName,
-      contentEditor,
+      editorLang,
       fileFormat,
 
       testInput,
 
-      //Commons
+      //Commons order types
       orderType,
       orderTypes,
+      orderTypeLabel,
+
+      //Commons BTF types
       btfType,
       btfTypes,
+      btfTypeLabel,
+
+      //Commons request flags
       signatureFlag,
       requestEDS,
       signatureOZHNN,

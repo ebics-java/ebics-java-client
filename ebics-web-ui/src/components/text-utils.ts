@@ -75,6 +75,17 @@ export default function useTextUtils() {
     }
   };
 
+  const getFileExtension = (fileFormat: FileFormat): string => {
+    switch(fileFormat) {
+      case FileFormat.BINARY:
+        return 'zip';
+      case FileFormat.XML:
+        return 'xml';
+      default:
+        return 'txt';
+    }
+  }
+
   const applySmartAdjustments = async (
     fileText: string,
     fileFormat: FileFormat,
@@ -195,5 +206,6 @@ export default function useTextUtils() {
     currentDate,
     uniqueTimeStamp,
     applySmartAdjustments,
+    getFileExtension,
   };
 }

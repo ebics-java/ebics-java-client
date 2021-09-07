@@ -142,6 +142,7 @@ export interface UploadRequest {
 
 export interface UploadResponse {
   orderNumber: string;
+  transactionId: string;
 }
 
 export interface UploadRequestH004 extends UploadRequest {
@@ -159,6 +160,33 @@ export interface UploadRequestH005 extends UploadRequest {
   fileName: string;
   params: Map<string, string>;
 }
+
+export interface DownloadRequest {
+  password: string;
+  adminOrderType: string;
+  params: Map<string, string>;
+  startDate?: Date;
+  endDate?: Date;
+}
+
+export interface DownloadRequestH004 extends DownloadRequest {
+  password: string;
+  adminOrderType: string;
+  orderType?: string;
+  params: Map<string, string>;
+  startDate?: Date;
+  endDate?: Date;
+}
+
+export interface DownloadRequestH005 extends DownloadRequest {
+  password: string;
+  adminOrderType: string;
+  orderService?: Btf;
+  params: Map<string, string>;
+  startDate?: Date;
+  endDate?: Date;
+}
+
 
 interface Letter {
   letterText: string;
@@ -220,4 +248,49 @@ export interface UserSettings {
     pain00x: AutoAdjustmentsPain00x;
     swift: AutoAdjustmentsSwift;
   },
+}
+
+export enum AuthorisationLevel {
+  T, A, B, E,
+}
+
+/**
+ * H005 order type description
+ */
+export interface BTFType {
+  adminOrderType: string;
+  service?: BtfInt;
+  description?: string;
+  authorizationLevel?: AuthorisationLevel;
+  numSigRequired?: BigInteger;
+}
+
+/**
+ * H003, H004 order type description
+ */
+export interface OrderType {
+  adminOrderType: string;
+  orderType: string;
+  transferType?: TransferType;
+  description?: string;
+  authorizationLevel?: AuthorisationLevel;
+  numSigRequired?: BigInteger;
+}
+
+/**
+ * H003, H004, H005 order type descriptions
+ */
+export interface OrderTypeList {
+  btfTypes: BTFType[];
+  orderTypes: OrderType[];
+}
+
+export enum TransferType {
+  Upload, Download,
+}
+
+export enum OrderTypeFilter {
+  UploadOnly,
+  DownloadOnly,
+  All,
 }

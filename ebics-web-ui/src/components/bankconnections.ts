@@ -27,11 +27,14 @@ export default function useBankConnectionsAPI() {
   };
 
   const activeBankConnections = computed<User[] | undefined>(() => {
-    return bankConnections.value?.filter(bc => bc.userStatus == 'READY')
+    return bankConnections.value?.filter((bc) => bc.userStatus == 'READY');
   });
 
   const hasActiveConnections = computed<boolean>(() => {
-    return activeBankConnections.value != null && activeBankConnections.value?.length > 0;
+    return (
+      activeBankConnections.value != null &&
+      activeBankConnections.value?.length > 0
+    );
   });
 
   const confirmDialog = (title: string, message: string): Promise<boolean> => {
@@ -54,9 +57,18 @@ export default function useBankConnectionsAPI() {
     });
   };
 
-  const deleteBankConnection = async (bcId: number, bcName: string, askForConfimation = true): Promise<void> => {
+  const deleteBankConnection = async (
+    bcId: number,
+    bcName: string,
+    askForConfimation = true
+  ): Promise<void> => {
     try {
-      const canDelete = askForConfimation ? await confirmDialog('Confirm deletion', `Do you want to realy delete bank connection: '${bcName}'`) : true
+      const canDelete = askForConfimation
+        ? await confirmDialog(
+            'Confirm deletion',
+            `Do you want to realy delete bank connection: '${bcName}'`
+          )
+        : true;
       if (canDelete) {
         await api.delete<User>(`bankconnections/${bcId}`);
         await loadBankConnections();
@@ -66,7 +78,29 @@ export default function useBankConnectionsAPI() {
     }
   };
 
+  /**
+   * Display label of the bankConnection
+   */
+  const bankConnectionLabel = (bankConnection: User | undefined): string => {
+    if (
+      bankConnection &&
+      bankConnection.userId.trim().length > 0 &&
+      bankConnection.name.trim().length > 0
+    ) {
+      return `${bankConnection.userId} | ${bankConnection.name}`;
+    } else {
+      return '';
+    }
+  };
+
   onMounted(loadBankConnections);
 
-  return { bankConnections, activeBankConnections, hasActiveConnections, loadBankConnections, deleteBankConnection };
+  return {
+    bankConnections,
+    activeBankConnections,
+    hasActiveConnections,
+    loadBankConnections,
+    deleteBankConnection,
+    bankConnectionLabel,
+  };
 }
