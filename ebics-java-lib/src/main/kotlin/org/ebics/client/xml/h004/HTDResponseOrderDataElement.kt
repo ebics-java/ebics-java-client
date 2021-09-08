@@ -58,11 +58,9 @@ class HTDResponseOrderDataElement(factory: ContentFactory) : DefaultResponseElem
         with(response) {
             return userInfo.permissionArray.flatMap { permissions ->
                 //Lets find for each user permission the referred BTF type
-                val authorisationLevel =
-                    permissions.authorisationLevel?.let { AuthorisationLevel.valueOf(it.toString()) }
                 permissions.orderTypes.mapNotNull { orderType ->
                     partnerInfo.orderInfoArray.find { orderInfo -> orderInfo.orderType == orderType }
-                        ?.let { it to authorisationLevel }
+                        ?.let { it to EnumUtil.toAuthLevel(permissions)}
                 }
             }.map {
                 createOrderType(it.first, it.second)
@@ -73,26 +71,13 @@ class HTDResponseOrderDataElement(factory: ContentFactory) : DefaultResponseElem
 
     private fun createOrderType(orderInfo: AuthOrderInfoType, authLevel: AuthorisationLevel?): OrderType =
         OrderType(
-            recognizeAdminOrderType(orderInfo),
+            EnumUtil.recognizeAdminOrderType(orderInfo),
             orderInfo.orderType,
-            orderInfo.transferType?.let { tt -> TransferType.valueOf(tt.toString()) },
+            EnumUtil.toTransferType(orderInfo),
             orderInfo.description,
             authLevel,
             orderInfo.numSigRequired
         )
-
-
-    private fun recognizeAdminOrderType(orderInfo: AuthOrderInfoType): EbicsAdminOrderType? {
-        return try {
-            EbicsAdminOrderType.valueOf(orderInfo.orderType)
-        } catch (e: Exception) {
-            when (orderInfo.transferType?.toString()) {
-                TransferType.Upload.name -> EbicsAdminOrderType.UPL
-                TransferType.Download.name -> EbicsAdminOrderType.DNL
-                else -> null
-            }
-        }
-    }
 
     // --------------------------------------------------------------------
     // DATA MEMBERS

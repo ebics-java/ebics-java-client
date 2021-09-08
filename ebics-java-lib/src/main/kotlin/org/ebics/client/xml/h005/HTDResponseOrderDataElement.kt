@@ -86,12 +86,12 @@ class HTDResponseOrderDataElement(factory: ContentFactory) : DefaultResponseElem
                     st.serviceName,
                     st.serviceOption,
                     st.scope,
-                    st.container?.containerType?.let { ContainerType.valueOf(it.toString()) },
+                    EnumUtil.toContainerType(st.container),
                     EbicsMessage(st.msgName.stringValue, st.msgName?.variant, st.msgName?.version, st.msgName?.format)
                 )
             },
             authOrderInfoType?.description,
-            userPermissionType.authorisationLevel?.let { al -> AuthorisationLevel.valueOf(al.toString()) },
+            EnumUtil.toAuthLevel(userPermissionType),
             authOrderInfoType?.numSigRequired
         )
     }
