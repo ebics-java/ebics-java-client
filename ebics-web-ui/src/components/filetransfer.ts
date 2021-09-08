@@ -1,4 +1,4 @@
-import { User, UploadRequest, UploadResponse, DownloadRequest, UserPassword, BTFType } from 'components/models';
+import { User, UploadRequest, UploadResponse, DownloadRequest, UserPassword, BTFType, OrderType } from 'components/models';
 import { api } from 'boot/axios';
 import usePasswordAPI from './password-api';
 import { AxiosResponse } from 'axios';
@@ -80,7 +80,7 @@ export default function useFileTransferAPI() {
     const ebicsOrderTypes = async (
       user: User,
       ebicsVersion: string = user.ebicsVersion,
-    ): Promise<BTFType[]> => {
+    ): Promise<BTFType[] | OrderType[]> => {
       try {
         const password = await promptCertPassword(user, false);
         const response = await api.post<UserPassword, AxiosResponse<BTFType[]>>(
@@ -93,7 +93,7 @@ export default function useFileTransferAPI() {
         );
         return response.data;
       } catch (error) {
-        pwdApiErrorHandler(user, 'File download failed: ', error);
+        pwdApiErrorHandler(user, `Order types refresh for bank connection ${user.name} and ${ebicsVersion} failed: `, error);
         return [];
       }
     };

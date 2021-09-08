@@ -1,5 +1,5 @@
 <template>
-  <q-page class="justify-evenly" ref="testInput">
+  <q-page class="justify-evenly">
     <div v-if="hasActiveConnections" class="q-pa-md">
       <h5>Simple file download</h5>
 
@@ -21,11 +21,11 @@
           />
 
           <div v-if="bankConnection" class="q-gutter-sm">
-            <q-radio
+            <!-- q-radio
               v-model="bankConnection.ebicsVersion"
               val="H003"
               label="EBICS 2.4 (H003)"
-            />
+            /-->
             <q-radio
               v-model="bankConnection.ebicsVersion"
               val="H004"
@@ -88,6 +88,27 @@
               </q-item>
             </template>
           </q-select>
+          
+          <!--div v-if="bankConnection" class="q-gutter-sm">
+            <q-checkbox
+              v-model="historicDownload"
+              label="Historical download"
+            />
+            <q-input filled v-if="historicDownload" v-model="historicDateRange">
+              <template v-slot:append>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+                    <q-date v-model="historicDateRange" range >
+                      <div class="row items-center justify-end">
+                        <q-btn v-close-popup label="Close" color="primary" flat />
+                      </div>
+                    </q-date>
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+          </div-->
+
           <div class="q-pa-md q-gutter-sm">
             <q-btn label="Download" type="submit" color="primary" />
           </div>
@@ -126,7 +147,7 @@ import {
   OrderType,
 } from 'components/models';
 import { defineComponent } from 'vue';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { exportFile } from 'quasar';
 
 //Composition APIs
@@ -145,47 +166,16 @@ export default defineComponent({
     const { activeBankConnections, hasActiveConnections, bankConnectionLabel } =
       useBankConnectionsAPI();
     const { ebicsDownloadRequest } = useFileTransferAPI();
-    const { applySmartAdjustments, detectFileFormat, getFileExtension } = useTextUtils();
+    const { applySmartAdjustments, detectFileFormat, getFileExtension, currentDate } = useTextUtils();
     const { userSettings } = useUserSettings();
     const { btfTypes, orderTypes, orderTypeLabel, btfTypeLabel } =
       useOrderTypesAPI(bankConnection, ref(OrderTypeFilter.DownloadOnly));
 
-    //Single file setup
-    const testInput = ref(null);
-    const file = ref<File>();
-    const fileRawText = ref<string>(''); //Original text of input file
-    const fileText = ref<string>('<document>paste document here</document>'); //Text displayed in editor (in case of no binary)
-    const fileName = ref('');
+    const historicDownload = ref(false);
+    const historicDateRange = ref({from: currentDate(), to: currentDate()});
+
     const orderType = ref<OrderType>();
     const btfType = ref<BTFType>();
-
-    const signatureFlag = ref(true);
-    const requestEDS = ref(true);
-    const signatureOZHNN = ref(true);
-
-    //Multiple file setup
-    const files = ref<File[]>([]);
-    const resetFiles = () => {
-      files.value = [];
-    };
-
-    const fileFormat = computed((): FileFormat => {
-      return detectFileFormat(fileText.value);
-    });
-
-    const contentOptionsFilter = computed((): string => {
-      if (fileFormat.value == FileFormat.XML) return 'ContentOptions.Pain.00x';
-      else if (fileFormat.value == FileFormat.SWIFT)
-        return 'ContentOptions.Swift';
-      else return 'ContentOptions';
-    });
-
-    const editorLang = computed((): string => {
-      console.log('File format detected: ' + fileFormat.value.toString());
-      if (fileFormat.value == FileFormat.XML) return 'xml';
-      if (fileFormat.value == FileFormat.SWIFT) return 'text';
-      else return 'xml';
-    });
 
     const getDownloadRequest = (): DownloadRequest => {
       if (bankConnection.value?.ebicsVersion == 'H005') {
@@ -222,25 +212,13 @@ export default defineComponent({
       hasActiveConnections,
       bankConnectionLabel,
 
+      historicDownload,
+      historicDateRange,
+
       userSettings,
       replaceMsgId,
       applySmartAdjustments,
       detectFileFormat,
-      contentOptionsFilter,
-
-      //Multiple files
-      files,
-      resetFiles,
-
-      //Sigle file
-      file,
-      fileRawText,
-      fileText,
-      fileName,
-      editorLang,
-      fileFormat,
-
-      testInput,
 
       //Commons order types
       orderType,
@@ -253,9 +231,6 @@ export default defineComponent({
       btfTypeLabel,
 
       //Commons request flags
-      signatureFlag,
-      requestEDS,
-      signatureOZHNN,
       FileFormat,
       processDownload,
     };

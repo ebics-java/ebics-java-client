@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import org.ebics.client.api.EbicsUser
 import org.ebics.client.api.user.cert.UserKeyStore
 import org.ebics.client.api.partner.Partner
+import org.ebics.client.api.trace.TraceEntry
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.user.EbicsUserStatusEnum
 import javax.persistence.*
@@ -17,10 +18,10 @@ data class User (
     override val ebicsVersion: EbicsVersion,
     override val userId: String,
     override val name: String,
-    override val dn: String,
+    override var dn: String,
     override var userStatus: EbicsUserStatusEnum = EbicsUserStatusEnum.CREATED,
     override val useCertificate: Boolean,
-    val usePassword: Boolean,
+    var usePassword: Boolean,
 
     @ManyToOne(optional = false)
     @JoinColumn(name="PARTNER_ID")
@@ -32,4 +33,8 @@ data class User (
 
     val creator: String,
     val guestAccess: Boolean,
+
+    @JsonIgnore
+    @OneToMany(cascade = [CascadeType.ALL], mappedBy = "user")
+    val traces: List<TraceEntry> = emptyList(),
 ) : EbicsUser

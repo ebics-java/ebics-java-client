@@ -1,3 +1,3 @@
 package org.ebics.client.ebicsrestapi.bankconnection
 
-data class UserPass(val password:String)
+open class UserPass(val password:String)

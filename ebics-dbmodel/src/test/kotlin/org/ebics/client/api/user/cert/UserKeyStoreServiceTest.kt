@@ -31,15 +31,14 @@ open class UserKeyStoreServiceTest (
         //Create and store bank, partner, user
         val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), "EBXUBSCH", "UBS-PROD-CH", null)
         val bankId = bankService.createBank(bank)
-        val userInfo = BankConnection( EbicsVersion.H005, "CHT10001", "Jan", "cn=jan", "CH100001", bankId,
-            usePassword = true,
+        val userInfo = BankConnection( EbicsVersion.H005, "CHT10001", "Jan",  "CH100001", bankId,
             guestAccess = true
         )
         val userId = userService.createUserAndPartner(userInfo)
         val user = userService.getUserById(userId)
 
         //Create and store user certificate
-        val certificates = UserCertificateManager.create(userInfo.dn)
+        val certificates = UserCertificateManager.create("cn=jan")
         val pass = "testPass"
         val userKeyStore = UserKeyStore.fromUserCertMgr(user,certificates, pass)
         val keyStoreId = keyStoreService.save( userKeyStore )

@@ -1,7 +1,9 @@
 <template>
   <q-page class="justify-evenly">
     <div class="q-pa-md">
-      <h5 v-if="id !== undefined">Edit existing bank connection {{ user.name }}</h5>
+      <h5 v-if="id !== undefined">
+        Edit existing bank connection {{ user.name }}
+      </h5>
       <h5 v-else>Add new bank connection</h5>
 
       <div class="q-pa-md" style="max-width: 400px">
@@ -19,24 +21,12 @@
             ]"
           />
 
-          <q-input
-            filled
-            v-model="user.dn"
-            label="User DN"
-            hint="User domain name for certificat, example: cn=name,c=de,o=Organization,e=myemail@at.com"
-            lazy-rules
-            :rules="[
-              (val) =>
-                (val && val.length > 1) ||
-                'Please enter valid DN at least 2 characters',
-            ]"
-          />
-
           <!-- use-input, fill-input, input-debounce="0" @filter="filterBank" hide-selected  -->
           <q-select
             filled
             v-model="user.partner.bank"
             :options="banks"
+            :disable="userStatusInitializing"
             option-label="name"
             hint="EBICS Bank"
             lazy-rules
@@ -48,6 +38,7 @@
             v-model="user.userId"
             label="EBICS User ID"
             hint="EBICS User ID, example CHT00034"
+            :disable="userStatusInitializing"
             lazy-rules
             :rules="[
               (val) =>
@@ -61,6 +52,7 @@
             v-model="user.partner.partnerId"
             label="EBICS Partner ID"
             hint="EBICS Partner ID, example CH100208"
+            :disable="userStatusInitializing"
             lazy-rules
             :rules="[
               (val) =>
@@ -69,41 +61,59 @@
             ]"
           />
 
-          <div class="q-gutter-sm">
-            <q-radio
-              v-model="user.ebicsVersion"
-              :disable="userStatusInitializing"
-              val="H003"
-              contextmenu="test"
-              label="EBICS 2.4 (H003)"
-            />
-            <q-radio
-              v-model="user.ebicsVersion"
-              :disable="userStatusInitializing"
-              val="H004"
-              label="EBICS 2.5 (H004)"
-            />
-            <q-radio
-              v-model="user.ebicsVersion"
-              @click="updateUseCertificate()"
-              :disable="userStatusInitializing"
-              val="H005"
-              label="EBICS 3.0 (H005)"
-            />
-          </div>
+          <q-field
+            outlined
+            label="Default EBICS Version used"
+            stack-label
+            hint="Can be changed or set any time later manually"
+          >
+            <template v-slot:control>
+              <!-- q-radio
+                  v-model="user.ebicsVersion"
+                  :disable="userStatusInitializing"
+                  val="H003"
+                  contextmenu="test"
+                  label="EBICS 2.4 (H003)"
+                /-->
+              <q-radio
+                v-model="user.ebicsVersion"
+                val="H004"
+                label="EBICS 2.5 (H004)"
+              />
+              <q-radio
+                v-model="user.ebicsVersion"
+                val="H005"
+                label="EBICS 3.0 (H005)"
+              />
+            </template>
+          </q-field>
 
-          <q-toggle
-            :disable="user.ebicsVersion == 'H005'"
-            v-model="user.useCertificate"
-            label="Use Certificates"
+          <q-checkbox
+            v-model="user.guestAccess"
+            label="Share this bank connection"
+            hint="If enabled then this connection will be available to every GUEST user, used mainly for testing"
+          />
+
+          <q-input
+            disable
+            filled
+            v-model="user.dn"
+            label="User DN"
+            hint="Certificate user domain name"
+            lazy-rules
+            :rules="[
+              (val) =>
+                (val && val.length > 1) ||
+                'Please enter valid DN at least 2 characters',
+            ]"
           />
 
           <q-checkbox
+            v-if="id !== undefined"
+            disable
             v-model="user.usePassword"
             label="Protect your private keys with password (2FA)"
           />
-
-          <q-input filled v-model="user.userStatus" label="EBICS user status" />
 
           <div>
             <q-btn
@@ -129,26 +139,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, computed } from 'vue';
 import useUserDataAPI from 'components/bankconnection';
 import useBanksDataAPI from 'src/components/banks';
 
 export default defineComponent({
   name: 'User',
-  components: { },
+  components: {},
   props: {
     id: {
       type: Number,
       required: false,
       default: undefined,
-    },
-  },
-  data() {
-    return {};
-  },
-  computed: {
-    userStatusInitializing(): boolean {
-      return this.user.userStatus != 'CREATED' && this.user.userStatus != 'NEW';
     },
   },
   methods: {
@@ -158,16 +160,16 @@ export default defineComponent({
     onCancel() {
       this.$router.go(-1);
     },
-    updateUseCertificate() {
-      if (this.user.ebicsVersion == 'H005') {
-        this.user.useCertificate = true;
-      }
-    },
   },
   setup(props) {
     const { user, createOrUpdateUserData } = useUserDataAPI(props.id);
     const { banks } = useBanksDataAPI();
-    return { banks, user, createOrUpdateUserData };
+    const userStatusInitializing = computed((): boolean => {
+      return (
+        user.value.userStatus != 'CREATED' && user.value.userStatus != 'NEW'
+      );
+    });
+    return { banks, user, createOrUpdateUserData, userStatusInitializing };
   },
 });
 </script>

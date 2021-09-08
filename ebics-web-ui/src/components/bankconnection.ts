@@ -29,6 +29,8 @@ export default function useBankConnectionAPI(userId: number | undefined) {
     } as Partner,
     ebicsVersion: 'H005',
     userStatus: 'CREATED',
+    guestAccess: false,
+    usePassword: false,
   } as User);
 
   const refreshUserData = async () => {
@@ -53,7 +55,7 @@ export default function useBankConnectionAPI(userId: number | undefined) {
       dn: user.value.dn,
       partnerId: user.value.partner.partnerId,
       bankId: user.value.partner.bank.id,
-      useCertificate: user.value.useCertificate,
+      guestAccess: user.value.guestAccess,
       usePassword: user.value.usePassword,
     } as UserPartnerBank;
   });

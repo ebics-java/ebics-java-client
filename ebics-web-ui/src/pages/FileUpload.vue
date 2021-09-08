@@ -1,5 +1,5 @@
 <template>
-  <q-page class="justify-evenly" ref="testInput">
+  <q-page class="justify-evenly">
     <div v-if="hasActiveConnections" class="q-pa-md">
       <h5 v-if="fileEditor">Edit &amp; upload File</h5>
       <h5 v-else>Simple file upload</h5>
@@ -22,11 +22,11 @@
           />
 
           <div v-if="bankConnection" class="q-gutter-sm">
-            <q-radio
+            <!-- q-radio
               v-model="bankConnection.ebicsVersion"
               val="H003"
               label="EBICS 2.4 (H003)"
-            />
+            /-->
             <q-radio
               v-model="bankConnection.ebicsVersion"
               val="H004"

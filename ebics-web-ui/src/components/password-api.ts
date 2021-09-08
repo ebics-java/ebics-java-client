@@ -14,13 +14,13 @@ const tempPasswords: Ref<Map<number, string | undefined>> = ref<Map<number, stri
 export default function usePasswordAPI() {
   const q = useQuasar();
 
-  const passwordDialog = (userId: number, createPass: boolean): Promise<string> => {
+  const passwordDialog = (user: User, createPass: boolean): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
       q.dialog({
         title: createPass ? 'Create new password' : 'Enter password',
         message: createPass
           ? 'Create new password for your user certificate'
-          : 'Enter password for your user certificate',
+          : `Enter your password for user certificate for bank connection: '${user.name}'`,
         prompt: {
           model: '',
           type: 'password',
@@ -30,8 +30,8 @@ export default function usePasswordAPI() {
       })
         .onOk((data: unknown) => {
             const pwd = data as string
-            tempPasswords.value.set(userId, pwd)
-          console.log(`Entered password: ${pwd}`);
+            tempPasswords.value.set(user.id, pwd)
+          console.log(`Entered password: ${pwd} for user ${user.id}`);
           resolve(pwd);
         })
         .onCancel(() => {
@@ -61,7 +61,7 @@ export default function usePasswordAPI() {
           resolve(pwd);
         } else {
           //We will ask user for password
-          resolve(passwordDialog(user.id, createPass));
+          resolve(passwordDialog(user, createPass));
         }
       }
     });
@@ -77,13 +77,14 @@ export default function usePasswordAPI() {
     user: User,
     msg: string,
     error: unknown 
-  ): void => {
+  ): never => {
     apiErrorHandler(msg, error, (errorMessage) => {
         if (errorMessage.includes('wrong password')) {
           //In case of error 'wrong password' we have to reset temporary stored password in order to ask for new one
           resetCertPassword(user)
         }
     })
+    throw error;
   }
 
   return { pwdApiOkHandler, pwdApiErrorHandler, resetCertPassword, promptCertPassword };

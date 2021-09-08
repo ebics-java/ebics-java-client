@@ -1,7 +1,7 @@
 <template>
   <q-page class="justify-evenly">
-    <div class="q-pa-md">
-      <h5>User initialization: {{user.name}}</h5>
+    <div class="q-pa-md" style="max-width: 500px">
+      <h5>User initialization: {{ user.name }}</h5>
       <q-stepper
         v-model="actualWizardStep"
         color="primary"
@@ -15,12 +15,26 @@
           icon="forward_to_inbox"
           :done="isStepDone(UserIniWizzStep.CreateUserKeys)"
         >
-          Continue in order to create user private public keys. You can optionally
-          set PIN to protect access to your private keys.
-          <q-checkbox
-            v-model="user.usePassword"
-            label="Protect your private keys with password (2FA)"
-          />
+          Continue in order to create user private public keys. You can
+          optionally set PIN to protect access to your private keys.
+          <div class="q-pa-sm">
+            <q-input
+              filled
+              v-model="user.dn"
+              label="User DN"
+              hint="Certificate user domain name"
+              lazy-rules
+              :rules="[
+                (val) =>
+                  (val && val.length > 1) ||
+                  'Please enter valid DN at least 2 characters',
+              ]"
+            />
+            <q-checkbox
+              v-model="user.usePassword"
+              label="Protect your private keys with password (2FA)"
+            />
+          </div>
           <q-stepper-navigation>
             <q-btn
               @click="createUserKeys()"
@@ -37,12 +51,8 @@
           :done="isStepDone(UserIniWizzStep.UploadUserKeys)"
         >
           Continue in order to create user keys and send them to the bank using
-          the entered EBICS parameters (bank url, user, customer). For sending of
-          the keys INI and HIA administrative ordertypes will be used.
-          <q-checkbox
-            v-model="user.usePassword"
-            label="Protect your private keys with password (2FA)"
-          />
+          the entered EBICS parameters (bank url, user, customer). For sending
+          of the keys INI and HIA administrative ordertypes will be used.
           <q-stepper-navigation>
             <q-btn
               @click="uploadUserKeys()"
@@ -60,39 +70,64 @@
           :done="isStepDone(UserIniWizzStep.PrintUserLetters)"
         >
           In order to activate the this EBICS user you have to provide bellow
-          generated hash keys to your bank. The bank will check provided hash keys
-          and activate the EBICS user. 
+          generated hash keys to your bank. The bank will check provided hash
+          keys and activate the EBICS user.
           <q-list v-if="letters" bordered padding class="rounded-borders">
-            <q-item  v-ripple>
+            <q-item v-ripple>
               <q-item-section>
                 <q-item-label lines="1">Signature (A005)</q-item-label>
-                <q-item-label caption>{{letters.signature.hash}}</q-item-label>
+                <q-item-label caption>{{
+                  letters.signature.hash
+                }}</q-item-label>
               </q-item-section>
               <q-item-section side>
-                <q-btn class="gt-xs" size="15px" flat dense  icon="content_copy"></q-btn>
+                <q-btn
+                  class="gt-xs"
+                  size="15px"
+                  flat
+                  dense
+                  icon="content_copy"
+                ></q-btn>
               </q-item-section>
             </q-item>
-            <q-item  v-ripple>
-              <q-item-section>
-                <q-item-label lines="1">Encryption (E002)</q-item-label>
-                <q-item-label caption>{{letters.encryption.hash}}</q-item-label>
-              </q-item-section>
-              <q-item-section side>
-                <q-btn class="gt-xs" size="15px" flat dense  icon="content_copy"></q-btn>
-              </q-item-section>
-            </q-item>
-            <q-item  v-ripple>
+            <q-item v-ripple>
               <q-item-section>
                 <q-item-label lines="1">Authentication (X002)</q-item-label>
-                <q-item-label caption>{{letters.authentication.hash}}</q-item-label>
+                <q-item-label caption>{{
+                  letters.authentication.hash
+                }}</q-item-label>
               </q-item-section>
               <q-item-section side>
-                <q-btn class="gt-xs" size="15px" flat dense  icon="content_copy"></q-btn>
+                <q-btn
+                  class="gt-xs"
+                  size="15px"
+                  flat
+                  dense
+                  icon="content_copy"
+                ></q-btn>
+              </q-item-section>
+            </q-item>
+            <q-item v-ripple>
+              <q-item-section>
+                <q-item-label lines="1">Encryption (E002)</q-item-label>
+                <q-item-label caption>{{
+                  letters.encryption.hash
+                }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-btn
+                  class="gt-xs"
+                  size="15px"
+                  flat
+                  dense
+                  icon="content_copy"
+                ></q-btn>
               </q-item-section>
             </q-item>
           </q-list>
-          
-          <q-btn v-else
+
+          <q-btn
+            v-else
             @click="refreshUserLetters()"
             label="Refresh User Letters"
             color="primary"
@@ -143,7 +178,7 @@
         </q-step>
       </q-stepper>
       <q-space />
-      <q-card class="my-card">
+      <q-card class="my-card q-mt-md">
         <q-card-section>
           <q-banner inline-actions class="text-white bg-red">
             Do you want to reset the user status?
@@ -164,11 +199,16 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { UserIniWizzStep, AdminOrderType, UserLettersResponse } from 'components/models';
+import {
+  UserIniWizzStep,
+  AdminOrderType,
+  UserLettersResponse,
+} from 'components/models';
 import { QStepper } from 'quasar';
 import useUserDataAPI from 'components/bankconnection';
 import useUserInitAPI from 'components/bankconnection-init';
 import usePasswordAPI from 'components/password-api';
+import useDialogs from 'components/dialogs';
 
 export default defineComponent({
   name: 'UserInitalizationWizard',
@@ -182,7 +222,7 @@ export default defineComponent({
     return {
       //'importing enum' in order to be used in template
       UserIniWizzStep,
-      letters: undefined as (UserLettersResponse | undefined)
+      letters: undefined as UserLettersResponse | undefined,
     };
   },
   methods: {
@@ -191,10 +231,18 @@ export default defineComponent({
     },
     async resetUserStatus() {
       try {
-        //Get password for user certificates
-        await this.resetUserStatusRequest();
-        //Refresshing user status on success
-        await this.refreshUserData();
+        const del = await this.confirmDialog(
+            'Confirm reset',
+            'Do you really want to reset bank connection? (it must be then newly initialized in order to upload/download files)'
+          );
+        if (del) {
+          //Get password for user certificates
+          await this.resetUserStatusRequest();
+          //Reset the password for certificates
+          this.resetCertPassword(this.user);
+          //Refresshing user status on success
+          await this.refreshUserData();
+        }
       } catch (error) {
         console.log(error);
       }
@@ -248,8 +296,8 @@ export default defineComponent({
   },
   setup(props) {
     const { user, refreshUserData } = useUserDataAPI(props.id);
-
-    const { promptCertPassword } = usePasswordAPI();
+    const { confirmDialog } = useDialogs();
+    const { promptCertPassword, resetCertPassword } = usePasswordAPI();
 
     const {
       actualWizardStep,
@@ -270,6 +318,8 @@ export default defineComponent({
       resetUserStatusRequest,
       getUserLetters,
       promptCertPassword,
+      resetCertPassword,
+      confirmDialog,
     };
   },
 });

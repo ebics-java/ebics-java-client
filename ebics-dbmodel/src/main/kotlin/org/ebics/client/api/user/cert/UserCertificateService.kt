@@ -14,15 +14,17 @@ import java.util.*
 
 @Service
 class UserCertificateService(val userRepository: UserRepository, val userKeyStoreService: UserKeyStoreService) {
-    fun createOrUpdateUserCertificates(userId: Long, password: String): Long {
+    fun createOrUpdateUserCertificates(userId: Long, certRequest: CertRequest): Long {
         try {
             val user = userRepository.getById(userId, "bankconnection")
             SecurityCtxHelper.checkWriteAuthorization(user)
             user.checkAction(EbicsUserAction.CREATE_KEYS)
-            val userCertMgr = UserCertificateManager.create(user.dn)
-            val userKeyStore = UserKeyStore.fromUserCertMgr(user, userCertMgr, password)
+            val userCertMgr = UserCertificateManager.create(certRequest.dn)
+            val userKeyStore = UserKeyStore.fromUserCertMgr(user, userCertMgr, certRequest.password)
             userKeyStoreService.save(userKeyStore)
+            user.dn = certRequest.dn
             user.keyStore = userKeyStore
+            user.usePassword = certRequest.usePassword
             user.updateStatus(EbicsUserAction.CREATE_KEYS)
             userRepository.saveAndFlush(user)
             return userKeyStore.id!!

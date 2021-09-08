@@ -12,8 +12,7 @@ export interface UserPartnerBank {
   dn: string;
   partnerId: string;
   bankId: number;
-  useCertificate: boolean;
-  usePassword: boolean;
+  guestAccess: boolean;
 }
 
 export interface UserWizz {
@@ -41,8 +40,8 @@ export interface User extends UserWizz {
   userStatus: string;
   partner: Partner;
   keyStore: string;
-  useCertificate: boolean;
   usePassword: boolean;
+  guestAccess: boolean;
   securityMedium: string;
 }
 
@@ -132,6 +131,12 @@ export enum AdminOrderType {
 }
 
 export interface UserPassword {
+  password: string;
+}
+
+export interface CertRequest extends UserPassword {
+  dn: string;
+  usePassword: boolean;
   password: string;
 }
 

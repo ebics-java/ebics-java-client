@@ -8,6 +8,7 @@ import org.ebics.client.model.user.EbicsUserAction
 import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class UserService(
@@ -29,14 +30,17 @@ class UserService(
         with(bankConnection) {
             val partner = partnerService.createOrGetPartner(partnerId, bankId)
             val authentication = SecurityCtxHelper.getAuthentication()
+            val cn = name.toLowerCase().replace("[^\\x00-\\x7F]".toRegex(), "").replace("\\s".toRegex(), "-")
+            val country =
+                if (Locale.getDefault()?.country?.isNotBlank() == true) ",c=${Locale.getDefault().country.toLowerCase()}" else ""
             val user = User(
                 null,
                 ebicsVersion,
                 userId,
                 name,
-                dn,
+                dn = "cn=$cn$country",
                 useCertificate = ebicsVersion == EbicsVersion.H005,
-                usePassword = usePassword,
+                usePassword = false,
                 partner = partner,
                 keyStore = null,
                 creator = authentication.name,
@@ -60,14 +64,15 @@ class UserService(
                     ebicsVersion,
                     userId,
                     name,
-                    dn,
+                    currentUser.dn,
                     currentUser.userStatus,
                     ebicsVersion == EbicsVersion.H005,
-                    usePassword,
+                    currentUser.usePassword,
                     partner,
                     currentUser.keyStore,
                     currentUser.name,
-                    guestAccess
+                    guestAccess,
+                    currentUser.traces
                 )
                 EbicsUserStatusEnum.NEW -> User(
                     id,
@@ -81,7 +86,8 @@ class UserService(
                     partner,
                     currentUser.keyStore,
                     currentUser.name,
-                    guestAccess
+                    guestAccess,
+                    currentUser.traces
                 )
                 else -> User(
                     id,
@@ -95,7 +101,8 @@ class UserService(
                     currentUser.partner,
                     currentUser.keyStore,
                     currentUser.name,
-                    guestAccess
+                    guestAccess,
+                    currentUser.traces
                 )
             }
             userRepository.saveAndFlush(updatedUser)

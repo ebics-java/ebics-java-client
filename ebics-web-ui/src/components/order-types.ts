@@ -20,14 +20,27 @@ export default function useOrderTypesAPI(selectedBC:Ref<User | undefined>, filte
   const updateBtfTypesForActiveConnections = async():Promise<void> => {
     if (activeBankConnections.value) {
       for (const bankConnection of activeBankConnections.value) {
-        const orderTypeList = activeTypes.value.get(bankConnection.id);
-        if (!orderTypeList) { //If not fetched yet, do so
-          const bftTypes = await ebicsOrderTypes(bankConnection, 'H005');
-          console.log(`BtfTypes loaded for ${bankConnection.name}, types: ${JSON.stringify(bftTypes)}`)
-          const orderTypes = await ebicsOrderTypes(bankConnection, 'H004');
-          console.log(`Order types loaded for ${bankConnection.name}, types: ${JSON.stringify(orderTypes)}`)
-          activeTypes.value.set(bankConnection.id, {btfTypes: bftTypes, orderTypes: orderTypes} as OrderTypeList)
+        let orderTypeList:OrderTypeList | undefined = activeTypes.value.get(bankConnection.id);
+        //If not fetched yet, lets fetch order types for all version into cache
+        if (!orderTypeList) {
+          orderTypeList = {btfTypes: [], orderTypes: []} as OrderTypeList
         }
+          
+        if (orderTypeList && !orderTypeList.btfTypes.length) { 
+          try {
+            orderTypeList.btfTypes = await ebicsOrderTypes(bankConnection, 'H005');
+            console.log(`BtfTypes loaded for ${bankConnection.name}, types: ${JSON.stringify(orderTypeList.btfTypes)}`)
+          } catch (error) {}
+        }
+
+        if (orderTypeList && !orderTypeList.orderTypes.length) { 
+          try {
+            orderTypeList.orderTypes = await ebicsOrderTypes(bankConnection, 'H004') as OrderType[];
+            console.log(`Order types loaded for ${bankConnection.name}, types: ${JSON.stringify(orderTypeList.orderTypes)}`)
+          } catch (error) {}
+        }
+
+        activeTypes.value.set(bankConnection.id, orderTypeList)
       }
     }
   };
@@ -80,7 +93,7 @@ export default function useOrderTypesAPI(selectedBC:Ref<User | undefined>, filte
       )}|${s(btm?.messageNameVersion)}|${s(btm?.messageNameFormat)}`;
     } else return '';
   };
-
+/** 
   function extensionFromDescription(description: string | undefined): string | undefined {
     if (description?.includes('ZIP') || description?.includes('zip'))
       return 'zip';
@@ -91,6 +104,7 @@ export default function useOrderTypesAPI(selectedBC:Ref<User | undefined>, filte
     return undefined;
   }
 
+  
   const getDownloadFileNameFromOrderType = (ot: OrderType):string => {
     return `${ot.adminOrderType}`
   }
@@ -118,7 +132,7 @@ export default function useOrderTypesAPI(selectedBC:Ref<User | undefined>, filte
       }
     } else
       return undefined
-  }
+  } **/
 
   watch(selectedBC, selectUserOrderTypes);
   watch(activeBankConnections, updateBtfTypesForActiveConnections);

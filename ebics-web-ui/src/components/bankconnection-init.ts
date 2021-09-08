@@ -5,6 +5,7 @@ import {
   UserPassword,
   AdminOrderType,
   UserLettersResponse,
+  CertRequest,
 } from 'components/models';
 import { api } from 'boot/axios';
 import usePasswordAPI from './password-api';
@@ -73,9 +74,11 @@ export default function useUserInitAPI(
   const createUserKeysRequest = async (): Promise<void> => {
     try {
       const pass = await promptCertPassword(user.value, true);
-      await api.post<UserPassword>(`bankconnections/${user.value.id}/certificates`, {
+      await api.post<CertRequest>(`bankconnections/${user.value.id}/certificates`, {
+        dn: user.value.dn,
+        usePassword: user.value.usePassword,
         password: pass,
-      });
+      } as CertRequest);
       pwdApiOkHandler(
         `Certificates created successfully for user name: ${user.value.name} dn: ${user.value.dn}`
       );
