@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("banks")
 @CrossOrigin(origins = ["http://localhost:8081"])
-class EbicsBankResource (val bankService: BankService, val ebicsBankAPI: EbicsBankAPI) {
+class EbicsBankResource(val bankService: BankService, val ebicsBankAPI: EbicsBankAPI) {
 
     @GetMapping()
     fun listBanks(): List<Bank> = bankService.findBanks()
@@ -23,19 +23,26 @@ class EbicsBankResource (val bankService: BankService, val ebicsBankAPI: EbicsBa
     fun deleteBankById(@PathVariable bankId: Long) = bankService.deleteBankById(bankId)
 
     @PostMapping("")
-    fun createBank(@RequestBody bank: Bank):Long = bankService.createBank(bank)
+    fun createBank(@RequestBody bank: Bank): Long = bankService.createBank(bank)
 
     @PutMapping("{bankId}")
-    fun updateBank(@RequestBody bank: Bank, @PathVariable bankId:Long) = bankService.updateBankById(bankId, bank)
+    fun updateBank(@RequestBody bank: Bank, @PathVariable bankId: Long) = bankService.updateBankById(bankId, bank)
 
     @GetMapping("{bankId}/supportedVersion")
-    fun getSupportedVersions(@PathVariable bankId:Long, @RequestParam mode: EbicsAccessMode = EbicsAccessMode.OptionalOnline): List<VersionSupport> = ebicsBankAPI.getSupportedVersions(bankId, mode)
+    fun getSupportedVersions(
+        @PathVariable bankId: Long,
+        @RequestParam mode: EbicsAccessMode = EbicsAccessMode.OptionalOnline
+    ): List<VersionSupport> = ebicsBankAPI.getSupportedVersions(bankId, mode)
 
     @GetMapping("supportedVersion")
-    fun getSupportedVersionsOnline(@RequestParam bankURL: String, @RequestParam hostId: String): List<VersionSupport> = ebicsBankAPI.getSupportedVersionsLive(bankURL, hostId)
+    fun getSupportedVersionsOnline(@RequestParam bankURL: String, @RequestParam hostId: String): List<VersionSupport> =
+        ebicsBankAPI.getSupportedVersionsLive(bankURL, hostId)
 
     @PutMapping("{bankId}/supportedVersion/{ebicsVersion}")
-    fun updateSupportedVersion(@PathVariable bankId:Long, @PathVariable ebicsVersion: EbicsVersion, @RequestBody versionSupport: VersionSupportBase): Long =
+    fun updateSupportedVersion(
+        @PathVariable bankId: Long,
+        @PathVariable ebicsVersion: EbicsVersion,
+        @RequestBody versionSupport: VersionSupportBase
+    ): Long =
         ebicsBankAPI.updateSupportedVersion(bankId, versionSupport)
-
 }
