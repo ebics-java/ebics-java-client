@@ -5,11 +5,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class VersionSupportService(private val versionSupportRepository: VersionSupportRepository) {
-    fun updateVersionSupport(versionSupport: VersionSupport): Long {
-        return versionSupportRepository.save(versionSupport).id!!
+    fun updateVersionSupport(versionSupport: VersionSupport) {
+        versionSupportRepository.save(versionSupport)
     }
 
-    fun updateVersionSupport(base: VersionSupportBase, bank: Bank): Long {
-        return updateVersionSupport(VersionSupport.fromBaseAndBank(base, bank))
+    fun updateVersionSupport(base: VersionSupportBase, bank: Bank) {
+        updateVersionSupport(VersionSupport.fromBaseAndBank(base, bank))
     }
 }

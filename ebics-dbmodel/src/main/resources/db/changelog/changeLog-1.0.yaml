@@ -352,28 +352,34 @@ databaseChangeLog:
             type: BOOLEAN
         tableName: UserSettings
 - changeSet:
-    id: 1631350751749-1
+    id: 1631476562158-1
     author: honza.toegel (generated)
     changes:
     - createTable:
         columns:
         - column:
-            autoIncrement: true
             constraints:
               nullable: false
               primaryKey: true
               primaryKeyName: EbicsVersionSupportPK
-            name: id
+            name: bankId
             type: BIGINT
         - column:
             constraints:
               nullable: false
-            name: isAllowedForUse
+              primaryKey: true
+              primaryKeyName: EbicsVersionSupportPK
+            name: version
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+            name: isAllowed
             type: BOOLEAN
         - column:
             constraints:
               nullable: false
-            name: isPreferredForUse
+            name: isDefault
             type: BOOLEAN
         - column:
             constraints:
@@ -381,37 +387,22 @@ databaseChangeLog:
             name: isSupportedByBank
             type: BOOLEAN
         - column:
-            name: version
-            type: INT
-        - column:
             constraints:
               nullable: false
-            name: bank_id
-            type: BIGINT
+            name: isSupportedByClient
+            type: BOOLEAN
         tableName: EbicsVersionSupport
 - changeSet:
-    id: 1631350751749-2
+    id: 1631476562158-2
     author: honza.toegel (generated)
     changes:
     - addForeignKeyConstraint:
-        baseColumnNames: bank_id
+        baseColumnNames: bankId
         baseTableName: EbicsVersionSupport
-        constraintName: FKa2ijipgc03vv1httlmg77m0w6
+        constraintName: FK5dn8cxjuvs9nryoopme6spi3f
         deferrable: false
         initiallyDeferred: false
         referencedColumnNames: id
         referencedTableName: Bank
         validate: true
-- changeSet:
-    id: 1631351728007-1
-    author: honza.toegel (generated)
-    changes:
-    - addColumn:
-        columns:
-        - column:
-            constraints:
-              nullable: false
-            name: isSupportedByClient
-            type: boolean
-        tableName: EbicsVersionSupport
 

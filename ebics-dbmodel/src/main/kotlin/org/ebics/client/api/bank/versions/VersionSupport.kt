@@ -6,24 +6,26 @@ import org.ebics.client.model.EbicsVersion
 import javax.persistence.*
 
 @Entity(name = "EbicsVersionSupport")
+@IdClass(VersionSupportId::class)
 class VersionSupport(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id:Long? = null,
-
+    @Column(name = "version")
     val version: EbicsVersion,
+
     val isSupportedByBank: Boolean,
     val isSupportedByClient: Boolean,
-    val isAllowedForUse: Boolean,
-    val isPreferredForUse: Boolean,
+    val isAllowed: Boolean,
+    val isDefault: Boolean,
 
     @JsonIgnore
     @ManyToOne(optional = false)
+    @JoinColumn(name = "bankId", referencedColumnName = "id")
+    @Id
     val bank: Bank,
 ) {
     companion object {
         fun fromBaseAndBank(base: VersionSupportBase, bank: Bank): VersionSupport = VersionSupport(
-            base.id, base.version, base.isSupportedByBank, base.isSupportedByClient, base.isAllowedForUse, base.isPreferredForUse, bank
+            base.version, base.isSupportedByBank, base.isSupportedByClient, base.isAllowedForUse, base.isPreferredForUse, bank
         )
     }
 }

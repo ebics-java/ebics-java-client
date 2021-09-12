@@ -16,7 +16,7 @@ import java.net.URL
 @Component("EbicsBankAPI")
 class EbicsBankAPI(private val configuration: EbicsRestConfiguration, private val bankService: BankService, private val versionSupportService: VersionSupportService) {
 
-    fun updateSupportedVersion(bankId: Long, versionSupport: VersionSupportBase): Long {
+    fun updateSupportedVersion(bankId: Long, versionSupport: VersionSupportBase) {
         val bank = bankService.getBankById(bankId)
         return versionSupportService.updateVersionSupport(versionSupport, bank)
     }
@@ -40,7 +40,7 @@ class EbicsBankAPI(private val configuration: EbicsRestConfiguration, private va
         val supportedVersions = serverVersions.toSet().intersect(clientVersions)
 
         val highestSupportedVersion = supportedVersions.maxOrNull()
-        val currentDefaultVersion = bank.ebicsVersions.find { it.isPreferredForUse }?.version
+        val currentDefaultVersion = bank.ebicsVersions.find { it.isDefault }?.version
         //Check if the current preferred version is still supported by bank,
         //If not select the highest one automatically
         val futureDefaultVersion =
@@ -50,12 +50,11 @@ class EbicsBankAPI(private val configuration: EbicsRestConfiguration, private va
         return allVersions.map { version ->
             val storedVersion = bank.ebicsVersions.find { evPer -> evPer.version == version }
             VersionSupport(
-                storedVersion?.id,
                 version,
                 isSupportedByBank = serverVersions.contains(version),
                 isSupportedByClient = clientVersions.contains(version),
-                isAllowedForUse = supportedVersions.contains(version) && storedVersion?.isAllowedForUse ?: true,
-                isPreferredForUse = version == futureDefaultVersion, bank
+                isAllowed = supportedVersions.contains(version) && storedVersion?.isAllowed ?: true,
+                isDefault = version == futureDefaultVersion, bank
             )
         }
     }
@@ -70,8 +69,7 @@ class EbicsBankAPI(private val configuration: EbicsRestConfiguration, private va
         val highestSupportedVersion = supportedVersions.maxOrNull()
 
         return allVersions.map { version ->
-            VersionSupport(
-                null, version, true, clientVersions.contains(version), clientVersions.contains(version),
+            VersionSupport(version, true, clientVersions.contains(version), clientVersions.contains(version),
                 version == highestSupportedVersion, bank
             )
         }

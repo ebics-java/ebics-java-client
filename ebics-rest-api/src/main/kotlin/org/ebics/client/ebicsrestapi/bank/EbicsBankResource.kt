@@ -43,6 +43,6 @@ class EbicsBankResource(val bankService: BankService, val ebicsBankAPI: EbicsBan
         @PathVariable bankId: Long,
         @PathVariable ebicsVersion: EbicsVersion,
         @RequestBody versionSupport: VersionSupportBase
-    ): Long =
+    ) =
         ebicsBankAPI.updateSupportedVersion(bankId, versionSupport)
 }
