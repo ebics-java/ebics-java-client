@@ -351,4 +351,67 @@ databaseChangeLog:
             name: uploadOnDrop
             type: BOOLEAN
         tableName: UserSettings
+- changeSet:
+    id: 1631350751749-1
+    author: honza.toegel (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: EbicsVersionSupportPK
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: isAllowedForUse
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: isPreferredForUse
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: isSupportedByBank
+            type: BOOLEAN
+        - column:
+            name: version
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+            name: bank_id
+            type: BIGINT
+        tableName: EbicsVersionSupport
+- changeSet:
+    id: 1631350751749-2
+    author: honza.toegel (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: bank_id
+        baseTableName: EbicsVersionSupport
+        constraintName: FKa2ijipgc03vv1httlmg77m0w6
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: Bank
+        validate: true
+- changeSet:
+    id: 1631351728007-1
+    author: honza.toegel (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: isSupportedByClient
+            type: boolean
+        tableName: EbicsVersionSupport
 

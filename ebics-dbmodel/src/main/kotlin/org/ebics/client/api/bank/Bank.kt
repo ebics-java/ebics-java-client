@@ -3,9 +3,8 @@ package org.ebics.client.api.bank
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.ebics.client.api.EbicsBank
 import org.ebics.client.api.bank.cert.BankKeyStore
-import org.ebics.client.api.user.cert.UserKeyStore
+import org.ebics.client.api.bank.versions.VersionSupport
 import java.net.URL
-import java.security.interfaces.RSAPublicKey
 import javax.persistence.*
 
 @Entity
@@ -21,5 +20,8 @@ data class Bank(
 
     @JsonIgnore
     @OneToOne(optional = true, cascade = [CascadeType.ALL])
-    var keyStore: BankKeyStore?
+    var keyStore: BankKeyStore?,
+
+    @OneToMany(cascade = [CascadeType.ALL], mappedBy = "bank")
+    val ebicsVersions: List<VersionSupport> = emptyList()
 ) : EbicsBank

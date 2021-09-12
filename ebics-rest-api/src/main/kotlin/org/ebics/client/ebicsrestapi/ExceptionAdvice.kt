@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 
 @ControllerAdvice
 class ExceptionAdvice {
-    @ExceptionHandler( value =  [NotFoundException::class, AlreadyExistException::class, FunctionException::class, Exception::class])
+    @ExceptionHandler( value =  [NotFoundException::class, AlreadyExistException::class, FunctionException::class,
+        IllegalAccessException::class, AccessDeniedException::class, Exception::class])
     fun exceptionHandler(ex: Exception): ResponseEntity<ErrorMessage> {
         logger.error("Exception occur", ex)
         val status:HttpStatus = when(ex) {
@@ -22,6 +23,7 @@ class ExceptionAdvice {
             is FunctionException -> HttpStatus.BAD_REQUEST
             is EbicsException -> HttpStatus.BAD_REQUEST
             is IllegalAccessException -> HttpStatus.FORBIDDEN
+            is AccessDeniedException -> HttpStatus.FORBIDDEN
             else -> HttpStatus.INTERNAL_SERVER_ERROR
         }
         return ResponseEntity<ErrorMessage>(

@@ -22,14 +22,17 @@ import org.apache.http.HttpHeaders
 import org.apache.http.HttpHost
 import org.apache.http.auth.AuthScope
 import org.apache.http.auth.UsernamePasswordCredentials
+import org.apache.http.client.HttpClient
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.entity.EntityBuilder
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.impl.client.BasicCredentialsProvider
+import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.ProxyAuthenticationStrategy
 import org.apache.http.ssl.SSLContexts
 import org.apache.http.util.EntityUtils
+import org.ebics.client.api.Configuration
 import org.ebics.client.interfaces.ContentFactory
 import org.ebics.client.io.ByteArrayContentFactory
 import org.ebics.client.api.EbicsSession
@@ -42,15 +45,57 @@ import java.io.IOException
  * A simple HTTP request sender and receiver. The send returns a HTTP code that
  * should be analyzed before proceeding ebics request response parse.
  *
- */
-/**
  * Constructs a new `HttpRequestSender` with a given ebics
  * session.
  *
  * @param session
  * the ebics session
  */
-class HttpRequestSender(private val session: EbicsSession) {
+class HttpRequestSender(private val configuration: Configuration, private val bankURL: String) {
+
+    constructor(session: EbicsSession) : this(session.configuration, session.user.partner.bank.bankURL.toString())
+
+    /**
+     * Create HTTP client from EBICS configuration
+     */
+    private fun createHttpClient(conf: Configuration): CloseableHttpClient {
+        with(conf) {
+            with(HttpClientBuilder.create()) {
+                with (RequestConfig.copy(RequestConfig.DEFAULT)) {
+                    setSocketTimeout(300000)
+                    setConnectTimeout(300000)
+                    if (httpProxyHost.isNullOrBlank() && httpProxyPort != null) {
+                        setProxy(HttpHost(httpProxyHost, httpProxyPort!!))
+                    }
+                    setDefaultRequestConfig(build())
+                }
+
+                if (!httpProxyUser.isNullOrBlank()) {
+                    val credentialsProvider = BasicCredentialsProvider().apply {
+                        setCredentials(
+                            AuthScope(httpProxyHost, httpProxyPort!!),
+                            UsernamePasswordCredentials(httpProxyUser, httpProxyPassword)
+                        )
+                    }
+                    setDefaultCredentialsProvider(credentialsProvider)
+                    setProxyAuthenticationStrategy(ProxyAuthenticationStrategy())
+                }
+
+                if (!sslTrustedStoreFile.isNullOrBlank()) {
+                    val trustStoreFile = File(sslTrustedStoreFile!!)
+                    if (trustStoreFile.exists()) {
+                        try {
+                            setSSLContext(SSLContexts.custom().loadTrustMaterial(trustStoreFile).build())
+                        } catch (e: Exception) {
+                            logger.error("Error loading truststore: ", e)
+                        }
+                    } else
+                        logger.error("Provided truststore file name doesn't exist: $sslTrustedStoreFile")
+                }
+                return build()
+            }
+        }
+    }
 
     /**
      *  Sends the request contained in the `ContentFactory`.
@@ -64,44 +109,9 @@ class HttpRequestSender(private val session: EbicsSession) {
      */
     @Throws(IOException::class)
     fun send(request: ContentFactory): ByteArrayContentFactory {
-        val configBuilder = RequestConfig.copy(RequestConfig.DEFAULT).setSocketTimeout(300000).setConnectTimeout(300000)
-        val conf = session.configuration
-
-        val builder = HttpClientBuilder.create().setDefaultRequestConfig(
-            configBuilder.build()
-        )
-
-        with(conf) {
-            val port = httpProxyPort
-            if (httpProxyHost.isNullOrBlank() && port != null) {
-                configBuilder.setProxy(HttpHost(httpProxyHost, port))
-                if (!httpProxyUser.isNullOrBlank()) {
-                    val credentialsProvider = BasicCredentialsProvider()
-                    credentialsProvider.setCredentials(
-                        AuthScope(httpProxyHost, port),
-                        UsernamePasswordCredentials(conf.httpProxyUser, httpProxyPassword)
-                    )
-                    builder.setDefaultCredentialsProvider(credentialsProvider)
-                    builder.setProxyAuthenticationStrategy(ProxyAuthenticationStrategy())
-                }
-            }
-        }
-        if (!conf.sslTrustedStoreFile.isNullOrBlank()) {
-            val trustStoreFile = File(conf.sslTrustedStoreFile)
-            if (trustStoreFile.exists()) {
-                try {
-                    builder.setSSLContext(SSLContexts.custom().loadTrustMaterial(trustStoreFile).build())
-                } catch (e: Exception) {
-                    logger.error("Error loading truststore: " + e.message)
-                    e.printStackTrace()
-                }
-            } else
-                logger.error("Provided truststore file name doesn't exist: " + conf.sslTrustedStoreFile)
-        }
-        val httpClient = builder.build()
-        val input = request.content
-        val method = HttpPost(session.user.partner.bank.bankURL.toString())
-        val requestEntity = EntityBuilder.create().setStream(input).build()
+        val httpClient = createHttpClient(configuration)
+        val method = HttpPost(bankURL)
+        val requestEntity = EntityBuilder.create().setStream(request.content).build()
         method.entity = requestEntity
         method.setHeader(HttpHeaders.CONTENT_TYPE, "text/xml; charset=ISO-8859-1")
         httpClient.execute(method).use { response ->

@@ -15,14 +15,6 @@ export interface UserPartnerBank {
   guestAccess: boolean;
 }
 
-export interface UserWizz {
-  id: number;
-  ebicsVersion: string;
-  dn: string;
-  userStatus: string;
-  usePassword: boolean;
-}
-
 export interface EbicsApiError {
   timestamp: string;
   status: number;
@@ -31,7 +23,7 @@ export interface EbicsApiError {
   description: string;
 }
 
-export interface User extends UserWizz {
+export interface User {
   id: number;
   ebicsVersion: string;
   userId: string;

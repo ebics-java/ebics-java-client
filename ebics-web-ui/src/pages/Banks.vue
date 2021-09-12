@@ -66,13 +66,6 @@
               no-caps
               @click="routeToBankPage()"
             />
-            <q-btn
-              color="primary"
-              icon-right="archive"
-              label="Export to csv"
-              no-caps
-              @click="exportTable"
-            />
           </div>
         </template>
       </q-table>

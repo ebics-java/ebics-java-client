@@ -11,8 +11,8 @@
           <q-input
             filled
             v-model="user.name"
-            label="User name"
-            hint="Customer user name (used for displaying)"
+            label="Bank connection name"
+            hint="Name of your bank connection (displayed only)"
             lazy-rules
             :rules="[
               (val) =>
@@ -88,15 +88,23 @@
             </template>
           </q-field>
 
-          <q-checkbox
-            v-model="user.guestAccess"
-            label="Share this bank connection"
-            hint="If enabled then this connection will be available to every GUEST user, used mainly for testing"
-          />
+          <q-item tag="label" v-ripple>
+            <q-item-section avatar>
+              <q-checkbox v-model="user.guestAccess" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Share this bank connection</q-item-label>
+              <q-item-label caption
+                >If enabled then this connection will be available to every
+                GUEST user (do not use this for production!)</q-item-label
+              >
+            </q-item-section>
+          </q-item>
 
           <q-input
             disable
             filled
+            v-if="id !== undefined"
             v-model="user.dn"
             label="User DN"
             hint="Certificate user domain name"
@@ -108,12 +116,23 @@
             ]"
           />
 
-          <q-checkbox
-            v-if="id !== undefined"
-            disable
-            v-model="user.usePassword"
-            label="Protect your private keys with password (2FA)"
-          />
+          <q-item v-if="id !== undefined" tag="label" v-ripple>
+            <q-item-section avatar>
+              <q-checkbox
+                disable
+                v-model="user.usePassword"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label
+                >Private keys password protection (2FA)</q-item-label
+              >
+              <q-item-label caption
+                >Protect your private keys with additional password, must be
+                entered once for session in order to access the bank connection
+              </q-item-label>
+            </q-item-section>
+          </q-item>
 
           <div>
             <q-btn

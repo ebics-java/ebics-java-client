@@ -39,6 +39,8 @@ export default function useBaseAPI() {
         let message = ebicsApiError.message;
         if (ebicsApiError.description && !ebicsApiError.description.includes(message))
           message = `message: ${message} description: ${ebicsApiError.description}`;
+        if (message == undefined)
+          message = JSON.stringify(error.message)
         q.notify({
           color: 'negative',
           position: 'bottom-right',

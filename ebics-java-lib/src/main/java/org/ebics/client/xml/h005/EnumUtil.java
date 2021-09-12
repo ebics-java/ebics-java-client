@@ -1,9 +1,15 @@
 package org.ebics.client.xml.h005;
 
+import org.ebics.client.model.EbicsVersion;
 import org.ebics.client.order.AuthorisationLevel;
 import org.ebics.client.order.h005.ContainerType;
+import org.ebics.schema.h000.HEVResponseDataType;
 import org.ebics.schema.h005.ContainerFlagType;
 import org.ebics.schema.h005.UserPermissionType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * This conversion between xml bean generated enums & kotlin enums must be made unfortunatelly in java because of maven compilation bug

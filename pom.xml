@@ -46,7 +46,6 @@
     <modules>
         <module>ebics-java-lib</module>
         <module>ebics-dbmodel</module>
-        <module>ebics-console-app</module>
         <module>ebics-web-ui</module>
         <module>ebics-rest-api</module>
     </modules>

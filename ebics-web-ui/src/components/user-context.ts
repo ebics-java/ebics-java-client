@@ -116,7 +116,6 @@ export default function useUserContextAPI() {
   };
 
   const onCredentialsChanged = () => {
-    console.log('Credentials changed');
     if (authenticationType.value == AuthenticationType.HTTP_BASIC) {
       api.defaults.auth = basicCredentials.value;
     }

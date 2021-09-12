@@ -43,7 +43,7 @@ class SecurityConfiguration() : WebSecurityConfigurerAdapter(true) {
             .antMatchers(HttpMethod.POST, "/bankconnections").hasRole("USER")
             .antMatchers(HttpMethod.PUT, "/bankconnections/{\\d+}").hasRole("USER")
             .antMatchers(HttpMethod.DELETE, "/bankconnections/{\\d+}").hasAnyRole("ADMIN", "USER")
-            .antMatchers(HttpMethod.GET, "/banks/**").hasAnyRole("ADMIN", "USER")
+            .antMatchers(HttpMethod.GET, "/banks/**").hasAnyRole("ADMIN", "USER", "GUEST")
             .antMatchers(HttpMethod.POST, "/banks/**").hasRole("ADMIN")
             .antMatchers(HttpMethod.PUT, "/banks/**").hasRole("ADMIN")
             .antMatchers(HttpMethod.PATCH, "/banks/**").hasRole("ADMIN")

@@ -48,7 +48,7 @@ export default defineComponent({
     async onLogin() {
       try {
         await this.refreshUserContextData()
-        await this.$router.push({path: '/'})
+        await this.$router.push({path: '/userctx'})
       } catch(error) {
         console.log(JSON.stringify(error))
       }

@@ -16,34 +16,36 @@
  *
  * $Id$
  */
-package org.ebics.client.file
+package org.ebics.client.xml.h000
 
-import org.ebics.client.api.Serializable
+import org.ebics.client.api.EbicsSession
 import org.ebics.client.exception.EbicsException
-import java.io.ObjectInputStream
+import org.ebics.client.xml.h005.DefaultEbicsRootElement
+import org.ebics.schema.h000.EbicsHEVRequestDocument
 
 /**
- * A mean to serialize and deserialize `Object`.
- * The manager should ensure serialization and deserialization
- * operations
+ * The HEV request
  *
- * @author hachani
+ * @author Jan Toegel
  */
-interface SerializationManager {
-    /**
-     * Serializes a `Savable` object
-     * @param obj the `Savable` object$
-     * @throws EbicsException serialization fails
-     */
-    @Throws(EbicsException::class)
-    fun serialize(obj: Serializable)
 
-    /**
-     * Deserializes the given object input stream.
-     * @param name the name of the serialized object
-     * @return the corresponding object input stream
-     * @throws EbicsException deserialization fails
-     */
+class HEVRequest(val ebicsHostID: String) : DefaultEbicsRootElement() {
     @Throws(EbicsException::class)
-    fun getDeserializeStream(name: String): ObjectInputStream
+    override fun build() {
+        with (EbicsHEVRequestDocument.Factory.newInstance()) {
+            this.addNewEbicsHEVRequest().hostID = ebicsHostID
+            document = this
+        }
+    }
+
+    override val name: String = "EbicsHEVRequestDocument.xml"
+
+    override fun toByteArray(): ByteArray {
+        setSaveSuggestedPrefixes("http://www.ebics.org/h000", "")
+        return super.toByteArray()
+    }
+
+    companion object {
+        private const val serialVersionUID = -5523105558015982970L
+    }
 }

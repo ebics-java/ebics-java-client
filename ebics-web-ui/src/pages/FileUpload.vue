@@ -256,7 +256,6 @@ import { QForm } from 'quasar';
 import { VAceEditor } from 'vue3-ace-editor';
 import 'ace-builds/src-noconflict/mode-xml';
 import 'ace-builds/src-noconflict/theme-clouds';
-import { VAceEditorInstance } from 'vue3-ace-editor/types';
 import UserPreferences from 'components/UserPreferences.vue';
 
 //Composition APIs
