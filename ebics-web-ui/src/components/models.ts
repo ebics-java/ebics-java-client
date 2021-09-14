@@ -5,6 +5,22 @@ export interface Bank {
   hostId: string;
 }
 
+export enum EbicsVersion {
+  H002 = 'H002',
+  H003 = 'H003',
+  H004 = 'H004',
+  H005 = 'H005',
+  H006 = 'H006',
+}
+
+export interface EbicsVersionSettings {
+  version: EbicsVersion;
+  isSupportedByBank: boolean;
+  isSupportedByClient: boolean;
+  isAllowed: boolean;
+  isDefault: boolean;
+}
+
 export interface UserPartnerBank {
   ebicsVersion: string;
   userId: string;

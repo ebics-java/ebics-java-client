@@ -23,5 +23,5 @@ data class Bank(
     var keyStore: BankKeyStore?,
 
     @OneToMany(cascade = [CascadeType.ALL], mappedBy = "bank")
-    val ebicsVersions: List<VersionSupport> = emptyList()
+    val ebicsVersions: List<VersionSupport>? = emptyList()
 ) : EbicsBank

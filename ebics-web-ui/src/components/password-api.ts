@@ -77,14 +77,13 @@ export default function usePasswordAPI() {
     user: User,
     msg: string,
     error: unknown 
-  ): never => {
+  ): void => {
     apiErrorHandler(msg, error, (errorMessage) => {
         if (errorMessage.includes('wrong password')) {
           //In case of error 'wrong password' we have to reset temporary stored password in order to ask for new one
           resetCertPassword(user)
         }
     })
-    throw error;
   }
 
   return { pwdApiOkHandler, pwdApiErrorHandler, resetCertPassword, promptCertPassword };

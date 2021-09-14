@@ -61,7 +61,7 @@ class HTDResponseOrderDataElement(factory: ContentFactory) : DefaultResponseElem
      */
     fun getOrderTypes(): List<OrderType> {
         with(response) {
-            return userInfo.permissionArray.map { permission ->
+            return userInfo.permissionArray.mapNotNull { it }.map { permission ->
                 //Lets find for each user permission the referred BTF type
                 permission to partnerInfo.orderInfoArray.find {
                     it.adminOrderType == permission.adminOrderType && ((it.service == null && permission.service == null) || it.service.equalXml(

@@ -2,6 +2,7 @@ package org.ebics.client.api.user
 
 import org.assertj.core.api.Assertions.assertThat
 import org.ebics.client.api.bank.Bank
+import org.ebics.client.api.bank.BankData
 import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.user.cert.UserKeyStoreService
 import org.ebics.client.api.partner.PartnerService
@@ -25,7 +26,7 @@ class UserServiceTest(
 ) {
     @Test
     fun createAndGetUser() {
-        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"),  "EBXUBSCH", "UBS-PROD-CH", null)
+        val bank = BankData(  URL("https://ebics.ubs.com/ebicsweb/ebicsweb"),  "EBXUBSCH", "UBS-PROD-CH")
         val bankId = bankService.createBank(bank)
         val userInfo = BankConnection(EbicsVersion.H004, "CHT10001", "Jan",  "CH100001", bankId, false)
         val userId = userService.createUserAndPartner(userInfo)

@@ -2,6 +2,7 @@ package org.ebics.client.api.user.cert
 
 import org.assertj.core.api.Assertions.assertThat
 import org.ebics.client.api.bank.Bank
+import org.ebics.client.api.bank.BankData
 import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.partner.PartnerService
 import org.ebics.client.api.user.BankConnection
@@ -29,7 +30,7 @@ open class UserKeyStoreServiceTest (
     @Test
     fun createStoreAndLoad() {
         //Create and store bank, partner, user
-        val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), "EBXUBSCH", "UBS-PROD-CH", null)
+        val bank = BankData( URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), "EBXUBSCH", "UBS-PROD-CH")
         val bankId = bankService.createBank(bank)
         val userInfo = BankConnection( EbicsVersion.H005, "CHT10001", "Jan",  "CH100001", bankId,
             guestAccess = true

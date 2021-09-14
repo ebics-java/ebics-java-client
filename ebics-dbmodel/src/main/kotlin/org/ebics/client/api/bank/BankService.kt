@@ -8,15 +8,19 @@ import org.springframework.stereotype.Service
 @Service
 class BankService(private val bankRepository: BankRepository) {
     fun findBanks(): List<Bank> = bankRepository.findAll()
-    fun createBank(bank: Bank): Long {
-        require(bank.id == null) { "This method cant be used for updating of existing bank, provide bank object without id" }
-        bankRepository.saveAndFlush(bank)
-        return bank.id!!
+    fun createBank(bank: BankData): Long {
+        val createdBank = Bank(null, bank.bankURL, bank.hostId, bank.name, null, emptyList())
+        bankRepository.saveAndFlush(createdBank)
+        return createdBank.id!!
     }
 
-    fun updateBankById(bankId: Long, bank: Bank) {
-        when (bankRepository.findById(bankId).isPresent) {
-            true -> bankRepository.save(bank)
+    fun updateBankById(bankId: Long, bank: BankData) {
+        val currentBank = bankRepository.findById(bankId);
+        when (currentBank.isPresent) {
+            true -> {
+                val updatedBank = Bank(bankId, bank.bankURL, bank.hostId, bank.name, currentBank.get().keyStore, currentBank.get().ebicsVersions)
+                bankRepository.save(updatedBank)
+            }
             false -> throw NotFoundException(bankId, "bank", null)
         }
     }

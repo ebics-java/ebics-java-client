@@ -1,6 +1,7 @@
 package org.ebics.client.ebicsrestapi.bank
 
 import org.ebics.client.api.bank.Bank
+import org.ebics.client.api.bank.BankData
 import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.bank.versions.VersionSupport
 import org.ebics.client.api.bank.versions.VersionSupportBase
@@ -23,22 +24,22 @@ class EbicsBankResource(val bankService: BankService, val ebicsBankAPI: EbicsBan
     fun deleteBankById(@PathVariable bankId: Long) = bankService.deleteBankById(bankId)
 
     @PostMapping("")
-    fun createBank(@RequestBody bank: Bank): Long = bankService.createBank(bank)
+    fun createBank(@RequestBody bank: BankData): Long = bankService.createBank(bank)
 
     @PutMapping("{bankId}")
-    fun updateBank(@RequestBody bank: Bank, @PathVariable bankId: Long) = bankService.updateBankById(bankId, bank)
+    fun updateBank(@RequestBody bank: BankData, @PathVariable bankId: Long) = bankService.updateBankById(bankId, bank)
 
-    @GetMapping("{bankId}/supportedVersion")
+    @GetMapping("{bankId}/supportedVersions")
     fun getSupportedVersions(
         @PathVariable bankId: Long,
         @RequestParam mode: EbicsAccessMode = EbicsAccessMode.OptionalOnline
     ): List<VersionSupport> = ebicsBankAPI.getSupportedVersions(bankId, mode)
 
-    @GetMapping("supportedVersion")
+    @GetMapping("supportedVersions")
     fun getSupportedVersionsOnline(@RequestParam bankURL: String, @RequestParam hostId: String): List<VersionSupport> =
         ebicsBankAPI.getSupportedVersionsLive(bankURL, hostId)
 
-    @PutMapping("{bankId}/supportedVersion/{ebicsVersion}")
+    @PutMapping("{bankId}/supportedVersions/{ebicsVersion}")
     fun updateSupportedVersion(
         @PathVariable bankId: Long,
         @PathVariable ebicsVersion: EbicsVersion,

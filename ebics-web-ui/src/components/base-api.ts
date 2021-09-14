@@ -30,7 +30,7 @@ export default function useBaseAPI() {
     msg: string,
     error: unknown,
     apiErrorCallback: undefined | ((errorMessage: string) => void) = undefined
-  ): never => {
+  ): void => {
     console.error('Handling error: ' + JSON.stringify(error));
     if (isAxiosError<EbicsApiError>(error)) {
       if (error.response) {
@@ -72,7 +72,6 @@ export default function useBaseAPI() {
         icon: 'report_problem',
       });
     }
-    throw error;
   };
 
   return {
