@@ -3,6 +3,12 @@ export interface Bank {
   bankURL: string;
   name: string;
   hostId: string;
+  keyStore: {
+    id: number;
+    e002DigestHex: string;
+    x002DigestHex: string;
+  }
+  ebicsVersions: EbicsVersion[];
 }
 
 export enum EbicsVersion {
@@ -22,7 +28,7 @@ export interface EbicsVersionSettings {
 }
 
 export interface UserPartnerBank {
-  ebicsVersion: string;
+  ebicsVersion: EbicsVersion;
   userId: string;
   name: string;
   dn: string;
@@ -41,7 +47,7 @@ export interface EbicsApiError {
 
 export interface User {
   id: number;
-  ebicsVersion: string;
+  ebicsVersion: EbicsVersion;
   userId: string;
   name: string;
   dn: string;

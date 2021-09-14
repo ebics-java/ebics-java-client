@@ -22,6 +22,8 @@ fun String.decodeHexToByteArray(): ByteArray {
  */
 fun ByteArray.toHexString(): String = joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 
+fun String.addSpaces(afterCharCount: Int): String = this.replace("(.{$afterCharCount})".toRegex(), "$1 ")
+
 fun LocalDate.toDate(): Date {
     // Getting system timezone
     val systemTimeZone = ZoneId.systemDefault()

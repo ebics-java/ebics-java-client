@@ -166,8 +166,46 @@
           :done="isStepDone(UserIniWizzStep.VerifyBankKeys)"
         >
           Verify bellow downloaded bank keys with the one provided by your bank
-          during onboarding. In case they not match, this connection can't be
-          trussted - identity of the bank is not valid.
+          during onboarding. In case they match, is your connection ready to use.
+          If they keys DON'T match this connection can't be trussted - identity of the bank is not valid.
+          <q-list bordered padding class="rounded-borders">
+            <q-item v-ripple>
+              <q-item-section>
+                <q-item-label lines="1">Authentication (X002)</q-item-label>
+                <q-item-label caption>{{
+                  user.partner.bank.keyStore.x002DigestHex
+                }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-btn
+                  class="gt-xs"
+                  size="15px"
+                  flat
+                  dense
+                  icon="content_copy"
+                  @click="copyToClipboard(user.partner.bank.keyStore.x002DigestHex)"
+                ></q-btn>
+              </q-item-section>
+            </q-item>
+            <q-item v-ripple>
+              <q-item-section>
+                <q-item-label lines="1">Encryption (E002)</q-item-label>
+                <q-item-label caption>{{
+                  user.partner.bank.keyStore.e002DigestHex
+                }}</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-btn
+                  class="gt-xs"
+                  size="15px"
+                  flat
+                  dense
+                  icon="content_copy"
+                  @click="copyToClipboard(user.partner.bank.keyStore.e002DigestHex)"
+                ></q-btn>
+              </q-item-section>
+            </q-item>
+          </q-list>
           <q-stepper-navigation>
             <q-btn
               @click="verifyBankKeys()"
@@ -209,6 +247,7 @@ import useUserDataAPI from 'components/bankconnection';
 import useUserInitAPI from 'components/bankconnection-init';
 import usePasswordAPI from 'components/password-api';
 import useDialogs from 'components/dialogs';
+import { copyToClipboard } from 'quasar'
 
 export default defineComponent({
   name: 'UserInitalizationWizard',
@@ -308,6 +347,10 @@ export default defineComponent({
       getUserLetters,
     } = useUserInitAPI(user);
 
+    const copyToClip = async(txt:string):Promise<void> => {
+      await copyToClipboard(txt);
+    }
+
     return {
       user,
       refreshUserData,
@@ -320,6 +363,7 @@ export default defineComponent({
       promptCertPassword,
       resetCertPassword,
       confirmDialog,
+      copyToClipboard,
     };
   },
 });

@@ -91,7 +91,7 @@ class UserService(
                 )
                 else -> User(
                     id,
-                    currentUser.ebicsVersion,
+                    ebicsVersion,
                     currentUser.userId,
                     name,
                     currentUser.dn,

@@ -18,7 +18,6 @@ data class Bank(
     override val hostId: String,
     override val name: String,
 
-    @JsonIgnore
     @OneToOne(optional = true, cascade = [CascadeType.ALL])
     var keyStore: BankKeyStore?,
 

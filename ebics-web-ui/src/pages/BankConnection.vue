@@ -101,7 +101,7 @@
             </q-item-section>
           </q-item>
 
-          <q-input
+          <!-- q-input
             disable
             filled
             v-if="id !== undefined"
@@ -132,7 +132,7 @@
                 entered once for session in order to access the bank connection
               </q-item-label>
             </q-item-section>
-          </q-item>
+          </q-item -->
 
           <div>
             <q-btn
