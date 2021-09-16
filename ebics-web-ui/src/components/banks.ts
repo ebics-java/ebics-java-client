@@ -11,7 +11,7 @@ import useDialogs from './dialogs';
  *  loadBanks function to trigger refreshing of banks
  *  deleteBank function to delete bank 
  */
-export default function useBankConnectionsAPI() {
+export default function useBanksAPI() {
   const { apiErrorHandler } = useBaseAPI();
   const { confirmDialog } = useDialogs();
 
