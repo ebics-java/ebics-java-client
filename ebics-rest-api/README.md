@@ -1,14 +1,14 @@
 # REST API Configuration
 
 The configuration of WAR file is externalized to have easier control over deployed application in production.
-The external configuration can override 
-* all spring properties using config.properties (or yaml)
-* all logback configs
+The external configuration define: 
+* spring properties using config.properties (or config.yaml)
+* logging settings 
 
 ##Configuration home directory
 
 The config.properties & logback.xml is expected on path
-$EWC_CONFIG_HOME/config.properties (or yaml)
+$EWC_CONFIG_HOME/config.properties (or config.yaml)
 $EWC_CONFIG_HOME/logback.xml
 
 ## HTTPS Certificate
