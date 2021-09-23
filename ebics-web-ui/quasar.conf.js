@@ -52,19 +52,18 @@ module.exports = configure(function (ctx) {
       'material-icons', // optional, you are not bound to it
     ],
 
-    prod: {
-      env: {
+    // Full list of options: https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
+    build: {
+      env: ctx.dev ? {
+        API_URL: 'https://localhost/EbicsWebClient',
+        AUTH_TYPE: 'HTTP_BASIC',
+        AUTH_TYPE_SSO_OVER_BASIC: undefined
+      } : {
         //Use relative path for PRODUCTION  - means FE SPA & BE REST are using same URL
         API_URL: undefined,
         AUTH_TYPE: 'SSO',
-      },
-    },
-
-    // Full list of options: https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
-    build: {
-      env: {
-        API_URL: 'https://localhost/EbicsWebClient',
-        AUTH_TYPE: 'HTTP_BASIC',
+        //Simulates SSO in with statically given HTTP basic credentials (only by AuthenticationType.SSO for dev purposes)
+        AUTH_TYPE_SSO_OVER_BASIC: 'yes'
       },
       vueRouterMode: 'hash', // available values: 'hash', 'history'
 

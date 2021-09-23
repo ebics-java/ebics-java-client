@@ -17,9 +17,13 @@ function getAuthTypeFromEnv():AuthenticationType {
   }
 }
 
+function getAuthSSOBasicTypeFromEnv():boolean {
+  return process.env.AUTH_TYPE_SSO_OVER_BASIC ? true : false;
+}
+
 const authenticationType = ref<AuthenticationType>(getAuthTypeFromEnv());
 const refreshUserContextByMounth = true;
-const ssoDevOverBasic = ref(true); //Simulates SSO in with statically given HTTP basic credentials (only by AuthenticationType.SSO for dev purposes)
+const ssoDevOverBasic = ref(getAuthSSOBasicTypeFromEnv()); 
 
 //Reactive http basic credentials object available in browser session
 //Initally no default password & username to force login, can be changed for dev purposes
