@@ -41,7 +41,7 @@ public class ReturnCode implements Serializable {
    * standard code, symbolic name and text
    * @param code the given standard code.
    * @param symbolicName the symbolic name.
-   * @param the code text
+   * @param text the code text
    */
   public ReturnCode(String code, String symbolicName, String text) {
     this.code = code;
@@ -117,6 +117,11 @@ public class ReturnCode implements Serializable {
     return code.hashCode();
   }
 
+  @Override
+  public String toString() {
+    return code + " " + symbolicName + " " + text;
+  }
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
@@ -153,6 +158,7 @@ public class ReturnCode implements Serializable {
   private static final long 		serialVersionUID = -497883146384363199L;
 
   private static final Map<String, ReturnCode> returnCodes = new HashMap<>();
+  private static final Messages messages = new Messages(BUNDLE_NAME);
 
   static {
     EBICS_OK = create("000000", "EBICS_OK");
@@ -181,15 +187,18 @@ public class ReturnCode implements Serializable {
     EBICS_MAX_TRANSACTIONS_EXCEEDED = create("091119", "EBICS_MAX_TRANSACTIONS_EXCEEDED");
     EBICS_X509_CERTIFICATE_NOT_VALID_YET = create("091209", "EBICS_X509_CERTIFICATE_NOT_VALID_YET");
     EBICS_SIGNATURE_VERIFICATION_FAILED = create("091301", "EBICS_SIGNATURE_VERIFICATION_FAILED");
-
-
-
   }
 
-    private static ReturnCode create(String code, String symbolicName) {
-        ReturnCode returnCode = new ReturnCode(code, symbolicName, Messages.getString(code,
-            BUNDLE_NAME));
-        returnCodes.put(code, returnCode);
-        return returnCode;
+  private static ReturnCode create(String code, String symbolicName) {
+    String text = messages.getString(code);
+    if (text == null) {
+      throw new NullPointerException("No text for code: " + code);
     }
+    ReturnCode returnCode = new ReturnCode(code, symbolicName, text);
+    ReturnCode prev = returnCodes.put(code, returnCode);
+    if (prev != null) {
+      throw new IllegalStateException("Duplicated code: " + code);
+    }
+    return returnCode;
+  }
 }

@@ -20,6 +20,7 @@
 package org.kopi.ebics.xml;
 
 import org.kopi.ebics.exception.EbicsException;
+import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.schema.h003.MutableHeaderType;
 import org.kopi.ebics.schema.h003.StaticHeaderType;
 import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest;
@@ -27,7 +28,6 @@ import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest.Body;
 import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest.Header;
 import org.kopi.ebics.schema.h003.MutableHeaderType.SegmentNumber;
 import org.kopi.ebics.session.EbicsSession;
-import org.kopi.ebics.session.OrderType;
 
 /**
  * The <code>DTransferRequestElement</code> is the common elements
@@ -47,7 +47,7 @@ public class DownloadTransferRequestElement extends TransferRequestElement {
    * @param transactionId the transaction ID
    */
   public DownloadTransferRequestElement(EbicsSession session,
-                                 OrderType type,
+                                 EbicsOrderType type,
                                  int segmentNumber,
                                  boolean lastSegment,
                                  byte[] transactionId)

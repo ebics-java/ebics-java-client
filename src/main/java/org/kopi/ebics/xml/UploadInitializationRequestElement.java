@@ -27,6 +27,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.ContentFactory;
+import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.io.Splitter;
 import org.kopi.ebics.schema.h003.DataEncryptionInfoType.EncryptionPubKeyDigest;
 import org.kopi.ebics.schema.h003.DataTransferRequestType;
@@ -71,7 +72,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
    * @throws EbicsException
    */
   public UploadInitializationRequestElement(EbicsSession session,
-                                       org.kopi.ebics.session.OrderType orderType, OrderAttributeType.Enum orderAttribute,
+                                       EbicsOrderType orderType, OrderAttributeType.Enum orderAttribute,
                                        byte[] userData)
     throws EbicsException
   {
@@ -118,7 +119,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
 	                                          "http://www.w3.org/2001/04/xmlenc#sha256",
 	                                          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
-    orderType = EbicsXmlFactory.createOrderType(type.toString());
+    orderType = EbicsXmlFactory.createOrderType(type.getCode());
     fileFormat = EbicsXmlFactory.createFileFormatType(session.getConfiguration().getLocale().getCountry().toUpperCase(),
 	                                              session.getSessionParam("FORMAT"));
 

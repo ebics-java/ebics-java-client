@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.kopi.ebics.exception.EbicsException;
+import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest;
 import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest.Body;
 import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest.Header;
@@ -62,7 +63,7 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
    * @throws EbicsException
    */
   public DownloadInitializationRequestElement(EbicsSession session,
-                                       org.kopi.ebics.session.OrderType type,
+                                       EbicsOrderType type,
                                        Date startRange,
                                        Date endRange)
     throws EbicsException
@@ -95,7 +96,7 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
 	                                          "http://www.w3.org/2001/04/xmlenc#sha256",
 	                                          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
-    orderType = EbicsXmlFactory.createOrderType(type.toString());
+    orderType = EbicsXmlFactory.createOrderType(type.getCode());
     if (type.equals(org.kopi.ebics.session.OrderType.FDL)) {
       FDLOrderParamsType		fDLOrderParamsType;
       FileFormatType 			fileFormat;

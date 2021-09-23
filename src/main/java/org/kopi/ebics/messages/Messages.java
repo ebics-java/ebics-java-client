@@ -25,151 +25,66 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
- * A mean to manage application messages.
- *
- * @author Hachani
+ * A class to manage application messages.
  *
  */
 public class Messages {
 
-  /**
-   * Return the corresponding value of a given key and string parameter.
-   * @param key the given key
-   * @param bundleName the bundle name
-   * @param params the parameter
-   * @return the corresponding key value
-   */
-  public static String getString(String key, String bundleName, String param) {
-    try {
-      ResourceBundle		resourceBundle;
+  private static Locale defaultLocale = Locale.ENGLISH;
+  private final Locale locale;
+  private final ResourceBundle resourceBundle;
 
-      resourceBundle = ResourceBundle.getBundle(bundleName, locale);
-      return MessageFormat.format(resourceBundle.getString(key), param);
-    } catch (MissingResourceException e) {
-      return "!!" + key + "!!";
-    } catch (NullPointerException npe) {
-      if (param != null)
-        return "!!" + key + " with param " + param + "!!";
-      else
-        return "!!" + key + "!!";
-    }
+  public Messages(String bundleName, Locale locale) {
+    this.locale = locale;
+    this.resourceBundle = getBundle(bundleName, locale);
+  }
+
+  public Messages(String bundleName) {
+    this(bundleName, defaultLocale);
   }
 
   /**
-   * Return the corresponding value of a given key and integer parameter.
+   * Return the corresponding value of a given key and string parameter.
    * @param key the given key
-   * @param bundleName the bundle name
-   * @param param the parameter
+   * @param arguments object(s) to format
    * @return the corresponding key value
    */
-  public static String getString(String key, String bundleName, int param) {
+  public String getString(String key, Object ... arguments) {
     try {
-      ResourceBundle		resourceBundle;
-
-      resourceBundle = ResourceBundle.getBundle(bundleName, locale);
-      return MessageFormat.format(resourceBundle.getString(key), param);
+      MessageFormat messageFormat = new MessageFormat(resourceBundle.getString(key));
+      messageFormat.setLocale(locale);
+      return messageFormat.format(arguments);
     } catch (MissingResourceException e) {
-      return "!!" + key + "!!";
-    } catch (NullPointerException npe) {
-      return "!!" + key + "!!";
+      throw new RuntimeException(e);
     }
   }
 
   /**
    * Return the corresponding value of a given key and parameters.
    * @param key the given key
-   * @param bundleName the bundle name
    * @return the corresponding key value
    */
-  public static String getString(String key, String bundleName) {
+  public String getString(String key) {
     try {
-      ResourceBundle		resourceBundle;
-
-      resourceBundle = ResourceBundle.getBundle(bundleName, locale);
       return resourceBundle.getString(key);
     } catch (MissingResourceException e) {
-      return "!!" + key + "!!";
-    } catch (NullPointerException npe) {
-      return "!!" + key + "!!";
+      throw new RuntimeException(e);
     }
   }
 
-  /**
-   * Return the corresponding value of a given key and string parameter.
-   * @param key the given key
-   * @param bundleName the bundle name
-   * @param locale the bundle locale
-   * @param params the parameter
-   * @return the corresponding key value
-   */
-  public static String getString(String key, String bundleName, Locale locale, String param) {
+  private static ResourceBundle getBundle(String bundleName, Locale locale) {
     try {
-      ResourceBundle		resourceBundle;
-
-      resourceBundle = ResourceBundle.getBundle(bundleName, locale);
-      return MessageFormat.format(resourceBundle.getString(key), param);
+      return ResourceBundle.getBundle(bundleName, locale);
     } catch (MissingResourceException e) {
-      return "!!" + key + "!!";
-    } catch (NullPointerException npe) {
-      if (param != null)
-        return "!!" + key + " with param " + param + "!!";
-      else
-        return "!!" + key + "!!";
+      try {
+        return ResourceBundle.getBundle(bundleName, Locale.ENGLISH);
+      } catch (MissingResourceException e2) {
+        throw new RuntimeException(e2);
+      }
     }
   }
 
-  /**
-   * Return the corresponding value of a given key and integer parameter.
-   * @param key the given key
-   * @param bundleName the bundle name
-   * @param locale the bundle locale
-   * @param param the parameter
-   * @return the corresponding key value
-   */
-  public static String getString(String key, String bundleName, Locale locale, int param) {
-    try {
-      ResourceBundle		resourceBundle;
-
-      resourceBundle = ResourceBundle.getBundle(bundleName, locale);
-      return MessageFormat.format(resourceBundle.getString(key), param);
-    } catch (MissingResourceException e) {
-      return "!!" + key + "!!";
-    } catch (NullPointerException npe) {
-      return "!!" + key + "!!";
-    }
-  }
-
-  /**
-   * Return the corresponding value of a given key and parameters.
-   * @param key the given key
-   * @param bundleName the bundle name
-   * @param locale the bundle locale
-   * @return the corresponding key value
-   */
-  public static String getString(String key, String bundleName, Locale locale) {
-    try {
-      ResourceBundle		resourceBundle;
-
-      resourceBundle = ResourceBundle.getBundle(bundleName, locale);
-      return resourceBundle.getString(key);
-    } catch (MissingResourceException e) {
-      return "!!" + key + "!!";
-    } catch (NullPointerException npe) {
-      return "!!" + key + "!!";
-    }
-  }
-
-  /**
-   * Sets the default locale.
-   * @param locale the locale
-   */
   public static void setLocale(Locale locale) {
-    Messages.locale = locale;
+    Messages.defaultLocale = locale;
   }
-
-  // --------------------------------------------------------------------
-  // DATA MEMBERS
-  // --------------------------------------------------------------------
-
-  private static Locale					locale;
 }

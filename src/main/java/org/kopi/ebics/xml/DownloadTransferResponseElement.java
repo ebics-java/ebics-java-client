@@ -21,7 +21,7 @@ package org.kopi.ebics.xml;
 
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.ContentFactory;
-import org.kopi.ebics.session.OrderType;
+import org.kopi.ebics.interfaces.EbicsOrderType;
 
 /**
  * The <code>DTransferResponseElement</code> is the response element
@@ -39,7 +39,7 @@ public class DownloadTransferResponseElement extends TransferResponseElement {
    * @param name the element name.
    */
   public DownloadTransferResponseElement(ContentFactory factory,
-                                  OrderType orderType,
+                                  EbicsOrderType orderType,
                                   String name)
   {
     super(factory, name);

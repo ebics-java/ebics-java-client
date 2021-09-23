@@ -64,7 +64,7 @@ public class User implements EbicsUser, Savable {
    * @param name the user name,
    * @param email the user email
    * @param country the user country
-   * @param organisation the user organization or company
+   * @param organization the user organization or company
    * @param passwordCallback a callback-handler that supplies us with the password.
    *                         This parameter can be null, in this case no password is used.
    * @throws IOException
@@ -255,8 +255,6 @@ public class User implements EbicsUser, Savable {
    * <p> All white-space characters should be removed from entry buffer {@code buf}.
    *
    * @param buf the given byte buffer
-   * @param offset the offset
-   * @param length the length
    * @return The byte buffer portion corresponding to the given length and offset
    */
   public static byte[] removeOSSpecificChars(byte[] buf) {
@@ -576,8 +574,6 @@ public class User implements EbicsUser, Savable {
    * @param input The encrypted data
    * @param key The secret key.
    * @return The decrypted data sent from the EBICS bank.
-   * @throws GeneralSecurityException
-   * @throws IOException
    */
   private byte[] decryptData(byte[] input, byte[] key)
     throws EbicsException

@@ -53,10 +53,10 @@ public class A005Letter extends AbstractInitLetter {
                     user.getUserId(),
                     user.getName(),
                     user.getPartner().getPartnerId(),
-                    getString("INILetter.version", BUNDLE_NAME, locale),
-                    getString("INILetter.certificate", BUNDLE_NAME, locale),
+                    getString("INILetter.version"),
+                    getString("INILetter.certificate"),
                     Base64.encodeBase64(user.getA005Certificate(), true),
-                    getString("INILetter.digest", BUNDLE_NAME, locale),
+                    getString("INILetter.digest"),
                     getHash(user.getA005Certificate()));
         } else {
             build(user.getPartner().getBank().getHostId(),
@@ -64,21 +64,21 @@ public class A005Letter extends AbstractInitLetter {
                     user.getUserId(),
                     user.getName(),
                     user.getPartner().getPartnerId(),
-                    getString("INILetter.version", BUNDLE_NAME, locale),
-                    getString("INILetter.certificate", BUNDLE_NAME, locale),
+                    getString("INILetter.version"),
+                    getString("INILetter.certificate"),
                     null,
-                    getString("INILetter.digest", BUNDLE_NAME, locale),
+                    getString("INILetter.digest"),
                     getHash(user.getA005PublicKey()));
         }
     }
 
   @Override
   public String getTitle() {
-    return getString("INILetter.title", BUNDLE_NAME, locale);
+    return getString("INILetter.title");
   }
 
   @Override
   public String getName() {
-    return getString("INILetter.name", BUNDLE_NAME, locale) + ".txt";
+    return getString("INILetter.name") + ".txt";
   }
 }

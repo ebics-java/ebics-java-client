@@ -20,6 +20,7 @@
 package org.kopi.ebics.xml;
 
 import org.kopi.ebics.exception.EbicsException;
+import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.schema.h003.EmptyMutableHeaderType;
 import org.kopi.ebics.schema.h003.OrderDetailsType;
 import org.kopi.ebics.schema.h003.ProductElementType;
@@ -30,7 +31,6 @@ import org.kopi.ebics.schema.h003.EbicsUnsecuredRequestDocument.EbicsUnsecuredRe
 import org.kopi.ebics.schema.h003.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Body.DataTransfer;
 import org.kopi.ebics.schema.h003.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Body.DataTransfer.OrderData;
 import org.kopi.ebics.session.EbicsSession;
-import org.kopi.ebics.session.OrderType;
 
 /**
  * The <code>UnsecuredRequestElement</code> is the common element
@@ -48,7 +48,7 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
    * @param orderId the order id, if null a random one is generated.
    */
   public UnsecuredRequestElement(EbicsSession session,
-                                 OrderType orderType,
+                                 EbicsOrderType orderType,
                                  String orderId,
                                  byte[] orderData)
   {
@@ -72,7 +72,7 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
 
     orderDetails = EbicsXmlFactory.createOrderDetailsType("DZNNN",
 						          orderId == null ? session.getUser().getPartner().nextOrderId() : orderId,
-	                                                  orderType.toString());
+	                                                  orderType.getCode());
 
     productType = EbicsXmlFactory.creatProductElementType(session.getProduct().getLanguage(),
 	                                                  session.getProduct().getName());
@@ -109,7 +109,7 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private OrderType			orderType;
+  private EbicsOrderType orderType;
   private String			orderId;
   private byte[]			orderData;
   private static final long 		serialVersionUID = -3548730114599886711L;

@@ -23,7 +23,7 @@ import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.NoDownloadDataAvailableException;
 import org.kopi.ebics.exception.ReturnCode;
 import org.kopi.ebics.interfaces.ContentFactory;
-import org.kopi.ebics.session.OrderType;
+import org.kopi.ebics.interfaces.EbicsOrderType;
 
 /**
  * The <code>DInitializationResponseElement</code> is the response element
@@ -41,7 +41,7 @@ public class DownloadInitializationResponseElement extends InitializationRespons
    * @param name the element name
    */
   public DownloadInitializationResponseElement(ContentFactory factory,
-                                        OrderType orderType,
+                                        EbicsOrderType orderType,
                                         String name)
   {
     super(factory, orderType, name);
