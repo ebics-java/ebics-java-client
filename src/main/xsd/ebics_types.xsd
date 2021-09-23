@@ -1479,19 +1479,14 @@
 					<documentation xml:lang="de">Updates abholen</documentation>
 				</annotation>
 			</enumeration>
-			<enumeration value="C52">
-				<annotation>
-					<documentation xml:lang="de">camt.052 Vormerkposten / Avise (VMK)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="C53">
+			<enumeration value="Z53">
 				<annotation>
 					<documentation xml:lang="de">camt.053 Tagesauszug (STA)</documentation>
 				</annotation>
 			</enumeration>
-			<enumeration value="C54">
+			<enumeration value="Z54">
 				<annotation>
-					<documentation xml:lang="de">Sammelbuchungsinformationen (DTI)</documentation>
+					<documentation xml:lang="de">camt.054 Sammelbuchungsinformationen (DTI)</documentation>
 				</annotation>
 			</enumeration>
 
