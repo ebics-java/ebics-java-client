@@ -19,78 +19,39 @@
 
 package org.kopi.ebics.xml;
 
-import java.util.Calendar;
-import java.util.Date;
-
-import javax.xml.namespace.QName;
-
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
-import org.kopi.ebics.schema.h003.AuthenticationPubKeyInfoType;
+import org.kopi.ebics.schema.h003.*;
 import org.kopi.ebics.schema.h003.DataEncryptionInfoType.EncryptionPubKeyDigest;
-import org.kopi.ebics.schema.h003.DataTransferRequestType;
 import org.kopi.ebics.schema.h003.DataTransferRequestType.DataEncryptionInfo;
 import org.kopi.ebics.schema.h003.DataTransferRequestType.SignatureData;
-import org.kopi.ebics.schema.h003.EbicsNoPubKeyDigestsRequestDocument;
 import org.kopi.ebics.schema.h003.EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest;
-import org.kopi.ebics.schema.h003.EbicsRequestDocument;
 import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest;
 import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest.Body.TransferReceipt;
-import org.kopi.ebics.schema.h003.EbicsUnsecuredRequestDocument;
 import org.kopi.ebics.schema.h003.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest;
 import org.kopi.ebics.schema.h003.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Body;
 import org.kopi.ebics.schema.h003.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Body.DataTransfer;
 import org.kopi.ebics.schema.h003.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Body.DataTransfer.OrderData;
 import org.kopi.ebics.schema.h003.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Header;
-import org.kopi.ebics.schema.h003.EmptyMutableHeaderType;
-import org.kopi.ebics.schema.h003.EncryptionPubKeyInfoType;
-import org.kopi.ebics.schema.h003.FDLOrderParamsDocument;
-import org.kopi.ebics.schema.h003.FDLOrderParamsType;
 import org.kopi.ebics.schema.h003.FDLOrderParamsType.DateRange;
-import org.kopi.ebics.schema.h003.FULOrderParamsDocument;
-import org.kopi.ebics.schema.h003.FULOrderParamsType;
-import org.kopi.ebics.schema.h003.FileFormatType;
-import org.kopi.ebics.schema.h003.HIARequestOrderDataDocument;
-import org.kopi.ebics.schema.h003.HIARequestOrderDataType;
-import org.kopi.ebics.schema.h003.MutableHeaderType;
 import org.kopi.ebics.schema.h003.MutableHeaderType.SegmentNumber;
-import org.kopi.ebics.schema.h003.NoPubKeyDigestsRequestStaticHeaderType;
-import org.kopi.ebics.schema.h003.OrderAttributeType;
-import org.kopi.ebics.schema.h003.OrderDetailsType;
 import org.kopi.ebics.schema.h003.ParameterDocument.Parameter;
 import org.kopi.ebics.schema.h003.ParameterDocument.Parameter.Value;
-import org.kopi.ebics.schema.h003.ProductElementType;
-import org.kopi.ebics.schema.h003.StandardOrderParamsDocument;
-import org.kopi.ebics.schema.h003.StandardOrderParamsType;
-import org.kopi.ebics.schema.h003.StaticHeaderOrderDetailsType;
 import org.kopi.ebics.schema.h003.StaticHeaderOrderDetailsType.OrderType;
-import org.kopi.ebics.schema.h003.StaticHeaderType;
 import org.kopi.ebics.schema.h003.StaticHeaderType.BankPubKeyDigests;
 import org.kopi.ebics.schema.h003.StaticHeaderType.BankPubKeyDigests.Authentication;
 import org.kopi.ebics.schema.h003.StaticHeaderType.BankPubKeyDigests.Encryption;
 import org.kopi.ebics.schema.h003.StaticHeaderType.Product;
 import org.kopi.ebics.schema.h003.TransactionPhaseType.Enum;
-import org.kopi.ebics.schema.h003.UnsecuredRequestStaticHeaderType;
-import org.kopi.ebics.schema.s001.OrderSignatureDataType;
 import org.kopi.ebics.schema.s001.PubKeyValueType;
-import org.kopi.ebics.schema.s001.SignaturePubKeyInfoType;
-import org.kopi.ebics.schema.s001.SignaturePubKeyOrderDataDocument;
-import org.kopi.ebics.schema.s001.SignaturePubKeyOrderDataType;
-import org.kopi.ebics.schema.s001.UserSignatureDataDocument;
-import org.kopi.ebics.schema.s001.UserSignatureDataSigBookType;
-import org.kopi.ebics.schema.xmldsig.CanonicalizationMethodType;
-import org.kopi.ebics.schema.xmldsig.DigestMethodType;
-import org.kopi.ebics.schema.xmldsig.RSAKeyValueType;
-import org.kopi.ebics.schema.xmldsig.ReferenceType;
-import org.kopi.ebics.schema.xmldsig.SignatureMethodType;
+import org.kopi.ebics.schema.s001.*;
 import org.kopi.ebics.schema.xmldsig.SignatureType;
-import org.kopi.ebics.schema.xmldsig.SignatureValueType;
-import org.kopi.ebics.schema.xmldsig.SignedInfoDocument;
-import org.kopi.ebics.schema.xmldsig.SignedInfoType;
-import org.kopi.ebics.schema.xmldsig.TransformType;
-import org.kopi.ebics.schema.xmldsig.TransformsType;
-import org.kopi.ebics.schema.xmldsig.X509DataType;
+import org.kopi.ebics.schema.xmldsig.*;
+
+import javax.xml.namespace.QName;
+import java.util.Calendar;
+import java.util.Date;
 
 
 /**

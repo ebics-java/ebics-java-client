@@ -19,15 +19,11 @@
 
 package org.kopi.ebics.session;
 
-import java.io.File;
-
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.RollingFileAppender;
+import org.apache.log4j.*;
 import org.kopi.ebics.exception.ReturnCode;
 import org.kopi.ebics.interfaces.EbicsLogger;
+
+import java.io.File;
 
 
 /**

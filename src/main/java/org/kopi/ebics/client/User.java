@@ -19,6 +19,19 @@
 
 package org.kopi.ebics.client;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.kopi.ebics.certificate.CertificateManager;
+import org.kopi.ebics.exception.EbicsException;
+import org.kopi.ebics.interfaces.EbicsPartner;
+import org.kopi.ebics.interfaces.EbicsUser;
+import org.kopi.ebics.interfaces.PasswordCallback;
+import org.kopi.ebics.interfaces.Savable;
+import org.kopi.ebics.utils.Utils;
+import org.kopi.ebics.xml.UserSignature;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.crypto.dsig.SignedInfo;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -29,20 +42,6 @@ import java.security.Signature;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.crypto.dsig.SignedInfo;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.kopi.ebics.certificate.CertificateManager;
-import org.kopi.ebics.exception.EbicsException;
-import org.kopi.ebics.interfaces.EbicsPartner;
-import org.kopi.ebics.interfaces.EbicsUser;
-import org.kopi.ebics.interfaces.PasswordCallback;
-import org.kopi.ebics.interfaces.Savable;
-import org.kopi.ebics.utils.Utils;
-import org.kopi.ebics.xml.UserSignature;
 
 /**
  * Simple implementation of an EBICS user.

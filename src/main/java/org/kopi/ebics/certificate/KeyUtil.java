@@ -19,18 +19,13 @@
 
 package org.kopi.ebics.certificate;
 
-import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.interfaces.RSAPublicKey;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.kopi.ebics.exception.EbicsException;
+
+import java.io.UnsupportedEncodingException;
+import java.security.*;
+import java.security.interfaces.RSAPublicKey;
 
 /**
  * Some key utilities

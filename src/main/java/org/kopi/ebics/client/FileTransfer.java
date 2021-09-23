@@ -19,11 +19,6 @@
 
 package org.kopi.ebics.client;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Date;
-
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.ContentFactory;
 import org.kopi.ebics.interfaces.EbicsOrderType;
@@ -34,17 +29,12 @@ import org.kopi.ebics.schema.h003.OrderAttributeType;
 import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.utils.Constants;
 import org.kopi.ebics.utils.Utils;
-import org.kopi.ebics.xml.DefaultEbicsRootElement;
-import org.kopi.ebics.xml.DownloadInitializationRequestElement;
-import org.kopi.ebics.xml.DownloadInitializationResponseElement;
-import org.kopi.ebics.xml.DownloadTransferRequestElement;
-import org.kopi.ebics.xml.DownloadTransferResponseElement;
-import org.kopi.ebics.xml.InitializationResponseElement;
-import org.kopi.ebics.xml.ReceiptRequestElement;
-import org.kopi.ebics.xml.ReceiptResponseElement;
-import org.kopi.ebics.xml.TransferResponseElement;
-import org.kopi.ebics.xml.UploadInitializationRequestElement;
-import org.kopi.ebics.xml.UploadTransferRequestElement;
+import org.kopi.ebics.xml.*;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Date;
 
 
 /**

@@ -19,27 +19,19 @@
 
 package org.kopi.ebics.xml;
 
-import java.io.ByteArrayInputStream;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.utils.IgnoreAllErrorHandler;
 import org.apache.xpath.XPathAPI;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsUser;
-import org.kopi.ebics.schema.xmldsig.CanonicalizationMethodType;
-import org.kopi.ebics.schema.xmldsig.DigestMethodType;
-import org.kopi.ebics.schema.xmldsig.ReferenceType;
-import org.kopi.ebics.schema.xmldsig.SignatureMethodType;
-import org.kopi.ebics.schema.xmldsig.SignatureType;
-import org.kopi.ebics.schema.xmldsig.SignedInfoType;
-import org.kopi.ebics.schema.xmldsig.TransformType;
-import org.kopi.ebics.schema.xmldsig.TransformsType;
+import org.kopi.ebics.schema.xmldsig.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
 
 
 /**

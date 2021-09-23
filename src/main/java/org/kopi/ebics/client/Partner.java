@@ -19,13 +19,13 @@
 
 package org.kopi.ebics.client;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 import org.kopi.ebics.interfaces.EbicsBank;
 import org.kopi.ebics.interfaces.EbicsPartner;
 import org.kopi.ebics.interfaces.Savable;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 
 /**

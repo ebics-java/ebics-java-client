@@ -19,17 +19,8 @@
 
 package org.kopi.ebics.xml;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.util.Calendar;
-
 import org.kopi.ebics.exception.EbicsException;
-import org.kopi.ebics.schema.h003.EbicsNoPubKeyDigestsRequestDocument;
-import org.kopi.ebics.schema.h003.EmptyMutableHeaderType;
-import org.kopi.ebics.schema.h003.NoPubKeyDigestsRequestStaticHeaderType;
-import org.kopi.ebics.schema.h003.OrderDetailsType;
-import org.kopi.ebics.schema.h003.ProductElementType;
+import org.kopi.ebics.schema.h003.*;
 import org.kopi.ebics.schema.h003.EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest;
 import org.kopi.ebics.schema.h003.EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest.Body;
 import org.kopi.ebics.schema.h003.EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest.Header;
@@ -37,6 +28,11 @@ import org.kopi.ebics.schema.xmldsig.SignatureType;
 import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.session.OrderType;
 import org.kopi.ebics.utils.Utils;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.util.Calendar;
 
 /**
  * The <code>NoPubKeyDigestsRequestElement</code> is the root element

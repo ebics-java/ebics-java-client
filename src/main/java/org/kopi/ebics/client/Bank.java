@@ -19,14 +19,14 @@
 
 package org.kopi.ebics.client;
 
+import org.kopi.ebics.interfaces.EbicsBank;
+import org.kopi.ebics.interfaces.Savable;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.security.interfaces.RSAPublicKey;
-
-import org.kopi.ebics.interfaces.EbicsBank;
-import org.kopi.ebics.interfaces.Savable;
 
 
 /**

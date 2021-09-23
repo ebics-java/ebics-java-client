@@ -19,21 +19,6 @@
 
 package org.kopi.ebics.xml;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
-
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlObject;
@@ -47,6 +32,15 @@ import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.interfaces.EbicsRootElement;
 import org.kopi.ebics.session.EbicsSession;
+
+import javax.xml.namespace.QName;
+import java.io.*;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 

@@ -19,14 +19,6 @@
 
 package org.kopi.ebics.client;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.GeneralSecurityException;
-import java.security.interfaces.RSAPublicKey;
-
 import org.kopi.ebics.certificate.KeyStoreManager;
 import org.kopi.ebics.certificate.KeyUtil;
 import org.kopi.ebics.exception.EbicsException;
@@ -34,13 +26,15 @@ import org.kopi.ebics.interfaces.ContentFactory;
 import org.kopi.ebics.io.ByteArrayContentFactory;
 import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.utils.Utils;
-import org.kopi.ebics.xml.HIARequestElement;
-import org.kopi.ebics.xml.HPBRequestElement;
-import org.kopi.ebics.xml.HPBResponseOrderDataElement;
-import org.kopi.ebics.xml.INIRequestElement;
-import org.kopi.ebics.xml.KeyManagementResponseElement;
-import org.kopi.ebics.xml.SPRRequestElement;
-import org.kopi.ebics.xml.SPRResponseElement;
+import org.kopi.ebics.xml.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.GeneralSecurityException;
+import java.security.interfaces.RSAPublicKey;
 
 
 /**

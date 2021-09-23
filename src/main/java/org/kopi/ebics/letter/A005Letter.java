@@ -19,13 +19,13 @@
 
 package org.kopi.ebics.letter;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.Locale;
-
 import org.apache.commons.codec.binary.Base64;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsUser;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Locale;
 
 
 /**

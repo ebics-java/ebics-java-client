@@ -19,13 +19,13 @@
 
 package org.kopi.ebics.interfaces;
 
+import org.kopi.ebics.exception.EbicsException;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
-
-import org.kopi.ebics.exception.EbicsException;
 
 
 /**

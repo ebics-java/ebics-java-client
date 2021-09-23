@@ -19,11 +19,11 @@
 
 package org.kopi.ebics.exception;
 
+import org.kopi.ebics.messages.Messages;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.kopi.ebics.messages.Messages;
 
 
 /**

@@ -19,37 +19,11 @@
 
 package org.kopi.ebics.client;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.net.URL;
-import java.security.GeneralSecurityException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.NoDownloadDataAvailableException;
-import org.kopi.ebics.interfaces.Configuration;
-import org.kopi.ebics.interfaces.EbicsBank;
-import org.kopi.ebics.interfaces.EbicsOrderType;
-import org.kopi.ebics.interfaces.EbicsUser;
-import org.kopi.ebics.interfaces.InitLetter;
-import org.kopi.ebics.interfaces.LetterManager;
-import org.kopi.ebics.interfaces.PasswordCallback;
+import org.kopi.ebics.interfaces.*;
 import org.kopi.ebics.io.IOUtils;
 import org.kopi.ebics.messages.Messages;
 import org.kopi.ebics.schema.h003.OrderAttributeType;
@@ -58,6 +32,11 @@ import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.session.OrderType;
 import org.kopi.ebics.session.Product;
 import org.kopi.ebics.utils.Constants;
+
+import java.io.*;
+import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.util.*;
 
 /**
  * The ebics client application. Performs necessary tasks to contact the ebics
@@ -591,9 +570,8 @@ public class EbicsClient {
         options.addOption(null, "create", false, "Create and initialize EBICS user");
         addOption(options, OrderType.STA,"Fetch STA file (MT940 file)");
         addOption(options, OrderType.VMK, "Fetch VMK file (MT942 file)");
-        addOption(options, OrderType.C52, "Fetch camt.052 file");
-        addOption(options, OrderType.C53, "Fetch camt.053 file");
-        addOption(options, OrderType.C54, "Fetch camt.054 file");
+        addOption(options, OrderType.Z53, "Fetch camt.053 file");
+        addOption(options, OrderType.Z54, "Fetch camt.054 file");
         addOption(options, OrderType.ZDF, "Fetch ZDF file (zip file with documents)");
         addOption(options, OrderType.ZB6, "Fetch ZB6 file");
         addOption(options, OrderType.PTK, "Fetch client protocol file (TXT)");
@@ -643,8 +621,7 @@ public class EbicsClient {
         String inputFileValue = cmd.getOptionValue("i");
 
         List<? extends EbicsOrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
-            OrderType.C52, OrderType.C53, OrderType.C54,
-            OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
+            OrderType.Z53, OrderType.Z54, OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
 
         for (EbicsOrderType type : fetchFileOrders) {
             if (hasOption(cmd, type)) {

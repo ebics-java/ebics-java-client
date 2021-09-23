@@ -19,11 +19,11 @@
 
 package org.kopi.ebics.interfaces;
 
+import org.kopi.ebics.exception.EbicsException;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
-
-import org.kopi.ebics.exception.EbicsException;
 
 
 /**
