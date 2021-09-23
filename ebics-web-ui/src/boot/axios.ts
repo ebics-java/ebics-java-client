@@ -13,11 +13,11 @@ declare module '@vue/runtime-core' {
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create(
-  {
-    //For dev purposes only (otherwise comment for production, because the ContextPath, port, protocol can be changed)
-    baseURL: 'https://localhost/EbicsWebClient',
-  });
+const api = axios.create({ 
+  //For development mode we set different backend API URL manually over quasar.conf.js
+  //For production is by default undefined => relative URL (same for frontend & backend)
+  baseURL: process.env.API_URL,
+});
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api

@@ -209,10 +209,9 @@ interface UserCertificateManager {
      */
     @Throws(EbicsException::class, GeneralSecurityException::class, IOException::class)
     fun decrypt(encryptedData: ByteArray, transactionKey: ByteArray): ByteArray {
-        val blockSize: Int
         val cipher: Cipher = Cipher.getInstance("RSA/NONE/PKCS1Padding", BouncyCastleProvider.PROVIDER_NAME)
         cipher.init(Cipher.DECRYPT_MODE, e002PrivateKey)
-        blockSize = cipher.blockSize
+        val blockSize: Int = cipher.blockSize
         val outputStream = ByteArrayOutputStream()
         var j = 0
         while (j * blockSize < transactionKey.size) {

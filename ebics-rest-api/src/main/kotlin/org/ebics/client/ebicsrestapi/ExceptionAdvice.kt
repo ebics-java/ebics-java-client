@@ -5,6 +5,7 @@ import org.ebics.client.api.FunctionException
 import org.ebics.client.api.NotFoundException
 import org.ebics.client.api.user.UserService
 import org.ebics.client.exception.EbicsException
+import org.ebics.client.exception.NoDownloadDataAvailableException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -21,6 +22,7 @@ class ExceptionAdvice {
             is NotFoundException -> HttpStatus.NOT_FOUND
             is AlreadyExistException -> HttpStatus.CONFLICT //EXISTING RESOURCE
             is FunctionException -> HttpStatus.BAD_REQUEST
+            is NoDownloadDataAvailableException -> HttpStatus.NOT_FOUND
             is EbicsException -> HttpStatus.BAD_REQUEST
             is IllegalAccessException -> HttpStatus.FORBIDDEN
             is AccessDeniedException -> HttpStatus.FORBIDDEN

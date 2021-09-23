@@ -347,10 +347,6 @@ export default defineComponent({
       getUserLetters,
     } = useUserInitAPI(user);
 
-    const copyToClip = async(txt:string):Promise<void> => {
-      await copyToClipboard(txt);
-    }
-
     return {
       user,
       refreshUserData,

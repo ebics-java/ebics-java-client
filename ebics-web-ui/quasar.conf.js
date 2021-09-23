@@ -52,8 +52,20 @@ module.exports = configure(function (ctx) {
       'material-icons', // optional, you are not bound to it
     ],
 
+    prod: {
+      env: {
+        //Use relative path for PRODUCTION  - means FE SPA & BE REST are using same URL
+        API_URL: undefined,
+        AUTH_TYPE: 'SSO',
+      },
+    },
+
     // Full list of options: https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
+      env: {
+        API_URL: 'https://localhost/EbicsWebClient',
+        AUTH_TYPE: 'HTTP_BASIC',
+      },
       vueRouterMode: 'hash', // available values: 'hash', 'history'
 
       // transpile: false,
@@ -82,7 +94,7 @@ module.exports = configure(function (ctx) {
     // Full list of options: https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
       https: false,
-      port: 8080,
+      port: 8081,
       open: true // opens browser window automatically
     },
 
@@ -101,7 +113,7 @@ module.exports = configure(function (ctx) {
       // directives: [],
 
       // Quasar plugins
-      plugins: ['Dialog', 'Notify']
+      plugins: ['Dialog', 'Notify', 'LoadingBar']
     },
 
     // animations: 'all', // --- includes all animations

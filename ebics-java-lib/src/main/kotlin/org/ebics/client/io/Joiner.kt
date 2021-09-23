@@ -52,10 +52,10 @@ class Joiner(
      * @throws EbicsException
      */
     @Throws(EbicsException::class)
-    fun writeTo(output: OutputStream, transactionKey: ByteArray?) {
+    fun writeTo(output: OutputStream, transactionKey: ByteArray) {
         try {
             buffer.close()
-            val decrypted: ByteArray = userCert.decrypt(buffer.toByteArray(), transactionKey!!)
+            val decrypted: ByteArray = userCert.decrypt(buffer.toByteArray(), transactionKey)
             output.write(Utils.unzip(decrypted))
         } catch (e: GeneralSecurityException) {
             throw EbicsException(e.message)

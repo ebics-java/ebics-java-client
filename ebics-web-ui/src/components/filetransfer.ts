@@ -45,27 +45,26 @@ export default function useFileTransferAPI() {
 
   /**
    * Executest EBICS download file request
-   * @param adminOrderType
-   * @param pass
+   * @param downloadRequest
+   * @param ebicsVersion
    * @returns
    */
      const ebicsDownloadRequest = async (
       user: User,
       downloadRequest: DownloadRequest,
       ebicsVersion: string = user.ebicsVersion,
-    ): Promise<string | undefined> => {
+    ): Promise<Blob | undefined> => {
       try {
         downloadRequest.password = await promptCertPassword(user, false);
         console.log(JSON.stringify(downloadRequest));
         const response = await api.post<DownloadRequest, AxiosResponse<string>>(
           `bankconnections/${user.id}/${ebicsVersion}/download`,
-          downloadRequest,
+          downloadRequest, {responseType: 'arraybuffer'}
         );
-        console.log('Download response: ' + JSON.stringify(response))
         pwdApiOkHandler(
           `File downloaded successfully for bank connection: ${user.name}`
         );
-        return response.data;
+        return new Blob([response.data]);
       } catch (error) {
         pwdApiErrorHandler(user, 'File download failed: ', error);
       }

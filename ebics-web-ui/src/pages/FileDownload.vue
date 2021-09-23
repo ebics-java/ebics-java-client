@@ -191,14 +191,29 @@ export default defineComponent({
       }
     };
 
+    const getDownloadOrderTypeFileName = (): string => {
+      if (bankConnection.value?.ebicsVersion == 'H005') {
+        if (btfType.value?.service) 
+          return btfType.value?.service.serviceName;
+        else
+          return btfType.value?.adminOrderType ?? 'XXX'
+      } else {
+        //H004, H003
+        return  orderType.value?.orderType ?? 'XXX';
+      }
+    };
+
     const processDownload = async (): Promise<void> => {
       if (bankConnection.value) {
         const fileData = await ebicsDownloadRequest(bankConnection.value, getDownloadRequest());
         
         if (fileData) {
-          const fileFormat = detectFileFormat(fileData);
-          let fileExtension = getFileExtension(fileFormat);
-          const status = exportFile('download.' + fileExtension, fileData, {mimeType: 'application/xml'});
+          const fileText = await fileData.text();
+          const fileFormat = detectFileFormat(fileText);
+          const fileExtension = getFileExtension(fileFormat);
+          const fileName = getDownloadOrderTypeFileName();
+          //, {mimeType: 'application/xml'}
+          const status = exportFile(`download.${fileName}.${fileExtension}`, fileData, {mimeType: 'application/octet-stream'});
           if (status !== true) {
             console.error(`Browser error by downloading of the file: ${JSON.stringify(status)}`)
           }

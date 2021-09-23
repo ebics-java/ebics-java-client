@@ -5,8 +5,19 @@ import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import { AxiosBasicCredentials } from 'axios';
 
-//TBD move into global quasar config
-const authenticationType = ref<AuthenticationType>(AuthenticationType.SSO);
+//Read authentication type from quasar env variables defined in config.
+function getAuthTypeFromEnv():AuthenticationType {
+  switch(process.env.AUTH_TYPE) {
+    case 'SSO':
+      return AuthenticationType.SSO;
+    case 'HTTP_BASIC':
+      return AuthenticationType.HTTP_BASIC;
+    default:
+      return AuthenticationType.SSO;
+  }
+}
+
+const authenticationType = ref<AuthenticationType>(getAuthTypeFromEnv());
 const refreshUserContextByMounth = true;
 const ssoDevOverBasic = ref(true); //Simulates SSO in with statically given HTTP basic credentials (only by AuthenticationType.SSO for dev purposes)
 

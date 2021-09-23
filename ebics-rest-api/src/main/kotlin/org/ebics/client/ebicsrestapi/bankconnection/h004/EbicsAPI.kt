@@ -23,6 +23,8 @@ import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
+import java.io.File
+import java.io.FileOutputStream
 
 @Component("EbicsAPIH004")
 class EbicsAPI(

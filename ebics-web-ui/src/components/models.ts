@@ -234,10 +234,10 @@ export enum AuthenticationType {
 }
 
 export enum FileFormat {
-  XML,
-  SWIFT,
-  TEXT,
-  BINARY,
+  XML = 'xml',
+  SWIFT = 'swift',
+  TEXT = 'text',
+  BINARY = 'binary',
 }
 
 export interface AutoAdjustmentsPain00x {
