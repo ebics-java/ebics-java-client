@@ -19,11 +19,11 @@
 
 package org.kopi.ebics.io;
 
-import javax.crypto.spec.SecretKeySpec;
-
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.ContentFactory;
 import org.kopi.ebics.utils.Utils;
+
+import javax.crypto.spec.SecretKeySpec;
 
 
 /**

@@ -19,9 +19,6 @@
 
 package org.kopi.ebics.client;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
@@ -41,6 +38,9 @@ import org.kopi.ebics.interfaces.Configuration;
 import org.kopi.ebics.interfaces.ContentFactory;
 import org.kopi.ebics.io.ByteArrayContentFactory;
 import org.kopi.ebics.session.EbicsSession;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * A simple HTTP request sender and receiver. The send returns a HTTP code that

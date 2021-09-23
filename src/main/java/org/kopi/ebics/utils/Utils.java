@@ -19,6 +19,21 @@
 
 package org.kopi.ebics.utils;
 
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.utils.IgnoreAllErrorHandler;
+import org.apache.xpath.XPathAPI;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.kopi.ebics.exception.EbicsException;
+import org.kopi.ebics.messages.Messages;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.traversal.NodeIterator;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,22 +45,6 @@ import java.util.Date;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.xml.security.c14n.Canonicalizer;
-import org.apache.xml.security.utils.IgnoreAllErrorHandler;
-import org.apache.xpath.XPathAPI;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.kopi.ebics.exception.EbicsException;
-import org.kopi.ebics.messages.Messages;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.traversal.NodeIterator;
 
 
 /**

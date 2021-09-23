@@ -19,10 +19,10 @@
 
 package org.kopi.ebics.io;
 
+import org.kopi.ebics.interfaces.ContentFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.kopi.ebics.interfaces.ContentFactory;
 
 
 /**

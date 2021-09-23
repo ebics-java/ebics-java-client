@@ -19,8 +19,6 @@
 
 package org.kopi.ebics.xml;
 
-import java.util.Calendar;
-
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.schema.s001.PubKeyValueType;
 import org.kopi.ebics.schema.s001.SignaturePubKeyInfoType;
@@ -28,6 +26,8 @@ import org.kopi.ebics.schema.s001.SignaturePubKeyOrderDataType;
 import org.kopi.ebics.schema.xmldsig.RSAKeyValueType;
 import org.kopi.ebics.schema.xmldsig.X509DataType;
 import org.kopi.ebics.session.EbicsSession;
+
+import java.util.Calendar;
 
 
 /**

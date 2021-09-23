@@ -19,23 +19,18 @@
 
 package org.kopi.ebics.letter;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import org.apache.commons.codec.binary.Hex;
+import org.kopi.ebics.exception.EbicsException;
+import org.kopi.ebics.interfaces.InitLetter;
+import org.kopi.ebics.messages.Messages;
+
+import java.io.*;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.interfaces.RSAPublicKey;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import org.apache.commons.codec.binary.Hex;
-import org.kopi.ebics.exception.EbicsException;
-import org.kopi.ebics.interfaces.InitLetter;
-import org.kopi.ebics.messages.Messages;
 
 
 public abstract class AbstractInitLetter implements InitLetter {

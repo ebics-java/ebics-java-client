@@ -19,10 +19,10 @@
 
 package org.kopi.ebics.interfaces;
 
+import org.kopi.ebics.exception.EbicsException;
+
 import java.io.PrintStream;
 import java.io.Serializable;
-
-import org.kopi.ebics.exception.EbicsException;
 
 
 public interface EbicsElement extends Serializable {

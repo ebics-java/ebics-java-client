@@ -19,14 +19,14 @@
 
 package org.kopi.ebics.session;
 
+import org.kopi.ebics.exception.EbicsException;
+import org.kopi.ebics.interfaces.Configuration;
+import org.kopi.ebics.interfaces.EbicsUser;
+
 import java.io.IOException;
 import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.kopi.ebics.exception.EbicsException;
-import org.kopi.ebics.interfaces.Configuration;
-import org.kopi.ebics.interfaces.EbicsUser;
 
 
 /**

@@ -19,6 +19,10 @@
 
 package org.kopi.ebics.certificate;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.kopi.ebics.interfaces.EbicsUser;
+import org.kopi.ebics.interfaces.PasswordCallback;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,11 +33,6 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Date;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import org.kopi.ebics.interfaces.EbicsUser;
-import org.kopi.ebics.interfaces.PasswordCallback;
 
 /**
  * Simple manager for EBICS certificates.

@@ -19,9 +19,9 @@
 
 package org.kopi.ebics.interfaces;
 
-import java.io.OutputStream;
-
 import org.kopi.ebics.exception.EbicsException;
+
+import java.io.OutputStream;
 
 
 /**

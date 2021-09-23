@@ -19,13 +19,13 @@
 
 package org.kopi.ebics.xml;
 
-import java.io.IOException;
-
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.ReturnCode;
 import org.kopi.ebics.interfaces.ContentFactory;
+
+import java.io.IOException;
 
 
 /**

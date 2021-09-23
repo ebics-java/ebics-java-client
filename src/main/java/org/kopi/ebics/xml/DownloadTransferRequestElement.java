@@ -21,12 +21,12 @@ package org.kopi.ebics.xml;
 
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsOrderType;
-import org.kopi.ebics.schema.h003.MutableHeaderType;
-import org.kopi.ebics.schema.h003.StaticHeaderType;
 import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest;
 import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest.Body;
 import org.kopi.ebics.schema.h003.EbicsRequestDocument.EbicsRequest.Header;
+import org.kopi.ebics.schema.h003.MutableHeaderType;
 import org.kopi.ebics.schema.h003.MutableHeaderType.SegmentNumber;
+import org.kopi.ebics.schema.h003.StaticHeaderType;
 import org.kopi.ebics.session.EbicsSession;
 
 /**
