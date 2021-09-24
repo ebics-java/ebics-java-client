@@ -13,6 +13,7 @@
         <kotlin.version>1.4.32</kotlin.version>
         <kotlin.version.short>1.4</kotlin.version.short>
         <spring.version>2.5.3</spring.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <build>
         <plugins>
