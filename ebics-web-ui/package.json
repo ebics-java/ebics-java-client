@@ -10,17 +10,17 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
-    "@quasar/extras": "^1.0.0",
+    "@quasar/extras": "^1.11.1",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
-    "quasar": "^2.0.0-beta.1",
-    "vue-i18n": "^9.0.0-beta.0",
+    "quasar": "^2.1.0",
+    "vue-i18n": "^9.0.0",
     "vue-uuid": "^2.0.2",
     "vue3-ace-editor": "^2.0.2"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",
-    "@quasar/app": "^3.0.0-beta.1",
+    "@quasar/app": "^3.1.0",
     "@types/node": "^10.17.15",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",

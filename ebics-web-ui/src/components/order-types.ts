@@ -24,12 +24,14 @@ export default function useOrderTypesAPI(selectedBC:Ref<User | undefined>, filte
         //If not fetched yet, lets fetch order types for all version into cache
         if (!orderTypeList) {
           orderTypeList = {btfTypes: [], orderTypes: []} as OrderTypeList
+          activeTypes.value.set(bankConnection.id, orderTypeList)
         }
           
         if (orderTypeList && !orderTypeList.btfTypes.length) { 
           try {
             orderTypeList.btfTypes = await ebicsOrderTypes(bankConnection, 'H005');
             console.log(`BtfTypes loaded for ${bankConnection.name}, types: ${JSON.stringify(orderTypeList.btfTypes)}`)
+            refreshSelectedOrderTypes(bankConnection);
           } catch (error) {}
         }
 
@@ -37,11 +39,17 @@ export default function useOrderTypesAPI(selectedBC:Ref<User | undefined>, filte
           try {
             orderTypeList.orderTypes = await ebicsOrderTypes(bankConnection, 'H004') as OrderType[];
             console.log(`Order types loaded for ${bankConnection.name}, types: ${JSON.stringify(orderTypeList.orderTypes)}`)
+            refreshSelectedOrderTypes(bankConnection);
           } catch (error) {}
         }
-
-        activeTypes.value.set(bankConnection.id, orderTypeList)
       }
+    }
+  };
+
+  const refreshSelectedOrderTypes = (bankConnection: User): void => {
+    //Trigger refresh of filtered list after retreiving server response
+    if (selectedBC.value?.id == bankConnection.id) { 
+      selectUserOrderTypes();
     }
   };
 
@@ -53,7 +61,7 @@ export default function useOrderTypesAPI(selectedBC:Ref<User | undefined>, filte
     if (selectedBC.value) {
       const selectedTypes = activeTypes.value.get(selectedBC.value.id);
       if (selectedTypes) {
-        console.log('Btf types assigned sucessfully')
+        console.log('Refreshing order type list for selected BC: ' + selectedBC.value.name)
         if (filterType.value == OrderTypeFilter.All) {
           btfTypes.value = selectedTypes.btfTypes;
           orderTypes.value = selectedTypes.orderTypes;
@@ -65,7 +73,7 @@ export default function useOrderTypesAPI(selectedBC:Ref<User | undefined>, filte
           orderTypes.value = selectedTypes.orderTypes.filter(ot => ot.adminOrderType == 'DNL' || ot.adminOrderType == 'FDL' || ot.adminOrderType == 'HAC');
         }
       } else {
-        console.error('No BTF types loaded for given bank connection: ' + selectedBC.value.id.toString())
+        console.error('No BTF types / OrderTypes loaded for given bank connection: ' + selectedBC.value.id.toString())
       }
     }
   }

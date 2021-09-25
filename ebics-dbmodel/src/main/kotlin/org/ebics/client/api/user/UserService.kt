@@ -70,7 +70,7 @@ class UserService(
                     currentUser.usePassword,
                     partner,
                     currentUser.keyStore,
-                    currentUser.name,
+                    currentUser.creator,
                     guestAccess,
                     currentUser.traces
                 )
@@ -85,7 +85,7 @@ class UserService(
                     currentUser.usePassword,
                     partner,
                     currentUser.keyStore,
-                    currentUser.name,
+                    currentUser.creator,
                     guestAccess,
                     currentUser.traces
                 )
@@ -100,7 +100,7 @@ class UserService(
                     currentUser.usePassword,
                     currentUser.partner,
                     currentUser.keyStore,
-                    currentUser.name,
+                    currentUser.creator,
                     guestAccess,
                     currentUser.traces
                 )

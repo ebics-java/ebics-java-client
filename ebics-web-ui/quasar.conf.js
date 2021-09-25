@@ -67,7 +67,13 @@ module.exports = configure(function (ctx) {
       },
       vueRouterMode: 'hash', // available values: 'hash', 'history'
 
-      // transpile: false,
+      //transpile: true,
+      //minify: true,
+      uglifyOptions: {
+        format: {
+          ascii_only: true // This fixing  wrong transpiled unicode chars in regex from sace.js 
+        }
+      },
 
       // Add dependencies for transpiling with Babel (Array of string/regex)
       // (from node_modules, which are by default not transpiled).

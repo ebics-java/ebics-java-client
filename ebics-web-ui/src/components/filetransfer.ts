@@ -86,7 +86,6 @@ export default function useFileTransferAPI() {
           `bankconnections/${user.id}/${ebicsVersion}/orderTypes`,
           {password: password},
         );
-        console.log('Download order-types response: ' + JSON.stringify(response))
         pwdApiOkHandler(
           `Order types downloaded successfully for bank connection: ${user.name}`
         );
