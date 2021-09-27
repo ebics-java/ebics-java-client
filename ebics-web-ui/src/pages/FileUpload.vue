@@ -6,7 +6,7 @@
 
       <!-- style="max-width: 400px" -->
       <div class="q-pa-md">
-        <q-form ref="uploadForm" @submit="onSubmit" class="q-gutter-md">
+        <q-form ref="uploadForm" @submit="processUpload" class="q-gutter-md">
           <q-select
             filled
             v-model="bankConnection"
@@ -131,7 +131,7 @@
             label="Drop file here"
             hint="Max file size (20MB)"
             max-file-size="21000000"
-            @rejected="onRejected"
+            @rejected="onRejectedMessage(false)"
             @update:model-value="onUpdateInputFile"
           >
             <template v-slot:prepend>
@@ -152,7 +152,7 @@
             "
             hint="Max file size (1GB)"
             max-file-size="1200000000"
-            @rejected="onRejected"
+            @rejected="onRejectedMessage(true)"
             @update:model-value="onUpdateInputFiles"
             lazy-rules
             :rules="[
@@ -252,7 +252,7 @@ import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
 
 //Components
-import { QForm } from 'quasar';
+import { QForm, useQuasar } from 'quasar';
 import { VAceEditor } from 'vue3-ace-editor';
 import 'ace-builds/src-noconflict/mode-xml';
 import 'ace-builds/src-noconflict/theme-clouds';
@@ -273,91 +273,6 @@ export default defineComponent({
       type: Boolean,
       required: true,
       default: false,
-    },
-  },
-  data() {
-    return {};
-  },
-  methods: {
-    async applySmartAdjustmentsForSingleFile() {
-      this.fileText = await this.applySmartAdjustments(
-        this.fileText,
-        this.fileFormat,
-        this.userSettings
-      );
-    },
-
-    async onUpdateInputFiles(files: File[]) {
-      console.log(files);
-      this.files = files;
-
-      if (this.userSettings.uploadOnDrop) {
-        const validationResult = await (
-          this.$refs.uploadForm as QForm
-        ).validate();
-        if (!validationResult) {
-          this.files = [];
-          this.$q.notify({
-            color: 'warning',
-            position: 'bottom-right',
-            message: 'File will be not uploaded',
-            caption:
-              'Please correct validation issues before uploading the file',
-            icon: 'warning',
-          });
-        }
-      }
-    },
-
-    /**
-     * Load text of the input file into text area
-     * (only for text files, binary cant be edited)
-     */
-    async onUpdateInputFile(file: File) {
-      console.log(file.name);
-      this.file = file;
-      this.fileName = file.name;
-      try {
-        this.fileRawText = await file.text();
-        if (this.detectFileFormat(this.fileRawText) == FileFormat.BINARY) {
-          this.$q.notify({
-            color: 'positive',
-            position: 'bottom-right',
-            message:
-              "Binary files can't be edited, but you can still upload them",
-            icon: 'warning',
-          });
-        } else {
-          if (this.userSettings.adjustmentOptions.applyAutomatically)
-            this.fileText = await this.applySmartAdjustments(
-              this.fileRawText,
-              this.fileFormat,
-              this.userSettings
-            );
-          else this.fileText = this.fileRawText;
-        }
-      } catch (error) {
-        this.$q.notify({
-          color: 'negative',
-          position: 'bottom-right',
-          message: `Loading file failed: ${JSON.stringify(error)}`,
-          icon: 'report_problem',
-        });
-      }
-    },
-
-
-    async onSubmit() {
-      await this.processUpload();
-    },
-
-    onRejected() {
-      //rejectedFiles: File[]
-      this.$q.notify({
-        type: 'negative',
-        message:
-          'File must smaller than 20MB, for bigger files use upload without editor',
-      });
     },
   },
   setup(props) {
@@ -390,6 +305,11 @@ export default defineComponent({
     const resetFiles = () => {
       files.value = [];
     };
+
+    //Reference to upload Form because of validation
+    const uploadForm = ref<QForm>()
+
+    const q = useQuasar();
 
     const fileFormat = computed((): FileFormat => {
       return detectFileFormat(fileText.value);
@@ -460,6 +380,84 @@ export default defineComponent({
       }
     };
 
+    /**
+     * Load text of the input file into text area
+     * (only for text files, binary cant be edited)
+     */
+    const onUpdateInputFile = async (inputFile: File) => {
+      file.value = inputFile;
+      fileName.value = inputFile.name;
+      try {
+        fileRawText.value = await file.value.text();
+        const detectedFileFormat = detectFileFormat(fileRawText.value);
+        if (detectedFileFormat == FileFormat.BINARY) {
+          file.value = undefined;
+          q.notify({
+            color: 'positive',
+            position: 'bottom-right',
+            message:
+              "Binary file detected, please use 'Simple file upload' instead.",
+            icon: 'warning',
+          });
+        } else {
+          if (userSettings.value.adjustmentOptions.applyAutomatically) {
+            fileText.value = await applySmartAdjustments(
+              fileRawText.value,
+              detectedFileFormat,
+              userSettings.value
+            );
+          } else {
+            fileText.value = fileRawText.value;
+          } 
+        }
+      } catch (error) {
+        q.notify({
+          color: 'negative',
+          position: 'bottom-right',
+          message: `Loading file failed: ${JSON.stringify(error)}`,
+          icon: 'report_problem',
+        });
+      }
+    };
+
+    const applySmartAdjustmentsForSingleFile =  async() => {
+      fileText.value = await applySmartAdjustments(
+        fileText.value,
+        fileFormat.value,
+        userSettings.value
+      );
+    };
+
+    const onUpdateInputFiles = async(inputFiles: File[]) => {
+      console.log(inputFiles);
+      files.value = inputFiles;
+
+      if (userSettings.value.uploadOnDrop) {
+        const validationResult = await (
+          uploadForm.value as QForm
+        ).validate();
+        if (!validationResult) {
+          files.value = [];
+          q.notify({
+            color: 'warning',
+            position: 'bottom-right',
+            message: 'File will be not uploaded',
+            caption:
+              'Please correct validation issues before uploading the file',
+            icon: 'warning',
+          });
+        }
+      }
+    };
+
+    const onRejectedMessage = (multiple: boolean) => {
+      q.notify({
+        type: 'negative',
+        message:
+          `File must smaller than ${multiple ? '1.2GB' : '20MB'}, for bigger files use 'Simple file upload'`
+      });
+    };
+
     return {
       bankConnection,
       activeBankConnections,
@@ -476,6 +474,7 @@ export default defineComponent({
       //Multiple files
       files,
       resetFiles,
+      onUpdateInputFiles,
 
       //Sigle file
       file,
@@ -484,6 +483,9 @@ export default defineComponent({
       fileName,
       editorLang,
       fileFormat,
+      onUpdateInputFile,
+      applySmartAdjustmentsForSingleFile,
+      onRejectedMessage,
 
       testInput,
 
