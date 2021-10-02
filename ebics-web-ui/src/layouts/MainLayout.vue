@@ -10,10 +10,11 @@
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
-
         <q-toolbar-title>
           EBICS Web Client
         </q-toolbar-title>
+        
+        <div v-if="userContext" class="text-caption on-left">version {{userContext.appVersion}}</div>
         <q-btn v-if="userContext" unelevated to="/userctx">User: '{{userContext.name}}'</q-btn>
         <q-btn v-else unelevated to="/login">Login</q-btn>
       </q-toolbar>
@@ -94,6 +95,20 @@
 
             <q-item-section>
               Download file
+            </q-item-section>
+          </q-item>
+
+          <q-item 
+            to="/settings"
+            exact
+            clickable 
+            v-ripple>
+            <q-item-section avatar>
+              <q-icon name="settings" />
+            </q-item-section>
+
+            <q-item-section>
+              Settings
             </q-item-section>
           </q-item>
 

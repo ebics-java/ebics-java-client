@@ -405,4 +405,48 @@ databaseChangeLog:
         referencedColumnNames: id
         referencedTableName: Bank
         validate: true
+- changeSet:
+    id: 1633145648844-1
+    author: honza (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: adjustmentOptions_swift_idPrefix
+            type: varchar(255)
+        tableName: UserSettings
+- changeSet:
+      id: 1633145648844-2
+      author: honza (generated)
+      changes:
+        - sql: update UserSettings set adjustmentOptions_swift_idPrefix=adjustmentOptions_pain00x_idPrefix
+- changeSet:
+    id: 1633207140210-1
+    author: honza (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_swift_f30
+            type: boolean
+        tableName: UserSettings
+- changeSet:
+    id: 1633207140210-2
+    author: honza (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: adjustmentOptions_swift_randomIds
+            type: boolean
+        tableName: UserSettings
+- changeSet:
+      id: 1633207140210-3
+      author: honza
+      changes:
+          - sql: update UserSettings set adjustmentOptions_swift_f30=true, adjustmentOptions_swift_randomIds=false
 

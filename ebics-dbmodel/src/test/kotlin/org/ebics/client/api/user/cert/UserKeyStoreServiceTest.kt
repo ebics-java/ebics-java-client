@@ -33,7 +33,7 @@ open class UserKeyStoreServiceTest (
         val bank = BankData( URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), "EBXUBSCH", "UBS-PROD-CH")
         val bankId = bankService.createBank(bank)
         val userInfo = BankConnection( EbicsVersion.H005, "CHT10001", "Jan",  "CH100001", bankId,
-            guestAccess = true
+            guestAccess = true, useCertificate = true
         )
         val userId = userService.createUserAndPartner(userInfo)
         val user = userService.getUserById(userId)

@@ -17,7 +17,7 @@ class UserSettingsService(private val userSettingsRepository: UserSettingsReposi
                 UserSettings(userId, false, true, AdjustmentOptions(
                     applyAutomatically = true,
                     AdjustmentsOptionsPain00x(true, true, true, true, true, true, true, true, true, userId ),
-                    AdjustmentsOptionsSwift(true, true, true)
+                    AdjustmentsOptionsSwift(true, true, true, false, true, userId)
                 ))
         }
     }

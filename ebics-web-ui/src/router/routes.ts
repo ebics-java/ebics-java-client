@@ -62,6 +62,8 @@ const routes: RouteRecordRaw[] = [
       },
       { path: '/download', component: () => import('pages/FileDownload.vue') },
       { path: '/userctx', component: () => import('pages/UserContext.vue') },
+      { path: '/version', component: () => import('pages/Version.vue') },
+      { path: '/settings', component: () => import('pages/UserSettings.vue') },
       { path: '/userlogin', component: () => import('pages/UserLogin.vue') },
     ],
   },

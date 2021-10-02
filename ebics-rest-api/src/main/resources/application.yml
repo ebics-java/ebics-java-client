@@ -1,3 +1,7 @@
+build:
+  #Use maven build properties in spring, provide those values for application
+  revision: "@revision@"
+  timestamp: "@maven.build.timestamp@"
 ebics:
   signatureVersion: "A005"
   authenticationVersion: "X002"

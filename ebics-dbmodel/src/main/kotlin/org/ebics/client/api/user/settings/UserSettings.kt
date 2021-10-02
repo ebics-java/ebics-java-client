@@ -47,4 +47,7 @@ class AdjustmentsOptionsSwift(
     val uetr: Boolean,
     val f20: Boolean,
     val f21: Boolean,
+    val randomIds: Boolean,
+    val f30: Boolean,
+    val idPrefix: String,
 )

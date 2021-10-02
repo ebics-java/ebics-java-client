@@ -87,6 +87,7 @@
                   flat
                   dense
                   icon="content_copy"
+                  @click="copyToClipboard(letters?.signature.hash ?? '')"
                 ></q-btn>
               </q-item-section>
             </q-item>
@@ -104,6 +105,7 @@
                   flat
                   dense
                   icon="content_copy"
+                  @click="copyToClipboard(letters?.authentication.hash ?? '')"
                 ></q-btn>
               </q-item-section>
             </q-item>
@@ -121,6 +123,7 @@
                   flat
                   dense
                   icon="content_copy"
+                  @click="copyToClipboard(letters?.encryption.hash ?? '')"
                 ></q-btn>
               </q-item-section>
             </q-item>

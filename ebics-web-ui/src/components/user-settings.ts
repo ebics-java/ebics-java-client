@@ -1,5 +1,5 @@
 import { ref, onMounted } from 'vue';
-import { Bank, UserSettings } from 'components/models';
+import { UserSettings } from 'components/models';
 import { api } from 'boot/axios';
 import useBaseAPI from './base-api';
 
@@ -24,6 +24,9 @@ const userSettings = ref<UserSettings>({
       uetr: true,
       f20: true,
       f21: false,
+      f30: true,
+      idPrefix: 't111111',
+      randomIds: false,
     },
   },
 });
@@ -47,9 +50,9 @@ export default function useUserSettingsAPI() {
 
   const saveUserSettings = async (): Promise<void> => {
     try {
-      await api.put<Bank>('user/settings', userSettings);
+      await api.put<UserSettings>('user/settings', userSettings);
     } catch (error) {
-      apiErrorHandler('Deleting of bank failed', error);
+      apiErrorHandler('Saving settings failed', error);
     }
   };
 

@@ -63,6 +63,8 @@ export interface UserContext {
   name: string;
   roles: Array<string>;
   time: string;
+  appVersion: string;
+  appBuildTimestamp: string;
 }
 
 export interface Partner {
@@ -257,6 +259,9 @@ export interface AutoAdjustmentsSwift {
   uetr: boolean;
   f20: boolean;
   f21: boolean;
+  f30: boolean;
+  idPrefix: string;
+  randomIds: boolean;
 }
 
 export interface UserSettings {

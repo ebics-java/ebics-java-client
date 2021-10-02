@@ -164,7 +164,7 @@ export default defineComponent({
     const bankConnection = ref<User>();
     const replaceMsgId = ref(true);
     const { activeBankConnections, hasActiveConnections, bankConnectionLabel } =
-      useBankConnectionsAPI();
+      useBankConnectionsAPI(true);
     const { ebicsDownloadRequest } = useFileTransferAPI();
     const { applySmartAdjustments, detectFileFormat, getFileExtension, currentDate } = useTextUtils();
     const { userSettings } = useUserSettings();

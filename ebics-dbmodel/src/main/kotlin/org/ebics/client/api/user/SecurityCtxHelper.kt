@@ -1,5 +1,6 @@
 package org.ebics.client.api.user
 
+import org.ebics.client.api.BankConnectionPermission
 import org.ebics.client.api.user.settings.UserSettings
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -27,10 +28,18 @@ class SecurityCtxHelper {
 
         fun getPrincipalName(): String = getAuthentication().name
 
+        fun isAuthorizedFor(bankConnection: User, permission: BankConnectionPermission, authentication: Authentication = getAuthentication()): Boolean {
+            return when (permission) {
+                BankConnectionPermission.READ -> isAuthorizedForBankConnectionRead(bankConnection, authentication)
+                BankConnectionPermission.WRITE -> isAuthorizedForBankConnectionWrite(bankConnection, authentication)
+                BankConnectionPermission.USE -> isAuthorizedForBankConnectionUse(bankConnection, authentication)
+            }
+        }
+
         /**
          * Return true if the actual security context of the request is authorized for the reading of user attributes
          */
-        fun isAuthorizedForUserRead(
+        fun isAuthorizedForBankConnectionRead(
             user: User,
             authentication: Authentication = getAuthentication()
         ): Boolean {
@@ -44,9 +53,21 @@ class SecurityCtxHelper {
         }
 
         /**
+         * Return true if the actual security context of the request is authorized for the using of bank connection (Upload/Download)
+         */
+        fun isAuthorizedForBankConnectionUse(
+            user: User,
+            authentication: Authentication = getAuthentication()
+        ): Boolean {
+            with(authentication) {
+                return user.guestAccess || user.creator == name
+            }
+        }
+
+        /**
          * Return true if the actual security context of the request is authorized for the changing/adding/deleting of user attributes
          */
-        private fun isAuthorizedForUserWrite(
+        private fun isAuthorizedForBankConnectionWrite(
             user: User,
             authentication: Authentication = getAuthentication()
         ): Boolean {
@@ -59,12 +80,33 @@ class SecurityCtxHelper {
             }
         }
 
+        fun checkAuthorization(bankConnection: User, permission: BankConnectionPermission, authentication: Authentication = getAuthentication()) {
+            when (permission) {
+                BankConnectionPermission.READ -> checkReadAuthorization(bankConnection, authentication)
+                BankConnectionPermission.WRITE -> checkWriteAuthorization(bankConnection, authentication)
+                BankConnectionPermission.USE -> checkUseAuthorization(bankConnection, authentication)
+            }
+        }
+
+        fun checkReadAuthorization(
+            user: User,
+            authentication: Authentication = getAuthentication()
+        ) {
+            if (!isAuthorizedForBankConnectionRead(user, authentication))
+                throw IllegalAccessException("Web user '${authentication.name}' is not authorized for reading of EBICS bank connection: '${user.name}'")
+        }
+
         fun checkWriteAuthorization(
             user: User,
             authentication: Authentication = getAuthentication()
         ) {
-            if (!isAuthorizedForUserWrite(user, authentication))
+            if (!isAuthorizedForBankConnectionWrite(user, authentication))
                 throw IllegalAccessException("Web user '${authentication.name}' is not authorized for changing of EBICS bank connection: '${user.name}'")
+        }
+
+        fun checkUseAuthorization(user: User, authentication: Authentication = getAuthentication()) {
+            if (!isAuthorizedForBankConnectionUse(user, authentication))
+                throw IllegalAccessException("Web user '${authentication.name}' is not authorized for using of EBICS bank connection: '${user.name}'")
         }
 
         fun checkWriteAuthorization(

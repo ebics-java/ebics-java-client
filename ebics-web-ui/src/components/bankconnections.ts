@@ -11,7 +11,7 @@ import { useQuasar } from 'quasar';
  *  loadBankConnections function to trigger refreshing of bank connections
  *  deleteBankConnection function to delete bank connection
  */
-export default function useBankConnectionsAPI() {
+export default function useBankConnectionsAPI(usePermission = false) {
   const { apiErrorHandler } = useBaseAPI();
   const q = useQuasar();
 
@@ -19,7 +19,7 @@ export default function useBankConnectionsAPI() {
 
   const loadBankConnections = async (): Promise<void> => {
     try {
-      const response = await api.get<User[]>('bankconnections');
+      const response = await api.get<User[]>(`bankconnections?permission=${usePermission ? 'USE' : 'READ'}`);
       bankConnections.value = response.data;
     } catch (error) {
       apiErrorHandler('Loading of bank data failed', error);

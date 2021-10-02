@@ -1,4 +1,9 @@
-import { AutoAdjustmentsPain00x, FileFormat, UserSettings } from './models';
+import {
+  AutoAdjustmentsPain00x,
+  AutoAdjustmentsSwift,
+  FileFormat,
+  UserSettings,
+} from './models';
 import { uuid } from 'vue-uuid';
 
 /**
@@ -29,26 +34,32 @@ export default function useTextUtils() {
    *
    * @returns current date in YYYY-MM-DD format
    */
-  const currentDate = () => {
+  const currentDate = (dash = true): string => {
     const date = new Date();
-    return `${date.getFullYear()}-${(date.getMonth() + 1)
+    return `${date.getFullYear()}${dash ? '-' : ''}${(date.getMonth() + 1)
       .toString()
-      .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+      .padStart(2, '0')}${dash ? '-' : ''}${date
+      .getDate()
+      .toString()
+      .padStart(2, '0')}`;
   };
 
   /**
    *
    * @returns unique timestamp within 1 year in MMDD-hhmmss format
    */
-  const uniqueTimeStamp = () => {
+  const uniqueTimeStamp = (dash = true) => {
     const date = new Date();
     return `${(date.getMonth() + 1).toString().padStart(2, '0')}${date
       .getDate()
       .toString()
-      .padStart(2, '0')}-${date.getHours().toString().padStart(2, '0')}${date
-      .getMinutes()
+      .padStart(2, '0')}${dash ? '-' : ''}${date
+      .getHours()
       .toString()
-      .padStart(2, '0')}${date.getSeconds().toString().padStart(2, '0')}`;
+      .padStart(2, '0')}${date.getMinutes().toString().padStart(2, '0')}${date
+      .getSeconds()
+      .toString()
+      .padStart(2, '0')}`;
   };
 
   const detectFileFormat = (fileContent: string): FileFormat => {
@@ -76,7 +87,7 @@ export default function useTextUtils() {
   };
 
   const getFileExtension = (fileFormat: FileFormat): string => {
-    switch(fileFormat) {
+    switch (fileFormat) {
       case FileFormat.BINARY:
         return 'zip';
       case FileFormat.XML:
@@ -84,7 +95,7 @@ export default function useTextUtils() {
       default:
         return 'txt';
     }
-  }
+  };
 
   const applySmartAdjustments = async (
     fileText: string,
@@ -95,7 +106,10 @@ export default function useTextUtils() {
       case FileFormat.BINARY:
       case FileFormat.TEXT:
       case FileFormat.SWIFT:
-        return fileText;
+        return await applySmartAdjustmentsSwift(
+          fileText,
+          settings.adjustmentOptions.swift
+        );
         break;
       case FileFormat.XML:
         return await applySmartAdjustmentsPain00x(
@@ -105,12 +119,70 @@ export default function useTextUtils() {
     }
   };
 
-  /*const applySmartAdjustmentsSwift = async (
+  const makeUniqueId = (length: number): string => {
+    let result = '';
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  };
+
+  function trimString(str: string): string {
+    if (str.length <= 16) return str;
+    else if (str.length) return str.slice(str.length - 16);
+    else return str;
+  }
+
+  const applySmartAdjustmentsSwift = async (
     fileText: string,
-    settings: AutoAdjustmentsSwift,
+    settings: AutoAdjustmentsSwift
   ): Promise<string> => {
-    return '';
-  }*/
+    const s = settings;
+    const idPrefix = s.idPrefix + uniqueTimeStamp(false);
+    let cLevel = 1;
+    const regExpParts = [
+      s.f20 ? '(:20:.*)' : null,
+      s.f21 ? '(:21:.*)' : null,
+      s.f30 ? '(:30:.*)' : null,
+      s.uetr ? '({121:.*})' : null,
+    ].filter(Boolean);
+    if (regExpParts.length) {
+      const regExp = new RegExp(regExpParts.join('|'), 'g');
+      console.log(regExp.source);
+      const text = await findAndReplace(fileText, regExp, (match) => {
+        if (s.f20 && match.startsWith(':20:')) {
+          return `:20:${
+            s.randomIds
+              ? makeUniqueId(16)
+              : trimString(idPrefix + cLevel.toString())
+          }`;
+        }
+        if (s.f21 && match.startsWith(':21:')) {
+          const res = `:21:${
+            s.randomIds
+              ? makeUniqueId(16)
+              : trimString(idPrefix + cLevel.toString())
+          }`;
+          cLevel++;
+          return res;
+        }
+        if (s.f30 && match.startsWith(':30')) {
+          return `:30:${currentDate(false).slice(2)}`;
+        }
+        if (s.uetr && match.startsWith('{121')) {
+          return `{121:${uuid.v4()}}`;
+        } else {
+          return 'unknown match';
+        }
+      });
+      return text;
+    } else {
+      return fileText;
+    }
+  };
 
   const applySmartAdjustmentsPain00x = async (
     fileText: string,
@@ -122,61 +194,61 @@ export default function useTextUtils() {
     let cLevel = 0;
     let nbOfTrxs = 0;
     let ctrlSum = 0;
-    const regExp = new RegExp(
-      (s.pmtInfId || s.instrId || s.endToEndId
+    const regExpParts = [
+      s.pmtInfId || s.instrId || s.endToEndId
         ? '(<PmtInfId>.*</PmtInfId>)'
-        : '') +
-        (s.instrId ? '|(<InstrId>.*</InstrId>)' : '') +
-        (s.endToEndId || s.nbOfTrxsCalc
-          ? '|(<EndToEndId>.*</EndToEndId>)'
-          : '') +
-        (s.uetr ? '|(<InstrInf>UETR/.*</InstrInf>)' : '') +
-        (s.ctrlSumCalc
-          ? '|(<InstdAmt Ccy="\\w{3}">.*<\\/InstdAmt>)|(<Amt Ccy="\\w{3}">.*<\\/Amt>)'
-          : '') +
-        (s.creDtTm ? '|(<CreDtTm>.*<\\/CreDtTm>)' : '') +
-        (s.reqdExctnDt ? '|(<ReqdExctnDt>.*<\\/ReqdExctnDt>)' : '') +
-        (s.msgId ? '|(<MsgId>.*</MsgId>)' : ''),
-      'g'
-    );
-    console.log('Source regexp: ' + regExp.source);
-    const output = await findAndReplace(fileText, regExp, (match) => {
-      if (s.msgId && match.startsWith('<MsgId>')) {
-        return `<MsgId>${idPrefix}</MsgId>`;
-      } else if (match.startsWith('<PmtInfId>')) {
-        cLevel = 0;
-        bLevel++;
-        return s.pmtInfId
-          ? `<PmtInfId>${idPrefix}-B${bLevel}</PmtInfId>`
-          : match;
-      } else if (s.instrId && match.startsWith('<InstrId>')) {
-        return `<InstrId>${idPrefix}-B${bLevel}-C${cLevel + 1}</InstrId>`;
-      } else if (
-        (s.endToEndId || s.nbOfTrxsCalc) &&
-        match.startsWith('<EndToEndId>')
-      ) {
-        cLevel++;
-        nbOfTrxs++;
-        return s.endToEndId
-          ? `<EndToEndId>${idPrefix}-B${bLevel}-C${cLevel}</EndToEndId>`
-          : match;
-      } else if (s.uetr && match.startsWith('<InstrInf>')) {
+        : null,
+      s.instrId ? '(<InstrId>.*</InstrId>)' : null,
+      s.endToEndId || s.nbOfTrxsCalc ? '(<EndToEndId>.*</EndToEndId>)' : null,
+      s.uetr ? '(<InstrInf>UETR/.*</InstrInf>)' : null,
+      s.ctrlSumCalc
+        ? '(<InstdAmt Ccy="\\w{3}">.*<\\/InstdAmt>)|(<Amt Ccy="\\w{3}">.*<\\/Amt>)'
+        : null,
+      s.creDtTm ? '(<CreDtTm>.*<\\/CreDtTm>)' : null,
+      s.reqdExctnDt ? '(<ReqdExctnDt>.*<\\/ReqdExctnDt>)' : null,
+      s.msgId ? '(<MsgId>.*</MsgId>)' : null,
+    ].filter(Boolean);
+    let output = fileText;
+    if (regExpParts.length) {
+      const regExp = new RegExp(regExpParts.join('|'), 'g');
+      output = await findAndReplace(fileText, regExp, (match) => {
+        if (s.msgId && match.startsWith('<MsgId>')) {
+          return `<MsgId>${idPrefix}</MsgId>`;
+        } else if (match.startsWith('<PmtInfId>')) {
+          cLevel = 0;
+          bLevel++;
+          return s.pmtInfId
+            ? `<PmtInfId>${idPrefix}-B${bLevel}</PmtInfId>`
+            : match;
+        } else if (s.instrId && match.startsWith('<InstrId>')) {
+          return `<InstrId>${idPrefix}-B${bLevel}-C${cLevel + 1}</InstrId>`;
+        } else if (
+          (s.endToEndId || s.nbOfTrxsCalc) &&
+          match.startsWith('<EndToEndId>')
+        ) {
+          cLevel++;
+          nbOfTrxs++;
+          return s.endToEndId
+            ? `<EndToEndId>${idPrefix}-B${bLevel}-C${cLevel}</EndToEndId>`
+            : match;
+        } else if (s.uetr && match.startsWith('<InstrInf>')) {
           return `<InstrInf>UETR/${uuid.v4()}</InstrInf>`;
-      } else if (
-        s.ctrlSumCalc &&
-        (match.startsWith('<InstdAmt') || match.startsWith('<Amt'))
-      ) {
-        const amt = Number(
-          match.substring(match.indexOf('>') + 1, match.lastIndexOf('<'))
-        );
-        ctrlSum += amt;
-        return match;
-      } else if (s.reqdExctnDt && match.startsWith('<ReqdExctnDt>')) {
-        return `<ReqdExctnDt>${currentDate()}</ReqdExctnDt>`;
-      } else if (s.creDtTm && match.startsWith('<CreDtTm>')) {
-        return `<CreDtTm>${new Date().toISOString()}</CreDtTm>`;
-      } else return 'Unknown match';
-    });
+        } else if (
+          s.ctrlSumCalc &&
+          (match.startsWith('<InstdAmt') || match.startsWith('<Amt'))
+        ) {
+          const amt = Number(
+            match.substring(match.indexOf('>') + 1, match.lastIndexOf('<'))
+          );
+          ctrlSum += amt;
+          return match;
+        } else if (s.reqdExctnDt && match.startsWith('<ReqdExctnDt>')) {
+          return `<ReqdExctnDt>${currentDate()}</ReqdExctnDt>`;
+        } else if (s.creDtTm && match.startsWith('<CreDtTm>')) {
+          return `<CreDtTm>${new Date().toISOString()}</CreDtTm>`;
+        } else return 'Unknown match';
+      });
+    }
     if (s.nbOfTrxsCalc || s.ctrlSumCalc) {
       return await findAndReplace(
         output,
@@ -207,5 +279,6 @@ export default function useTextUtils() {
     uniqueTimeStamp,
     applySmartAdjustments,
     getFileExtension,
+    makeUniqueId,
   };
 }

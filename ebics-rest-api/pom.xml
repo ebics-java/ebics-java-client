@@ -80,12 +80,26 @@
 			<version>3.3.1</version>
 			<type>maven-plugin</type>
 		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-maven-allopen</artifactId>
+			<version>${kotlin.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<finalName>${artifactId}</finalName>
 		<sourceDirectory>src/main/kotlin</sourceDirectory>
 		<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+		<resources>
+			<resource>
+				<filtering>true</filtering>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>application.yml</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
@@ -164,7 +178,12 @@
 					</args>
 					<compilerPlugins>
 						<plugin>spring</plugin>
+						<!-- All open instead of final classes/methods to enable spring AOP support -->
+						<plugin>all-open</plugin>
 					</compilerPlugins>
+					<pluginOptions>
+						<option>all-open:annotation=org.springframework.web.bind.annotation.RestController</option>
+					</pluginOptions>
 				</configuration>
 				<dependencies>
 					<dependency>

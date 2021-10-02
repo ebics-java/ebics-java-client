@@ -280,7 +280,7 @@ export default defineComponent({
     const bankConnection = ref<User>();
     const replaceMsgId = ref(true);
     const { activeBankConnections, hasActiveConnections, bankConnectionLabel } =
-      useBankConnectionsAPI();
+      useBankConnectionsAPI(true);
     const { ebicsUploadRequest } = useFileTransferAPI();
     const { applySmartAdjustments, detectFileFormat } = useTextUtils();
     const { userSettings } = useUserSettings();

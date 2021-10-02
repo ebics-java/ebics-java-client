@@ -9,4 +9,5 @@ data class BankConnection(
     val partnerId: String,
     val bankId: Long,
     val guestAccess: Boolean,
+    val useCertificate: Boolean,
 )

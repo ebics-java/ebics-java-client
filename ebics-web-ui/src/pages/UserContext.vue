@@ -101,7 +101,6 @@
               </q-item-section>
             </q-item>
           </q-list>
-          <user-preferences />
         </div>
         <div v-else>
           <p>No user context available, try to log in</p>
@@ -116,11 +115,9 @@
 import { defineComponent } from 'vue';
 import useUserContextAPI from 'src/components/user-context';
 import { AuthenticationType } from 'components/models';
-import UserPreferences from 'components/UserPreferences.vue'
 
 export default defineComponent({
   name: 'UserContext',
-  components: { UserPreferences },
   data() {
     return {
       //'importing enum' in order to be used in template

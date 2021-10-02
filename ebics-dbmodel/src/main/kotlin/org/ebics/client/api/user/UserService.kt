@@ -1,9 +1,9 @@
 package org.ebics.client.api.user
 
+import org.ebics.client.api.BankConnectionPermission
 import org.ebics.client.api.getById
 import org.ebics.client.api.user.cert.UserKeyStoreService
 import org.ebics.client.api.partner.PartnerService
-import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.user.EbicsUserAction
 import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.slf4j.LoggerFactory
@@ -18,12 +18,20 @@ class UserService(
 ) {
 
 
-    fun findUsers(): List<User> {
-        return userRepository.findAll().filter { SecurityCtxHelper.isAuthorizedForUserRead(it) }
+    fun findUsers(permission: BankConnectionPermission): List<User> {
+        return userRepository.findAll().filter { SecurityCtxHelper.isAuthorizedFor(it, permission) }
     }
 
-    fun getUserById(userId: Long): User {
-        return userRepository.getById(userId, "bankconnection")
+    fun getUserById(userId: Long, permission: BankConnectionPermission = BankConnectionPermission.READ): User {
+        val bankConnection = userRepository.getById(userId, "bankconnection")
+        SecurityCtxHelper.checkAuthorization(bankConnection, permission)
+        return bankConnection
+    }
+
+    fun saveUser(bankConnection: User): Long {
+        SecurityCtxHelper.checkWriteAuthorization(bankConnection)
+        userRepository.saveAndFlush(bankConnection)
+        return bankConnection.id!!
     }
 
     fun createUserAndPartner(bankConnection: BankConnection): Long {
@@ -39,7 +47,7 @@ class UserService(
                 userId,
                 name,
                 dn = "cn=$cn$country",
-                useCertificate = ebicsVersion == EbicsVersion.H005,
+                useCertificate = useCertificate,
                 usePassword = false,
                 partner = partner,
                 keyStore = null,
@@ -66,7 +74,7 @@ class UserService(
                     name,
                     currentUser.dn,
                     currentUser.userStatus,
-                    ebicsVersion == EbicsVersion.H005,
+                    useCertificate,
                     currentUser.usePassword,
                     partner,
                     currentUser.keyStore,
@@ -81,7 +89,7 @@ class UserService(
                     name,
                     currentUser.dn,
                     currentUser.userStatus,
-                    ebicsVersion == EbicsVersion.H005,
+                    useCertificate,
                     currentUser.usePassword,
                     partner,
                     currentUser.keyStore,
@@ -96,7 +104,7 @@ class UserService(
                     name,
                     currentUser.dn,
                     currentUser.userStatus,
-                    currentUser.useCertificate,
+                    useCertificate,
                     currentUser.usePassword,
                     currentUser.partner,
                     currentUser.keyStore,
