@@ -7,18 +7,27 @@ import org.springframework.stereotype.Service
 
 @Service
 class UserSettingsService(private val userSettingsRepository: UserSettingsRepository) {
-    fun getUserSettings(): UserSettings {
-        val userId = SecurityCtxHelper.getPrincipalName()
+    fun getCurrentUserSettings(): UserSettings =
+        getUserSettings(SecurityCtxHelper.getPrincipalName())
+
+    fun getUserSettings(userId: String): UserSettings {
         with(userSettingsRepository.findById(userId)) {
             return if (isPresent)
                 get()
             else
-                //Return defaults if the settings doesn't exist yet
+            //Return defaults if the settings doesn't exist yet
                 UserSettings(userId, false, true, AdjustmentOptions(
                     applyAutomatically = true,
                     AdjustmentsOptionsPain00x(true, true, true, true, true, true, true, true, true, userId ),
                     AdjustmentsOptionsSwift(true, true, true, false, true, userId)
                 ))
+        }
+    }
+
+    fun updateCurrentUserSettings(userSettings: UserSettingsData) {
+        val userId = SecurityCtxHelper.getPrincipalName()
+        with(userSettings) {
+            updateUserSettings(UserSettings(userId, uploadOnDrop, testerSettings, adjustmentOptions))
         }
     }
 

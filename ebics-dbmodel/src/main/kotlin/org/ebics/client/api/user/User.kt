@@ -7,6 +7,7 @@ import org.ebics.client.api.partner.Partner
 import org.ebics.client.api.trace.TraceEntry
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.user.EbicsUserStatusEnum
+import org.ebics.client.order.h004.OrderType
 import javax.persistence.*
 
 @Entity
@@ -37,4 +38,8 @@ data class User (
     @JsonIgnore
     @OneToMany(cascade = [CascadeType.ALL], mappedBy = "user")
     val traces: List<TraceEntry> = emptyList(),
+
+    @JsonIgnore
+    @OneToMany(cascade = [CascadeType.ALL], mappedBy = "user")
+    val orderTypes: List<OrderType>
 ) : EbicsUser

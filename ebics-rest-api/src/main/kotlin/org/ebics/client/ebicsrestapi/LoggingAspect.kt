@@ -6,12 +6,15 @@ import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Pointcut
 import org.aspectj.lang.reflect.MethodSignature
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.stereotype.Component
 import org.springframework.util.StopWatch
-import javax.servlet.http.HttpServletRequest
 
 @Aspect
 @Component
+//Logging aspect is currently disabled, because its causing unnecessary side-effect
+// - Configuration class correctly initialized from config file, BUT then after injecting having null fields,... ?why
+@ConditionalOnExpression("\${logging.aspect.enabled:false}")
 class LoggingAspect {
 
     @Pointcut("execution(* org.ebics.client.ebicsrestapi..*(..))")

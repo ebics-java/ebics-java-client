@@ -36,13 +36,12 @@ const userSettings = ref<UserSettings>({
  * @returns user settings related API
  */
 export default function useUserSettingsAPI() {
-  const { apiErrorHandler } = useBaseAPI();
+  const { apiErrorHandler, apiOkHandler } = useBaseAPI();
 
   const loadUserSettings = async (): Promise<void> => {
     try {
       const response = await api.get<UserSettings>('user/settings');
       userSettings.value = response.data;
-      console.log('User settings loaded: ' + JSON.stringify(userSettings.value))
     } catch (error) {
       apiErrorHandler('Loading of user settings failed', error);
     }
@@ -50,7 +49,8 @@ export default function useUserSettingsAPI() {
 
   const saveUserSettings = async (): Promise<void> => {
     try {
-      await api.put<UserSettings>('user/settings', userSettings);
+      await api.put<UserSettings>('user/settings', userSettings.value);
+      apiOkHandler('User settings successfully saved')
     } catch (error) {
       apiErrorHandler('Saving settings failed', error);
     }

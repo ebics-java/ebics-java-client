@@ -1,11 +1,8 @@
-package org.ebics.client.ebicsrestapi.user
+package org.ebics.client.ebicsrestapi.user.settings
 
-import org.ebics.client.api.bank.Bank
-import org.ebics.client.api.bank.BankService
-import org.ebics.client.api.partner.PartnerService
 import org.ebics.client.api.user.settings.UserSettings
+import org.ebics.client.api.user.settings.UserSettingsData
 import org.ebics.client.api.user.settings.UserSettingsService
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -14,12 +11,12 @@ import org.springframework.web.bind.annotation.*
 class UserSettingsResource(private val userSettingsService: UserSettingsService) {
     @GetMapping()
     fun getUserSettings(): UserSettings {
-        return userSettingsService.getUserSettings()
+        return userSettingsService.getCurrentUserSettings()
     }
 
     @PutMapping
-    fun updateUserSettings(@RequestBody userSettings: UserSettings) {
-        userSettingsService.updateUserSettings(userSettings)
+    fun updateUserSettings(@RequestBody userSettings: UserSettingsData) {
+        userSettingsService.updateCurrentUserSettings(userSettings)
     }
 }
 

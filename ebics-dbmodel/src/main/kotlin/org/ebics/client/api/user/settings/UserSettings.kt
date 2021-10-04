@@ -2,6 +2,12 @@ package org.ebics.client.api.user.settings
 
 import javax.persistence.*
 
+data class UserSettingsData(
+    val uploadOnDrop: Boolean,
+    val testerSettings: Boolean,
+    val adjustmentOptions: AdjustmentOptions,
+)
+
 /**
     User Settings class
  */
