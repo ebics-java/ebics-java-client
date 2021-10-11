@@ -35,6 +35,7 @@ export interface UserPartnerBank {
   partnerId: string;
   bankId: number;
   guestAccess: boolean;
+  useCertificate: boolean;
 }
 
 export interface EbicsApiError {
@@ -56,7 +57,9 @@ export interface User {
   keyStore: string;
   usePassword: boolean;
   guestAccess: boolean;
+  creator: string;
   securityMedium: string;
+  useCertificate: boolean;
 }
 
 export interface UserContext {

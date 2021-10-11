@@ -88,7 +88,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>${artifactId}</finalName>
+		<finalName>${project.artifactId}</finalName>
 		<sourceDirectory>src/main/kotlin</sourceDirectory>
 		<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
 		<resources>
@@ -97,6 +97,7 @@
 				<directory>src/main/resources</directory>
 				<includes>
 					<include>application.yml</include>
+					<include>*.xml</include>
 				</includes>
 			</resource>
 		</resources>

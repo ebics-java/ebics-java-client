@@ -1,15 +1,11 @@
 package org.ebics.client.ebicsrestapi.bankconnection.h005
 
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
-import org.apache.xmlbeans.XmlObject
-import org.ebics.client.api.BankConnectionPermission
+import org.ebics.client.api.user.permission.BankConnectionAccessType
 import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.bank.cert.BankKeyStoreService
-import org.ebics.client.api.getById
-import org.ebics.client.api.user.SecurityCtxHelper
 import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
-import org.ebics.client.api.user.UserRepository
 import org.ebics.client.api.user.UserService
 import org.ebics.client.ebicsrestapi.bankconnection.UploadResponse
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
@@ -17,19 +13,11 @@ import org.ebics.client.filetransfer.h005.FileTransfer
 import org.ebics.client.keymgmt.h005.KeyManagementImpl
 import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.Product
-import org.ebics.client.order.AuthorisationLevel
-import org.ebics.client.order.EbicsAdminOrderType
-import org.ebics.client.order.EbicsMessage
-import org.ebics.client.order.EbicsService
-import org.ebics.client.order.h005.ContainerType
 import org.ebics.client.order.h005.EbicsDownloadOrder
 import org.ebics.client.order.h005.EbicsUploadOrder
 import org.ebics.client.order.h005.OrderType
 import org.ebics.client.utils.toDate
 import org.ebics.client.utils.toHexString
-import org.ebics.schema.h005.AuthOrderInfoType
-import org.ebics.schema.h005.HTDReponseOrderDataType
-import org.ebics.schema.h005.UserPermissionType
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
@@ -47,7 +35,7 @@ class EbicsAPI(
         Product("EBICS 3.0 H005 REST API Client", "en", "org.jto.ebics")
 
     fun sendINI(userIdPass: UserIdPass) {
-        val user = userService.getUserById(userIdPass.id, BankConnectionPermission.WRITE)
+        val user = userService.getUserById(userIdPass.id, BankConnectionAccessType.WRITE)
         with (requireNotNull ( user.keyStore ) {"User certificates must be first initialized"}) {
             val manager = toUserCertMgr( userIdPass.password )
             val session = EbicsSession(user, configuration, product, manager, null)
@@ -57,7 +45,7 @@ class EbicsAPI(
     }
 
     fun sendHIA(userIdPass: UserIdPass) {
-        val user = userService.getUserById(userIdPass.id, BankConnectionPermission.WRITE)
+        val user = userService.getUserById(userIdPass.id, BankConnectionAccessType.WRITE)
         with (requireNotNull ( user.keyStore ) {"User certificates must be first initialized"}) {
             val manager = toUserCertMgr( userIdPass.password )
             val session = EbicsSession(user, configuration, product, manager, null)
@@ -67,7 +55,7 @@ class EbicsAPI(
     }
 
     fun sendHPB(userIdPass: UserIdPass) {
-        val user = userService.getUserById(userIdPass.id, BankConnectionPermission.WRITE)
+        val user = userService.getUserById(userIdPass.id, BankConnectionAccessType.WRITE)
         with (requireNotNull ( user.keyStore ) {"User certificates must be first initialized"}) {
             val userCertManager = toUserCertMgr( userIdPass.password )
             val session = EbicsSession(user, configuration, product, userCertManager, null)
@@ -80,7 +68,7 @@ class EbicsAPI(
     }
 
     fun uploadFile(userId: Long, uploadRequest: UploadRequest, uploadFile: MultipartFile): UploadResponse {
-        val user = userService.getUserById(userId, BankConnectionPermission.USE)
+        val user = userService.getUserById(userId, BankConnectionAccessType.USE)
         with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {
             val userCertManager = toUserCertMgr(uploadRequest.password)
             with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {
@@ -94,7 +82,7 @@ class EbicsAPI(
     }
 
     fun downloadFile(userId: Long, downloadRequest: DownloadRequest): ResponseEntity<Resource> {
-        val user = userService.getUserById(userId, BankConnectionPermission.USE)
+        val user = userService.getUserById(userId, BankConnectionAccessType.USE)
         with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {
             val userCertManager = toUserCertMgr(downloadRequest.password)
             with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {
@@ -110,7 +98,7 @@ class EbicsAPI(
     }
 
     fun getOrderTypes(userId: Long, password: String): List<OrderType> {
-        val user = userService.getUserById(userId, BankConnectionPermission.USE)
+        val user = userService.getUserById(userId, BankConnectionAccessType.USE)
         with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {
             val userCertManager = toUserCertMgr(password)
             with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {

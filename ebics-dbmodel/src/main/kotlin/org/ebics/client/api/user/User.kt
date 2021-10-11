@@ -5,9 +5,9 @@ import org.ebics.client.api.EbicsUser
 import org.ebics.client.api.user.cert.UserKeyStore
 import org.ebics.client.api.partner.Partner
 import org.ebics.client.api.trace.TraceEntry
+import org.ebics.client.api.user.permission.BankConnectionAccessRightsController
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.user.EbicsUserStatusEnum
-import org.ebics.client.order.h004.OrderType
 import javax.persistence.*
 
 @Entity
@@ -39,7 +39,13 @@ data class User (
     @OneToMany(cascade = [CascadeType.ALL], mappedBy = "user")
     val traces: List<TraceEntry> = emptyList(),
 
+    //@JsonIgnore
+    //@OneToMany(cascade = [CascadeType.ALL], mappedBy = "user")
+    //val orderTypes: List<OrderType>
+) : EbicsUser, BankConnectionAccessRightsController {
     @JsonIgnore
-    @OneToMany(cascade = [CascadeType.ALL], mappedBy = "user")
-    val orderTypes: List<OrderType>
-) : EbicsUser
+    override fun getCreatorName(): String = creator
+    override fun isGuestAccess(): Boolean = guestAccess
+    @JsonIgnore
+    override fun getObjectName(): String = "BankConnection: '$name' created by: '$creator' of EBICS user id: '$userId'"
+}

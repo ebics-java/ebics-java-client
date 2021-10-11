@@ -1,9 +1,11 @@
 package org.ebics.client.api.user
 
-import org.ebics.client.api.BankConnectionPermission
 import org.ebics.client.api.getById
+import org.ebics.client.api.partner.Partner
 import org.ebics.client.api.user.cert.UserKeyStoreService
 import org.ebics.client.api.partner.PartnerService
+import org.ebics.client.api.security.AuthenticationContext
+import org.ebics.client.api.user.permission.BankConnectionAccessType
 import org.ebics.client.model.user.EbicsUserAction
 import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.slf4j.LoggerFactory
@@ -18,18 +20,18 @@ class UserService(
 ) {
 
 
-    fun findUsers(permission: BankConnectionPermission): List<User> {
-        return userRepository.findAll().filter { SecurityCtxHelper.isAuthorizedFor(it, permission) }
+    fun findUsers(permission: BankConnectionAccessType): List<User> {
+        return userRepository.findAll().filter { it.hasAccess(permission, AuthenticationContext.fromSecurityContext()) }
     }
 
-    fun getUserById(userId: Long, permission: BankConnectionPermission = BankConnectionPermission.READ): User {
+    fun getUserById(userId: Long, permission: BankConnectionAccessType = BankConnectionAccessType.READ): User {
         val bankConnection = userRepository.getById(userId, "bankconnection")
-        SecurityCtxHelper.checkAuthorization(bankConnection, permission)
+        bankConnection.checkAccess(permission)
         return bankConnection
     }
 
     fun saveUser(bankConnection: User): Long {
-        SecurityCtxHelper.checkWriteAuthorization(bankConnection)
+        bankConnection.checkWriteAccess()
         userRepository.saveAndFlush(bankConnection)
         return bankConnection.id!!
     }
@@ -37,24 +39,21 @@ class UserService(
     fun createUserAndPartner(bankConnection: BankConnection): Long {
         with(bankConnection) {
             val partner = partnerService.createOrGetPartner(partnerId, bankId)
-            val authentication = SecurityCtxHelper.getAuthentication()
-            val cn = name.toLowerCase().replace("[^\\x00-\\x7F]".toRegex(), "").replace("\\s".toRegex(), "-")
-            val country =
-                if (Locale.getDefault()?.country?.isNotBlank() == true) ",c=${Locale.getDefault().country.toLowerCase()}" else ""
+            val authCtx = AuthenticationContext.fromSecurityContext()
             val user = User(
                 null,
                 ebicsVersion,
                 userId,
                 name,
-                dn = "cn=$cn$country",
+                dn = DomainNameGenerator(name, Locale.getDefault()?.country).toString(),
                 useCertificate = useCertificate,
                 usePassword = false,
                 partner = partner,
                 keyStore = null,
-                creator = authentication.name,
+                creator = authCtx.name,
                 guestAccess = guestAccess
             )
-            SecurityCtxHelper.checkWriteAuthorization(user, authentication)
+            user.checkWriteAccess()
             userRepository.saveAndFlush(user)
             return user.id!!
         }
@@ -64,62 +63,59 @@ class UserService(
         with(bankConnection) {
             val partner = partnerService.createOrGetPartner(partnerId, bankId)
             val currentUser = userRepository.getById(id, "bankconnection")
-            SecurityCtxHelper.checkWriteAuthorization(currentUser)
+            currentUser.checkWriteAccess()
             //Depending on user status only some values are editable
             val updatedUser = when (currentUser.userStatus) {
-                EbicsUserStatusEnum.CREATED -> User(
-                    id,
-                    ebicsVersion,
-                    userId,
-                    name,
-                    currentUser.dn,
-                    currentUser.userStatus,
-                    useCertificate,
-                    currentUser.usePassword,
-                    partner,
-                    currentUser.keyStore,
-                    currentUser.creator,
-                    guestAccess,
-                    currentUser.traces
+                EbicsUserStatusEnum.CREATED, EbicsUserStatusEnum.NEW -> currentUser.updateFromBankConnectionBeforeInitialization(
+                    bankConnection,
+                    partner
                 )
-                EbicsUserStatusEnum.NEW -> User(
-                    id,
-                    ebicsVersion,
-                    userId,
-                    name,
-                    currentUser.dn,
-                    currentUser.userStatus,
-                    useCertificate,
-                    currentUser.usePassword,
-                    partner,
-                    currentUser.keyStore,
-                    currentUser.creator,
-                    guestAccess,
-                    currentUser.traces
-                )
-                else -> User(
-                    id,
-                    ebicsVersion,
-                    currentUser.userId,
-                    name,
-                    currentUser.dn,
-                    currentUser.userStatus,
-                    useCertificate,
-                    currentUser.usePassword,
-                    currentUser.partner,
-                    currentUser.keyStore,
-                    currentUser.creator,
-                    guestAccess,
-                    currentUser.traces
-                )
+                else -> currentUser.updateFromBankConnectionAfterInitialization(bankConnection)
             }
             userRepository.saveAndFlush(updatedUser)
             return id
         }
     }
 
+    private fun User.updateFromBankConnectionAfterInitialization(
+        bankConnection: BankConnection
+    ) = User(
+        id,
+        bankConnection.ebicsVersion,
+        userId,
+        bankConnection.name,
+        dn,
+        userStatus,
+        useCertificate,
+        usePassword,
+        partner,
+        keyStore,
+        creator,
+        bankConnection.guestAccess,
+        traces
+    )
+
+    private fun User.updateFromBankConnectionBeforeInitialization(
+        bankConnection: BankConnection,
+        partner: Partner
+    ) = User(
+        id,
+        bankConnection.ebicsVersion,
+        bankConnection.userId,
+        bankConnection.name,
+        dn,
+        userStatus,
+        bankConnection.useCertificate,
+        usePassword,
+        partner,
+        keyStore,
+        creator,
+        bankConnection.guestAccess,
+        traces
+    )
+
     fun deleteUser(userId: Long) {
-        SecurityCtxHelper.checkWriteAuthorization(userRepository.getById(userId, "bankconnection"))
+        userRepository.getById(userId, "bankconnection").checkWriteAccess()
         userRepository.deleteById(userId)
     }
 
@@ -130,7 +126,7 @@ class UserService(
      */
     fun resetStatus(userId: Long): Unit {
         val user = userRepository.getById(userId, "bankconnection")
-        SecurityCtxHelper.checkWriteAuthorization(user)
+        user.checkWriteAccess()
         //Delete user key if available
         user.keyStore?.let { userKeyStoreService.deleteById(it.id!!) }
         //Set user status to CREATED

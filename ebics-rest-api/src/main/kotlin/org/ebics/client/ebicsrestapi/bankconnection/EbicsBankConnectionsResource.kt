@@ -1,6 +1,6 @@
 package org.ebics.client.ebicsrestapi.bankconnection
 
-import org.ebics.client.api.BankConnectionPermission
+import org.ebics.client.api.user.permission.BankConnectionAccessType
 import org.ebics.client.api.user.*
 import org.springframework.web.bind.annotation.*
 
@@ -11,7 +11,7 @@ class EbicsBankConnectionsResource (
     private val userService: UserService)
 {
     @GetMapping("")
-    fun listBankConnections(@RequestParam(required = false) permission: BankConnectionPermission = BankConnectionPermission.READ): List<User> =
+    fun listBankConnections(@RequestParam(required = false) permission: BankConnectionAccessType = BankConnectionAccessType.READ): List<User> =
         userService.findUsers(permission)
 
     @GetMapping("{userId}")

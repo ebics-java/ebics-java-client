@@ -1,13 +1,11 @@
 package org.ebics.client.ebicsrestapi.bankconnection.h004
 
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
-import org.ebics.client.api.BankConnectionPermission
+import org.ebics.client.api.user.permission.BankConnectionAccessType
 import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.bank.cert.BankKeyStoreService
-import org.ebics.client.api.getById
 import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
-import org.ebics.client.api.user.UserRepository
 import org.ebics.client.api.user.UserService
 import org.ebics.client.ebicsrestapi.bankconnection.UploadResponse
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
@@ -25,8 +23,6 @@ import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
-import java.io.File
-import java.io.FileOutputStream
 
 @Component("EbicsAPIH004")
 class EbicsAPI(
@@ -39,7 +35,7 @@ class EbicsAPI(
         Product("EBICS 2.5 H004 REST API Client", "en", "org.jto.ebics")
 
     fun sendINI(userIdPass: UserIdPass) {
-        val user = userService.getUserById(userIdPass.id, BankConnectionPermission.WRITE)
+        val user = userService.getUserById(userIdPass.id, BankConnectionAccessType.WRITE)
         with (requireNotNull ( user.keyStore ) {"User certificates must be first initialized"}) {
             val manager = toUserCertMgr( userIdPass.password )
             val session = EbicsSession(user, configuration, product, manager, null)
@@ -49,7 +45,7 @@ class EbicsAPI(
     }
 
     fun sendHIA(userIdPass: UserIdPass) {
-        val user = userService.getUserById(userIdPass.id, BankConnectionPermission.WRITE)
+        val user = userService.getUserById(userIdPass.id, BankConnectionAccessType.WRITE)
         with (requireNotNull ( user.keyStore ) {"User certificates must be first initialized"}) {
             val manager = toUserCertMgr( userIdPass.password )
             val session = EbicsSession(user, configuration, product, manager, null)
@@ -59,7 +55,7 @@ class EbicsAPI(
     }
 
     fun sendHPB(userIdPass: UserIdPass) {
-        val user = userService.getUserById(userIdPass.id, BankConnectionPermission.WRITE)
+        val user = userService.getUserById(userIdPass.id, BankConnectionAccessType.WRITE)
         with (requireNotNull ( user.keyStore ) {"User certificates must be first initialized"}) {
             val userCertManager = toUserCertMgr( userIdPass.password )
             val session = EbicsSession(user, configuration, product, userCertManager, null)
@@ -72,7 +68,7 @@ class EbicsAPI(
     }
 
     fun uploadFile(userId: Long, uploadRequest: UploadRequest, uploadFile: MultipartFile): UploadResponse {
-        val user = userService.getUserById(userId, BankConnectionPermission.USE)
+        val user = userService.getUserById(userId, BankConnectionAccessType.USE)
         with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {
             val userCertManager = toUserCertMgr(uploadRequest.password)
             with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {
@@ -86,7 +82,7 @@ class EbicsAPI(
     }
 
     fun downloadFile(userId: Long, downloadRequest: DownloadRequest): ResponseEntity<Resource> {
-        val user = userService.getUserById(userId, BankConnectionPermission.USE)
+        val user = userService.getUserById(userId, BankConnectionAccessType.USE)
         with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {
             val userCertManager = toUserCertMgr(downloadRequest.password)
             with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {
@@ -102,7 +98,7 @@ class EbicsAPI(
     }
 
     fun getOrderTypes(userId: Long, password: String): List<OrderType> {
-        val user = userService.getUserById(userId, BankConnectionPermission.USE)
+        val user = userService.getUserById(userId, BankConnectionAccessType.USE)
         with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {
             val userCertManager = toUserCertMgr(password)
             with (requireNotNull(user.partner.bank.keyStore) {"Bank certificates must be first initialized"}) {

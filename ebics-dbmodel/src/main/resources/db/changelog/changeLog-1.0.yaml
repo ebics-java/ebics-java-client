@@ -449,4 +449,28 @@ databaseChangeLog:
       author: honza
       changes:
           - sql: update UserSettings set adjustmentOptions_swift_f30=true, adjustmentOptions_swift_randomIds=false
-
+- changeSet:
+    id: 1633836963286-1
+    author: honza (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: creator
+            type: varchar(255)
+        tableName: TraceEntry
+- changeSet:
+    id: 1633836963286-2
+    author: honza (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: dateTime
+            type: timestamp
+        tableName: TraceEntry
+- changeSet:
+      id: 1633836963286-3
+      author: honza
+      changes:
+          - sql: delete from TraceEntry

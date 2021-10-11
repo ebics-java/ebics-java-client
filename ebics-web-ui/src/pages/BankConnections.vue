@@ -162,6 +162,22 @@ export default defineComponent({
         field: (row: User) => row?.partner?.bank?.name ?? '',
         sortable: true,
       },
+      {
+        name: 'owner',
+        required: true,
+        label: 'Owner',
+        align: 'left',
+        field: (row: User) => row?.creator ?? '',
+        sortable: true,
+      },
+      {
+        name: 'shared',
+        required: true,
+        label: 'Shared',
+        align: 'left',
+        field: (row: User) => row?.guestAccess ? 'yes' : 'no',
+        sortable: true,
+      },
     ];
     const {bankConnections, deleteBankConnection} = useBankConnectionsAPI();
 

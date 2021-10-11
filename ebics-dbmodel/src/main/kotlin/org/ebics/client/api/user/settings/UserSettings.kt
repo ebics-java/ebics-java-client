@@ -21,7 +21,10 @@ class UserSettings(
 
     @Embedded
     val adjustmentOptions: AdjustmentOptions,
-)
+) : UserSettingsAccessRightsController {
+    override fun getOwnerName(): String = userId
+    override fun getObjectName(): String = "User settings of '$userId'"
+}
 
 @Embeddable
 class AdjustmentOptions(

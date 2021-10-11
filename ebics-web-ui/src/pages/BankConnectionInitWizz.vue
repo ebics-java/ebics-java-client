@@ -139,7 +139,7 @@
           ></q-btn>
           <q-stepper-navigation>
             <q-btn
-              @click="printUserLetters()"
+              @click="nextStep()"
               color="primary"
               label="Continue"
             ></q-btn>
@@ -170,7 +170,8 @@
         >
           Verify bellow downloaded bank keys with the one provided by your bank
           during onboarding. In case they match, is your connection ready to use.
-          If they keys DON'T match this connection can't be trussted - identity of the bank is not valid.
+          If they keys DON'T match this connection can't be trussted - identity of the bank is not valid. 
+          Download the bank keys again, or reset connection and initialize again.
           <q-list bordered padding class="rounded-borders">
             <q-item v-ripple>
               <q-item-section>
@@ -211,9 +212,9 @@
           </q-list>
           <q-stepper-navigation>
             <q-btn
-              @click="verifyBankKeys()"
+              @click="downloadBankKeys()"
               color="primary"
-              label="Finish"
+              label="Download bank keys again"
             ></q-btn>
           </q-stepper-navigation>
         </q-step>
@@ -239,7 +240,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { ref, defineComponent } from 'vue';
 import {
   UserIniWizzStep,
   AdminOrderType,
@@ -260,82 +261,6 @@ export default defineComponent({
       required: true,
     },
   },
-  data() {
-    return {
-      //'importing enum' in order to be used in template
-      UserIniWizzStep,
-      letters: undefined as UserLettersResponse | undefined,
-    };
-  },
-  methods: {
-    nextStep() {
-      (this.$refs.wizz as QStepper).next();
-    },
-    async resetUserStatus() {
-      try {
-        const del = await this.confirmDialog(
-            'Confirm reset',
-            'Do you really want to reset bank connection? (it must be then newly initialized in order to upload/download files)'
-          );
-        if (del) {
-          //Get password for user certificates
-          await this.resetUserStatusRequest();
-          //Reset the password for certificates
-          this.resetCertPassword(this.user);
-          //Refresshing user status on success
-          await this.refreshUserData();
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    /*
-      Create EBICS User Keys
-    */
-    async createUserKeys() {
-      try {
-        //Upload user keys (INI and/or HIA) depending on user status
-        await this.createUserKeysRequest();
-        //Refresshing user status on success
-        await this.refreshUserData();
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    async uploadUserKeys() {
-      try {
-        //Create user letters
-        this.letters = await this.getUserLetters();
-        //Execute INI request
-        await this.ebicsAdminTypeRequest(AdminOrderType.INI);
-        //Execute HIA request
-        await this.ebicsAdminTypeRequest(AdminOrderType.HIA);
-        //Refresh user data
-        await this.refreshUserData();
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    printUserLetters() {
-      this.nextStep();
-    },
-    async refreshUserLetters() {
-      this.letters = await this.getUserLetters();
-    },
-    async downloadBankKeys() {
-      try {
-        //Download bank keys using HPB order type
-        await this.ebicsAdminTypeRequest(AdminOrderType.HPB);
-        //Refresshing user status on success
-        await this.refreshUserData();
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    verifyBankKeys() {
-      this.nextStep();
-    },
-  },
   setup(props) {
     const { user, refreshUserData } = useUserDataAPI(props.id);
     const { confirmDialog } = useDialogs();
@@ -350,6 +275,75 @@ export default defineComponent({
       getUserLetters,
     } = useUserInitAPI(user);
 
+    const downloadBankKeys = async():Promise<void> => {
+      try {
+        //Download bank keys using HPB order type
+        await ebicsAdminTypeRequest(AdminOrderType.HPB);
+        //Refresshing user status on success
+        await refreshUserData();
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const resetUserStatus = async():Promise<void> => {
+      try {
+        const del = await confirmDialog(
+            'Confirm reset',
+            'Do you really want to reset bank connection? (it must be then newly initialized in order to upload/download files)'
+          );
+        if (del) {
+          //Get password for user certificates
+          await resetUserStatusRequest();
+          //Reset the password for certificates
+          resetCertPassword(user.value);
+          //Refresshing user status on success
+          await refreshUserData();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    
+    /*
+      Create EBICS User Keys
+    */
+    const createUserKeys = async(): Promise<void> => {
+      try {
+        //Upload user keys (INI and/or HIA) depending on user status
+        await createUserKeysRequest();
+        //Refresshing user status on success
+        await refreshUserData();
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const letters = ref<UserLettersResponse | undefined>(undefined);
+    const refreshUserLetters = async():Promise<void> => {
+      letters.value = await getUserLetters();
+    };
+    const uploadUserKeys = async(): Promise<void> => {
+      try {
+        //Create/Refresh user letters
+        await refreshUserLetters();
+        //Execute INI request
+        await ebicsAdminTypeRequest(AdminOrderType.INI);
+        //Execute HIA request
+        await ebicsAdminTypeRequest(AdminOrderType.HIA);
+        //Refresh user data
+        await refreshUserData();
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const wizz = ref<QStepper | null>(null)
+    //Next step of the initialization wizard
+    const nextStep = ():void => {
+      wizz.value?.next();
+    };
+
     return {
       user,
       refreshUserData,
@@ -363,6 +357,15 @@ export default defineComponent({
       resetCertPassword,
       confirmDialog,
       copyToClipboard,
+      downloadBankKeys,
+      resetUserStatus,
+      createUserKeys,
+      uploadUserKeys,
+      letters,
+      UserIniWizzStep,
+      nextStep,
+      refreshUserLetters,
+      wizz,
     };
   },
 });

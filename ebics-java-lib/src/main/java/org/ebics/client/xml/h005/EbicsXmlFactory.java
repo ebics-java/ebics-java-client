@@ -936,7 +936,11 @@ public class EbicsXmlFactory {
 
     private static SignatureFlagType createSignatureFlag(boolean requestEDS) {
         SignatureFlagType signatureFlagType = SignatureFlagType.Factory.newInstance();
-        signatureFlagType.setRequestEDS(requestEDS);
+        //requestEDS attribute if used, then must be true.
+        //If not used, then whole attribute requestEDS must not be present
+        //It is forbidden to set requestEDS to false
+        if (requestEDS)
+            signatureFlagType.setRequestEDS(true);
         return signatureFlagType;
     }
 

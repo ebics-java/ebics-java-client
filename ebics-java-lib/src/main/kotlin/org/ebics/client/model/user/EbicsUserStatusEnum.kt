@@ -32,6 +32,7 @@ enum class EbicsUserStatusEnum {
             EbicsUserAction.HPB ->
                 when (this) {
                     INITIALIZED -> READY
+                    READY -> READY
                     else -> error("$action action cant be executed at user state: $this")
                 }
             EbicsUserAction.SPR ->
@@ -57,7 +58,7 @@ enum class EbicsUserStatusEnum {
             EbicsUserAction.HIA ->
                 require(this == NEW || this == LOCKED || this == PARTLY_INITIALIZED_INI) { "$action action cant be executed at user state: $this" }
             EbicsUserAction.HPB ->
-                require(this == INITIALIZED) { "$action action cant be executed at user state: $this" }
+                require(this == INITIALIZED || this == READY) { "$action action cant be executed at user state: $this" }
             EbicsUserAction.SPR ->
                 require(this == READY) { "$action action cant be executed at user state: $this" }
         }

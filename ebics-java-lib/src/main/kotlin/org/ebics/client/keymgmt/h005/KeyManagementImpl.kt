@@ -98,7 +98,6 @@ class KeyManagementImpl(session: EbicsSession) : KeyManagement(session) {
      */
     @Throws(IOException::class, GeneralSecurityException::class, EbicsException::class)
     override fun sendHPB(password: String): BankCertificateManager {
-        require(session.user.useCertificate) { "H005 allow only certificates. Please set useCertificate=true." }
         session.user.checkAction(EbicsUserAction.HPB)
         val sender = HttpRequestSender(session)
         val request = HPBRequestElement(session).apply { build(); validate() }

@@ -1,6 +1,6 @@
 package org.ebics.client.ebicsrestapi.user
 
-import org.ebics.client.api.user.SecurityCtxHelper
+import org.ebics.client.api.security.AuthenticationContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
@@ -16,9 +16,9 @@ class UserResource(@Value("\${build.revision}") val buildVersion: String,
     fun user(): UserContext
     {
         with(
-            SecurityCtxHelper.getAuthentication()
+            AuthenticationContext.fromSecurityContext()
         ) {
-            return UserContext(name, authorities.map { it.toString() }, buildVersion, buildTimestamp)
+            return UserContext(name, roles.map { it.toString() }, buildVersion, buildTimestamp)
         }
     }
 }

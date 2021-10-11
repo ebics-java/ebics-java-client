@@ -3,7 +3,6 @@ package org.ebics.client.api.user.cert
 import org.ebics.client.api.EbicsUser
 import org.ebics.client.api.FunctionException
 import org.ebics.client.api.getById
-import org.ebics.client.api.user.SecurityCtxHelper
 import org.ebics.client.api.user.UserRepository
 import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.letter.DefaultLetterManager
@@ -17,7 +16,7 @@ class UserCertificateService(val userRepository: UserRepository, val userKeyStor
     fun createOrUpdateUserCertificates(userId: Long, certRequest: CertRequest): Long {
         try {
             val user = userRepository.getById(userId, "bankconnection")
-            SecurityCtxHelper.checkWriteAuthorization(user)
+            user.checkWriteAccess()
             user.checkAction(EbicsUserAction.CREATE_KEYS)
             val userCertMgr = UserCertificateManager.create(certRequest.dn)
             val userKeyStore = UserKeyStore.fromUserCertMgr(user, userCertMgr, certRequest.password)
@@ -48,7 +47,7 @@ class UserCertificateService(val userRepository: UserRepository, val userKeyStor
 
     fun getUserLetters(userId: Long, password: String): CertificateLetters {
         val user = userRepository.getById(userId, "bankconnection")
-        SecurityCtxHelper.checkWriteAuthorization(user)
+        user.checkWriteAccess()
         user.checkAction(EbicsUserAction.CREATE_LETTERS)
         with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {
             val userCertManager = toUserCertMgr(password)

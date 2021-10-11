@@ -116,7 +116,7 @@ class HttpRequestSender(private val configuration: Configuration, private val ba
         method.setHeader(HttpHeaders.CONTENT_TYPE, "text/xml; charset=ISO-8859-1")
         httpClient.execute(method).use { response ->
             //Check the HTTP return code (must be 200)
-            Utils.checkHttpCode(response.statusLine.statusCode)
+            Utils.checkHttpCode(response)
             //If ok returning content
             return ByteArrayContentFactory(
                 EntityUtils.toByteArray(response.entity)

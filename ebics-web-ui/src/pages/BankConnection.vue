@@ -88,6 +88,21 @@
             </template>
           </q-field>
 
+          <q-item tag="label" v-ripple :disable="userStatusInitializing">
+            <q-item-section avatar>
+              <q-checkbox :disable="userStatusInitializing"
+                v-model="user.useCertificate"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Use client certificates for EBICS initialization</q-item-label>
+              <q-item-label caption
+                >If enabled X509 Certificates will be used for initialization.
+                If disabled, clasic EBICS keys will be used for initialization.</q-item-label
+              >
+            </q-item-section>
+          </q-item>
+
           <q-item tag="label" v-ripple>
             <q-item-section avatar>
               <q-checkbox v-model="user.guestAccess" />
@@ -100,39 +115,6 @@
               >
             </q-item-section>
           </q-item>
-
-          <!-- q-input
-            disable
-            filled
-            v-if="id !== undefined"
-            v-model="user.dn"
-            label="User DN"
-            hint="Certificate user domain name"
-            lazy-rules
-            :rules="[
-              (val) =>
-                (val && val.length > 1) ||
-                'Please enter valid DN at least 2 characters',
-            ]"
-          />
-
-          <q-item v-if="id !== undefined" tag="label" v-ripple>
-            <q-item-section avatar>
-              <q-checkbox
-                disable
-                v-model="user.usePassword"
-              />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label
-                >Private keys password protection (2FA)</q-item-label
-              >
-              <q-item-label caption
-                >Protect your private keys with additional password, must be
-                entered once for session in order to access the bank connection
-              </q-item-label>
-            </q-item-section>
-          </q-item -->
 
           <div>
             <q-btn
