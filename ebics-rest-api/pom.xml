@@ -97,8 +97,17 @@
 				<directory>src/main/resources</directory>
 				<includes>
 					<include>application.yml</include>
-					<include>*.xml</include>
 				</includes>
+			</resource>
+			<resource>
+				<filtering>false</filtering>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+				<excludes>
+					<exclude>application.yml</exclude>
+				</excludes>
 			</resource>
 		</resources>
 		<plugins>
