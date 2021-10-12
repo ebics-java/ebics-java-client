@@ -83,13 +83,13 @@ public interface EbicsUser {
 
   /**
    * Sets the authentication certificate.
-   * @param a005certificate the authentication certificate.
+   * @param x002certificate the authentication certificate.
    */
   public void setX002Certificate(X509Certificate x002certificate);
 
   /**
    * Sets the encryption certificate.
-   * @param a005certificate the encryption certificate.
+   * @param e002certificate the encryption certificate.
    */
   public void setE002Certificate(X509Certificate e002certificate);
 
@@ -101,13 +101,13 @@ public interface EbicsUser {
 
   /**
    * Sets the authentication private key
-   * @param a005Key the authentication private key
+   * @param x002Key the authentication private key
    */
   public void setX002PrivateKey(PrivateKey x002Key);
 
   /**
    * Sets the encryption private key
-   * @param a005Key the encryption private key
+   * @param e002Key the encryption private key
    */
   public void setE002PrivateKey(PrivateKey e002Key);
 

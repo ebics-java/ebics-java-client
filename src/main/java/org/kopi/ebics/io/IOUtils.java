@@ -132,7 +132,7 @@ public class IOUtils {
   /**
    * Returns the content of a <code>ContentFactory</code> as a byte array
    * @param content
-   * @return
+   * @return content of a <code>ContentFactory</code> as a <code>byte[]</code>
    * @throws EbicsException
    */
     public static byte[] getFactoryContent(ContentFactory content) throws EbicsException {

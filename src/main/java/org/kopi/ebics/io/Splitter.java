@@ -113,7 +113,7 @@ public class Splitter {
    * a given segment number.
    * 
    * @param segmentNumber the segment number
-   * @return
+   * @return content of a data segment
    */
   public ContentFactory getContent(int segmentNumber) {
     byte[]		segment;

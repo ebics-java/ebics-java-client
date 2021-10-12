@@ -97,7 +97,7 @@ public class CertificateManager {
 
   /**
    * Creates the authentication certificate.
-   * @param the expiration date of a the certificate.
+   * @param end the expiration date of a the certificate.
    * @throws GeneralSecurityException
    * @throws IOException
    */

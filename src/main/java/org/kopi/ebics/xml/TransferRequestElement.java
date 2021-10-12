@@ -46,7 +46,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
    * @param type the order type
    * @param segmentNumber the segment number to be sent
    * @param lastSegment is it the last segment?
-   * @param transactionID the transaction ID
+   * @param transactionId the transaction ID
    */
   public TransferRequestElement(EbicsSession session,
                                 String name,

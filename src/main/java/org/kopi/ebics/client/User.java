@@ -32,7 +32,6 @@ import java.security.interfaces.RSAPublicKey;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.crypto.dsig.SignedInfo;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.kopi.ebics.certificate.CertificateManager;
@@ -42,6 +41,7 @@ import org.kopi.ebics.interfaces.EbicsUser;
 import org.kopi.ebics.interfaces.PasswordCallback;
 import org.kopi.ebics.interfaces.Savable;
 import org.kopi.ebics.utils.Utils;
+import org.kopi.ebics.xml.SignedInfo;
 import org.kopi.ebics.xml.UserSignature;
 
 /**
@@ -283,7 +283,7 @@ public class User implements EbicsUser, Savable {
    * @param email the user email
    * @param country the user country
    * @param organization the user organization
-   * @return
+   * @return Distinguished Names
    */
   private String makeDN(String name,
                         String email,
