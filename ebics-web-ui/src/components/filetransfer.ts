@@ -1,4 +1,4 @@
-import { User, UploadRequest, UploadResponse, DownloadRequest, UserPassword, BTFType, OrderType } from 'components/models';
+import { BankConnection, UploadRequest, UploadResponse, DownloadRequest, UserPassword, BTFType, OrderType } from 'components/models';
 import { api } from 'boot/axios';
 import usePasswordAPI from './password-api';
 import { AxiosResponse } from 'axios';
@@ -14,13 +14,13 @@ export default function useFileTransferAPI() {
    * @returns
    */
   const ebicsUploadRequest = async (
-    user: User,
+    bankConnection: BankConnection,
     uploadRequest: UploadRequest,
     uploadFile: Blob,
-    ebicsVersion: string = user.ebicsVersion,
+    ebicsVersion: string = bankConnection.ebicsVersion,
   ): Promise<UploadResponse | undefined> => {
     try {
-      uploadRequest.password = await promptCertPassword(user, false);
+      uploadRequest.password = await promptCertPassword(bankConnection, false);
       console.log(JSON.stringify(uploadRequest));
       const formData = new FormData();
       formData.append(
@@ -29,17 +29,17 @@ export default function useFileTransferAPI() {
       );
       formData.append('uploadFile', uploadFile);
       const response = await api.post<UploadRequest, AxiosResponse<UploadResponse>>(
-        `bankconnections/${user.id}/${ebicsVersion}/upload`,
+        `bankconnections/${bankConnection.id}/${ebicsVersion}/upload`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
       console.log('Upload response: ' + JSON.stringify(response))
       pwdApiOkHandler(
-        `File uploaded successfully for bank connection: ${user.name}, order number: ${response.data.orderNumber}`
+        `File uploaded successfully for bank connection: ${bankConnection.name}, order number: ${response.data.orderNumber}`
       );
       return response.data;
     } catch (error) {
-      pwdApiErrorHandler(user, 'File upload failed: ', error);
+      pwdApiErrorHandler(bankConnection, 'File upload failed: ', error);
     }
   };
 
@@ -50,48 +50,50 @@ export default function useFileTransferAPI() {
    * @returns
    */
      const ebicsDownloadRequest = async (
-      user: User,
+      bankConnection: BankConnection,
       downloadRequest: DownloadRequest,
-      ebicsVersion: string = user.ebicsVersion,
+      ebicsVersion: string = bankConnection.ebicsVersion,
     ): Promise<Blob | undefined> => {
       try {
-        downloadRequest.password = await promptCertPassword(user, false);
+        downloadRequest.password = await promptCertPassword(bankConnection, false);
         console.log(JSON.stringify(downloadRequest));
         const response = await api.post<DownloadRequest, AxiosResponse<string>>(
-          `bankconnections/${user.id}/${ebicsVersion}/download`,
+          `bankconnections/${bankConnection.id}/${ebicsVersion}/download`,
           downloadRequest, {responseType: 'arraybuffer'}
         );
         pwdApiOkHandler(
-          `File downloaded successfully for bank connection: ${user.name}`
+          `File downloaded successfully for bank connection: ${bankConnection.name}`
         );
         return new Blob([response.data]);
       } catch (error) {
-        pwdApiErrorHandler(user, 'File download failed: ', error);
+        pwdApiErrorHandler(bankConnection, 'File download failed: ', error);
       }
     };
 
     /**
      * Executest EBICS HTD request in order to get avaialable order types  
-     * @param user bank connection for this request
+     * @param bankConnection bank connection for this request
      * @param ebicsVersion ebics version used, if other that from bank connection default
-     * @returns
+     * @returns available order types, in case of error emtpty list
      */
     const ebicsOrderTypes = async (
-      user: User,
-      ebicsVersion: string = user.ebicsVersion,
+      bankConnection: BankConnection,
+      ebicsVersion: string = bankConnection.ebicsVersion,
     ): Promise<BTFType[] | OrderType[]> => {
       try {
-        const password = await promptCertPassword(user, false);
+        const password = await promptCertPassword(bankConnection, false);
         const response = await api.post<UserPassword, AxiosResponse<BTFType[]>>(
-          `bankconnections/${user.id}/${ebicsVersion}/orderTypes`,
+          `bankconnections/${bankConnection.id}/${ebicsVersion}/orderTypes`,
           {password: password},
         );
-        pwdApiOkHandler(
-          `Order types downloaded successfully for bank connection: ${user.name}`
+        console.debug(
+          `Order types ${ebicsVersion} loaded for bank connection ${
+            bankConnection.name
+          }, types: ${JSON.stringify(response.data)}`
         );
         return response.data;
       } catch (error) {
-        pwdApiErrorHandler(user, `Order types refresh for bank connection ${user.name} and ${ebicsVersion} failed: `, error);
+        pwdApiErrorHandler(bankConnection, `Order types refresh for bank connection ${bankConnection.name} and ${ebicsVersion} failed: `, error);
         return [];
       }
     };

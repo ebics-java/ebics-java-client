@@ -1,7 +1,9 @@
 <template>
   <q-page class="justify-evenly">
     <div class="q-pa-md" style="max-width: 500px">
-      <h5>User initialization: {{ user.name }}</h5>
+      <h5>Bank connection initialization: {{ bankConnection.name }}</h5>
+      <div class="text-subtitle1">Name: {{bankConnection.name}}</div>
+      <div class="text-subtitle1">Partner: {{bankConnection.partner.partnerId}} | User: {{bankConnection.userId}}</div>
       <q-stepper
         v-model="actualWizardStep"
         color="primary"
@@ -20,7 +22,7 @@
           <div class="q-pa-sm">
             <q-input
               filled
-              v-model="user.dn"
+              v-model="bankConnection.dn"
               label="User DN"
               hint="Certificate user domain name"
               lazy-rules
@@ -31,7 +33,7 @@
               ]"
             />
             <q-checkbox
-              v-model="user.usePassword"
+              v-model="bankConnection.usePassword"
               label="Protect your private keys with password (2FA)"
             />
           </div>
@@ -71,7 +73,7 @@
         >
           In order to activate the this EBICS user you have to provide bellow
           generated hash keys to your bank. The bank will check provided hash
-          keys and activate the EBICS user.
+          keys and activate the EBICS bankConnection.
           <q-list v-if="letters" bordered padding class="rounded-borders">
             <q-item v-ripple>
               <q-item-section>
@@ -138,11 +140,7 @@
             icon="print"
           ></q-btn>
           <q-stepper-navigation>
-            <q-btn
-              @click="nextStep()"
-              color="primary"
-              label="Continue"
-            ></q-btn>
+            <q-btn @click="nextStep()" color="primary" label="Continue"></q-btn>
           </q-stepper-navigation>
         </q-step>
 
@@ -169,15 +167,16 @@
           :done="isStepDone(UserIniWizzStep.VerifyBankKeys)"
         >
           Verify bellow downloaded bank keys with the one provided by your bank
-          during onboarding. In case they match, is your connection ready to use.
-          If they keys DON'T match this connection can't be trussted - identity of the bank is not valid. 
-          Download the bank keys again, or reset connection and initialize again.
+          during onboarding. In case they match, is your connection ready to
+          use. If they keys DON'T match this connection can't be trussted -
+          identity of the bank is not valid. Download the bank keys again, or
+          reset connection and initialize again.
           <q-list bordered padding class="rounded-borders">
             <q-item v-ripple>
               <q-item-section>
                 <q-item-label lines="1">Authentication (X002)</q-item-label>
                 <q-item-label caption>{{
-                  user.partner.bank.keyStore.x002DigestHex
+                  bankConnection.partner.bank.keyStore.x002DigestHex
                 }}</q-item-label>
               </q-item-section>
               <q-item-section side>
@@ -187,7 +186,9 @@
                   flat
                   dense
                   icon="content_copy"
-                  @click="copyToClipboard(user.partner.bank.keyStore.x002DigestHex)"
+                  @click="
+                    copyToClipboard(bankConnection.partner.bank.keyStore.x002DigestHex)
+                  "
                 ></q-btn>
               </q-item-section>
             </q-item>
@@ -195,7 +196,7 @@
               <q-item-section>
                 <q-item-label lines="1">Encryption (E002)</q-item-label>
                 <q-item-label caption>{{
-                  user.partner.bank.keyStore.e002DigestHex
+                  bankConnection.partner.bank.keyStore.e002DigestHex
                 }}</q-item-label>
               </q-item-section>
               <q-item-section side>
@@ -205,7 +206,9 @@
                   flat
                   dense
                   icon="content_copy"
-                  @click="copyToClipboard(user.partner.bank.keyStore.e002DigestHex)"
+                  @click="
+                    copyToClipboard(bankConnection.partner.bank.keyStore.e002DigestHex)
+                  "
                 ></q-btn>
               </q-item-section>
             </q-item>
@@ -247,11 +250,11 @@ import {
   UserLettersResponse,
 } from 'components/models';
 import { QStepper } from 'quasar';
-import useUserDataAPI from 'components/bankconnection';
-import useUserInitAPI from 'components/bankconnection-init';
+import useBankConnectionAPI from 'components/bankconnection';
+import useBankConnectionInitializationAPI from 'components/bankconnection-init';
 import usePasswordAPI from 'components/password-api';
 import useDialogs from 'components/dialogs';
-import { copyToClipboard } from 'quasar'
+import { copyToClipboard } from 'quasar';
 
 export default defineComponent({
   name: 'UserInitalizationWizard',
@@ -262,7 +265,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { user, refreshUserData } = useUserDataAPI(props.id);
+    const { bankConnection, refreshUserData } = useBankConnectionAPI(props.id);
     const { confirmDialog } = useDialogs();
     const { promptCertPassword, resetCertPassword } = usePasswordAPI();
 
@@ -273,9 +276,9 @@ export default defineComponent({
       ebicsAdminTypeRequest,
       resetUserStatusRequest,
       getUserLetters,
-    } = useUserInitAPI(user);
+    } = useBankConnectionInitializationAPI(bankConnection);
 
-    const downloadBankKeys = async():Promise<void> => {
+    const downloadBankKeys = async (): Promise<void> => {
       try {
         //Download bank keys using HPB order type
         await ebicsAdminTypeRequest(AdminOrderType.HPB);
@@ -286,17 +289,17 @@ export default defineComponent({
       }
     };
 
-    const resetUserStatus = async():Promise<void> => {
+    const resetUserStatus = async (): Promise<void> => {
       try {
         const del = await confirmDialog(
-            'Confirm reset',
-            'Do you really want to reset bank connection? (it must be then newly initialized in order to upload/download files)'
-          );
+          'Confirm reset',
+          'Do you really want to reset bank connection? (it must be then newly initialized in order to upload/download files)'
+        );
         if (del) {
           //Get password for user certificates
           await resetUserStatusRequest();
           //Reset the password for certificates
-          resetCertPassword(user.value);
+          resetCertPassword(bankConnection.value);
           //Refresshing user status on success
           await refreshUserData();
         }
@@ -304,11 +307,11 @@ export default defineComponent({
         console.log(error);
       }
     };
-    
+
     /*
       Create EBICS User Keys
     */
-    const createUserKeys = async(): Promise<void> => {
+    const createUserKeys = async (): Promise<void> => {
       try {
         //Upload user keys (INI and/or HIA) depending on user status
         await createUserKeysRequest();
@@ -320,10 +323,10 @@ export default defineComponent({
     };
 
     const letters = ref<UserLettersResponse | undefined>(undefined);
-    const refreshUserLetters = async():Promise<void> => {
+    const refreshUserLetters = async (): Promise<void> => {
       letters.value = await getUserLetters();
     };
-    const uploadUserKeys = async(): Promise<void> => {
+    const uploadUserKeys = async (): Promise<void> => {
       try {
         //Create/Refresh user letters
         await refreshUserLetters();
@@ -338,14 +341,14 @@ export default defineComponent({
       }
     };
 
-    const wizz = ref<QStepper | null>(null)
+    const wizz = ref<QStepper | null>(null);
     //Next step of the initialization wizard
-    const nextStep = ():void => {
+    const nextStep = (): void => {
       wizz.value?.next();
     };
 
     return {
-      user,
+      bankConnection,
       refreshUserData,
       actualWizardStep,
       isStepDone,

@@ -29,6 +29,7 @@ const userSettings = ref<UserSettings>({
       randomIds: false,
     },
   },
+  displayAdminTypes: false,
 });
 
 /**

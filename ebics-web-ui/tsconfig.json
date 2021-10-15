@@ -1,6 +1,13 @@
 {
   "extends": "@quasar/app/tsconfig-preset",
   "compilerOptions": {
-    "baseUrl": "."
+    "baseUrl": ".",
+    "target": "esnext",
+    "module": "esnext",
+    "lib": [
+      "dom", //FormData
+      "ES2020.Promise", //Promise.allSettled
+      "webworker", 
+    ]
   }
 }

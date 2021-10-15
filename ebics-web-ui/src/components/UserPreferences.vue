@@ -121,6 +121,22 @@
           v-model="userSettings.adjustmentOptions.swift.randomIds"
         />
       </div>
+      <q-separator
+        spaced
+        v-if="
+          displaySection('ContentOptions.Swift') &&
+          displaySection('Download')
+        "
+      />
+      <div v-if="displaySection('Download')">
+        <q-item-label header>Download Settings</q-item-label>
+        <boolean-option
+          :disable="!userSettings.testerSettings"
+          label="Display administrative order types"
+          hint="Admin order types like HTD, HAA,.. will be included into list of downloadable order types"
+          v-model="userSettings.displayAdminTypes"
+        />
+      </div>
     </q-list>
     <div class="q-ma-md">
       <q-btn

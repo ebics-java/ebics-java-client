@@ -1,5 +1,5 @@
 import { ref, onMounted, computed } from 'vue';
-import { User } from 'components/models';
+import { BankConnection, BankConnectionAccess } from 'components/models';
 import { api } from 'boot/axios';
 import useBaseAPI from './base-api';
 import { useQuasar } from 'quasar';
@@ -11,22 +11,22 @@ import { useQuasar } from 'quasar';
  *  loadBankConnections function to trigger refreshing of bank connections
  *  deleteBankConnection function to delete bank connection
  */
-export default function useBankConnectionsAPI(usePermission = false) {
+export default function useBankConnectionsAPI(accessRight: BankConnectionAccess = BankConnectionAccess.READ) {
   const { apiErrorHandler } = useBaseAPI();
   const q = useQuasar();
 
-  const bankConnections = ref<User[]>();
+  const bankConnections = ref<BankConnection[]>();
 
   const loadBankConnections = async (): Promise<void> => {
     try {
-      const response = await api.get<User[]>(`bankconnections?permission=${usePermission ? 'USE' : 'READ'}`);
+      const response = await api.get<BankConnection[]>(`bankconnections?permission=${accessRight}`);
       bankConnections.value = response.data;
     } catch (error) {
       apiErrorHandler('Loading of bank data failed', error);
     }
   };
 
-  const activeBankConnections = computed<User[] | undefined>(() => {
+  const activeBankConnections = computed<BankConnection[] | undefined>(() => {
     return bankConnections.value?.filter((bc) => bc.userStatus == 'READY');
   });
 
@@ -70,7 +70,7 @@ export default function useBankConnectionsAPI(usePermission = false) {
           )
         : true;
       if (canDelete) {
-        await api.delete<User>(`bankconnections/${bcId}`);
+        await api.delete<BankConnection>(`bankconnections/${bcId}`);
         await loadBankConnections();
       }
     } catch (error) {
@@ -81,7 +81,7 @@ export default function useBankConnectionsAPI(usePermission = false) {
   /**
    * Display label of the bankConnection
    */
-  const bankConnectionLabel = (bankConnection: User | undefined): string => {
+  const bankConnectionLabel = (bankConnection: BankConnection | undefined): string => {
     if (
       bankConnection &&
       bankConnection.userId.trim().length > 0 &&

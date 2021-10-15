@@ -239,7 +239,7 @@
 
 <script lang="ts">
 import {
-  User,
+  BankConnection,
   UploadRequest,
   UploadRequestH004,
   UploadRequestH005,
@@ -247,6 +247,7 @@ import {
   BTFType,
   OrderTypeFilter,
   OrderType,
+  BankConnectionAccess,
 } from 'components/models';
 import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
@@ -277,10 +278,10 @@ export default defineComponent({
   },
   setup(props) {
     //Selected bank connection
-    const bankConnection = ref<User>();
+    const bankConnection = ref<BankConnection>();
     const replaceMsgId = ref(true);
     const { activeBankConnections, hasActiveConnections, bankConnectionLabel } =
-      useBankConnectionsAPI(true);
+      useBankConnectionsAPI(BankConnectionAccess.USE);
     const { ebicsUploadRequest } = useFileTransferAPI();
     const { applySmartAdjustments, detectFileFormat } = useTextUtils();
     const { userSettings } = useUserSettings();

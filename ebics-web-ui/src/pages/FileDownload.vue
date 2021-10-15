@@ -137,7 +137,7 @@
 
 <script lang="ts">
 import {
-  User,
+  BankConnection,
   DownloadRequest,
   DownloadRequestH004,
   DownloadRequestH005,
@@ -145,9 +145,10 @@ import {
   BTFType,
   OrderTypeFilter,
   OrderType,
+  BankConnectionAccess,
 } from 'components/models';
 import { defineComponent } from 'vue';
-import { ref } from 'vue';
+import { ref, toRef } from 'vue';
 import { exportFile } from 'quasar';
 
 //Composition APIs
@@ -161,15 +162,15 @@ export default defineComponent({
   name: 'FileDownload',
   setup() {
     //Selected bank connection
-    const bankConnection = ref<User>();
+    const bankConnection = ref<BankConnection>();
     const replaceMsgId = ref(true);
     const { activeBankConnections, hasActiveConnections, bankConnectionLabel } =
-      useBankConnectionsAPI(true);
+      useBankConnectionsAPI(BankConnectionAccess.USE);
     const { ebicsDownloadRequest } = useFileTransferAPI();
     const { applySmartAdjustments, detectFileFormat, getFileExtension, currentDate } = useTextUtils();
     const { userSettings } = useUserSettings();
     const { btfTypes, orderTypes, orderTypeLabel, btfTypeLabel } =
-      useOrderTypesAPI(bankConnection, ref(OrderTypeFilter.DownloadOnly));
+      useOrderTypesAPI(bankConnection, ref(OrderTypeFilter.DownloadOnly), toRef(userSettings.value, 'displayAdminTypes') );
 
     const historicDownload = ref(false);
     const historicDateRange = ref({from: currentDate(), to: currentDate()});
@@ -180,11 +181,13 @@ export default defineComponent({
     const getDownloadRequest = (): DownloadRequest => {
       if (bankConnection.value?.ebicsVersion == 'H005') {
         return {
+          adminOrderType: btfType.value?.adminOrderType,
           orderService: btfType.value?.service,
         } as DownloadRequestH005;
       } else {
         //H004, H003
         return {
+          adminOrderType: orderType.value?.adminOrderType,
           orderType: orderType.value?.orderType,
           params: new Map(),
         } as DownloadRequestH004;

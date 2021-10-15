@@ -9,6 +9,7 @@
 /* eslint-env node */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { configure } = require('quasar/wrappers');
+const { VERSION } = require('vue-i18n');
 
 module.exports = configure(function (ctx) {
   return {

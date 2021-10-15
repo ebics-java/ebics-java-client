@@ -19,6 +19,12 @@ export enum EbicsVersion {
   H006 = 'H006',
 }
 
+export enum BankConnectionAccess {
+  READ = 'READ',
+  WRITE = 'WRITE',
+  USE = 'USE',
+}
+
 export interface EbicsVersionSettings {
   version: EbicsVersion;
   isSupportedByBank: boolean;
@@ -46,7 +52,7 @@ export interface EbicsApiError {
   description: string;
 }
 
-export interface User {
+export interface BankConnection {
   id: number;
   ebicsVersion: EbicsVersion;
   userId: string;
@@ -91,6 +97,7 @@ export interface BtfMessageInt {
   messageNameFormat?: string;
 }
 
+/*
 export class Btf implements BtfInt {
   constructor(
     serviceName: string,
@@ -140,7 +147,7 @@ export class BtfMessage implements BtfMessageInt {
   label(): string {
     return `${this.messageName}.${s(this.messageNameVariant)}.${s(this.messageNameVersion)}.${s(this.messageNameFormat)}`;
   }
-}
+}*/
 
 export enum AdminOrderType {
   INI = 'INI',
@@ -178,7 +185,7 @@ export interface UploadRequestH004 extends UploadRequest {
 
 export interface UploadRequestH005 extends UploadRequest {
   password: string;
-  orderService: Btf;
+  orderService: BtfInt;
   signatureFlag: boolean;
   edsFlag: boolean;
   fileName: string;
@@ -205,7 +212,7 @@ export interface DownloadRequestH004 extends DownloadRequest {
 export interface DownloadRequestH005 extends DownloadRequest {
   password: string;
   adminOrderType: string;
-  orderService?: Btf;
+  orderService?: BtfInt;
   params: Map<string, string>;
   startDate?: Date;
   endDate?: Date;
@@ -275,6 +282,7 @@ export interface UserSettings {
     pain00x: AutoAdjustmentsPain00x;
     swift: AutoAdjustmentsSwift;
   },
+  displayAdminTypes: boolean;
 }
 
 export enum AuthorisationLevel {
@@ -307,7 +315,7 @@ export interface OrderType {
 /**
  * H003, H004, H005 order type descriptions
  */
-export interface OrderTypeList {
+export interface OrderTypesCache {
   btfTypes: BTFType[];
   orderTypes: OrderType[];
 }

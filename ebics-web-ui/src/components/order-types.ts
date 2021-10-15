@@ -1,151 +1,250 @@
 import { ref, watch, Ref } from 'vue';
-import { User, BTFType, OrderTypeFilter, OrderType, OrderTypeList } from 'components/models';
+import {
+  BankConnection,
+  BTFType,
+  OrderTypeFilter,
+  OrderType,
+  OrderTypesCache,
+  TransferType,
+  BankConnectionAccess,
+  EbicsVersion,
+} from 'components/models';
 import useBankConnectionsAPI from './bankconnections';
 import useFileTransferAPI from './filetransfer';
+import { CustomMap } from './utils';
+import usePasswordAPI from './password-api';
 
-//Global cache of all active BTF types for all active bank connections..
-const activeTypes: Ref<Map<number,OrderTypeList>> = ref<Map<number,OrderTypeList>>(new Map());
+//Global internal cache of all BTF's and OrderTypes for all active bank connections..
+const orderTypeCache: CustomMap<number, OrderTypesCache> = new CustomMap<
+  number,
+  OrderTypesCache
+>();
 
-export default function useOrderTypesAPI(selectedBC:Ref<User | undefined>, filterType:Ref<OrderTypeFilter>) {
-  //BTF types for given selectedBC
-  const btfTypes: Ref<BTFType[]> = ref([]);
-  const orderTypes: Ref<OrderType[]> = ref([]);
+export default function useOrderTypesAPI(
+  selectedBankConnection: Ref<BankConnection | undefined>,
+  filterType: Ref<OrderTypeFilter>,
+  displayAdminTypes: Ref<boolean> = ref(false)
+) {
+  //BTF   types of selectedBankConnection filtered by filterType
+  const outputBtfTypes: Ref<BTFType[]> = ref([]);
+  //Order types of selectedBankConnection filtered by filterType
+  const outputOrderTypes: Ref<OrderType[]> = ref([]);
 
   const { ebicsOrderTypes } = useFileTransferAPI();
-  const { activeBankConnections } = useBankConnectionsAPI();
+  const { activeBankConnections } = useBankConnectionsAPI(
+    BankConnectionAccess.USE
+  );
+  const { promptCertPassword } = usePasswordAPI();
 
   /**
-   * Update global BTF types cache
+   * If the ordertype list is empty or refresh is forced,
+   * Then download available ordertypes from EBICS server and store them to the cache
+   * @param bankConnection
+   * @param orderTypesCache used to store output
+   * @param forceCashRefresh force refresh even if there is already cached result
    */
-  const updateBtfTypesForActiveConnections = async():Promise<void> => {
-    if (activeBankConnections.value) {
-      for (const bankConnection of activeBankConnections.value) {
-        let orderTypeList:OrderTypeList | undefined = activeTypes.value.get(bankConnection.id);
-        //If not fetched yet, lets fetch order types for all version into cache
-        if (!orderTypeList) {
-          orderTypeList = {btfTypes: [], orderTypes: []} as OrderTypeList
-          activeTypes.value.set(bankConnection.id, orderTypeList)
-        }
-          
-        if (orderTypeList && !orderTypeList.btfTypes.length) { 
-          try {
-            orderTypeList.btfTypes = await ebicsOrderTypes(bankConnection, 'H005');
-            console.log(`BtfTypes loaded for ${bankConnection.name}, types: ${JSON.stringify(orderTypeList.btfTypes)}`)
-            refreshSelectedOrderTypes(bankConnection);
-          } catch (error) {}
-        }
+  const updateOrderTypesH004CacheForBankConnection = async (
+    bankConnection: BankConnection,
+    orderTypesCache: OrderTypesCache,
+    forceCashRefresh = false
+  ) => {
+    if (orderTypesCache.orderTypes.length == 0 || forceCashRefresh) {
+      const orderTypesRefreshPromise = ebicsOrderTypes(
+        bankConnection,
+        EbicsVersion.H004
+      ) as Promise<OrderType[]>;
 
-        if (orderTypeList && !orderTypeList.orderTypes.length) { 
-          try {
-            orderTypeList.orderTypes = await ebicsOrderTypes(bankConnection, 'H004') as OrderType[];
-            console.log(`Order types loaded for ${bankConnection.name}, types: ${JSON.stringify(orderTypeList.orderTypes)}`)
-            refreshSelectedOrderTypes(bankConnection);
-          } catch (error) {}
-        }
-      }
-    }
-  };
+      orderTypesCache.orderTypes = await orderTypesRefreshPromise;
 
-  const refreshSelectedOrderTypes = (bankConnection: User): void => {
-    //Trigger refresh of filtered list after retreiving server response
-    if (selectedBC.value?.id == bankConnection.id) { 
-      selectUserOrderTypes();
+      if (bankConnection.id == selectedBankConnection.value?.id)
+        refreshOutputOrderTypes(bankConnection);
     }
   };
 
   /**
-   * Choose proper btfTypes base on user selected bank connection
-   * Filter the result filterType
+   * If the ordertype list is empty or refresh is forced,
+   * Then download available ordertypes from EBICS server
+   * @param bankConnection
+   * @param orderTypeList used to store output
+   * @param forceCashRefresh force refresh even if there is already cached result
    */
-  const selectUserOrderTypes = () => {
-    if (selectedBC.value) {
-      const selectedTypes = activeTypes.value.get(selectedBC.value.id);
-      if (selectedTypes) {
-        console.log('Refreshing order type list for selected BC: ' + selectedBC.value.name)
-        if (filterType.value == OrderTypeFilter.All) {
-          btfTypes.value = selectedTypes.btfTypes;
-          orderTypes.value = selectedTypes.orderTypes;
-        } else if (filterType.value == OrderTypeFilter.UploadOnly) {
-          btfTypes.value = selectedTypes.btfTypes.filter(btf => btf.adminOrderType == 'BTU')
-          orderTypes.value = selectedTypes.orderTypes.filter(ot => ot.adminOrderType == 'UPL' || ot.adminOrderType == 'FUL');
-        } else if (filterType.value == OrderTypeFilter.DownloadOnly) {
-          btfTypes.value = selectedTypes.btfTypes.filter(btf => btf.adminOrderType == 'BTD' || btf.adminOrderType == 'HAC')
-          orderTypes.value = selectedTypes.orderTypes.filter(ot => ot.adminOrderType == 'DNL' || ot.adminOrderType == 'FDL' || ot.adminOrderType == 'HAC');
-        }
-      } else {
-        console.error('No BTF types / OrderTypes loaded for given bank connection: ' + selectedBC.value.id.toString())
-      }
+  const updateOrderTypesH005CacheForBankConnection = async (
+    bankConnection: BankConnection,
+    orderTypeList: OrderTypesCache,
+    forceCashRefresh = false
+  ) => {
+    if (orderTypeList.btfTypes.length == 0 || forceCashRefresh) {
+      const orderTypesRefreshPromise = ebicsOrderTypes(
+        bankConnection,
+        EbicsVersion.H005
+      ) as Promise<BTFType[]>;
+
+      orderTypeList.btfTypes = await orderTypesRefreshPromise;
+
+      if (bankConnection.id == selectedBankConnection.value?.id)
+        refreshOutputBtfTypes(bankConnection);
     }
-  }
-  
-  function s(input: string | undefined): string {
+  };
+
+  /**
+   * Refresh ordertypes & BTF types cache for given bank connection
+   * @param bankConnection
+   * @param forceCashRefresh force refreshing even if the cache already have the order types.
+   */
+  const updateOrderTypesCacheForBankConnection = async (
+    bankConnection: BankConnection,
+    forceCashRefresh = false
+  ) => {
+
+    //Create emtpy order type cache for this bank connection
+    const orderTypesCache: OrderTypesCache = orderTypeCache.getOrAdd(
+      bankConnection.id,
+      { btfTypes: [], orderTypes: [] }
+    );
+
+    //For pasword protected connection ask first password 
+    //It prevents parallel poping of UI password dialog
+    await promptCertPassword(bankConnection, false);
+
+    //Now execute all update promisses 
+    //the password UI would not pop-up any more because of previous promptCertPassword
+    await Promise.allSettled([
+      updateOrderTypesH004CacheForBankConnection(
+        bankConnection,
+        orderTypesCache,
+        forceCashRefresh
+      ),
+      updateOrderTypesH005CacheForBankConnection(
+        bankConnection,
+        orderTypesCache,
+        forceCashRefresh
+      ),
+    ]);
+  };
+
+  const updateOrderTypesCacheForAllActiveConnections =
+    async (): Promise<void> => {
+      if (activeBankConnections.value) {
+        //Collect all update ordertype promisses
+        const updateOrderTypesPromisses = activeBankConnections.value.map(
+          (bankConnection) =>
+            updateOrderTypesCacheForBankConnection(bankConnection)
+        );
+
+        //Execute those promisses parallel
+        await Promise.allSettled(updateOrderTypesPromisses);
+      }
+    };
+
+  const refreshOutputOrdertypesForSelectedBankConnection = () => {
+    if (selectedBankConnection.value) {
+      refreshOutputBtfTypes(selectedBankConnection.value);
+      refreshOutputOrderTypes(selectedBankConnection.value);
+    }
+  };
+
+  const downloadableAdminOrderTypes = ['HAC', 'HAA', 'HPD', 'HKD', 'HTD'];
+
+  const refreshOutputBtfTypes = (bankConnection: BankConnection) => {
+    const selectedTypes = orderTypeCache.get(bankConnection.id);
+    if (selectedTypes) {
+      if (filterType.value == OrderTypeFilter.All) {
+        outputBtfTypes.value = selectedTypes.btfTypes;
+      } else if (filterType.value == OrderTypeFilter.UploadOnly) {
+        outputBtfTypes.value = selectedTypes.btfTypes.filter(
+          (btf) => btf.adminOrderType == 'BTU'
+        );
+      } else if (filterType.value == OrderTypeFilter.DownloadOnly) {
+        outputBtfTypes.value = selectedTypes.btfTypes.filter(
+          (btf) =>
+            btf.adminOrderType == 'BTD' ||
+            (displayAdminTypes.value &&
+              downloadableAdminOrderTypes.includes(btf.adminOrderType))
+        );
+      }
+    } else {
+      console.warn(
+        'No BTF types cached for given bank connection: ' +
+          bankConnection.id.toString()
+      );
+    }
+  };
+
+  const refreshOutputOrderTypes = (bankConnection: BankConnection) => {
+    const selectedTypes = orderTypeCache.get(bankConnection.id);
+    if (selectedTypes) {
+      if (filterType.value == OrderTypeFilter.All) {
+        outputOrderTypes.value = selectedTypes.orderTypes;
+      } else if (filterType.value == OrderTypeFilter.UploadOnly) {
+        outputOrderTypes.value = selectedTypes.orderTypes.filter(
+          (ot) => ot.adminOrderType == 'UPL' || ot.adminOrderType == 'FUL'
+        );
+      } else if (filterType.value == OrderTypeFilter.DownloadOnly) {
+        outputOrderTypes.value = selectedTypes.orderTypes.filter(
+          (ot) =>
+            ot.adminOrderType == 'DNL' ||
+            ot.adminOrderType == 'FDL' ||
+            (displayAdminTypes.value &&
+              downloadableAdminOrderTypes.includes(ot.adminOrderType)) ||
+            ot.transferType == TransferType.Download
+        );
+      }
+    } else {
+      console.warn(
+        'No OrderTypes cached for given bank connection: ' +
+          bankConnection.id.toString()
+      );
+    }
+  };
+
+  /**
+   * @returns @param input if its not empty, otherwise returns @param delimiter
+   */
+  function s(input: string | undefined, delimiter = '-'): string {
     if (input) return input;
-    else return '-';
+    else return delimiter;
   }
 
-  const orderTypeLabel = (ot: OrderType | undefined): string => {
-    if (ot) {
-      return ot.orderType
-    } else 
-      return '';
+  /**
+   * @returns string representation of @param orderType
+   */
+  const orderTypeLabel = (orderType: OrderType | undefined): string => {
+    if (orderType) {
+      return orderType.orderType;
+    } else return '';
   };
 
+  /**
+   * @returns string representation of @param btf
+   */
   const btfTypeLabel = (btf: BTFType | undefined): string => {
     if (btf) {
       const bts = btf.service;
       const btm = bts?.message;
-      return `${s(bts?.serviceName)}|${s(bts?.serviceOption)}|${s(
-        bts?.scope
-      )}|${s(bts?.containerType)}|${s(btm?.messageName)}|${s(
-        btm?.messageNameVariant
-      )}|${s(btm?.messageNameVersion)}|${s(btm?.messageNameFormat)}`;
+      if (bts && btm) {
+        return `${s(bts.serviceName)}|${s(bts.serviceOption)}|${s(
+          bts.scope
+        )}|${s(bts.containerType)}|${s(btm.messageName)}|${s(
+          btm.messageNameVariant
+        )}|${s(btm.messageNameVersion)}|${s(btm.messageNameFormat)}`;
+      } else {
+        return btf.adminOrderType;
+      }
     } else return '';
   };
-/** 
-  function extensionFromDescription(description: string | undefined): string | undefined {
-    if (description?.includes('ZIP') || description?.includes('zip'))
-      return 'zip';
-    else if (description?.includes('XML') || description?.includes('xml'))
-      return 'xml';
-    else if (description?.includes('csv') || description?.includes('csv'))
-      return 'csv';  
-    return undefined;
-  }
 
-  
-  const getDownloadFileNameFromOrderType = (ot: OrderType):string => {
-    return `${ot.adminOrderType}`
-  }
-
-  const getDownloadFileExtensionFromOrderType = (ot: OrderType):string | undefined => {
-    return extensionFromDescription(ot.description);
-  }
-
-  const getDownloadFileNameFromBtfType = (btf: BTFType):string => {
-    if (btf.service) {
-      return `${btf.service.serviceName}-${btf.service.message.messageName}`
-    } else
-      return btf.adminOrderType
-  }
-
-  const getDownloadFileExtensionFromBtfType = (btf: BTFType):string | undefined => {
-    if (btf.service) {
-      switch(btf.service.containerType) {
-        case 'ZIP':
-          return 'zip';
-          case 'XML':
-            return 'xml';
-        default:
-          return extensionFromDescription(btf.description);
-      }
-    } else
-      return undefined
-  } **/
-
-  watch(selectedBC, selectUserOrderTypes);
-  watch(activeBankConnections, updateBtfTypesForActiveConnections);
+  watch(
+    selectedBankConnection,
+    refreshOutputOrdertypesForSelectedBankConnection
+  );
+  watch(activeBankConnections, updateOrderTypesCacheForAllActiveConnections);
 
   return {
-    btfTypes, orderTypes, btfTypeLabel, orderTypeLabel,
+    btfTypes: outputBtfTypes,
+    orderTypes: outputOrderTypes,
+    btfTypeLabel,
+    orderTypeLabel,
+    //Can be used for forced refresh from UI
+    updateOrderTypesCacheForBankConnection,
   };
 }

@@ -2,7 +2,7 @@
   <q-page class="justify-evenly">
     <div class="q-pa-md">
       <h5 v-if="id !== undefined">
-        Edit existing bank connection {{ user.name }}
+        Edit existing bank connection {{ bankConnection.name }}
       </h5>
       <h5 v-else>Add new bank connection</h5>
 
@@ -10,7 +10,7 @@
         <q-form @submit="onSubmit()" @reset="onCancel" class="q-gutter-md">
           <q-input
             filled
-            v-model="user.name"
+            v-model="bankConnection.name"
             label="Bank connection name"
             hint="Name of your bank connection (displayed only)"
             lazy-rules
@@ -24,7 +24,7 @@
           <!-- use-input, fill-input, input-debounce="0" @filter="filterBank" hide-selected  -->
           <q-select
             filled
-            v-model="user.partner.bank"
+            v-model="bankConnection.partner.bank"
             :options="banks"
             :disable="userStatusInitializing"
             option-label="name"
@@ -35,7 +35,7 @@
 
           <q-input
             filled
-            v-model="user.userId"
+            v-model="bankConnection.userId"
             label="EBICS User ID"
             hint="EBICS User ID, example CHT00034"
             :disable="userStatusInitializing"
@@ -49,7 +49,7 @@
 
           <q-input
             filled
-            v-model="user.partner.partnerId"
+            v-model="bankConnection.partner.partnerId"
             label="EBICS Partner ID"
             hint="EBICS Partner ID, example CH100208"
             :disable="userStatusInitializing"
@@ -69,19 +69,19 @@
           >
             <template v-slot:control>
               <!-- q-radio
-                  v-model="user.ebicsVersion"
+                  v-model="bankConnection.ebicsVersion"
                   :disable="userStatusInitializing"
                   val="H003"
                   contextmenu="test"
                   label="EBICS 2.4 (H003)"
                 /-->
               <q-radio
-                v-model="user.ebicsVersion"
+                v-model="bankConnection.ebicsVersion"
                 val="H004"
                 label="EBICS 2.5 (H004)"
               />
               <q-radio
-                v-model="user.ebicsVersion"
+                v-model="bankConnection.ebicsVersion"
                 val="H005"
                 label="EBICS 3.0 (H005)"
               />
@@ -91,7 +91,7 @@
           <q-item tag="label" v-ripple :disable="userStatusInitializing">
             <q-item-section avatar>
               <q-checkbox :disable="userStatusInitializing"
-                v-model="user.useCertificate"
+                v-model="bankConnection.useCertificate"
               />
             </q-item-section>
             <q-item-section>
@@ -105,7 +105,7 @@
 
           <q-item tag="label" v-ripple>
             <q-item-section avatar>
-              <q-checkbox v-model="user.guestAccess" />
+              <q-checkbox v-model="bankConnection.guestAccess" />
             </q-item-section>
             <q-item-section>
               <q-item-label>Share this bank connection</q-item-label>
@@ -141,7 +141,7 @@
 
 <script lang="ts">
 import { defineComponent, computed } from 'vue';
-import useUserDataAPI from 'components/bankconnection';
+import useBankConnectionAPI from 'components/bankconnection';
 import useBanksDataAPI from 'src/components/banks';
 
 export default defineComponent({
@@ -163,14 +163,14 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { user, createOrUpdateUserData } = useUserDataAPI(props.id);
+    const { bankConnection, createOrUpdateUserData } = useBankConnectionAPI(props.id);
     const { banks } = useBanksDataAPI();
     const userStatusInitializing = computed((): boolean => {
       return (
-        user.value.userStatus != 'CREATED' && user.value.userStatus != 'NEW'
+        bankConnection.value.userStatus != 'CREATED' && bankConnection.value.userStatus != 'NEW'
       );
     });
-    return { banks, user, createOrUpdateUserData, userStatusInitializing };
+    return { banks, bankConnection, createOrUpdateUserData, userStatusInitializing };
   },
 });
 </script>

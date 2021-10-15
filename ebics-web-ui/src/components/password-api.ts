@@ -1,6 +1,6 @@
 import { ref, Ref } from 'vue';
 import { useQuasar } from 'quasar';
-import { User } from 'components/models'
+import { BankConnection } from 'components/models'
 import useBaseAPI from './base-api';
 
 /**
@@ -14,7 +14,7 @@ const tempPasswords: Ref<Map<number, string | undefined>> = ref<Map<number, stri
 export default function usePasswordAPI() {
   const q = useQuasar();
 
-  const passwordDialog = (user: User, createPass: boolean): Promise<string> => {
+  const passwordDialog = (user: BankConnection, createPass: boolean): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
       q.dialog({
         title: createPass ? 'Create new password' : 'Enter password',
@@ -48,7 +48,7 @@ export default function usePasswordAPI() {
    * createPass=true in order to ask for new password
    * createPass=false in order to ask for existing password
    */
-  const promptCertPassword = (user: User, createPass: boolean): Promise<string> => {
+  const promptCertPassword = (user: BankConnection, createPass: boolean): Promise<string> => {
     return new Promise<string>((resolve) => {
       if (!user.usePassword) {
         console.log('No pass required');
@@ -67,14 +67,14 @@ export default function usePasswordAPI() {
     });
   };
 
-  const resetCertPassword = (user: User): void => {
+  const resetCertPassword = (user: BankConnection): void => {
     tempPasswords.value.set(user.id, undefined)
   }
 
   const {apiOkHandler: pwdApiOkHandler, apiErrorHandler} = useBaseAPI();
 
   const pwdApiErrorHandler = (
-    user: User,
+    user: BankConnection,
     msg: string,
     error: unknown 
   ): void => {

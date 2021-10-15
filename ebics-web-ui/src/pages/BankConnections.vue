@@ -82,7 +82,7 @@
 </template>
 
 <script lang="ts">
-import { User } from 'components/models';
+import { BankConnection } from 'components/models';
 import { defineComponent } from 'vue';
 import useBankConnectionsAPI from 'components/bankconnections'
 
@@ -135,7 +135,7 @@ export default defineComponent({
         required: true,
         label: 'Name',
         align: 'left',
-        field: (row: User) => row.name,
+        field: (row: BankConnection) => row.name,
         sortable: true,
       },
       {
@@ -143,7 +143,7 @@ export default defineComponent({
         required: true,
         label: 'EBICS User ID',
         align: 'left',
-        field: (row: User) => row.userId,
+        field: (row: BankConnection) => row.userId,
         sortable: true,
       },
       {
@@ -151,7 +151,7 @@ export default defineComponent({
         required: true,
         label: 'EBICS Partner ID',
         align: 'left',
-        field: (row: User) => row?.partner?.partnerId ?? '',
+        field: (row: BankConnection) => row?.partner?.partnerId ?? '',
         sortable: true,
       },
       {
@@ -159,7 +159,7 @@ export default defineComponent({
         required: true,
         label: 'Bank Name',
         align: 'left',
-        field: (row: User) => row?.partner?.bank?.name ?? '',
+        field: (row: BankConnection) => row?.partner?.bank?.name ?? '',
         sortable: true,
       },
       {
@@ -167,7 +167,7 @@ export default defineComponent({
         required: true,
         label: 'Owner',
         align: 'left',
-        field: (row: User) => row?.creator ?? '',
+        field: (row: BankConnection) => row?.creator ?? '',
         sortable: true,
       },
       {
@@ -175,7 +175,7 @@ export default defineComponent({
         required: true,
         label: 'Shared',
         align: 'left',
-        field: (row: User) => row?.guestAccess ? 'yes' : 'no',
+        field: (row: BankConnection) => row?.guestAccess ? 'yes' : 'no',
         sortable: true,
       },
     ];

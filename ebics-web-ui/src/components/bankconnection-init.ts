@@ -1,6 +1,6 @@
 import { computed, Ref, ref } from 'vue';
 import {
-  User,
+  BankConnection,
   UserIniWizzStep,
   UserPassword,
   AdminOrderType,
@@ -12,8 +12,8 @@ import usePasswordAPI from './password-api';
 
 
 
-export default function useUserInitAPI(
-  user: Ref<User>
+export default function useBankConnectionInitializationAPI(
+  user: Ref<BankConnection>
 ) {
   const { pwdApiErrorHandler, pwdApiOkHandler, promptCertPassword } = usePasswordAPI();
 

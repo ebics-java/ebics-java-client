@@ -1,6 +1,6 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { User, Partner, Bank, UserPartnerBank } from 'components/models';
+import { BankConnection, Partner, Bank, UserPartnerBank } from 'components/models';
 import { api } from 'boot/axios';
 import useBaseAPI from './base-api';
 
@@ -17,7 +17,7 @@ export default function useBankConnectionAPI(userId: number | undefined) {
   const router = useRouter()
   const { apiErrorHandler, apiOkHandler } = useBaseAPI();
 
-  const user = ref<User>({
+  const bankConnection = ref<BankConnection>({
     name: '',
     userId: '',
     partner: {
@@ -32,13 +32,13 @@ export default function useBankConnectionAPI(userId: number | undefined) {
     guestAccess: false,
     usePassword: false,
     useCertificate: false,
-  } as User);
+  } as BankConnection);
 
   const refreshUserData = async () => {
     if (userId !== undefined) {
       try {
-        const response = await api.get<User>(`bankconnections/${userId}`)
-        user.value = response.data;
+        const response = await api.get<BankConnection>(`bankconnections/${userId}`)
+        bankConnection.value = response.data;
       } catch(error) {
         apiErrorHandler('Loading of user failed', error)
       }
@@ -50,15 +50,15 @@ export default function useBankConnectionAPI(userId: number | undefined) {
    */
   const userPartnerBank = computed<UserPartnerBank>(() => {
     return {
-      ebicsVersion: user.value.ebicsVersion,
-      userId: user.value.userId,
-      name: user.value.name,
-      dn: user.value.dn,
-      partnerId: user.value.partner.partnerId,
-      bankId: user.value.partner.bank.id,
-      guestAccess: user.value.guestAccess,
-      usePassword: user.value.usePassword,
-      useCertificate: user.value.useCertificate,
+      ebicsVersion: bankConnection.value.ebicsVersion,
+      userId: bankConnection.value.userId,
+      name: bankConnection.value.name,
+      dn: bankConnection.value.dn,
+      partnerId: bankConnection.value.partner.partnerId,
+      bankId: bankConnection.value.partner.bank.id,
+      guestAccess: bankConnection.value.guestAccess,
+      usePassword: bankConnection.value.usePassword,
+      useCertificate: bankConnection.value.useCertificate,
     } as UserPartnerBank;
   });
 
@@ -85,5 +85,5 @@ export default function useBankConnectionAPI(userId: number | undefined) {
   //User data is refreshed by mounting
   onMounted(refreshUserData);
 
-  return { user, userPartnerBank, refreshUserData, createOrUpdateUserData };
+  return { bankConnection, userPartnerBank, refreshUserData, createOrUpdateUserData };
 }
