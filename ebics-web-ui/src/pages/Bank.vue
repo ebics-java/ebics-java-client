@@ -1,9 +1,6 @@
 <template>
   <q-page class="justify-evenly">
     <div class="q-pa-md">
-      <h5 v-if="id !== undefined">Edit existing bank {{bank.name}}</h5>
-      <h5 v-else>Add new bank</h5>
-
       <div class="q-pa-md" style="max-width: 400px">
         <q-form @submit="onSubmit" @reset="onCancel" class="q-gutter-md">
           <q-input

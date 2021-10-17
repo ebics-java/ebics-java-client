@@ -1,9 +1,6 @@
 <template>
   <q-page class="justify-evenly">
     <div v-if="hasActiveConnections" class="q-pa-md">
-      <h5 v-if="fileEditor">Edit &amp; upload File</h5>
-      <h5 v-else>Simple file upload</h5>
-
       <!-- style="max-width: 400px" -->
       <div class="q-pa-md">
         <q-form ref="uploadForm" @submit="processUpload" class="q-gutter-md">

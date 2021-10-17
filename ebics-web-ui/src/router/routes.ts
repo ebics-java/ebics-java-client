@@ -5,16 +5,18 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/UserContext.vue') },
-      { path: '/banks', component: () => import('pages/Banks.vue') },
+      { path: '', meta: { label: 'User Context' }, component: () => import('pages/UserContext.vue') },
+      { path: '/banks', meta: { label: 'Banks' }, component: () => import('pages/Banks.vue') },
       {
         path: '/bank',
         name: 'bank/create',
+        meta: { label: 'Banks / Create' },
         component: () => import('pages/Bank.vue'),
       },
       {
         path: '/bank/:id',
         name: 'bank/edit',
+        meta: { label: 'Banks / Edit' },
         component: () => import('pages/Bank.vue'),
         props: (route) => {
           const id = Number.parseInt(route.params.id as string, 10);
@@ -24,15 +26,17 @@ const routes: RouteRecordRaw[] = [
           return { id };
         },
       },
-      { path: '/bankconnections', component: () => import('pages/BankConnections.vue') },
+      { path: '/bankconnections', meta: { label: 'Bank connections' }, component: () => import('pages/BankConnections.vue') },
       {
         path: '/bankconnection',
         name: 'bankconnection/create',
+        meta: { label: 'Bank connections / Add' },
         component: () => import('src/pages/BankConnection.vue'),
       },
       {
         path: '/bankconnection/:id',
         name: 'bankconnection/edit',
+        meta: { label: 'Bank connections / Edit' },
         component: () => import('pages/BankConnection.vue'),
         props: (route) => {
           const id = Number.parseInt(route.params.id as string, 10);
@@ -45,6 +49,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/bankconnection/:id/init',
         name: 'bankconnection/init',
+        meta: { label: 'Bank connections / Initialize' },
         component: () => import('pages/BankConnectionInitWizz.vue'),
         props: (route) => {
           const id = Number.parseInt(route.params.id as string, 10);
@@ -54,22 +59,25 @@ const routes: RouteRecordRaw[] = [
           return { id };
         },
       },
-      { path: '/upload/type=:type', name: 'upload', component: () => import('pages/FileUpload.vue'),
+      { 
+        path: '/upload/type=:type', name: 'upload', component: () => import('pages/FileUpload.vue'),
+        meta: { label: 'Upload File' },
         props: (route) => {
           const fileEditor = route.params.type == 'edit'
           return { fileEditor };
         },
       },
-      { path: '/download', component: () => import('pages/FileDownload.vue') },
-      { path: '/userctx', component: () => import('pages/UserContext.vue') },
-      { path: '/version', component: () => import('pages/Version.vue') },
-      { path: '/settings', component: () => import('pages/UserSettings.vue') },
-      { path: '/userlogin', component: () => import('pages/UserLogin.vue') },
+      { path: '/download', meta: { label: 'Download File' }, component: () => import('pages/FileDownload.vue') },
+      { path: '/userctx', meta: { label: 'User context' }, component: () => import('pages/UserContext.vue') },
+      { path: '/version', meta: { label: 'Version' }, component: () => import('pages/Version.vue') },
+      { path: '/settings', meta: { label: 'Settings' }, component: () => import('pages/UserSettings.vue') },
+      { path: '/userlogin', meta: { label: 'Login' }, component: () => import('pages/UserLogin.vue') },
     ],
   },
 
   {
     path: '/login',
+    meta: { label: 'Login' },
     component: () => import('pages/UserLogin.vue'),
   },
 

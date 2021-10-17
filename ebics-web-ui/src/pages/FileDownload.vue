@@ -1,7 +1,6 @@
 <template>
   <q-page class="justify-evenly">
     <div v-if="hasActiveConnections" class="q-pa-md">
-      <h5>Simple file download</h5>
 
       <!-- style="max-width: 400px" -->
       <div class="q-pa-md">

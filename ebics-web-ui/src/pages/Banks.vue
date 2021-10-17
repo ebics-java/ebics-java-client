@@ -1,7 +1,6 @@
 <template>
   <q-page class="justify-evenly">
     <div class="q-pa-md">
-      <h5>Banks</h5>
       <q-table
         title="Banks"
         :filter="filter"

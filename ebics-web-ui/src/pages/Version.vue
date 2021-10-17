@@ -1,7 +1,6 @@
 <template>
   <q-page class="justify-evenly">
     <div class="q-pa-md">
-      <h5>About</h5>
       <div class="q-pa-md" style="max-width: 400px">
         <div v-if="userContext">
           <q-list bordered padding>

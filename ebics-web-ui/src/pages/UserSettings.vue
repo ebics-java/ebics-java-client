@@ -1,7 +1,6 @@
 <template>
   <q-page class="justify-evenly">
     <div class="q-pa-md">
-      <h5>User Settings</h5>
       <div class="q-pa-md" style="max-width: 400px">
         <user-preferences saveButton/>
       </div>
