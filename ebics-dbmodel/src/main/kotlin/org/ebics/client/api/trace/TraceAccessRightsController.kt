@@ -29,7 +29,7 @@ interface TraceAccessRightsController : ReadAccessRightsController {
                 }
                 else -> {
                     logger.debug(
-                        "Read permission denied, no role available {} for {}",
+                        "Read permission denied, no role available '{}' for '{}'",
                         authorities.joinToString(),
                         authCtx.name
                     )

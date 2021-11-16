@@ -40,7 +40,7 @@ class EbicsBankAPI(private val configuration: EbicsRestConfiguration, private va
         val supportedVersions = serverVersions.toSet().intersect(clientVersions)
 
         val highestSupportedVersion = supportedVersions.maxOrNull()
-        val currentDefaultVersion = bank.ebicsVersions?.find { it.isDefault }?.version
+        val currentDefaultVersion = bank.ebicsVersions?.find { it.isPreferredForUse }?.version
         //Check if the current preferred version is still supported by bank,
         //If not select the highest one automatically
         val futureDefaultVersion =
@@ -53,8 +53,8 @@ class EbicsBankAPI(private val configuration: EbicsRestConfiguration, private va
                 version,
                 isSupportedByBank = serverVersions.contains(version),
                 isSupportedByClient = clientVersions.contains(version),
-                isAllowed = supportedVersions.contains(version) && storedVersion?.isAllowed ?: true,
-                isDefault = version == futureDefaultVersion, bank
+                isAllowedForUse = supportedVersions.contains(version) && storedVersion?.isAllowedForUse ?: true,
+                isPreferredForUse = version == futureDefaultVersion, bank
             )
         }
     }

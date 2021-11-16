@@ -13,6 +13,7 @@ import useBankConnectionsAPI from './bankconnections';
 import useFileTransferAPI from './filetransfer';
 import { CustomMap } from './utils';
 import usePasswordAPI from './password-api';
+import useBanksAPI from './banks';
 
 //Global internal cache of all BTF's and OrderTypes for all active bank connections..
 const orderTypeCache: CustomMap<number, OrderTypesCache> = new CustomMap<
@@ -35,9 +36,10 @@ export default function useOrderTypesAPI(
     BankConnectionAccess.USE
   );
   const { promptCertPassword } = usePasswordAPI();
+  const { isEbicsVersionAllowedForUse } = useBanksAPI();
 
   /**
-   * If the ordertype list is empty or refresh is forced,
+   * If the @param orderTypesCache is empty or refresh is forced,
    * Then download available ordertypes from EBICS server and store them to the cache
    * @param bankConnection
    * @param orderTypesCache used to store output
@@ -48,7 +50,13 @@ export default function useOrderTypesAPI(
     orderTypesCache: OrderTypesCache,
     forceCashRefresh = false
   ) => {
-    if (orderTypesCache.orderTypes.length == 0 || forceCashRefresh) {
+    if (
+      isEbicsVersionAllowedForUse(
+        bankConnection.partner.bank,
+        EbicsVersion.H004
+      ) &&
+      (orderTypesCache.orderTypes.length == 0 || forceCashRefresh)
+    ) {
       const orderTypesRefreshPromise = ebicsOrderTypes(
         bankConnection,
         EbicsVersion.H004
@@ -62,7 +70,7 @@ export default function useOrderTypesAPI(
   };
 
   /**
-   * If the ordertype list is empty or refresh is forced,
+   * If the @param orderTypesCache is empty or refresh is forced,
    * Then download available ordertypes from EBICS server
    * @param bankConnection
    * @param orderTypeList used to store output
@@ -73,7 +81,13 @@ export default function useOrderTypesAPI(
     orderTypeList: OrderTypesCache,
     forceCashRefresh = false
   ) => {
-    if (orderTypeList.btfTypes.length == 0 || forceCashRefresh) {
+    if (
+      isEbicsVersionAllowedForUse(
+        bankConnection.partner.bank,
+        EbicsVersion.H005
+      ) &&
+      (orderTypeList.btfTypes.length == 0 || forceCashRefresh)
+    ) {
       const orderTypesRefreshPromise = ebicsOrderTypes(
         bankConnection,
         EbicsVersion.H005
@@ -95,18 +109,17 @@ export default function useOrderTypesAPI(
     bankConnection: BankConnection,
     forceCashRefresh = false
   ) => {
-
     //Create emtpy order type cache for this bank connection
     const orderTypesCache: OrderTypesCache = orderTypeCache.getOrAdd(
       bankConnection.id,
       { btfTypes: [], orderTypes: [] }
     );
 
-    //For pasword protected connection ask first password 
+    //For pasword protected connection ask first password
     //It prevents parallel poping of UI password dialog
     await promptCertPassword(bankConnection, false);
 
-    //Now execute all update promisses 
+    //Now execute all update promisses
     //the password UI would not pop-up any more because of previous promptCertPassword
     await Promise.allSettled([
       updateOrderTypesH004CacheForBankConnection(

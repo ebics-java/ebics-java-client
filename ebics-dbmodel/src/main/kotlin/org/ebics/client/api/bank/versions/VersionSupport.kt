@@ -14,8 +14,8 @@ class VersionSupport(
 
     val isSupportedByBank: Boolean,
     val isSupportedByClient: Boolean,
-    val isAllowed: Boolean,
-    val isDefault: Boolean,
+    val isAllowedForUse: Boolean,
+    val isPreferredForUse: Boolean,
 
     @JsonIgnore
     @ManyToOne(optional = false)

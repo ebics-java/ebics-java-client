@@ -50,7 +50,7 @@ interface BankConnectionAccessRightsController : WriteAccessRightsController, Re
                 }
                 else -> {
                     logger.debug(
-                        "Write permission for '{}' denied, no role available {} for '{}'",
+                        "Write permission for '{}' denied, no role available '{}' for '{}'",
                         getObjectName(),
                         authorities.joinToString(),
                         authCtx.name
@@ -81,7 +81,7 @@ interface BankConnectionAccessRightsController : WriteAccessRightsController, Re
                 }
                 else -> {
                     logger.debug(
-                        "Read permission for '{}' denied, no role available {} for '{}'",
+                        "Read permission for '{}' denied, no role available '{}' for '{}'",
                         getObjectName(),
                         authorities.joinToString(),
                         authCtx.name
@@ -108,7 +108,7 @@ interface BankConnectionAccessRightsController : WriteAccessRightsController, Re
                 }
                 else -> {
                     logger.debug(
-                        "Use permission for '{}' denied, no role available {} for '{}'",
+                        "Use permission for '{}' denied, no role available '{}' for '{}'",
                         getObjectName(),
                         authorities.joinToString(),
                         authCtx.name

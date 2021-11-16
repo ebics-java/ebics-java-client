@@ -72,7 +72,7 @@ interface UserSettingsAccessRightsController : WriteAccessRightsController, Read
                 }
                 else -> {
                     logger.debug(
-                        "Read permission for '{}' denied, no role available {} for '{}'",
+                        "Read permission for '{}' denied, no role available '{}' for '{}'",
                         getObjectName(),
                         authorities.joinToString(),
                         authCtx.name

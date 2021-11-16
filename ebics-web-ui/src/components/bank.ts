@@ -79,21 +79,23 @@ export default function useBankAPI(bankId: number | undefined) {
 
   const saveVersionsSettings = async (): Promise<void> => {
     try {
+      console.log('Save versions');
       if (bank.value.id != undefined && versionSettings.value?.length) {
         for (const versionSett of versionSettings.value) {
           await api.put<EbicsVersionSettings[]>(
             `banks/${bank.value.id}/supportedVersions/${versionSett.version}`,
             versionSett
           );
+          console.log(`Save version ${JSON.stringify(versionSett)}`)
         }
       }
     } catch (error) {
-      apiErrorHandler('Loading of supported EBICS versions failed', error);
+      apiErrorHandler('Saving of supported EBICS versions failed', error);
     }
   };
 
   const allowedVersionsCount = computed(():number => {
-    return versionSettings.value.filter(v => v.isAllowed).length;
+    return versionSettings.value.filter(v => v.isAllowedForUse).length;
   });
 
   onMounted(async () => {

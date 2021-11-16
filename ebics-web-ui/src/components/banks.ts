@@ -1,5 +1,5 @@
 import { ref, onMounted } from 'vue';
-import { Bank } from 'components/models';
+import { Bank, EbicsVersion } from 'components/models';
 import { api } from 'boot/axios';
 import useBaseAPI from './base-api';
 import useDialogs from './dialogs';
@@ -38,7 +38,11 @@ export default function useBanksAPI() {
     }
   };
 
+  const isEbicsVersionAllowedForUse = (bank: Bank, ebicsVersion: EbicsVersion): boolean | undefined => {
+    return bank.ebicsVersions?.some(ver => (ver.version == ebicsVersion && ver.isAllowedForUse))
+  }
+
   onMounted(loadBanks);
 
-  return { banks, loadBanks, deleteBank };
+  return { banks, loadBanks, deleteBank, isEbicsVersionAllowedForUse };
 }

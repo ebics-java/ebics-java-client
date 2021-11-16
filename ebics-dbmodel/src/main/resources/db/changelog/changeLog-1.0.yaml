@@ -474,3 +474,21 @@ databaseChangeLog:
       author: honza
       changes:
           - sql: delete from TraceEntry
+- changeSet:
+      id: 1634550506090-0
+      author: honza
+      changes:
+          - renameColumn:
+                oldColumnName: ISDEFAULT
+                newColumnName: isPreferredForUse
+                tableName: EBICSVERSIONSUPPORT
+                type: boolean
+- changeSet:
+      id: 1634550506090-1
+      author: honza
+      changes:
+          - renameColumn:
+                oldColumnName: ISALLOWED
+                newColumnName: isAllowedForUse
+                tableName: EBICSVERSIONSUPPORT
+                type: boolean

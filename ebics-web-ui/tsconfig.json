@@ -8,6 +8,9 @@
       "dom", //FormData
       "ES2020.Promise", //Promise.allSettled
       "webworker", 
+    ],
+    "types": [
+      "jest"
     ]
   }
 }

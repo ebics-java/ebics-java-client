@@ -8,7 +8,7 @@ export interface Bank {
     e002DigestHex: string;
     x002DigestHex: string;
   }
-  ebicsVersions: EbicsVersion[];
+  ebicsVersions: EbicsVersionSettings[];
 }
 
 export enum EbicsVersion {
@@ -29,8 +29,8 @@ export interface EbicsVersionSettings {
   version: EbicsVersion;
   isSupportedByBank: boolean;
   isSupportedByClient: boolean;
-  isAllowed: boolean;
-  isDefault: boolean;
+  isAllowedForUse: boolean;
+  isPreferredForUse: boolean;
 }
 
 export interface UserPartnerBank {

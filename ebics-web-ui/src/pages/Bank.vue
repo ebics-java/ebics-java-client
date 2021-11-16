@@ -2,7 +2,7 @@
   <q-page class="justify-evenly">
     <div class="q-pa-md">
       <div class="q-pa-md" style="max-width: 400px">
-        <q-form @submit="onSubmit" @reset="onCancel" class="q-gutter-md">
+        <q-form @submit="onSubmitBank" @reset="onCancel" class="q-gutter-md">
           <q-input
             filled
             v-model="bank.name"
@@ -54,7 +54,7 @@
                 v-bind:key="vs.version"
                 :label="vs.version"
                 :disable="!vs.isSupportedByBank || !vs.isSupportedByClient"
-                v-model="vs.isAllowed"
+                v-model="vs.isAllowedForUse"
               />
 
               <q-btn
@@ -113,9 +113,9 @@ export default defineComponent({
     const onCancel = (): void => {
       router.go(-1);
     };
-    const onSubmit = async (): Promise<void> => {
+    const onSubmitBank = async (): Promise<void> => {
+      await saveVersionsSettings();
       await createOrUpdateBank();
-      //await saveVersionsSettings();
     };
     const validateUrl = (url: string): boolean => {
       const regex =
@@ -126,7 +126,7 @@ export default defineComponent({
       bank,
       versionSettings,
       onCancel,
-      onSubmit,
+      onSubmitBank,
       validateUrl,
       loadVersionsSettings,
       saveVersionsSettings,

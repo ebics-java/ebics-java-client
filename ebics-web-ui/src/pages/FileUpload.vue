@@ -68,11 +68,11 @@
             v-model="btfType"
             :options="btfTypes"
             :option-label="(t) => btfTypeLabel(t)"
-            label="BTF Message Type"
-            hint="Select EBICS BTF Message Type"
+            label="Business Transaction Format"
+            hint="Select EBICS Business Transaction Format (BTF)"
             lazy-rules
             :rules="[
-              (val) => val || 'Please select valid EBICS BTF Message Type',
+              (val) => val || 'Please select valid EBICS BTF',
             ]"
           >
             <template v-slot:option="scope">
