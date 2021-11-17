@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -611,6 +613,8 @@ public class EbicsClient {
         options.addOption("o", "output", true, "output file");
         options.addOption("i", "input", true, "input file");
 
+        options.addOption("s", "start", true, "Start date (yyyy-MM-dd)");
+        options.addOption("e", "end", true, "End date (yyyy-MM-dd)");
 
         CommandLine cmd = parseArguments(options, args);
 
@@ -642,6 +646,24 @@ public class EbicsClient {
         String outputFileValue = cmd.getOptionValue("o");
         String inputFileValue = cmd.getOptionValue("i");
 
+        // Process start and end dates. 
+        // If the end date is specified, start date is required
+        // If the start date is specified, the end date defaults
+        // to the current date.
+        String start = cmd.getOptionValue("s");
+        String end = cmd.getOptionValue("e");
+        Date startDate = null;
+        Date endDate = null;
+        if (start != null) {
+            final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            startDate = format.parse(start);
+            endDate = end != null
+                    ? format.parse(end)
+                    : Date.from(Instant.now());
+        } else if (end != null) {
+            throw new EbicsException("Start date required if end date is given");
+        }
+
         List<? extends EbicsOrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
             OrderType.C52, OrderType.C53, OrderType.C54,
             OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
@@ -649,7 +671,7 @@ public class EbicsClient {
         for (EbicsOrderType type : fetchFileOrders) {
             if (hasOption(cmd, type)) {
                 client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
-                    client.defaultProduct, type, false, null, null);
+                    client.defaultProduct, type, false, startDate, endDate);
                 break;
             }
         }
