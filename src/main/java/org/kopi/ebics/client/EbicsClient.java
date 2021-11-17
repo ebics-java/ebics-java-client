@@ -28,6 +28,7 @@ import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -55,6 +56,7 @@ import org.kopi.ebics.interfaces.PasswordCallback;
 import org.kopi.ebics.io.IOUtils;
 import org.kopi.ebics.messages.Messages;
 import org.kopi.ebics.schema.h003.OrderAttributeType;
+import org.kopi.ebics.session.CustomOrderType;
 import org.kopi.ebics.session.DefaultConfiguration;
 import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.session.OrderType;
@@ -392,6 +394,8 @@ public class EbicsClient {
             configuration.getTransferTraceDirectory(user));
 
         try {
+            configuration.getLogger().info(messages.getString("upload.request.send", 
+                orderType.getCode()));
             transferManager.sendFile(IOUtils.getFileContent(file), orderType, orderAttribute);
         } catch (IOException | EbicsException e) {
             configuration.getLogger()
@@ -418,6 +422,8 @@ public class EbicsClient {
             configuration.getTransferTraceDirectory(user));
 
         try {
+            configuration.getLogger().info(messages.getString("download.request.send", 
+                orderType.getCode()));
             transferManager.fetchFile(orderType, start, end, file);
         } catch (NoDownloadDataAvailableException e) {
             // don't log this exception as an error, caller can decide how to handle
@@ -616,6 +622,9 @@ public class EbicsClient {
         options.addOption("s", "start", true, "Start date (yyyy-MM-dd)");
         options.addOption("e", "end", true, "End date (yyyy-MM-dd)");
 
+        options.addOption("d", "download", true, "download custom order type");
+        options.addOption("u", "upload", true, "upload custom order type");
+
         CommandLine cmd = parseArguments(options, args);
 
         File defaultRootDir = new File(System.getProperty("user.home") + File.separator + "ebics"
@@ -664,25 +673,44 @@ public class EbicsClient {
             throw new EbicsException("Start date required if end date is given");
         }
 
-        List<? extends EbicsOrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
-            OrderType.C52, OrderType.C53, OrderType.C54,
-            OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
+        if (cmd.hasOption("d"))
+        {
+            client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
+                client.defaultProduct, 
+                new CustomOrderType(cmd.getOptionValue("d")), 
+                false, startDate, endDate);
+        }
+        else
+        {
+            List<? extends EbicsOrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
+                OrderType.C52, OrderType.C53, OrderType.C54,
+                OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
 
-        for (EbicsOrderType type : fetchFileOrders) {
-            if (hasOption(cmd, type)) {
-                client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
-                    client.defaultProduct, type, false, startDate, endDate);
-                break;
+            for (EbicsOrderType type : fetchFileOrders) {
+                if (hasOption(cmd, type)) {
+                    client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
+                        client.defaultProduct, type, false, startDate, endDate);
+                    break;
+                }
             }
         }
 
-        List<? extends EbicsOrderType> sendFileOrders = Arrays.asList(OrderType.XKD, OrderType.FUL, OrderType.XCT,
-            OrderType.XE2, OrderType.CCT);
-        for (EbicsOrderType type : sendFileOrders) {
-            if (hasOption(cmd, type)) {
-                client.sendFile(new File(inputFileValue), client.defaultUser,
-                    client.defaultProduct, type);
-                break;
+        if (cmd.hasOption("u"))
+        {
+            client.sendFile(new File(inputFileValue), client.defaultUser,
+                client.defaultProduct, 
+                new CustomOrderType(cmd.getOptionValue("u")));
+        }
+        else
+        {
+            List<? extends EbicsOrderType> sendFileOrders = Arrays.asList(OrderType.XKD, OrderType.FUL, OrderType.XCT,
+                OrderType.XE2, OrderType.CCT);
+            for (EbicsOrderType type : sendFileOrders) {
+                if (hasOption(cmd, type)) {
+                    client.sendFile(new File(inputFileValue), client.defaultUser,
+                        client.defaultProduct, type);
+                    break;
+                }
             }
         }
 
