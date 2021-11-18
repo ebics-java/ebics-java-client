@@ -28,7 +28,6 @@ import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,6 +47,7 @@ import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.NoDownloadDataAvailableException;
 import org.kopi.ebics.interfaces.Configuration;
 import org.kopi.ebics.interfaces.EbicsBank;
+import org.kopi.ebics.interfaces.EbicsLogger;
 import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.interfaces.EbicsUser;
 import org.kopi.ebics.interfaces.InitLetter;
@@ -440,6 +440,35 @@ public class EbicsClient {
     }
 
     /**
+     * Downloads file for order type without throwing NoDataAvailableException.
+     *
+     * Downloads file for the order type and logs success or warns about no data.
+     *
+     * @param file output file
+     * @param user EBICS User
+     * @param product EBICS Product
+     * @param orderType EBICS Order Type
+     * @param start Optional Date Range Start Date
+     * @param end Optional Date Range End Date
+     * @return true if data was available, false if not
+     * @throws java.io.IOException 
+     * @throws org.kopi.ebics.exception.EbicsException 
+    */
+    public boolean fetchFileIfAvailable(File file, User user, Product product, 
+        EbicsOrderType orderType, Date start, Date end) throws IOException,
+        EbicsException {
+
+        final EbicsLogger logger = configuration.getLogger();
+        try {
+            fetchFile(file, user, product, orderType, false, start, end);
+            configuration.getLogger().info(messages.getString("download.file.success", orderType.getCode()));
+            return true;
+        } catch (NoDownloadDataAvailableException nodataException) {
+            configuration.getLogger().warn(messages.getString("download.file.nodata", orderType.getCode()));
+            return false;
+        }
+    }
+    /**
      * Performs buffers save before quitting the client application.
      */
     public void quit() {
@@ -673,12 +702,15 @@ public class EbicsClient {
             throw new EbicsException("Start date required if end date is given");
         }
 
+        boolean allDataWasAvailable = true;
+
         if (cmd.hasOption("d"))
         {
-            client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
+            allDataWasAvailable &= client.fetchFileIfAvailable(getOutputFile(outputFileValue), 
+                client.defaultUser,
                 client.defaultProduct, 
                 new CustomOrderType(cmd.getOptionValue("d")), 
-                false, startDate, endDate);
+                startDate, endDate);
         }
         else
         {
@@ -688,8 +720,11 @@ public class EbicsClient {
 
             for (EbicsOrderType type : fetchFileOrders) {
                 if (hasOption(cmd, type)) {
-                    client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
-                        client.defaultProduct, type, false, startDate, endDate);
+                    allDataWasAvailable &= client.fetchFileIfAvailable(getOutputFile(outputFileValue), 
+                        client.defaultUser,
+                        client.defaultProduct, 
+                        type, 
+                        startDate, endDate);
                     break;
                 }
             }
@@ -721,6 +756,10 @@ public class EbicsClient {
             }
         }
         client.quit();
+        if (!allDataWasAvailable)
+        {
+            System.exit(2);
+        }
     }
 
     private static File getOutputFile(String outputFileName) {
