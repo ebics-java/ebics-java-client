@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -35,6 +36,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -544,12 +547,27 @@ public class EbicsClient {
     private static CommandLine parseArguments(Options options, String[] args) throws ParseException {
         CommandLineParser parser = new DefaultParser();
         options.addOption(null, "help", false, "Print this help text");
+        options.addOption(null, "version", false, "Print the version information and exit");
         CommandLine line = parser.parse(options, args);
         if (line.hasOption("help")) {
             HelpFormatter formatter = new HelpFormatter();
             System.out.println();
             formatter.printHelp(EbicsClient.class.getSimpleName(), options);
             System.out.println();
+            System.exit(0);
+        }
+        if (line.hasOption("version")) {
+            InputStream streamOrNull = EbicsClient.class.getClassLoader().getResourceAsStream(
+               "build.properties");
+            if (streamOrNull != null) {
+                try {
+                  Properties properties = new Properties();
+                  properties.load(streamOrNull);
+                  System.out.println(properties.getProperty("build.name") + " " +
+                    properties.getProperty("build.version"));
+            } catch (IOException ex) {}
+                
+            }
             System.exit(0);
         }
         return line;
@@ -654,10 +672,14 @@ public class EbicsClient {
         options.addOption("d", "download", true, "download custom order type");
         options.addOption("u", "upload", true, "upload custom order type");
 
+        options.addOption("c", "configuration-directory", true, "Configuration directory");
+
         CommandLine cmd = parseArguments(options, args);
 
-        File defaultRootDir = new File(System.getProperty("user.home") + File.separator + "ebics"
+        String configurationDirectory = cmd.getOptionValue("configuration-directory",
+            System.getProperty("user.home") + File.separator + "ebics"
             + File.separator + "client");
+        File defaultRootDir = new File(configurationDirectory);
         File ebicsClientProperties = new File(defaultRootDir, "ebics.txt");
         EbicsClient client = createEbicsClient(defaultRootDir, ebicsClientProperties);
 
