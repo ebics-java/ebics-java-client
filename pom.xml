@@ -139,6 +139,21 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.1</version>
             </plugin>
+            <plugin>
+              <groupId>de.ntcomputer</groupId>
+              <artifactId>executable-packer-maven-plugin</artifactId>
+              <version>1.0.1</version>
+              <configuration>
+                <mainClass>org.kopi.ebics.client.EbicsClient</mainClass>
+              </configuration>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>pack-executable-jar</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
         </plugins>
     </build>
     <properties>
