@@ -71,6 +71,7 @@ const routes: RouteRecordRaw[] = [
       { path: '/userctx', meta: { label: 'User context' }, component: () => import('pages/UserContext.vue') },
       { path: '/version', meta: { label: 'Version' }, component: () => import('pages/Version.vue') },
       { path: '/settings', meta: { label: 'Settings' }, component: () => import('pages/UserSettings.vue') },
+      { path: '/traces', meta: { label: 'Traces' }, component: () => import('pages/Traces.vue') },
       { path: '/userlogin', meta: { label: 'Login' }, component: () => import('pages/UserLogin.vue') },
     ],
   },

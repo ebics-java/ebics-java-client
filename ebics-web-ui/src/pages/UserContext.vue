@@ -63,7 +63,7 @@
 
             <q-item tag="label" v-ripple>
               <q-item-section side top>
-                <q-checkbox v-model="roleGuest" disable></q-checkbox>
+                <q-checkbox v-model="hasRoleGuest" disable></q-checkbox>
               </q-item-section>
 
               <q-item-section>
@@ -76,7 +76,7 @@
 
             <q-item tag="label" v-ripple>
               <q-item-section side top>
-                <q-checkbox v-model="roleUser" disable></q-checkbox>
+                <q-checkbox v-model="hasRoleUser" disable></q-checkbox>
               </q-item-section>
 
               <q-item-section>
@@ -89,7 +89,7 @@
 
             <q-item tag="label" v-ripple>
               <q-item-section side top>
-                <q-checkbox v-model="roleAdmin" disable></q-checkbox>
+                <q-checkbox v-model="hasRoleAdmin" disable></q-checkbox>
               </q-item-section>
 
               <q-item-section>
@@ -113,7 +113,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import useUserContextAPI from 'src/components/user-context';
-import { AuthenticationType } from 'components/models';
+import { AuthenticationType, UserRole } from 'components/models';
 
 export default defineComponent({
   name: 'UserContext',
@@ -128,14 +128,10 @@ export default defineComponent({
       await this.resetUserContextData()
     },
   },
-  computed: {
-    roleGuest(): boolean { return this.hasRole('GUEST'); },
-    roleUser(): boolean { return this.hasRole('USER'); },
-    roleAdmin(): boolean { return this.hasRole('ADMIN'); },
-  },
+
   setup() {
-    const { authenticationType, ssoDevOverBasic, basicCredentials, userContext, hasRole, resetUserContextData, refreshUserContextData } = useUserContextAPI();
-    return { authenticationType, ssoDevOverBasic, basicCredentials, userContext, hasRole, resetUserContextData, refreshUserContextData };
+    const { authenticationType, ssoDevOverBasic, basicCredentials, userContext, hasRoleUser, hasRoleGuest, hasRoleAdmin, resetUserContextData, refreshUserContextData } = useUserContextAPI();
+    return { authenticationType, ssoDevOverBasic, basicCredentials, userContext, hasRoleUser, hasRoleGuest, hasRoleAdmin, resetUserContextData, refreshUserContextData };
   },
 });
 </script>

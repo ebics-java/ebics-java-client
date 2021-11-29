@@ -19,7 +19,7 @@ export default function useBankConnectionsAPI(accessRight: BankConnectionAccess 
 
   const loadBankConnections = async (): Promise<void> => {
     try {
-      console.info('api: ' + JSON.stringify(api));
+      //console.info('api: ' + JSON.stringify(api));
       const response = await api.get<BankConnection[]>(`bankconnections?permission=${accessRight}`);
       bankConnections.value = response.data;
     } catch (error) {
@@ -94,7 +94,7 @@ export default function useBankConnectionsAPI(accessRight: BankConnectionAccess 
     }
   };
 
-  //onMounted(loadBankConnections);
+  onMounted(loadBankConnections);
 
   return {
     bankConnections,

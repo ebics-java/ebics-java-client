@@ -85,6 +85,14 @@
 
             <q-item-section> Settings </q-item-section>
           </q-item>
+
+          <q-item v-if="hasRoleAdmin" to="/traces" exact clickable v-ripple>
+            <q-item-section avatar>
+              <q-icon name="receipt_long" />
+            </q-item-section>
+
+            <q-item-section> Traces </q-item-section>
+          </q-item>
         </q-list>
       </q-scroll-area>
     </q-drawer>
@@ -106,7 +114,7 @@ export default defineComponent({
 
   setup() {
     const leftDrawerOpen = ref(false);
-    const { userContext } = useUserContextAPI();
+    const { userContext, hasRoleAdmin } = useUserContextAPI();
     const router = useRouter();
 
     const menuItemOfCurrentRoute = computed((): MenuItemRouteMeta[] => {
@@ -118,6 +126,7 @@ export default defineComponent({
     return {
       menuItemOfCurrentRoute,
       userContext,
+      hasRoleAdmin,
       leftDrawerOpen,
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;

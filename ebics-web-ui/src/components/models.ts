@@ -245,6 +245,12 @@ export enum AuthenticationType {
   HTTP_BASIC = 'HTTP Basic (username + password)',
 }
 
+export enum UserRole {
+  GUEST = 'GUEST',
+  USER = 'USER',
+  ADMIN = 'ADMIN'
+}
+
 export enum FileFormat {
   XML = 'xml',
   SWIFT = 'swift',

@@ -1,6 +1,6 @@
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { UserContext, AuthenticationType } from 'components/models';
+import { UserContext, AuthenticationType, UserRole } from 'components/models';
 import { useQuasar } from 'quasar';
 import { api } from 'boot/axios';
 import { AxiosBasicCredentials } from 'axios';
@@ -121,7 +121,7 @@ export default function useUserContextAPI() {
   };
 
   //Check if the user has specific role
-  const hasRole = (userRoleName: string): boolean => {
+  const hasRole = (userRoleName: UserRole): boolean => {
     return (
       userContext.value !== undefined &&
       userContext.value.roles.some((roleName) =>
@@ -129,6 +129,16 @@ export default function useUserContextAPI() {
       )
     );
   };
+
+  const hasRoleGuest = computed(():boolean => {
+    return hasRole(UserRole.GUEST);
+  });
+  const hasRoleUser = computed(():boolean => {
+    return hasRole(UserRole.USER);
+  });
+  const hasRoleAdmin = computed(():boolean => {
+    return hasRole(UserRole.ADMIN);
+  });
 
   const onCredentialsChanged = () => {
     if (authenticationType.value == AuthenticationType.HTTP_BASIC) {
@@ -150,6 +160,9 @@ export default function useUserContextAPI() {
     userContext,
     basicCredentials,
     hasRole,
+    hasRoleGuest,
+    hasRoleUser,
+    hasRoleAdmin,
     resetUserContextData,
     refreshUserContextData,
   };
