@@ -56,7 +56,7 @@ module.exports = configure(function (ctx) {
     // Full list of options: https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       env: ctx.dev ? {
-        API_URL: 'https://localhost/EbicsWebClient',
+        API_URL: 'http://localhost:8080/EbicsWebClient',
         AUTH_TYPE: 'HTTP_BASIC',
         AUTH_TYPE_SSO_OVER_BASIC: undefined
       } : {

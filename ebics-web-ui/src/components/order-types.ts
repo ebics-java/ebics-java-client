@@ -50,6 +50,7 @@ export default function useOrderTypesAPI(
     orderTypesCache: OrderTypesCache,
     forceCashRefresh = false
   ) => {
+    console.log(`Loading order types H004 ${JSON.stringify(bankConnection.partner.bank)}`)
     if (
       isEbicsVersionAllowedForUse(
         bankConnection.partner.bank,
@@ -81,6 +82,7 @@ export default function useOrderTypesAPI(
     orderTypeList: OrderTypesCache,
     forceCashRefresh = false
   ) => {
+    console.log(`Loading order types H005 ${JSON.stringify(bankConnection.partner.bank)}`)
     if (
       isEbicsVersionAllowedForUse(
         bankConnection.partner.bank,
@@ -138,6 +140,7 @@ export default function useOrderTypesAPI(
   const updateOrderTypesCacheForAllActiveConnections =
     async (): Promise<void> => {
       if (activeBankConnections.value) {
+        console.log('Loading order types')
         //Collect all update ordertype promisses
         const updateOrderTypesPromisses = activeBankConnections.value.map(
           (bankConnection) =>
@@ -146,6 +149,7 @@ export default function useOrderTypesAPI(
 
         //Execute those promisses parallel
         await Promise.allSettled(updateOrderTypesPromisses);
+        console.log('Order types loaded')
       }
     };
 

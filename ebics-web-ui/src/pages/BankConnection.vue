@@ -74,11 +74,13 @@
                 v-model="bankConnection.ebicsVersion"
                 val="H004"
                 label="EBICS 2.5 (H004)"
+                :disable="!isEbicsVersionAllowedForUse(bankConnection.partner.bank, EbicsVersion.H004)"
               />
               <q-radio
                 v-model="bankConnection.ebicsVersion"
                 val="H005"
                 label="EBICS 3.0 (H005)"
+                :disable="!isEbicsVersionAllowedForUse(bankConnection.partner.bank, EbicsVersion.H005)"
               />
             </template>
           </q-field>
@@ -138,6 +140,7 @@
 import { defineComponent, computed } from 'vue';
 import useBankConnectionAPI from 'components/bankconnection';
 import useBanksDataAPI from 'src/components/banks';
+import {EbicsVersion} from 'src/components/models'
 
 export default defineComponent({
   name: 'User',
@@ -159,13 +162,13 @@ export default defineComponent({
   },
   setup(props) {
     const { bankConnection, createOrUpdateUserData } = useBankConnectionAPI(props.id);
-    const { banks } = useBanksDataAPI();
+    const { banks, isEbicsVersionAllowedForUse } = useBanksDataAPI();
     const userStatusInitializing = computed((): boolean => {
       return (
         bankConnection.value.userStatus != 'CREATED' && bankConnection.value.userStatus != 'NEW'
       );
     });
-    return { banks, bankConnection, createOrUpdateUserData, userStatusInitializing };
+    return { banks, bankConnection, createOrUpdateUserData, userStatusInitializing, isEbicsVersionAllowedForUse, EbicsVersion };
   },
 });
 </script>

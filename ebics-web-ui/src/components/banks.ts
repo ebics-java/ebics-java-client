@@ -39,7 +39,8 @@ export default function useBanksAPI() {
   };
 
   const isEbicsVersionAllowedForUse = (bank: Bank, ebicsVersion: EbicsVersion): boolean | undefined => {
-    return bank.ebicsVersions?.some(ver => (ver.version == ebicsVersion && ver.isAllowedForUse))
+    return !bank.ebicsVersions?.length //The ebicsVersions are empty, till first save happen...
+          || bank.ebicsVersions?.some(ver => (ver.version == ebicsVersion && ver.isAllowedForUse))
   }
 
   onMounted(loadBanks);

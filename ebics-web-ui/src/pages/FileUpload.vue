@@ -26,11 +26,13 @@
             /-->
             <q-radio
               v-model="bankConnection.ebicsVersion"
+              :disable="!isEbicsVersionAllowedForUse(bankConnection.partner.bank, EbicsVersion.H004)"
               val="H004"
               label="EBICS 2.5 (H004)"
             />
             <q-radio
               v-model="bankConnection.ebicsVersion"
+              :disable="!isEbicsVersionAllowedForUse(bankConnection.partner.bank, EbicsVersion.H005)"
               val="H005"
               label="EBICS 3.0 (H005)"
             />
@@ -245,6 +247,7 @@ import {
   OrderTypeFilter,
   OrderType,
   BankConnectionAccess,
+  EbicsVersion,
 } from 'components/models';
 import { defineComponent } from 'vue';
 import { ref, computed } from 'vue';
@@ -262,6 +265,7 @@ import useFileTransferAPI from 'components/filetransfer';
 import useTextUtils from 'components/text-utils';
 import useUserSettings from 'components/user-settings';
 import useOrderTypesAPI from 'components/order-types';
+import useBanksAPI from 'src/components/banks';
 
 export default defineComponent({
   name: 'FileUpload',
@@ -281,6 +285,7 @@ export default defineComponent({
       useBankConnectionsAPI(BankConnectionAccess.USE);
     const { ebicsUploadRequest } = useFileTransferAPI();
     const { applySmartAdjustments, detectFileFormat } = useTextUtils();
+    const { isEbicsVersionAllowedForUse } = useBanksAPI();
     const { userSettings } = useUserSettings();
     const { btfTypes, orderTypes, orderTypeLabel, btfTypeLabel } =
       useOrderTypesAPI(bankConnection, ref(OrderTypeFilter.UploadOnly));
@@ -461,6 +466,8 @@ export default defineComponent({
       activeBankConnections,
       hasActiveConnections,
       bankConnectionLabel,
+      isEbicsVersionAllowedForUse,
+      EbicsVersion,
 
       userSettings,
       replaceMsgId,
