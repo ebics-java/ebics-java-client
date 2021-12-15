@@ -52,8 +52,7 @@
 </template>
 
 <script lang="ts">
-import { BankConnection } from 'components/models';
-import { defineComponent, ref, Ref, computed } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import useTracesAPI from 'components/traces';
 import { TraceEntry } from 'components/traces';
 import { VAceEditor } from 'vue3-ace-editor';

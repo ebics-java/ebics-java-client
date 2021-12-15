@@ -6,10 +6,8 @@ import {
   OrderType,
   OrderTypesCache,
   TransferType,
-  BankConnectionAccess,
   EbicsVersion,
 } from 'components/models';
-import useBankConnectionsAPI from './bankconnections';
 import useFileTransferAPI from './filetransfer';
 import { CustomMap } from './utils';
 import usePasswordAPI from './password-api';
@@ -23,8 +21,9 @@ const orderTypeCache: CustomMap<number, OrderTypesCache> = new CustomMap<
 
 export default function useOrderTypesAPI(
   selectedBankConnection: Ref<BankConnection | undefined>,
+  activeBankConnections: Ref<BankConnection[] | undefined>,
   filterType: Ref<OrderTypeFilter>,
-  displayAdminTypes: Ref<boolean> = ref(false)
+  displayAdminTypes: Ref<boolean> = ref(false),
 ) {
   //BTF   types of selectedBankConnection filtered by filterType
   const outputBtfTypes: Ref<BTFType[]> = ref([]);
@@ -32,11 +31,8 @@ export default function useOrderTypesAPI(
   const outputOrderTypes: Ref<OrderType[]> = ref([]);
 
   const { ebicsOrderTypes } = useFileTransferAPI();
-  const { activeBankConnections } = useBankConnectionsAPI(
-    BankConnectionAccess.USE
-  );
   const { promptCertPassword } = usePasswordAPI();
-  const { isEbicsVersionAllowedForUse } = useBanksAPI();
+  const { isEbicsVersionAllowedForUse } = useBanksAPI(true);
 
   /**
    * If the @param orderTypesCache is empty or refresh is forced,

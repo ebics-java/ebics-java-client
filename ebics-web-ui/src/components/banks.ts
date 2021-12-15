@@ -11,7 +11,7 @@ import useDialogs from './dialogs';
  *  loadBanks function to trigger refreshing of banks
  *  deleteBank function to delete bank 
  */
-export default function useBanksAPI() {
+export default function useBanksAPI(avoidRefreshOnMounted = false) {
   const { apiErrorHandler } = useBaseAPI();
   const { confirmDialog } = useDialogs();
 
@@ -43,7 +43,8 @@ export default function useBanksAPI() {
           || bank.ebicsVersions?.some(ver => (ver.version == ebicsVersion && ver.isAllowedForUse))
   }
 
-  onMounted(loadBanks);
+  if (!avoidRefreshOnMounted)
+    onMounted(loadBanks);
 
   return { banks, loadBanks, deleteBank, isEbicsVersionAllowedForUse };
 }

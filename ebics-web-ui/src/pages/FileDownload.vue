@@ -171,10 +171,10 @@ export default defineComponent({
       useBankConnectionsAPI(BankConnectionAccess.USE);
     const { ebicsDownloadRequest } = useFileTransferAPI();
     const { applySmartAdjustments, detectFileFormat, getFileExtension, currentDate } = useTextUtils();
-    const { isEbicsVersionAllowedForUse } = useBanksAPI();
+    const { isEbicsVersionAllowedForUse } = useBanksAPI(true);
     const { userSettings } = useUserSettings();
     const { btfTypes, orderTypes, orderTypeLabel, btfTypeLabel } =
-      useOrderTypesAPI(bankConnection, ref(OrderTypeFilter.DownloadOnly), toRef(userSettings.value, 'displayAdminTypes') );
+      useOrderTypesAPI(bankConnection, activeBankConnections, ref(OrderTypeFilter.DownloadOnly), toRef(userSettings.value, 'displayAdminTypes') );
 
     const historicDownload = ref(false);
     const historicDateRange = ref({from: currentDate(), to: currentDate()});

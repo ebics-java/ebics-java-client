@@ -285,10 +285,10 @@ export default defineComponent({
       useBankConnectionsAPI(BankConnectionAccess.USE);
     const { ebicsUploadRequest } = useFileTransferAPI();
     const { applySmartAdjustments, detectFileFormat } = useTextUtils();
-    const { isEbicsVersionAllowedForUse } = useBanksAPI();
+    const { isEbicsVersionAllowedForUse } = useBanksAPI(true);
     const { userSettings } = useUserSettings();
     const { btfTypes, orderTypes, orderTypeLabel, btfTypeLabel } =
-      useOrderTypesAPI(bankConnection, ref(OrderTypeFilter.UploadOnly));
+      useOrderTypesAPI(bankConnection, activeBankConnections, ref(OrderTypeFilter.UploadOnly));
 
     //Single file setup
     const testInput = ref(null);
