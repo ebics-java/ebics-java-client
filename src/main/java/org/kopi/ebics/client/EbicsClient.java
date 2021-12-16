@@ -23,9 +23,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,6 +36,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -45,6 +50,7 @@ import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.NoDownloadDataAvailableException;
 import org.kopi.ebics.interfaces.Configuration;
 import org.kopi.ebics.interfaces.EbicsBank;
+import org.kopi.ebics.interfaces.EbicsLogger;
 import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.interfaces.EbicsUser;
 import org.kopi.ebics.interfaces.InitLetter;
@@ -53,6 +59,7 @@ import org.kopi.ebics.interfaces.PasswordCallback;
 import org.kopi.ebics.io.IOUtils;
 import org.kopi.ebics.messages.Messages;
 import org.kopi.ebics.schema.h003.OrderAttributeType;
+import org.kopi.ebics.session.CustomOrderType;
 import org.kopi.ebics.session.DefaultConfiguration;
 import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.session.OrderType;
@@ -390,6 +397,8 @@ public class EbicsClient {
             configuration.getTransferTraceDirectory(user));
 
         try {
+            configuration.getLogger().info(messages.getString("upload.request.send", 
+                orderType.getCode()));
             transferManager.sendFile(IOUtils.getFileContent(file), orderType, orderAttribute);
         } catch (IOException | EbicsException e) {
             configuration.getLogger()
@@ -416,6 +425,8 @@ public class EbicsClient {
             configuration.getTransferTraceDirectory(user));
 
         try {
+            configuration.getLogger().info(messages.getString("download.request.send", 
+                orderType.getCode()));
             transferManager.fetchFile(orderType, start, end, file);
         } catch (NoDownloadDataAvailableException e) {
             // don't log this exception as an error, caller can decide how to handle
@@ -431,6 +442,35 @@ public class EbicsClient {
         fetchFile(file, defaultUser, defaultProduct, orderType, false, start, end);
     }
 
+    /**
+     * Downloads file for order type without throwing NoDataAvailableException.
+     *
+     * Downloads file for the order type and logs success or warns about no data.
+     *
+     * @param file output file
+     * @param user EBICS User
+     * @param product EBICS Product
+     * @param orderType EBICS Order Type
+     * @param start Optional Date Range Start Date
+     * @param end Optional Date Range End Date
+     * @return true if data was available, false if not
+     * @throws java.io.IOException 
+     * @throws org.kopi.ebics.exception.EbicsException 
+    */
+    public boolean fetchFileIfAvailable(File file, User user, Product product, 
+        EbicsOrderType orderType, Date start, Date end) throws IOException,
+        EbicsException {
+
+        final EbicsLogger logger = configuration.getLogger();
+        try {
+            fetchFile(file, user, product, orderType, false, start, end);
+            configuration.getLogger().info(messages.getString("download.file.success", orderType.getCode()));
+            return true;
+        } catch (NoDownloadDataAvailableException nodataException) {
+            configuration.getLogger().warn(messages.getString("download.file.nodata", orderType.getCode()));
+            return false;
+        }
+    }
     /**
      * Performs buffers save before quitting the client application.
      */
@@ -507,12 +547,27 @@ public class EbicsClient {
     private static CommandLine parseArguments(Options options, String[] args) throws ParseException {
         CommandLineParser parser = new DefaultParser();
         options.addOption(null, "help", false, "Print this help text");
+        options.addOption(null, "version", false, "Print the version information and exit");
         CommandLine line = parser.parse(options, args);
         if (line.hasOption("help")) {
             HelpFormatter formatter = new HelpFormatter();
             System.out.println();
             formatter.printHelp(EbicsClient.class.getSimpleName(), options);
             System.out.println();
+            System.exit(0);
+        }
+        if (line.hasOption("version")) {
+            InputStream streamOrNull = EbicsClient.class.getClassLoader().getResourceAsStream(
+               "build.properties");
+            if (streamOrNull != null) {
+                try {
+                  Properties properties = new Properties();
+                  properties.load(streamOrNull);
+                  System.out.println(properties.getProperty("build.name") + " " +
+                    properties.getProperty("build.version"));
+            } catch (IOException ex) {}
+                
+            }
             System.exit(0);
         }
         return line;
@@ -611,11 +666,20 @@ public class EbicsClient {
         options.addOption("o", "output", true, "output file");
         options.addOption("i", "input", true, "input file");
 
+        options.addOption("s", "start", true, "Start date (yyyy-MM-dd)");
+        options.addOption("e", "end", true, "End date (yyyy-MM-dd)");
+
+        options.addOption("d", "download", true, "download custom order type");
+        options.addOption("u", "upload", true, "upload custom order type");
+
+        options.addOption("c", "configuration-directory", true, "Configuration directory");
 
         CommandLine cmd = parseArguments(options, args);
 
-        File defaultRootDir = new File(System.getProperty("user.home") + File.separator + "ebics"
+        String configurationDirectory = cmd.getOptionValue("configuration-directory",
+            System.getProperty("user.home") + File.separator + "ebics"
             + File.separator + "client");
+        File defaultRootDir = new File(configurationDirectory);
         File ebicsClientProperties = new File(defaultRootDir, "ebics.txt");
         EbicsClient client = createEbicsClient(defaultRootDir, ebicsClientProperties);
 
@@ -642,25 +706,68 @@ public class EbicsClient {
         String outputFileValue = cmd.getOptionValue("o");
         String inputFileValue = cmd.getOptionValue("i");
 
-        List<? extends EbicsOrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
-            OrderType.C52, OrderType.C53, OrderType.C54,
-            OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
+        // Process start and end dates. 
+        // If the end date is specified, start date is required
+        // If the start date is specified, the end date defaults
+        // to the current date.
+        String start = cmd.getOptionValue("s");
+        String end = cmd.getOptionValue("e");
+        Date startDate = null;
+        Date endDate = null;
+        if (start != null) {
+            final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            startDate = format.parse(start);
+            endDate = end != null
+                    ? format.parse(end)
+                    : Date.from(Instant.now());
+        } else if (end != null) {
+            throw new EbicsException("Start date required if end date is given");
+        }
 
-        for (EbicsOrderType type : fetchFileOrders) {
-            if (hasOption(cmd, type)) {
-                client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
-                    client.defaultProduct, type, false, null, null);
-                break;
+        boolean allDataWasAvailable = true;
+
+        if (cmd.hasOption("d"))
+        {
+            allDataWasAvailable &= client.fetchFileIfAvailable(getOutputFile(outputFileValue), 
+                client.defaultUser,
+                client.defaultProduct, 
+                new CustomOrderType(cmd.getOptionValue("d")), 
+                startDate, endDate);
+        }
+        else
+        {
+            List<? extends EbicsOrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
+                OrderType.C52, OrderType.C53, OrderType.C54,
+                OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
+
+            for (EbicsOrderType type : fetchFileOrders) {
+                if (hasOption(cmd, type)) {
+                    allDataWasAvailable &= client.fetchFileIfAvailable(getOutputFile(outputFileValue), 
+                        client.defaultUser,
+                        client.defaultProduct, 
+                        type, 
+                        startDate, endDate);
+                    break;
+                }
             }
         }
 
-        List<? extends EbicsOrderType> sendFileOrders = Arrays.asList(OrderType.XKD, OrderType.FUL, OrderType.XCT,
-            OrderType.XE2, OrderType.CCT);
-        for (EbicsOrderType type : sendFileOrders) {
-            if (hasOption(cmd, type)) {
-                client.sendFile(new File(inputFileValue), client.defaultUser,
-                    client.defaultProduct, type);
-                break;
+        if (cmd.hasOption("u"))
+        {
+            client.sendFile(new File(inputFileValue), client.defaultUser,
+                client.defaultProduct, 
+                new CustomOrderType(cmd.getOptionValue("u")));
+        }
+        else
+        {
+            List<? extends EbicsOrderType> sendFileOrders = Arrays.asList(OrderType.XKD, OrderType.FUL, OrderType.XCT,
+                OrderType.XE2, OrderType.CCT);
+            for (EbicsOrderType type : sendFileOrders) {
+                if (hasOption(cmd, type)) {
+                    client.sendFile(new File(inputFileValue), client.defaultUser,
+                        client.defaultProduct, type);
+                    break;
+                }
             }
         }
 
@@ -671,6 +778,10 @@ public class EbicsClient {
             }
         }
         client.quit();
+        if (!allDataWasAvailable)
+        {
+            System.exit(2);
+        }
     }
 
     private static File getOutputFile(String outputFileName) {

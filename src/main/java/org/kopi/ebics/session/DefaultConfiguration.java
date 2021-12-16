@@ -41,6 +41,9 @@ import org.kopi.ebics.letter.DefaultLetterManager;
 /**
  * A simple client application configuration.
  *
+ * Loads client configuration from a property file, but allows properties
+ * to be overridden from the System properties.
+ *
  * @author hachani
  *
  */
@@ -60,13 +63,17 @@ public class DefaultConfiguration implements Configuration {
   }
 
   /**
-   * Returns the corresponding property of the given key
+   * Returns the corresponding property of the given key.
+   *
+   * First, attempts to load property from system properties. If none found,
+   * loads the property from the bundle.
+   *
    * @param key the property key
    * @return the property value.
    */
   private String getString(String key) {
     try {
-      return bundle.getString(key);
+      return System.getProperty(key, bundle.getString(key));
     } catch(MissingResourceException e) {
       return "!!" + key + "!!";
     }
@@ -94,12 +101,30 @@ public class DefaultConfiguration implements Configuration {
     //Create users directory
     IOUtils.createDirectories(getUsersDirectory());
 
-    logger.setLogFile(getLogDirectory() + File.separator + getLogFileName());
+    logger.setLogFile(resolveFile(getLogDirectory(), getLogFileName()));
     ((DefaultEbicsLogger)logger).setFileLoggingEnabled(true);
     ((DefaultEbicsLogger)logger).setLevel(DefaultEbicsLogger.ALL_LEVEL);
     serializationManager.setSerializationDirectory(getSerializationDirectory());
     traceManager.setTraceEnabled(isTraceEnabled());
     letterManager = new DefaultLetterManager(getLocale());
+  }
+
+  /**
+   * Returns absolute file name or prepends directory name.
+   *
+   * <p> If fileName starts with path separator, just returns the fileName. 
+   * Otherwise, prepends directory name and a path separator.
+   *
+   * @param directory directory name
+   * @param file file name
+   * @return 
+   */
+  public static String resolveFile(String directory, String file) {
+    if (file != null && file.startsWith(File.separator)) { 
+      return file;
+    } else {
+      return directory + File.separator + file;
+    }
   }
 
   @Override
@@ -109,7 +134,7 @@ public class DefaultConfiguration implements Configuration {
 
   @Override
   public String getLogDirectory() {
-    return rootDir + File.separator + getString("log.dir.name");
+    return resolveFile(rootDir, getString("log.dir.name"));
   }
 
   @Override
@@ -119,7 +144,7 @@ public class DefaultConfiguration implements Configuration {
 
   @Override
   public String getConfigurationFile() {
-    return rootDir + File.separator + getString("conf.file.name");
+    return resolveFile(rootDir, getString("conf.file.name"));
   }
 
   @Override
@@ -129,22 +154,22 @@ public class DefaultConfiguration implements Configuration {
 
   @Override
   public String getKeystoreDirectory(EbicsUser user) {
-    return getUserDirectory(user) + File.separator + getString("keystore.dir.name");
+    return resolveFile(getUserDirectory(user), getString("keystore.dir.name"));
   }
 
   @Override
   public String getTransferTraceDirectory(EbicsUser user) {
-    return getUserDirectory(user) + File.separator + getString("traces.dir.name");
+    return resolveFile(getUserDirectory(user), getString("traces.dir.name"));
   }
 
   @Override
   public String getSerializationDirectory() {
-    return rootDir + File.separator + getString("serialization.dir.name");
+    return resolveFile(rootDir, getString("serialization.dir.name"));
   }
 
   @Override
   public String getSSLTrustedStoreDirectory() {
-    return rootDir + File.separator + getString("ssltruststore.dir.name");
+    return resolveFile(rootDir, getString("ssltruststore.dir.name"));
   }
 
   @Override
@@ -154,12 +179,12 @@ public class DefaultConfiguration implements Configuration {
 
   @Override
   public String getSSLBankCertificates() {
-    return rootDir + File.separator + getString("sslbankcert.dir.name");
+    return resolveFile(rootDir, getString("sslbankcert.dir.name"));
   }
 
   @Override
   public String getUsersDirectory() {
-    return rootDir + File.separator + getString("users.dir.name");
+    return resolveFile(rootDir, getString("users.dir.name"));
   }
 
   @Override
@@ -179,12 +204,12 @@ public class DefaultConfiguration implements Configuration {
 
   @Override
   public String getLettersDirectory(EbicsUser user) {
-    return getUserDirectory(user) + File.separator + getString("letters.dir.name");
+    return resolveFile(getUserDirectory(user), getString("letters.dir.name"));
   }
 
   @Override
   public String getUserDirectory(EbicsUser user) {
-    return getUsersDirectory() + File.separator + user.getUserId();
+    return resolveFile(getUsersDirectory(), user.getUserId());
   }
 
   @Override

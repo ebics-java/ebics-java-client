@@ -125,9 +125,22 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
                                                                         orderType,
                                                                         fDLOrderParamsType);
     } else {
-      StandardOrderParamsType		standardOrderParamsType;
+        StandardOrderParamsType		standardOrderParamsType;
+        standardOrderParamsType = EbicsXmlFactory.createStandardOrderParamsType();
 
-      standardOrderParamsType = EbicsXmlFactory.createStandardOrderParamsType();
+        if (startRange != null && endRange != null) {
+            StandardOrderParamsType.DateRange range = StandardOrderParamsType.DateRange.Factory.newInstance();
+            Calendar start = Calendar.getInstance();
+            Calendar end = Calendar.getInstance();
+            start.setTime(startRange);
+            end.setTime(endRange);
+            range.setStart(start);
+            range.setEnd(end);
+
+            standardOrderParamsType.setDateRange(range);
+        }
+
+
       //FIXME Some banks cannot handle OrderID element in download process. Add parameter in configuration!!!
       orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(null,//session.getUser().getPartner().nextOrderId(),
 	                                                                OrderAttributeType.DZHNN,
