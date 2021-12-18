@@ -30,9 +30,10 @@ class EbicsSessionCache(
     private fun createSession(
         userIdPass: UserIdPass,
         product: Product,
-        bankKeysRequired: Boolean = true
+        bankKeysRequired: Boolean = true,
+        accessType: BankConnectionAccessType = BankConnectionAccessType.USE
     ): EbicsSession {
-        val user = userService.getUserById(userIdPass.id, BankConnectionAccessType.WRITE)
+        val user = userService.getUserById(userIdPass.id, accessType)
         with(requireNotNull(user.keyStore) { "User certificates must be initialized in order to create EBICS session" }) {
             val manager = toUserCertMgr(userIdPass.password)
             val bankCertManager = if (bankKeysRequired) {
