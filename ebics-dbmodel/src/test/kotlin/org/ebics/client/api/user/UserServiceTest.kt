@@ -1,7 +1,6 @@
 package org.ebics.client.api.user
 
 import org.assertj.core.api.Assertions.assertThat
-import org.ebics.client.api.bank.Bank
 import org.ebics.client.api.bank.BankData
 import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.user.cert.UserKeyStoreService
@@ -19,9 +18,9 @@ import java.net.URL
 @ExtendWith(SpringExtension::class)
 @DataJpaTest
 @AutoConfigurationPackage(basePackages = ["org.ebics.client.api.*"])
-@ContextConfiguration(classes = [BankService::class, UserKeyStoreService::class, PartnerService::class, UserService::class])
+@ContextConfiguration(classes = [BankService::class, UserKeyStoreService::class, PartnerService::class, UserServiceImpl::class])
 class UserServiceTest(
-    @Autowired private val userService: UserService,
+    @Autowired private val userService: UserServiceImpl,
     @Autowired private val bankService: BankService,
 ) {
     @Test

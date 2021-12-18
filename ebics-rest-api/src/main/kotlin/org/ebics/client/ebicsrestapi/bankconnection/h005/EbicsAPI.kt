@@ -6,7 +6,7 @@ import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.bank.cert.BankKeyStoreService
 import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
-import org.ebics.client.api.user.UserService
+import org.ebics.client.api.user.UserServiceImpl
 import org.ebics.client.ebicsrestapi.bankconnection.UploadResponse
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
 import org.ebics.client.filetransfer.h005.FileTransfer
@@ -26,7 +26,7 @@ import org.springframework.web.multipart.MultipartFile
 
 @Component("EbicsAPIH005")
 class EbicsAPI(
-    private val userService: UserService,
+    private val userService: UserServiceImpl,
     private val bankService: BankService,
     private val bankKeyStoreService: BankKeyStoreService,
     private val configuration: EbicsRestConfiguration)

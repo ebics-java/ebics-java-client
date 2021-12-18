@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("bankconnections")
 @CrossOrigin(origins = ["http://localhost:8081"])
 class EbicsBankConnectionsResource (
-    private val userService: UserService)
+    private val userService: UserServiceImpl)
 {
     @GetMapping("")
     fun listBankConnections(@RequestParam(required = false) permission: BankConnectionAccessType = BankConnectionAccessType.READ): List<User> =

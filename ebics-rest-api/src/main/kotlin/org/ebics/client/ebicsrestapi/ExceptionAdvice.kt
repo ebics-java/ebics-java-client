@@ -3,7 +3,6 @@ package org.ebics.client.ebicsrestapi
 import org.ebics.client.api.AlreadyExistException
 import org.ebics.client.api.FunctionException
 import org.ebics.client.api.NotFoundException
-import org.ebics.client.api.user.UserService
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.exception.NoDownloadDataAvailableException
 import org.slf4j.LoggerFactory
