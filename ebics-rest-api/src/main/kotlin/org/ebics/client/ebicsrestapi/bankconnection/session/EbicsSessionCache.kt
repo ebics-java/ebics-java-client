@@ -19,11 +19,12 @@ class EbicsSessionCache(
     fun getSession(
         userIdPass: UserIdPass,
         product: Product,
-        bankKeysRequired: Boolean = true
+        bankKeysRequired: Boolean = true,
+        accessType: BankConnectionAccessType = BankConnectionAccessType.USE
     ): CachedSession {
         return CachedSession(
             UUID.randomUUID().toString(),
-            createSession(userIdPass, product, bankKeysRequired)
+            createSession(userIdPass, product, bankKeysRequired, accessType)
         )
     }
 
