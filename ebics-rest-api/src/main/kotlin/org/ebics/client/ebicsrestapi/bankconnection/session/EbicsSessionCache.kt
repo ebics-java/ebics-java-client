@@ -21,11 +21,8 @@ class EbicsSessionCache(
         product: Product,
         bankKeysRequired: Boolean = true,
         accessType: BankConnectionAccessType = BankConnectionAccessType.USE
-    ): CachedSession {
-        return CachedSession(
-            UUID.randomUUID().toString(),
-            createSession(userIdPass, product, bankKeysRequired, accessType)
-        )
+    ): EbicsSession {
+        return createSession(userIdPass, product, bankKeysRequired, accessType)
     }
 
     private fun createSession(

@@ -1,8 +1,6 @@
 package org.ebics.client.ebicsrestapi.bankconnection
 
-import org.ebics.client.api.EbicsSession
 import org.ebics.client.api.bank.Bank
-import org.ebics.client.ebicsrestapi.bankconnection.session.CachedSession
 import org.ebics.client.ebicsrestapi.bankconnection.session.EbicsSessionCache
 import org.ebics.client.model.Product
 import org.junit.jupiter.api.Assertions
@@ -12,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import java.io.IOException
 
 @SpringBootTest
-//@ContextConfiguration(classes = [EbicsSessionCache::class, EbicsRestConfiguration::class, UserServiceTestImpl::class, TraceService::class, TraceRepository::class])
 class EbicsSessionCacheTest(@Autowired private val ebicsSessionCache: EbicsSessionCache) {
 
     val prod = Product("testProd", "de", "JTO")
@@ -33,12 +30,12 @@ class EbicsSessionCacheTest(@Autowired private val ebicsSessionCache: EbicsSessi
                 UserIdPass(1, "pass1"), prod
             )
         ) {
+            Assertions.assertNotNull(this)
             Assertions.assertTrue(sessionId.isNotBlank())
             Assertions.assertTrue(sessionId.length == 36)
-            Assertions.assertNotNull(session)
-            Assertions.assertNotNull(session.userCert)
-            Assertions.assertNotNull(session.user)
-            Assertions.assertNotNull((session.user.partner.bank as Bank).keyStore)
+            Assertions.assertNotNull(userCert)
+            Assertions.assertNotNull(user)
+            Assertions.assertNotNull((user.partner.bank as Bank).keyStore)
         }
     }
 
@@ -49,13 +46,13 @@ class EbicsSessionCacheTest(@Autowired private val ebicsSessionCache: EbicsSessi
                 UserIdPass(2, "pass2"), prod, false
             )
         ) {
+            Assertions.assertNotNull(this)
             Assertions.assertTrue(sessionId.isNotBlank())
             Assertions.assertTrue(sessionId.length == 36)
             Assertions.assertNotNull(sessionId)
-            Assertions.assertNotNull(session)
-            Assertions.assertNotNull(session.userCert)
-            Assertions.assertNotNull(session.user)
-            Assertions.assertNull((session.user.partner.bank as Bank).keyStore)
+            Assertions.assertNotNull(userCert)
+            Assertions.assertNotNull(user)
+            Assertions.assertNull((user.partner.bank as Bank).keyStore)
         }
     }
 
@@ -77,15 +74,15 @@ class EbicsSessionCacheTest(@Autowired private val ebicsSessionCache: EbicsSessi
     fun ifTheNewSessionIsRequestedAndThenSameSessionOnceMore_Then_TheCachedSessionIsReturned() {
         val s1 =
             ebicsSessionCache.getSession(
-                 UserIdPass(1, "pass1"), prod, true
+                UserIdPass(1, "pass1"), prod, true
             )
         val s2 =
             ebicsSessionCache.getSession(
-                 UserIdPass(1, "pass1"), prod, true
+                UserIdPass(1, "pass1"), prod, true
             )
 
         Assertions.assertEquals(s1.sessionId, s2.sessionId, "Session ID must same")
-        Assertions.assertEquals(s1.session, s2.session, "The returned session must be same")
+        Assertions.assertEquals(s1, s2, "The returned session must be same")
     }
 
     @Test

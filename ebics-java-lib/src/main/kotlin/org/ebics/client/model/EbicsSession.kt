@@ -23,6 +23,8 @@ import org.ebics.client.api.Configuration
 import org.ebics.client.api.EbicsUser
 import org.ebics.client.certificate.BankCertificateManager
 import org.ebics.client.certificate.UserCertificateManager
+import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * The EBICS Session for EBICS API requests
@@ -59,6 +61,11 @@ class EbicsSession(
      *  this for further operations like uploads / downloads / SPR
      */
     override val bankCert: BankCertificateManager?,
+
+    /**
+     * Unique sessionId
+     */
+    override val sessionId: String = UUID.randomUUID().toString(),
 ): EbicsSession {
     override val parameters: MutableMap<String, String> = HashMap()
 }

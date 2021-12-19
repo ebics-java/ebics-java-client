@@ -4,8 +4,10 @@ import org.ebics.client.certificate.BankCertificateManager
 import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.model.Product
+import java.util.*
 
 interface EbicsSession {
+    val sessionId: String
     /**
      * The session user.
      */
