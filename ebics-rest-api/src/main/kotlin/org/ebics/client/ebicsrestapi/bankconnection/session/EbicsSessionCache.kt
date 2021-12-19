@@ -8,7 +8,6 @@ import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
 import org.ebics.client.model.Product
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class EbicsSessionCache(
