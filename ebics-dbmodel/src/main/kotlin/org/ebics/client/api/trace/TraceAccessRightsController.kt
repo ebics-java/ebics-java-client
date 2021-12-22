@@ -19,10 +19,7 @@ interface TraceAccessRightsController : ReadAccessRightsController {
     override fun hasReadAccess(authCtx: AuthenticationContext): Boolean {
         with(authCtx) {
             return when {
-                authCtx.hasRole(BusinessRole.ROLE_ADMIN) -> {
-                    logger.debug("Read permission granted through admin role for {}", authCtx.name)
-                    true
-                }
+                //Fix: ADMIN access removed as it could mean significant security breach
                 authCtx.hasRole(BusinessRole.ROLE_USER) && getOwnerName() == name -> {
                     logger.debug("Read permission granted through user access for {}", authCtx.name)
                     true

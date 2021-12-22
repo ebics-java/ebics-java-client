@@ -2,7 +2,7 @@ package org.ebics.client.order
 
 import org.ebics.client.order.h005.ContainerType
 
-class EbicsService(
+data class EbicsService(
     val serviceName: String,
     val serviceOption: String?,
     val scope: String?,

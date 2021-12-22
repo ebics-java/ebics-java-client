@@ -1,6 +1,6 @@
 package org.ebics.client.order
 
-class EbicsMessage (
+data class EbicsMessage (
     val messageName: String,
     val messageNameVariant: String?,
     val messageNameVersion: String?,

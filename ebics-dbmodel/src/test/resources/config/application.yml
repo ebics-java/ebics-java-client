@@ -1,6 +1,6 @@
 spring:
   liquibase:
-    change-log: "classpath:db/changelog/changeLog.xml"
+    change-log: "classpath:db/changelog/changeLog-1.0.yaml"
   jpa:
     hibernate:
       naming:
@@ -11,3 +11,12 @@ spring:
     driver-class-name: "org.h2.Driver"
     url: "jdbc:h2:mem:testonly"
     initialization-mode: "never"
+logging:
+  level:
+    root: INFO
+    # logs the SQL statements
+    org.hibernate.SQL: DEBUG
+    # Logs the JDBC parameters passed to a query
+    org.hibernate.type: TRACE
+    org.springframework.web: ERROR
+    org.hibernate: INFO

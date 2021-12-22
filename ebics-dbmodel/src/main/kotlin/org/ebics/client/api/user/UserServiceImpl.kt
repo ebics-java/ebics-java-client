@@ -19,7 +19,6 @@ class UserServiceImpl(
     private val userKeyStoreService: UserKeyStoreService,
 ) : UserService {
 
-
     override fun findUsers(permission: BankConnectionAccessType): List<User> {
         return userRepository.findAll().filter { it.hasAccess(permission, AuthenticationContext.fromSecurityContext()) }
     }

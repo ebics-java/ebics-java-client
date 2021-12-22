@@ -492,3 +492,104 @@ databaseChangeLog:
                 newColumnName: isAllowedForUse
                 tableName: EBICSVERSIONSUPPORT
                 type: boolean
+- changeSet:
+    id: 1640007586105-1
+    author: honza.toegel (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: orderType_adminOrderType
+            type: integer
+        tableName: TraceEntry
+- changeSet:
+    id: 1640007586105-2
+    author: honza.toegel (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: orderType_businessOrderType
+            type: varchar(10)
+        tableName: TraceEntry
+- changeSet:
+    id: 1640007586105-9
+    author: honza.toegel (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: orderType_ebicsServiceType_serviceName
+            type: varchar(8)
+        tableName: TraceEntry
+- changeSet:
+      id: 1640007586105-3
+      author: honza.toegel (generated)
+      changes:
+          - addColumn:
+                columns:
+                    - column:
+                          name: orderType_ebicsServiceType_containerType
+                          type: integer
+                tableName: TraceEntry
+- changeSet:
+      id: 1640007586105-4
+      author: honza.toegel (generated)
+      changes:
+          - addColumn:
+                columns:
+                    - column:
+                          name: orderType_ebicsServiceType_message_messageName
+                          type: varchar(20)
+                tableName: TraceEntry
+- changeSet:
+      id: 1640007586105-5
+      author: honza.toegel (generated)
+      changes:
+          - addColumn:
+                columns:
+                    - column:
+                          name: orderType_ebicsServiceType_message_messageNameFormat
+                          type: varchar(10)
+                tableName: TraceEntry
+- changeSet:
+      id: 1640007586105-6
+      author: honza.toegel (generated)
+      changes:
+          - addColumn:
+                columns:
+                    - column:
+                          name: orderType_ebicsServiceType_message_messageNameVariant
+                          type: varchar(8)
+                tableName: TraceEntry
+- changeSet:
+      id: 1640007586105-7
+      author: honza.toegel (generated)
+      changes:
+          - addColumn:
+                columns:
+                    - column:
+                          name: orderType_ebicsServiceType_message_messageNameVersion
+                          type: varchar(8)
+                tableName: TraceEntry
+- changeSet:
+      id: 1640007586105-8
+      author: honza.toegel (generated)
+      changes:
+          - addColumn:
+                columns:
+                    - column:
+                          name: orderType_ebicsServiceType_scope
+                          type: varchar(8)
+                tableName: TraceEntry
+- changeSet:
+    id: 1640007586105-10
+    author: honza.toegel (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: orderType_ebicsServiceType_serviceOption
+            type: varchar(20)
+        tableName: TraceEntry
+
