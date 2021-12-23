@@ -19,15 +19,17 @@
 package org.ebics.client.keymgmt.h005
 
 import org.ebics.client.api.EbicsSession
+import org.ebics.client.api.trace.h005.TraceSession
 import org.ebics.client.certificate.BankCertificateManager
 import org.ebics.client.certificate.BankCertificateManager.Companion.createFromCertificates
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.http.HttpRequestSender
-import org.ebics.client.interfaces.ContentFactory
 
 import org.ebics.client.io.ByteArrayContentFactory
 import org.ebics.client.keymgmt.KeyManagement
 import org.ebics.client.model.user.EbicsUserAction
+import org.ebics.client.order.EbicsAdminOrderType
+import org.ebics.client.order.h005.OrderTypeDefinition
 import org.ebics.client.utils.Utils
 import org.ebics.client.xml.h005.*
 import java.io.IOException
@@ -59,11 +61,12 @@ class KeyManagementImpl(session: EbicsSession) : KeyManagement(session) {
         session.user.checkAction(EbicsUserAction.INI)
         val sender = HttpRequestSender(session)
         val request = INIRequestElement(session).apply { build(); validate() }
-        session.configuration.traceManager.trace(request, session)
+        val traceSession = TraceSession(session, OrderTypeDefinition(EbicsAdminOrderType.INI))
+        traceSession.trace(request)
         val responseBody = sender.send(ByteArrayContentFactory(request.prettyPrint()))
         val response = KeyManagementResponseElement(responseBody, "INIResponse")
         response.build()
-        session.configuration.traceManager.trace(response, session)
+        traceSession.trace(response)
         response.report()
         session.user.updateStatus(EbicsUserAction.INI)
     }
@@ -79,11 +82,12 @@ class KeyManagementImpl(session: EbicsSession) : KeyManagement(session) {
         session.user.checkAction(EbicsUserAction.HIA)
         val sender = HttpRequestSender(session)
         val request = HIARequestElement(session).apply { build(); validate() }
-        session.configuration.traceManager.trace(request, session)
+        val traceSession = TraceSession(session, OrderTypeDefinition(EbicsAdminOrderType.HIA))
+        traceSession.trace(request)
         val responseBody = sender.send(ByteArrayContentFactory(request.prettyPrint()))
         val response = KeyManagementResponseElement(responseBody, "HIAResponse")
         response.build()
-        session.configuration.traceManager.trace(response, session)
+        traceSession.trace(response)
         response.report()
         session.user.updateStatus(EbicsUserAction.HIA)
     }
@@ -101,17 +105,18 @@ class KeyManagementImpl(session: EbicsSession) : KeyManagement(session) {
         session.user.checkAction(EbicsUserAction.HPB)
         val sender = HttpRequestSender(session)
         val request = HPBRequestElement(session).apply { build(); validate() }
-        session.configuration.traceManager.trace(request, session)
+        val traceSession = TraceSession(session, OrderTypeDefinition(EbicsAdminOrderType.HPB))
+        traceSession.trace(request)
         val responseBody = sender.send(ByteArrayContentFactory(request.prettyPrint()))
         val response = KeyManagementResponseElement(responseBody, "HBPResponse")
         response.build()
-        session.configuration.traceManager.trace(response, session)
+        traceSession.trace(response)
         response.report()
         val factory =
             ByteArrayContentFactory(Utils.unzip(session.userCert.decrypt(response.orderData, response.transactionKey)))
         val orderData = HPBResponseOrderDataElement(factory)
         orderData.build()
-        session.configuration.traceManager.trace(orderData, session)
+        traceSession.trace(orderData)
         val manager = createFromCertificates(orderData.bankE002Certificate, orderData.bankX002Certificate)
         session.user.updateStatus(EbicsUserAction.HPB)
         return manager
@@ -128,11 +133,12 @@ class KeyManagementImpl(session: EbicsSession) : KeyManagement(session) {
         session.user.checkAction(EbicsUserAction.SPR)
         val sender = HttpRequestSender(session)
         val request = SPRRequestElement(session).apply { build(); validate() }
-        session.configuration.traceManager.trace(request, session)
+        val traceSession = TraceSession(session, OrderTypeDefinition(EbicsAdminOrderType.SPR))
+        traceSession.trace(request)
         val responseBody = sender.send(ByteArrayContentFactory(request.prettyPrint()))
         val response = SPRResponseElement(responseBody)
         response.build()
-        session.configuration.traceManager.trace(response, session)
+        traceSession.trace(response)
         response.report()
         session.user.updateStatus(EbicsUserAction.SPR)
     }

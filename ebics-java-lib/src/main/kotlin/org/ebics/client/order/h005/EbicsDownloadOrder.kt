@@ -2,7 +2,7 @@ package org.ebics.client.order.h005
 
 import org.ebics.client.order.AbstractEbicsDownloadOrder
 import org.ebics.client.order.EbicsAdminOrderType
-import org.ebics.client.order.EbicsService
+import org.ebics.client.order.IEbicsService
 import java.util.*
 
 /**
@@ -12,5 +12,5 @@ import java.util.*
  * @param endDate end date (for historical downloads only)
  */
 class EbicsDownloadOrder
-(adminOrderType: EbicsAdminOrderType = EbicsAdminOrderType.BTD, val orderService: EbicsService?, startDate: Date?, endDate: Date?, params: Map<String, String> = emptyMap()) :
+(adminOrderType: EbicsAdminOrderType = EbicsAdminOrderType.BTD, val orderService: IEbicsService?, startDate: Date?, endDate: Date?, params: Map<String, String> = emptyMap()) :
     AbstractEbicsDownloadOrder(adminOrderType, startDate, endDate, params)

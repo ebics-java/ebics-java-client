@@ -18,6 +18,7 @@
  */
 package org.ebics.client.api
 
+import org.ebics.client.api.trace.TraceManager
 import java.util.*
 
 /**

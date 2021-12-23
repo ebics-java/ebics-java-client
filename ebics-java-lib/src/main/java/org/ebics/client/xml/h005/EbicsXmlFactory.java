@@ -22,7 +22,8 @@ package org.ebics.client.xml.h005;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
-import org.ebics.client.order.*;
+import org.ebics.client.order.IEbicsMessage;
+import org.ebics.client.order.IEbicsService;
 import org.ebics.client.order.h005.ContainerType;
 import org.ebics.client.order.h005.EbicsDownloadOrder;
 import org.ebics.client.order.h005.EbicsUploadOrder;
@@ -883,7 +884,7 @@ public class EbicsXmlFactory {
     }
 
 
-    public static MessageType createMessageType(EbicsMessage ebicsMessage) {
+    public static MessageType createMessageType(IEbicsMessage ebicsMessage) {
         MessageType messageType = MessageType.Factory.newInstance();
         messageType.setStringValue(ebicsMessage.getMessageName());
         if (ebicsMessage.getMessageNameFormat() != null)
@@ -895,7 +896,7 @@ public class EbicsXmlFactory {
         return messageType;
     }
 
-    public static RestrictedServiceType createRestrictedServiceType(EbicsService ebicsService) {
+    public static RestrictedServiceType createRestrictedServiceType(IEbicsService ebicsService) {
         RestrictedServiceType serviceType = RestrictedServiceType.Factory.newInstance();
         serviceType.setMsgName(createMessageType(ebicsService.getMessage()));
         serviceType.setServiceName(ebicsService.getServiceName());

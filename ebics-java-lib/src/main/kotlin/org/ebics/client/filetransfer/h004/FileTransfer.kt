@@ -21,6 +21,8 @@ package org.ebics.client.filetransfer.h004
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
 import org.ebics.client.api.EbicsSession
 import org.ebics.client.api.TransferState
+import org.ebics.client.api.trace.h004.ITraceSession
+import org.ebics.client.api.trace.h004.TraceSession
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.filetransfer.AbstractFileTransfer
 import org.ebics.client.http.HttpRequestSender
@@ -29,16 +31,13 @@ import org.ebics.client.io.ByteArrayContentFactory
 import org.ebics.client.io.Joiner
 import org.ebics.client.messages.Messages.getString
 import org.ebics.client.order.EbicsAdminOrderType
-import org.ebics.client.order.h004.EbicsDownloadOrder
-import org.ebics.client.order.h004.EbicsUploadOrder
-import org.ebics.client.order.h004.EbicsUploadOrderResponse
-import org.ebics.client.order.h004.OrderType
+import org.ebics.client.order.h004.*
 import org.ebics.client.utils.Constants
 import org.ebics.client.xml.h004.*
-import org.ebics.client.xml.h004.HTDResponseOrderDataElement
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.io.OutputStream
+import java.util.*
 
 /**
  * Handling of file transfers.
@@ -95,8 +94,9 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         )
         initializer.build()
         initializer.validate()
-        session.configuration.traceManager.trace(initializer.userSignature, session)
-        session.configuration.traceManager.trace(initializer, session)
+        val traceSession = TraceSession(session, OrderTypeDefinition(uploadOrder.adminOrderType, uploadOrder.orderType))
+        traceSession.trace(initializer.userSignature)
+        traceSession.trace(initializer)
         val responseBody = sender.send(ByteArrayContentFactory(initializer.prettyPrint()))
         
         val response = InitializationResponseElement(
@@ -104,13 +104,13 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
             DefaultEbicsRootElement.generateName(uploadOrder.orderType)
         )
         response.build()
-        session.configuration.traceManager.trace(response, session)
+        traceSession.trace(response)
         val state = TransferState(initializer.segmentNumber, response.transactionId)
         while (state.hasNext()) {
             val segmentNumber = state.next()
             sendFileSegment(
                 initializer.getContent(segmentNumber), segmentNumber, state.isLastSegment,
-                state.transactionId, uploadOrder.orderType ?: "FUL"
+                state.transactionId, uploadOrder.orderType ?: "FUL", traceSession
             )
         }
         return EbicsUploadOrderResponse(response.orderNumber, response.transactionId)
@@ -132,7 +132,8 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         segmentNumber: Int,
         lastSegment: Boolean,
         transactionId: ByteArray,
-        orderType: String
+        orderType: String,
+        traceSession: ITraceSession
     ) {
         logger.info(
             getString(
@@ -152,7 +153,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         val sender = HttpRequestSender(session)
         uploader.build()
         uploader.validate()
-        session.configuration.traceManager.trace(uploader, session)
+        traceSession.trace(uploader)
         val responseBody = sender.send(ByteArrayContentFactory(uploader.prettyPrint()))
         
         val response = TransferResponseElement(
@@ -160,7 +161,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
             DefaultEbicsRootElement.generateName(orderType)
         )
         response.build()
-        session.configuration.traceManager.trace(response, session)
+        traceSession.trace(response)
     }
 
     fun getHTD(): HTDResponseOrderDataElement {
@@ -202,7 +203,8 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         )
         initializer.build()
         initializer.validate()
-        session.configuration.traceManager.trace(initializer, session)
+        val traceSession = TraceSession(session, OrderTypeDefinition(downloadOrder.adminOrderType, downloadOrder.orderType), false)
+        traceSession.trace(initializer)
         val responseBody = sender.send(ByteArrayContentFactory(initializer.prettyPrint()))
         
         val response = DownloadInitializationResponseElement(
@@ -210,7 +212,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
             DefaultEbicsRootElement.generateName(downloadOrder.adminOrderType)
         )
         response.build()
-        session.configuration.traceManager.trace(response, session)
+        traceSession.trace(response)
         response.report()
         val state = TransferState(response.segmentsNumber, response.transactionId)
         state.setSegmentNumber(response.segmentNumber)
@@ -223,7 +225,8 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
                 segmentNumber,
                 state.isLastSegment,
                 state.transactionId,
-                joiner
+                joiner,
+                traceSession
             )
         }
         outputStream.use { dest -> joiner.writeTo(dest, response.transactionKey) }
@@ -234,7 +237,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         )
         receipt.build()
         receipt.validate()
-        session.configuration.traceManager.trace(receipt, session)
+        traceSession.trace(receipt)
         val receiptResponseBody = sender.send(ByteArrayContentFactory(receipt.prettyPrint()))
         
         val receiptResponse = ReceiptResponseElement(
@@ -242,13 +245,13 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
             DefaultEbicsRootElement.generateName(downloadOrder.adminOrderType)
         )
         receiptResponse.build()
-        session.configuration.traceManager.trace(receiptResponse, session)
+        traceSession.trace(receiptResponse)
         receiptResponse.report()
     }
 
     /**
      * Fetches a given portion of a file.
-     * @param adminOrderType the order type
+     * @param downloadOrder the download order
      * @param segmentNumber the segment number
      * @param lastSegment is it the last segment?
      * @param transactionId the transaction ID
@@ -262,7 +265,8 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         segmentNumber: Int,
         lastSegment: Boolean,
         transactionId: ByteArray,
-        joiner: Joiner
+        joiner: Joiner,
+        traceSession: TraceSession
     ) {
         val sender = HttpRequestSender(session)
         val downloader = DownloadTransferRequestElement(
@@ -274,7 +278,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         )
         downloader.build()
         downloader.validate()
-        session.configuration.traceManager.trace(downloader, session)
+        traceSession.trace(downloader)
         val responseBody = sender.send(ByteArrayContentFactory(downloader.prettyPrint()))
         
         val response = DownloadTransferResponseElement(
@@ -283,7 +287,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
             DefaultEbicsRootElement.generateName(adminOrderType)
         )
         response.build()
-        session.configuration.traceManager.trace(response, session)
+        traceSession.trace(response)
         response.report()
         joiner.append(response.orderData)
     }

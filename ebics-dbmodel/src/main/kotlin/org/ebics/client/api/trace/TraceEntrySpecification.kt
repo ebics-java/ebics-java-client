@@ -2,6 +2,7 @@ package org.ebics.client.api.trace
 
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
 import org.ebics.client.api.user.User
+import org.ebics.client.model.EbicsVersion
 import org.springframework.data.jpa.domain.Specification
 import javax.persistence.criteria.CriteriaBuilder
 import javax.persistence.criteria.Path
@@ -22,10 +23,6 @@ fun <T, X> Predicate.addEqualsIfNotNull(builder: CriteriaBuilder, path: Path<X>,
 
 fun <T, X> CriteriaBuilder.attributeEquals(path: Path<X>, attributeName: String, value: T): Predicate {
     return equal(path.get<SingularAttribute<X, T>>(attributeName), value)
-}
-
-fun creatorAndOtAndBcEquals(creator: String, orderType: OrderTypeDefinition, user: User, useSharedPartnerData: Boolean = true): Specification<TraceEntry> {
-    return creatorEquals(creator).and(orderTypeEquals(orderType)).and(bankConnectionEquals(user, useSharedPartnerData))
 }
 
 fun bankConnectionEquals(user: User, useSharedPartnerData: Boolean = true): Specification<TraceEntry> {
@@ -73,4 +70,37 @@ fun orderTypeEquals(orderType: OrderTypeDefinition): Specification<TraceEntry> {
         }
         p
     }
+}
+
+fun sessionIdEquals(sessionId: String): Specification<TraceEntry> {
+    return Specification<TraceEntry> { root, _, builder ->
+        builder.attributeEquals(root, "sessionId", sessionId)
+    }
+}
+
+fun ebicsVersionEquals(ebicsVersion: EbicsVersion): Specification<TraceEntry> {
+    return Specification<TraceEntry> { root, _, builder ->
+        builder.attributeEquals(root, "ebicsVersion", ebicsVersion)
+    }
+}
+
+fun uploadEquals(upload: Boolean): Specification<TraceEntry> {
+    return Specification<TraceEntry> { root, _, builder ->
+        builder.attributeEquals(root, "upload", upload)
+    }
+}
+
+fun traceTypeEquals(traceType: TraceType): Specification<TraceEntry> {
+    return Specification<TraceEntry> { root, _, builder ->
+        builder.attributeEquals(root, "traceType", traceType)
+    }
+}
+
+fun fileDownloadFilter(creator: String, orderType: OrderTypeDefinition, user: User, ebicsVersion: EbicsVersion, useSharedPartnerData: Boolean = true): Specification<TraceEntry> {
+    return creatorEquals(creator)
+        .and(orderTypeEquals(orderType))
+        .and(bankConnectionEquals(user, useSharedPartnerData))
+        .and(ebicsVersionEquals(ebicsVersion))
+        .and(uploadEquals(false))
+        .and(traceTypeEquals(TraceType.Content))
 }

@@ -592,4 +592,55 @@ databaseChangeLog:
             name: orderType_ebicsServiceType_serviceOption
             type: varchar(20)
         tableName: TraceEntry
-
+- changeSet:
+    id: 1640187568445-1
+    author: honza.toegel (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: ebicsVersion
+            type: integer
+        tableName: TraceEntry
+- changeSet:
+    id: 1640187568445-2
+    author: honza.toegel (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: orderNumber
+            type: varchar(40)
+        tableName: TraceEntry
+- changeSet:
+    id: 1640187568445-5
+    author: honza.toegel (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: sessionId
+            type: varchar(40)
+        tableName: TraceEntry
+- changeSet:
+    id: 1640187568445-6
+    author: honza.toegel (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: upload
+            type: boolean
+        tableName: TraceEntry
+- changeSet:
+      id: 1640187568445-7
+      author: honza.toegel (generated)
+      changes:
+          - addColumn:
+                columns:
+                    - column:
+                          name: traceType
+                          type: integer
+                tableName: TraceEntry

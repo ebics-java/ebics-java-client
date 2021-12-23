@@ -37,7 +37,11 @@ class TraceRepositoryTest(
         return bankService.createBank(bank)
     }
 
-    private fun getMockUser(userId: String = "CHT10001", partnerId: String = "CH100001", bankId:Long = getMockBank()): User {
+    private fun getMockUser(
+        userId: String = "CHT10001",
+        partnerId: String = "CH100001",
+        bankId: Long = getMockBank()
+    ): User {
         val userInfo = BankConnection(EbicsVersion.H004, userId, "Jan", partnerId, bankId, false, false)
         val bcId = userService.createUserAndPartner(userInfo)
         return userService.getUserById(bcId)
@@ -48,7 +52,18 @@ class TraceRepositoryTest(
     fun testTrRepoSearchByCreator() {
         val mockUser1 = getMockUser()
 
-        traceRepository.save(TraceEntry(null, "test", mockUser1, "jan"))
+        traceRepository.save(
+            TraceEntry(
+                null,
+                "test",
+                mockUser1,
+                "sessId1",
+                "O5N3",
+                EbicsVersion.H004,
+                false,
+                creator = "jan"
+            )
+        )
         val result = traceRepository.findOne(creatorEquals("jan"))
         Assertions.assertTrue(result.isPresent)
         val result2 = traceRepository.findOne(creatorEquals("chosee"))
@@ -63,7 +78,18 @@ class TraceRepositoryTest(
         val mockUser2 = getMockUser("CHT002", "CH1", bankId)
         val mockUser3 = getMockUser("CHT002", "XXXXX", bankId)
 
-        traceRepository.save(TraceEntry(null, "test", mockUser1, "jan"))
+        traceRepository.save(
+            TraceEntry(
+                null,
+                "test",
+                mockUser1,
+                "sessId1",
+                "O5N3",
+                EbicsVersion.H004,
+                false,
+                creator = "jan"
+            )
+        )
         val result = traceRepository.findOne(bankConnectionEquals(mockUser1))
         Assertions.assertTrue(result.isPresent)
         val result2 = traceRepository.findOne(bankConnectionEquals(mockUser2, false))
@@ -83,7 +109,7 @@ class TraceRepositoryTest(
                 null,
                 "test",
                 mockUser1,
-                "jan",
+                "sessId1", "O5N3", EbicsVersion.H004, false, creator = "jan",
                 orderType = OrderTypeDefinition(EbicsAdminOrderType.HTD)
             )
         )
@@ -103,13 +129,13 @@ class TraceRepositoryTest(
         val mockUser1 = getMockUser()
         traceRepository.save(
             TraceEntry(
-                null, "test", mockUser1, "jan", orderType =
+                null, "test", mockUser1, "sessId1", "O5N3", EbicsVersion.H004, false, creator = "jan", orderType =
                 OrderTypeDefinition(EbicsAdminOrderType.HTD, null, "XE2")
             )
         )
 
         val negativeResult =
-            traceRepository.findOne(orderTypeEquals( OrderTypeDefinition(EbicsAdminOrderType.HAC)))
+            traceRepository.findOne(orderTypeEquals(OrderTypeDefinition(EbicsAdminOrderType.HAC)))
         Assertions.assertFalse(negativeResult.isPresent)
 
         val negativeResult2 =
@@ -132,7 +158,7 @@ class TraceRepositoryTest(
         val service = EbicsService("name", "s", "dd", message = EbicsMessage("name1", "ff", "001", "Zip"))
         traceRepository.save(
             TraceEntry(
-                null, "test", mockUser1, "jan", orderType =
+                null, "test", mockUser1, "sessId1", "O5N3", EbicsVersion.H004, false, creator = "jan", orderType =
                 OrderTypeDefinition(EbicsAdminOrderType.HTD, service)
             )
         )
@@ -152,5 +178,26 @@ class TraceRepositoryTest(
         val posResult2 =
             traceRepository.findOne(orderTypeEquals(OrderTypeDefinition(EbicsAdminOrderType.HTD, service)))
         Assertions.assertTrue(posResult2.isPresent)
+    }
+
+    @Test
+    @WithMockUser(username = "jan", roles = ["USER"])
+    fun testTrRepoSearchByEbicsVersionBtf() {
+        val mockUser1 = getMockUser()
+        val service = EbicsService("name", "s", "dd", message = EbicsMessage("name1", "ff", "001", "Zip"))
+        traceRepository.save(
+            TraceEntry(
+                null, "test", mockUser1, "sessId1", "O5N3", EbicsVersion.H004, false, creator = "jan", orderType =
+                OrderTypeDefinition(EbicsAdminOrderType.HTD, service)
+            )
+        )
+
+        val negativeResult =
+            traceRepository.findOne(ebicsVersionEquals(EbicsVersion.H005))
+        Assertions.assertFalse(negativeResult.isPresent)
+
+        val positiveResult =
+            traceRepository.findOne(ebicsVersionEquals(EbicsVersion.H004))
+        Assertions.assertTrue(positiveResult.isPresent)
     }
 }

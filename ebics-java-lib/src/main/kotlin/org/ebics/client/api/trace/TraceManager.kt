@@ -16,33 +16,32 @@
  *
  * $Id$
  */
-package org.ebics.client.api
+package org.ebics.client.api.trace
 
-import org.ebics.client.exception.EbicsException
 import org.ebics.client.interfaces.EbicsRootElement
-import org.ebics.client.api.EbicsSession
 
 /**
  * A mean to make EBICS transfer logged by saving
  * requests and responses from the EBICS bank server.
- * This can be done using the `trace(EbicsRootElement)`
- *
- * @author hachani
  */
 interface TraceManager {
     /**
      * Saves the `EbicsRootElement` in the traces
-     * directory. This directory may be specified by the
-     * `EbicsConfiguration` client configuration.
      *
      * @param element the element to trace
-     * @param session the EBICS session
-     * @throws EbicsException cannot trace the ebics element
+     * @param traceRequest all the trace request attributes
      *
      * @see Configuration.isTraceEnabled
      */
-    @Throws(EbicsException::class)
-    fun trace(element: EbicsRootElement, session: EbicsSession)
+    fun trace(
+        element: EbicsRootElement,
+        traceSession: org.ebics.client.api.trace.h004.ITraceSession
+    )
+
+    fun trace(
+        element: EbicsRootElement,
+        traceSession: org.ebics.client.api.trace.h005.ITraceSession
+    )
 
     /**
      * Enables or disables the trace feature

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import org.ebics.client.api.security.AuthenticationContext
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
 import org.ebics.client.api.user.User
+import org.ebics.client.model.EbicsVersion
 import java.time.ZonedDateTime
 import javax.persistence.*
 
@@ -18,6 +19,16 @@ data class TraceEntry(
 
     @ManyToOne(optional = false)
     val user:User,
+
+    val sessionId: String,
+
+    val orderNumber: String? = null,
+    /**
+     * The EBICS version used for this entry
+     */
+    val ebicsVersion: EbicsVersion,
+
+    val upload: Boolean,
 
     /**
      * Web user who created this entry
@@ -35,6 +46,8 @@ data class TraceEntry(
      */
     @Embedded
     val orderType: OrderTypeDefinition? = null,
+
+    val traceType: TraceType = TraceType.EbicsEnvelope
 ) : TraceAccessRightsController {
     @JsonIgnore
     override fun getObjectName(): String = "Trace entry created by '$creator' from $dateTime"

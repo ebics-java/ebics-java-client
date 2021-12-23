@@ -1,8 +1,8 @@
 package org.ebics.client.order
 
 data class EbicsMessage (
-    val messageName: String,
-    val messageNameVariant: String?,
-    val messageNameVersion: String?,
-    val messageNameFormat: String?,
-)
+    override val messageName: String,
+    override val messageNameVariant: String?,
+    override val messageNameVersion: String?,
+    override val messageNameFormat: String?,
+) : IEbicsMessage
