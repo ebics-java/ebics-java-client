@@ -159,6 +159,7 @@ import useFileTransferAPI from 'components/filetransfer';
 import useTextUtils from 'components/text-utils';
 import useUserSettings from 'components/user-settings';
 import useOrderTypesAPI from 'components/order-types';
+import useOrderTypeLabelAPI from 'components/order-type-label';
 import useBanksAPI from 'components/banks'
 
 export default defineComponent({
@@ -173,7 +174,8 @@ export default defineComponent({
     const { applySmartAdjustments, detectFileFormat, getFileExtension, currentDate } = useTextUtils();
     const { isEbicsVersionAllowedForUse } = useBanksAPI(true);
     const { userSettings } = useUserSettings();
-    const { btfTypes, orderTypes, orderTypeLabel, btfTypeLabel } =
+    const { orderTypeLabel, btfTypeLabel } = useOrderTypeLabelAPI();
+    const { btfTypes, orderTypes } =
       useOrderTypesAPI(bankConnection, activeBankConnections, ref(OrderTypeFilter.DownloadOnly), toRef(userSettings.value, 'displayAdminTypes') );
 
     const historicDownload = ref(false);

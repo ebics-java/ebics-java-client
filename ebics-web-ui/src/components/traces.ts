@@ -1,7 +1,18 @@
 import { ref, onMounted } from 'vue';
-import { BankConnection } from 'components/models';
+import { BankConnection, BtfService, EbicsVersion } from 'components/models';
 import { api } from 'boot/axios';
 import useBaseAPI from './base-api';
+
+export enum TraceType {
+  EbicsEnvelope = 'EbicsEnvelope',
+  Content = 'Content',
+}
+
+export interface OrderTypeDefinition {
+  adminOrderType: string,
+  ebicsServiceType?: BtfService,
+  businessOrderType?: string,
+}
 
 export interface TraceEntry {
   id: number,
@@ -9,6 +20,12 @@ export interface TraceEntry {
   user: BankConnection,
   creator: string,
   dateTime: Date, 
+  sessionId: string,
+  orderNumber?: string,
+  ebicsVesion: EbicsVersion,
+  upload: boolean,
+  traceType: TraceType,
+  orderType: OrderTypeDefinition,
 }
 
 export default function useTracesAPI() {
@@ -18,7 +35,6 @@ export default function useTracesAPI() {
 
   const loadTraces = async (): Promise<void> => {
     try {
-      //console.info('api: ' + JSON.stringify(api));
       const response = await api.get<TraceEntry[]>('traces');
       traces.value = response.data;
     } catch (error) {

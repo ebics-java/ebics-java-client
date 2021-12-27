@@ -265,6 +265,7 @@ import useFileTransferAPI from 'components/filetransfer';
 import useTextUtils from 'components/text-utils';
 import useUserSettings from 'components/user-settings';
 import useOrderTypesAPI from 'components/order-types';
+import useOrderTypeLabelAPI from 'components/order-type-label';
 import useBanksAPI from 'src/components/banks';
 
 export default defineComponent({
@@ -287,7 +288,8 @@ export default defineComponent({
     const { applySmartAdjustments, detectFileFormat } = useTextUtils();
     const { isEbicsVersionAllowedForUse } = useBanksAPI(true);
     const { userSettings } = useUserSettings();
-    const { btfTypes, orderTypes, orderTypeLabel, btfTypeLabel } =
+    const { orderTypeLabel, btfTypeLabel } = useOrderTypeLabelAPI();
+    const { btfTypes, orderTypes } =
       useOrderTypesAPI(bankConnection, activeBankConnections, ref(OrderTypeFilter.UploadOnly));
 
     //Single file setup

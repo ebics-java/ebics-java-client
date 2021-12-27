@@ -82,15 +82,15 @@ export interface Partner {
   bank: Bank;
 }
 
-export interface BtfInt {
+export interface BtfService {
   serviceName: string;
   serviceOption?: string;
   scope?: string;
   containerType?: string;
-  message: BtfMessageInt;
+  message: BtfMessage;
 }
 
-export interface BtfMessageInt {
+export interface BtfMessage {
   messageName: string;
   messageNameVariant?: string;
   messageNameVersion?: string;
@@ -98,7 +98,7 @@ export interface BtfMessageInt {
 }
 
 /*
-export class Btf implements BtfInt {
+export class Btf implements BtfService {
   constructor(
     serviceName: string,
     serviceOption: string | undefined = undefined,
@@ -128,7 +128,7 @@ function s(txt: string | undefined): string {
   return txt ? txt : '-'
 }
 
-export class BtfMessage implements BtfMessageInt {
+export class BtfMessage implements BtfMessage {
   constructor(
     messageName: string,
     messageNameVariant: string | undefined = undefined,
@@ -185,7 +185,7 @@ export interface UploadRequestH004 extends UploadRequest {
 
 export interface UploadRequestH005 extends UploadRequest {
   password: string;
-  orderService: BtfInt;
+  orderService: BtfService;
   signatureFlag: boolean;
   edsFlag: boolean;
   fileName: string;
@@ -212,7 +212,7 @@ export interface DownloadRequestH004 extends DownloadRequest {
 export interface DownloadRequestH005 extends DownloadRequest {
   password: string;
   adminOrderType: string;
-  orderService?: BtfInt;
+  orderService?: BtfService;
   params: Map<string, string>;
   startDate?: Date;
   endDate?: Date;
@@ -300,7 +300,7 @@ export enum AuthorisationLevel {
  */
 export interface BTFType {
   adminOrderType: string;
-  service?: BtfInt;
+  service?: BtfService;
   description?: string;
   authorizationLevel?: AuthorisationLevel;
   numSigRequired?: BigInteger;

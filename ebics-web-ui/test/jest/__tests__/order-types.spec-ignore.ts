@@ -3,6 +3,7 @@ import { describe, expect, it, beforeAll } from '@jest/globals';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-jest';
 import { OrderType, BTFType, OrderTypeFilter } from 'src/components/models';
 import useOrderTypesAPI from 'src/components/order-types';
+import useOrderTypeLabelAPI from 'src/components/order-type-label';
 import useBankConnectionsAPI from 'src/components/bankconnections';
 //import { mount } from "@vue/test-utils"
 //import CompositionApi from "@/components/CompositionApi.vue"
@@ -17,7 +18,7 @@ describe('OrderTypes', () => {
   let orderTypeLabelFn: (btf: OrderType | undefined)=>string;
 
   beforeAll(() => {
-    const { btfTypeLabel, orderTypeLabel } = useOrderTypesAPI(ref(undefined), ref(undefined), ref(OrderTypeFilter.DownloadOnly), ref(true));
+    const { btfTypeLabel, orderTypeLabel } = useOrderTypeLabelAPI();
     btfTypeLabelFn = btfTypeLabel;
     orderTypeLabelFn = orderTypeLabel;
   });
