@@ -1,7 +1,7 @@
-package org.ebics.client.ebicsrestapi.bankconnection
+package org.ebics.client.ebicsrestapi.bankconnection.session
 
 import org.ebics.client.api.bank.Bank
-import org.ebics.client.ebicsrestapi.bankconnection.session.EbicsSessionCache
+import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
 import org.ebics.client.model.Product
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -10,7 +10,21 @@ import org.springframework.boot.test.context.SpringBootTest
 import java.io.IOException
 
 @SpringBootTest
-class EbicsSessionCacheTest(@Autowired private val ebicsSessionCache: EbicsSessionCache) {
+//@ContextConfiguration
+class EbicsSessionCacheTest(@Autowired private val ebicsSessionCache: IEbicsSessionCache) {
+
+    /*@Configuration
+    internal class ContextConfiguration {
+
+        @Bean
+        fun traceService(): TraceService = TraceService(traceRepository, true)
+
+        @Bean
+        fun sessionCache(): IEbicsSessionCache = EbicsSessionCache(UserServiceTestImpl(),
+            EbicsRestConfiguration(null,null,null,null,null, "",
+            "", "", true, true, "en",
+            traceService()))
+    }*/
 
     val prod = Product("testProd", "de", "JTO")
 

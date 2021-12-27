@@ -1,10 +1,10 @@
 package org.ebics.client.api.user.cert
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
 import org.ebics.client.api.user.User
 import org.ebics.client.certificate.UserCertificateManager
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 
 import javax.persistence.*
 
@@ -27,15 +27,15 @@ data class UserKeyStore(
     val user: User
 ) {
     fun toUserCertMgr(password: String):UserCertificateManager {
-        val ins = ByteInputStream(keyStoreBytes, keyStoreBytes.size)
+        val ins = ByteArrayInputStream(keyStoreBytes)
         return UserCertificateManager.load(ins, password, user.userId)
     }
 
     companion object {
         fun fromUserCertMgr(user:User, userCertMgr:UserCertificateManager, password: String):UserKeyStore {
-            val bos = ByteOutputStream(4096)
+            val bos = ByteArrayOutputStream(4096)
             userCertMgr.save(bos, password, user.userId)
-            return UserKeyStore(null, bos.bytes, user)
+            return UserKeyStore(null, bos.toByteArray(), user)
         }
     }
 }

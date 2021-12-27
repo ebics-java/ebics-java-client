@@ -1,24 +1,74 @@
 package org.ebics.client.api.trace
 
+import org.ebics.client.api.security.AuthenticationContext
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
 import org.ebics.client.api.user.User
 import org.ebics.client.model.EbicsVersion
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Service
+import java.time.ZonedDateTime
 
-interface FileService {
-    fun getLastDownloadedFile(
+@Service
+class FileService(private val traceRepository: TraceRepository,
+                  @Value("\${housekeeping.trace.older-than-days}")
+                  private val houseKeepOlderThanDays: Long) : IFileService {
+
+    override fun getLastDownloadedFile(
         orderType: OrderTypeDefinition,
         user: User,
         ebicsVersion: EbicsVersion,
-        useSharedPartnerData: Boolean = true
-    ): TraceEntry
+        useSharedPartnerData: Boolean
+    ): TraceEntry {
+        val authCtx = AuthenticationContext.fromSecurityContext()
+        return traceRepository
+            .findAll(
+                fileDownloadFilter(authCtx.name, orderType, user, ebicsVersion, useSharedPartnerData),
+                PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "dateTime"))
+            )
+            .single { it.hasReadAccess(authCtx) }.also {
+                logger.debug("File retrieved from file service, orderType {}, bank connection id={}, userId={}, ebicsVersion={}", orderType.toString(), user.id, user.userId, ebicsVersion)
+            }
+    }
 
-    fun addTextFile(
+    override fun addTextFile(
         user: User,
         orderType: OrderTypeDefinition,
         fileContent: String,
         sessionId: String,
-        orderNumber: String,
+        orderNumber: String?,
         ebicsVersion: EbicsVersion,
         upload: Boolean
-    )
+    ) {
+        traceRepository.save(
+            TraceEntry(
+                null,
+                fileContent,
+                user,
+                sessionId,
+                orderNumber,
+                ebicsVersion,
+                upload,
+                orderType = orderType,
+                traceType = TraceType.Content
+            )
+        )
+    }
+
+    override fun removeAllFilesOlderThan(@Value("$\\{value.from.file\\}") dateTime: ZonedDateTime) {
+        traceRepository.deleteByDateTimeLessThan(dateTime)
+    }
+
+    @Scheduled(cron = "0 0 1 * * *")
+    private fun houseKeeping() {
+        logger.info("House keeping of TraceEntries older than {} days", houseKeepOlderThanDays)
+        removeAllFilesOlderThan(ZonedDateTime.now().minusDays(houseKeepOlderThanDays))
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(FileService::class.java)
+    }
 }

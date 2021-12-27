@@ -24,9 +24,9 @@ import java.net.URL
 @ExtendWith(SpringExtension::class)
 @DataJpaTest
 @AutoConfigurationPackage(basePackages = ["org.ebics.client.api.*"])
-@ContextConfiguration(classes = [BankService::class, UserKeyStoreService::class, PartnerService::class, UserServiceImpl::class, FileServiceImpl::class])
+@ContextConfiguration(classes = [BankService::class, UserKeyStoreService::class, PartnerService::class, UserServiceImpl::class, FileService::class])
 class FileServiceTest(
-    @Autowired private val fileService: FileService,
+    @Autowired private val IFileService: IFileService,
     @Autowired private val userService: UserServiceImpl,
     @Autowired private val bankService: BankService,
 ) {
@@ -42,22 +42,22 @@ class FileServiceTest(
     @WithMockUser(username = "jan", roles = ["USER"])
     fun getLastHtdFile_when_empty_then_exception() {
         Assertions.assertThrows(Exception::class.java) {
-            fileService.getLastDownloadedFile(OrderTypeDefinition(EbicsAdminOrderType.HTD), getMockUser(), ebicsVersion = EbicsVersion.H004)
+            IFileService.getLastDownloadedFile(OrderTypeDefinition(EbicsAdminOrderType.HTD), getMockUser(), ebicsVersion = EbicsVersion.H004)
         }
     }
 
     @Test
     @WithMockUser(username = "jan", roles = ["USER"])
     fun addHtdFile_then_notTrowException() {
-        fileService.addTextFile(getMockUser(), OrderTypeDefinition(EbicsAdminOrderType.HTD), "htdFileContent", "sessId1", "ONHX", EbicsVersion.H005, true)
+        IFileService.addTextFile(getMockUser(), OrderTypeDefinition(EbicsAdminOrderType.HTD), "htdFileContent", "sessId1", "ONHX", EbicsVersion.H005, true)
     }
 
     @Test
     @WithMockUser(username = "jan", roles = ["USER"])
     fun addAndGetLastWithAdminOt_then_returnTheAddedFile() {
         val mockUser1 = getMockUser()
-        fileService.addTextFile(mockUser1, OrderTypeDefinition(EbicsAdminOrderType.HTD), "htdFileContent", "sessId1", "ONHX", EbicsVersion.H005, false)
-        val fileContent = fileService.getLastDownloadedFile(OrderTypeDefinition(EbicsAdminOrderType.HTD), mockUser1, EbicsVersion.H005)
+        IFileService.addTextFile(mockUser1, OrderTypeDefinition(EbicsAdminOrderType.HTD), "htdFileContent", "sessId1", "ONHX", EbicsVersion.H005, false)
+        val fileContent = IFileService.getLastDownloadedFile(OrderTypeDefinition(EbicsAdminOrderType.HTD), mockUser1, EbicsVersion.H005)
         Assertions.assertEquals("htdFileContent", fileContent.messageBody)
     }
 
@@ -66,8 +66,8 @@ class FileServiceTest(
     fun addAndGetLastWithBusinessOt_then_returnTheAddedFile() {
         val mockUser1 = getMockUser()
         val ot = OrderTypeDefinition(EbicsAdminOrderType.UPL, null, "XE2")
-        fileService.addTextFile(mockUser1, ot, "htdFileContent", "sessId1", "ONHX", EbicsVersion.H005, false)
-        val fileContent = fileService.getLastDownloadedFile(ot, mockUser1, EbicsVersion.H005)
+        IFileService.addTextFile(mockUser1, ot, "htdFileContent", "sessId1", "ONHX", EbicsVersion.H005, false)
+        val fileContent = IFileService.getLastDownloadedFile(ot, mockUser1, EbicsVersion.H005)
         Assertions.assertEquals("htdFileContent", fileContent.messageBody)
     }
 
@@ -75,10 +75,10 @@ class FileServiceTest(
     @WithMockUser(username = "jan", roles = ["USER"])
     fun add3AndGetLast_then_returnTheLastAddedFile() {
         val mockUser1 = getMockUser()
-        fileService.addTextFile(mockUser1, OrderTypeDefinition(EbicsAdminOrderType.HTD), "htdFileContent", "sessId1", "ONHX", EbicsVersion.H005, false)
-        fileService.addTextFile(mockUser1, OrderTypeDefinition(EbicsAdminOrderType.HTD), "htdFileContent2", "sessId1", "ONHX", EbicsVersion.H005, false)
-        fileService.addTextFile(mockUser1, OrderTypeDefinition(EbicsAdminOrderType.HTD), "htdFileContent3XXX", "sessId1", "ONHX", EbicsVersion.H005, false)
-        val fileContent = fileService.getLastDownloadedFile(OrderTypeDefinition(EbicsAdminOrderType.HTD), mockUser1, EbicsVersion.H005)
+        IFileService.addTextFile(mockUser1, OrderTypeDefinition(EbicsAdminOrderType.HTD), "htdFileContent", "sessId1", "ONHX", EbicsVersion.H005, false)
+        IFileService.addTextFile(mockUser1, OrderTypeDefinition(EbicsAdminOrderType.HTD), "htdFileContent2", "sessId1", "ONHX", EbicsVersion.H005, false)
+        IFileService.addTextFile(mockUser1, OrderTypeDefinition(EbicsAdminOrderType.HTD), "htdFileContent3XXX", "sessId1", "ONHX", EbicsVersion.H005, false)
+        val fileContent = IFileService.getLastDownloadedFile(OrderTypeDefinition(EbicsAdminOrderType.HTD), mockUser1, EbicsVersion.H005)
         Assertions.assertEquals("htdFileContent3XXX", fileContent.messageBody)
     }
 
@@ -86,10 +86,10 @@ class FileServiceTest(
     @WithMockUser(username = "jan", roles = ["USER"])
     fun add3WithDifferentOrderTypesAndGetLast_then_returnFirstItemForGivenOt() {
         val mockUser1 = getMockUser()
-        fileService.addTextFile(mockUser1, OrderTypeDefinition(EbicsAdminOrderType.HTD), "htdFileContent", "sessId1", "ONHX", EbicsVersion.H005, false)
-        fileService.addTextFile(mockUser1, OrderTypeDefinition(EbicsAdminOrderType.H3K), "htdFileContent-H3K", "sessId1", "ONHX", EbicsVersion.H005, false)
-        fileService.addTextFile(mockUser1, OrderTypeDefinition(EbicsAdminOrderType.HAC), "htdFileContent3XXX", "sessId1", "ONHX", EbicsVersion.H005, false)
-        val fileContent = fileService.getLastDownloadedFile(OrderTypeDefinition(EbicsAdminOrderType.H3K), mockUser1, EbicsVersion.H005)
+        IFileService.addTextFile(mockUser1, OrderTypeDefinition(EbicsAdminOrderType.HTD), "htdFileContent", "sessId1", "ONHX", EbicsVersion.H005, false)
+        IFileService.addTextFile(mockUser1, OrderTypeDefinition(EbicsAdminOrderType.H3K), "htdFileContent-H3K", "sessId1", "ONHX", EbicsVersion.H005, false)
+        IFileService.addTextFile(mockUser1, OrderTypeDefinition(EbicsAdminOrderType.HAC), "htdFileContent3XXX", "sessId1", "ONHX", EbicsVersion.H005, false)
+        val fileContent = IFileService.getLastDownloadedFile(OrderTypeDefinition(EbicsAdminOrderType.H3K), mockUser1, EbicsVersion.H005)
         Assertions.assertEquals("htdFileContent-H3K", fileContent.messageBody)
     }
 }

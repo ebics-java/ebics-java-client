@@ -623,6 +623,12 @@ databaseChangeLog:
             type: varchar(40)
         tableName: TraceEntry
 - changeSet:
+    id: 1640187568445-6a
+    author: honza
+    changes:
+        - delete:
+              tableName: TraceEntry
+- changeSet:
     id: 1640187568445-6
     author: honza.toegel (generated)
     changes:

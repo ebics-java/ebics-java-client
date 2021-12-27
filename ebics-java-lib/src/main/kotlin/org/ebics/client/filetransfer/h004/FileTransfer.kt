@@ -18,7 +18,6 @@
  */
 package org.ebics.client.filetransfer.h004
 
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
 import org.ebics.client.api.EbicsSession
 import org.ebics.client.api.TransferState
 import org.ebics.client.api.trace.h004.ITraceSession
@@ -35,8 +34,8 @@ import org.ebics.client.order.h004.*
 import org.ebics.client.utils.Constants
 import org.ebics.client.xml.h004.*
 import org.slf4j.LoggerFactory
+import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.io.OutputStream
 import java.util.*
 
 /**
@@ -164,19 +163,17 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         traceSession.trace(response)
     }
 
-    fun getHTD(): HTDResponseOrderDataElement {
-        val bos = ByteOutputStream()
-        fetchFile(EbicsDownloadOrder(EbicsAdminOrderType.HTD, null, null, null), bos)
-        return HTDResponseOrderDataElement(ByteArrayContentFactory(bos.bytes)).apply {
+    private fun parseHtdAndGetOrderTypes(htdContent: ByteArray): List<OrderType> {
+        return HTDResponseOrderDataElement(ByteArrayContentFactory(htdContent)).apply {
             build()
             validate()
-        }
+        }.getOrderTypes()
     }
 
     /**
      * Shortcut to ordertypes from HTD xml, for further processing
      */
-    fun getOrderTypes(): List<OrderType> = getHTD().getOrderTypes()
+    fun getOrderTypes(htdContent: ByteArray): List<OrderType> = parseHtdAndGetOrderTypes(htdContent)
 
     /**
      * Fetches a file of the given order type from the bank.
@@ -190,9 +187,9 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
      */
     @Throws(IOException::class, EbicsException::class)
     fun fetchFile(
-        downloadOrder: EbicsDownloadOrder,
-        outputStream: OutputStream
-    ) {
+        downloadOrder: EbicsDownloadOrder
+    ): ByteArrayOutputStream {
+        val outputStream = ByteArrayOutputStream()
         val sender = HttpRequestSender(session)
         val initializer = DownloadInitializationRequestElement(
             session,
@@ -247,6 +244,7 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         receiptResponse.build()
         traceSession.trace(receiptResponse)
         receiptResponse.report()
+        return outputStream
     }
 
     /**
