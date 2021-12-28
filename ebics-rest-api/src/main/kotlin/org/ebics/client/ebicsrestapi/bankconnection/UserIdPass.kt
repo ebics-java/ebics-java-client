@@ -1,5 +1,3 @@
 package org.ebics.client.ebicsrestapi.bankconnection
 
-
-
-data class UserIdPass(val id:Long, val password:String)
+data class UserIdPass(override val id:Long, override val password:String) : IUserIdPass

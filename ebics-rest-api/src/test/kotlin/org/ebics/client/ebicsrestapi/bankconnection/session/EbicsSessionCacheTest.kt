@@ -20,7 +20,6 @@ import org.springframework.context.annotation.Configuration
 
 
 @SpringBootTest
-//@ContextConfiguration
 @ExtendWith(MockKExtension::class)
 class EbicsSessionCacheTest(@Autowired private val ebicsSessionCache: IEbicsSessionCache) {
 

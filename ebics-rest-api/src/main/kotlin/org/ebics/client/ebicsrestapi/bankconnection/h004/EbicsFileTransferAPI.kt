@@ -50,13 +50,14 @@ class EbicsFileTransferAPI(
         return ResponseEntity.ok().contentLength(resource.contentLength()).body(resource)
     }
 
-    fun getOrderTypes(userId: Long, password: String): List<OrderType> {
+    fun getOrderTypes(userId: Long, password: String, useCache: Boolean): List<OrderType> {
         val session = sessionCache.getSession(UserIdPass(userId, password), product)
 
         val htdFileContent = fileDownloadCache.getLastFileCached(
             session,
             OrderTypeDefinition(EbicsAdminOrderType.HTD),
-            EbicsVersion.H004
+            EbicsVersion.H004,
+            useCache
         )
 
         return FileTransfer(session).getOrderTypes(htdFileContent)

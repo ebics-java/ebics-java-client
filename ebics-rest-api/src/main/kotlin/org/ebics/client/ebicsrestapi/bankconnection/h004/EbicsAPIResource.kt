@@ -1,5 +1,6 @@
 package org.ebics.client.ebicsrestapi.bankconnection.h004
 
+import org.ebics.client.ebicsrestapi.bankconnection.GetOrderTypesRequest
 import org.ebics.client.ebicsrestapi.bankconnection.UploadResponse
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
 import org.ebics.client.ebicsrestapi.bankconnection.UserPass
@@ -43,6 +44,6 @@ class EbicsAPIResource(
     ): ResponseEntity<Resource> = ebicsFileTransferAPI.downloadFile(userId, downloadRequest)
 
     @PostMapping("orderTypes")
-    fun getOrderTypes(@PathVariable userId: Long, @RequestBody userPass: UserPass): List<OrderType> =
-        ebicsFileTransferAPI.getOrderTypes(userId, userPass.password)
+    fun getOrderTypes(@PathVariable userId: Long, @RequestBody orderTypesRequest: GetOrderTypesRequest): List<OrderType> =
+        ebicsFileTransferAPI.getOrderTypes(userId, orderTypesRequest.password, orderTypesRequest.useCache)
 }
