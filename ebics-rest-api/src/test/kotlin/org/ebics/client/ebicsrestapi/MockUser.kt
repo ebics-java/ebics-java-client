@@ -1,5 +1,7 @@
 package org.ebics.client.ebicsrestapi
 
+import org.apache.xml.security.Init
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.api.bank.Bank
 import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.partner.Partner
@@ -9,9 +11,15 @@ import org.ebics.client.certificate.BankCertificateManager
 import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.model.EbicsVersion
 import java.net.URL
+import java.security.Security
 
 class MockUser {
     companion object {
+        init {
+            Init.init()
+            Security.addProvider(BouncyCastleProvider())
+        }
+
         fun createMockUser(userId: Long, bankCerts: Boolean = true): User {
             val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), "EBXUBSCH", "UBS-PROD-CH", null)
 
