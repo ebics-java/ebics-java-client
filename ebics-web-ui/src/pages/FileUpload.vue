@@ -52,6 +52,9 @@
             lazy-rules
             :rules="[(val) => val || 'Please select valid EBICS Order Type']"
           >
+            <template v-slot:append>
+              <q-btn round dense flat icon="refresh" @click.stop="refreshOrderTypes(bankConnection)" />
+            </template>
             <template v-slot:option="scope">
               <q-item v-bind="scope.itemProps">
                 <q-item-section>
@@ -77,6 +80,9 @@
               (val) => val || 'Please select valid EBICS BTF',
             ]"
           >
+            <template v-slot:append>
+              <q-btn round dense flat icon="refresh" @click.stop="refreshBtfTypes(bankConnection)" />
+            </template>
             <template v-slot:option="scope">
               <q-item v-bind="scope.itemProps">
                 <q-item-section>
@@ -289,7 +295,7 @@ export default defineComponent({
     const { isEbicsVersionAllowedForUse } = useBanksAPI(true);
     const { userSettings } = useUserSettings();
     const { orderTypeLabel, btfTypeLabel } = useOrderTypeLabelAPI();
-    const { btfTypes, orderTypes } =
+    const { btfTypes, orderTypes, refreshOrderTypes, refreshBtfTypes } =
       useOrderTypesAPI(bankConnection, activeBankConnections, ref(OrderTypeFilter.UploadOnly));
 
     //Single file setup
@@ -500,11 +506,13 @@ export default defineComponent({
       orderType,
       orderTypes,
       orderTypeLabel,
+      refreshOrderTypes,
 
       //Commons BTF types
       btfType,
       btfTypes,
       btfTypeLabel,
+      refreshBtfTypes,
 
       //Commons request flags
       signatureFlag,

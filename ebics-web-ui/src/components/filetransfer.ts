@@ -79,12 +79,13 @@ export default function useFileTransferAPI() {
     const ebicsOrderTypes = async (
       bankConnection: BankConnection,
       ebicsVersion: string = bankConnection.ebicsVersion,
+      useCache: boolean,
     ): Promise<BTFType[] | OrderType[]> => {
       try {
         const password = await promptCertPassword(bankConnection, false);
         const response = await api.post<UserPassword, AxiosResponse<BTFType[]>>(
           `bankconnections/${bankConnection.id}/${ebicsVersion}/orderTypes`,
-          {password: password},
+          {password: password, useCache: useCache},
         );
         console.debug(
           `Order types ${ebicsVersion} loaded for bank connection ${

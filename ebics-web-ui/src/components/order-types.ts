@@ -4,7 +4,6 @@ import {
   BTFType,
   OrderTypeFilter,
   OrderType,
-  OrderTypesCache,
   TransferType,
   EbicsVersion,
 } from 'components/models';
@@ -13,10 +12,16 @@ import { CustomMap } from './utils';
 import usePasswordAPI from './password-api';
 import useBanksAPI from './banks';
 
-//Global internal cache of all BTF's and OrderTypes for all active bank connections..
-const orderTypeCache: CustomMap<number, OrderTypesCache> = new CustomMap<
+//Global internal cache of all OrderTypes for all active bank connections..
+const orderTypeCache: CustomMap<number, OrderType[]> = new CustomMap<
   number,
-  OrderTypesCache
+  OrderType[]
+>();
+
+//Global internal cache of all BTF's for all active bank connections..
+const btfTypeCache: CustomMap<number, BTFType[]> = new CustomMap<
+  number,
+  OrderType[]
 >();
 
 export default function useOrderTypesAPI(
@@ -43,23 +48,29 @@ export default function useOrderTypesAPI(
    */
   const updateOrderTypesH004CacheForBankConnection = async (
     bankConnection: BankConnection,
-    orderTypesCache: OrderTypesCache,
-    forceCashRefresh = false
-  ) => {
-    console.log(`Loading order types H004 ${JSON.stringify(bankConnection.partner.bank)}`)
+    forceCashRefresh = false,
+    useServerCache = true,
+  ) => {    
+    const orderTypesCache: OrderType[] | undefined = orderTypeCache.get(bankConnection.id);
+
     if (
       isEbicsVersionAllowedForUse(
         bankConnection.partner.bank,
         EbicsVersion.H004
       ) &&
-      (orderTypesCache.orderTypes.length == 0 || forceCashRefresh)
+      (orderTypesCache === undefined || orderTypesCache.length == 0 || forceCashRefresh)
     ) {
+
+      console.log(`order types H004 refresh aptempt ${bankConnection.name}`)
+      
       const orderTypesRefreshPromise = ebicsOrderTypes(
         bankConnection,
-        EbicsVersion.H004
+        EbicsVersion.H004,
+        useServerCache
       ) as Promise<OrderType[]>;
 
-      orderTypesCache.orderTypes = await orderTypesRefreshPromise;
+      const loadedOrderTypes = await orderTypesRefreshPromise
+      orderTypeCache.set(bankConnection.id, loadedOrderTypes)
 
       if (bankConnection.id == selectedBankConnection.value?.id)
         refreshOutputOrderTypes(bankConnection);
@@ -72,26 +83,33 @@ export default function useOrderTypesAPI(
    * @param bankConnection
    * @param orderTypeList used to store output
    * @param forceCashRefresh force refresh even if there is already cached result
+   * @param useServerCache if false then request directly via EBICS, otherwise try to look into server cache first
    */
-  const updateOrderTypesH005CacheForBankConnection = async (
+  const updateBtfTypesH005CacheForBankConnection = async (
     bankConnection: BankConnection,
-    orderTypeList: OrderTypesCache,
-    forceCashRefresh = false
+    forceCashRefresh = false,
+    useServerCache = true,
   ) => {
-    console.log(`Loading order types H005 ${JSON.stringify(bankConnection.partner.bank)}`)
+    
+    const btfTypesCache: BTFType[] | undefined = btfTypeCache.get(bankConnection.id);
+
     if (
       isEbicsVersionAllowedForUse(
         bankConnection.partner.bank,
         EbicsVersion.H005
       ) &&
-      (orderTypeList.btfTypes.length == 0 || forceCashRefresh)
+      (btfTypesCache === undefined || btfTypesCache.length == 0 || forceCashRefresh)
     ) {
+      console.log(`btf types H005 refresh aptemt ${bankConnection.name}`)
+
       const orderTypesRefreshPromise = ebicsOrderTypes(
         bankConnection,
-        EbicsVersion.H005
+        EbicsVersion.H005,
+        useServerCache
       ) as Promise<BTFType[]>;
 
-      orderTypeList.btfTypes = await orderTypesRefreshPromise;
+      const loadedBtfTypes = await orderTypesRefreshPromise
+      btfTypeCache.set(bankConnection.id, loadedBtfTypes);
 
       if (bankConnection.id == selectedBankConnection.value?.id)
         refreshOutputBtfTypes(bankConnection);
@@ -107,11 +125,6 @@ export default function useOrderTypesAPI(
     bankConnection: BankConnection,
     forceCashRefresh = false
   ) => {
-    //Create emtpy order type cache for this bank connection
-    const orderTypesCache: OrderTypesCache = orderTypeCache.getOrAdd(
-      bankConnection.id,
-      { btfTypes: [], orderTypes: [] }
-    );
 
     //For pasword protected connection ask first password
     //It prevents parallel poping of UI password dialog
@@ -122,12 +135,10 @@ export default function useOrderTypesAPI(
     await Promise.allSettled([
       updateOrderTypesH004CacheForBankConnection(
         bankConnection,
-        orderTypesCache,
         forceCashRefresh
       ),
-      updateOrderTypesH005CacheForBankConnection(
+      updateBtfTypesH005CacheForBankConnection(
         bankConnection,
-        orderTypesCache,
         forceCashRefresh
       ),
     ]);
@@ -159,16 +170,16 @@ export default function useOrderTypesAPI(
   const downloadableAdminOrderTypes = ['HAC', 'HAA', 'HPD', 'HKD', 'HTD'];
 
   const refreshOutputBtfTypes = (bankConnection: BankConnection) => {
-    const selectedTypes = orderTypeCache.get(bankConnection.id);
+    const selectedTypes = btfTypeCache.get(bankConnection.id);
     if (selectedTypes) {
       if (filterType.value == OrderTypeFilter.All) {
-        outputBtfTypes.value = selectedTypes.btfTypes;
+        outputBtfTypes.value = selectedTypes;
       } else if (filterType.value == OrderTypeFilter.UploadOnly) {
-        outputBtfTypes.value = selectedTypes.btfTypes.filter(
+        outputBtfTypes.value = selectedTypes.filter(
           (btf) => btf.adminOrderType == 'BTU'
         );
       } else if (filterType.value == OrderTypeFilter.DownloadOnly) {
-        outputBtfTypes.value = selectedTypes.btfTypes.filter(
+        outputBtfTypes.value = selectedTypes.filter(
           (btf) =>
             btf.adminOrderType == 'BTD' ||
             (displayAdminTypes.value &&
@@ -178,7 +189,7 @@ export default function useOrderTypesAPI(
     } else {
       console.warn(
         'No BTF types cached for given bank connection: ' +
-          bankConnection.id.toString()
+          bankConnection.name
       );
     }
   };
@@ -187,13 +198,13 @@ export default function useOrderTypesAPI(
     const selectedTypes = orderTypeCache.get(bankConnection.id);
     if (selectedTypes) {
       if (filterType.value == OrderTypeFilter.All) {
-        outputOrderTypes.value = selectedTypes.orderTypes;
+        outputOrderTypes.value = selectedTypes;
       } else if (filterType.value == OrderTypeFilter.UploadOnly) {
-        outputOrderTypes.value = selectedTypes.orderTypes.filter(
+        outputOrderTypes.value = selectedTypes.filter(
           (ot) => ot.adminOrderType == 'UPL' || ot.adminOrderType == 'FUL'
         );
       } else if (filterType.value == OrderTypeFilter.DownloadOnly) {
-        outputOrderTypes.value = selectedTypes.orderTypes.filter(
+        outputOrderTypes.value = selectedTypes.filter(
           (ot) =>
             ot.adminOrderType == 'DNL' ||
             ot.adminOrderType == 'FDL' ||
@@ -205,7 +216,7 @@ export default function useOrderTypesAPI(
     } else {
       console.warn(
         'No OrderTypes cached for given bank connection: ' +
-          bankConnection.id.toString()
+        bankConnection.name
       );
     }
   };
@@ -216,10 +227,20 @@ export default function useOrderTypesAPI(
   );
   watch(activeBankConnections, updateOrderTypesCacheForAllActiveConnections);
 
+  const refreshOrderTypes = async(bankConnection?: BankConnection): Promise<void> => {
+    if (bankConnection) await updateOrderTypesH004CacheForBankConnection(bankConnection, true, false)
+  };
+
+  const refreshBtfTypes = async(bankConnection?: BankConnection): Promise<void> => {
+    if (bankConnection) await updateBtfTypesH005CacheForBankConnection(bankConnection, true, false)
+  };
+
   return {
     btfTypes: outputBtfTypes,
     orderTypes: outputOrderTypes,
     //Can be used for forced refresh from UI
+    refreshOrderTypes,
+    refreshBtfTypes,
     updateOrderTypesCacheForBankConnection,
   };
 }
