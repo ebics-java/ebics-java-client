@@ -13,7 +13,6 @@ import org.ebics.client.order.h005.EbicsDownloadOrder
 import org.ebics.client.order.h005.EbicsUploadOrder
 import org.ebics.client.order.h005.OrderType
 import org.ebics.client.utils.toDate
-import org.ebics.client.utils.toHexString
 import org.ebics.client.xml.h005.HTDResponseOrderDataElement
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.Resource
@@ -39,7 +38,7 @@ class EbicsFileTransferAPI(
             uploadRequest.params ?: emptyMap()
         )
         val response = FileTransferSession(session).sendFile(uploadFile.bytes, order)
-        return UploadResponse(response.orderNumber, response.transactionId.toHexString())
+        return UploadResponse(response.orderNumber, response.transactionId)
     }
 
     fun downloadFile(userId: Long, downloadRequest: DownloadRequest): ResponseEntity<Resource> {

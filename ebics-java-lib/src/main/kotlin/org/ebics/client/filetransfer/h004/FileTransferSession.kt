@@ -32,6 +32,7 @@ import org.ebics.client.messages.Messages.getString
 import org.ebics.client.order.EbicsAdminOrderType
 import org.ebics.client.order.h004.*
 import org.ebics.client.utils.Constants
+import org.ebics.client.utils.toHexString
 import org.ebics.client.xml.h004.*
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
@@ -118,9 +119,9 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
         }
         logger.info(
             String.format("Finished uploading file via EBICS sessionId=%s, userId=%s, partnerId=%s, bankURL=%s, order=%s, file length=%d, orderNumber=%s, transactionId=%s",
-                session.sessionId, session.user.userId, session.user.partner.partnerId, session.user.partner.bank.bankURL, uploadOrder.toString(), content.size, response.orderNumber, response.transactionId)
+                session.sessionId, session.user.userId, session.user.partner.partnerId, session.user.partner.bank.bankURL, uploadOrder.toString(), content.size, response.orderNumber, response.transactionId.toHexString())
         )
-        return EbicsUploadOrderResponse(response.orderNumber, response.transactionId)
+        return EbicsUploadOrderResponse(response.orderNumber, response.transactionId.toHexString())
     }
 
     /**
@@ -246,7 +247,7 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
         receiptResponse.report()
         logger.info(
             String.format("Finished downloading file via EBICS sessionId=%s, userId=%s, partnerId=%s, bankURL=%s, order=%s, transactionId=%s, fileLength=%d",
-                session.sessionId, session.user.userId, session.user.partner.partnerId, session.user.partner.bank.bankURL, downloadOrder.toString(), state.transactionId, outputStream.size())
+                session.sessionId, session.user.userId, session.user.partner.partnerId, session.user.partner.bank.bankURL, downloadOrder.toString(), state.transactionId.toHexString(), outputStream.size())
         )
         return outputStream
     }
