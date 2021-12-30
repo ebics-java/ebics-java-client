@@ -7,5 +7,5 @@ data class EbicsService(
     override val serviceOption: String?,
     override val scope: String?,
     override val containerType: ContainerType?,
-    override val message: IEbicsMessage
+    override val message: EbicsMessage
 ) : IEbicsService

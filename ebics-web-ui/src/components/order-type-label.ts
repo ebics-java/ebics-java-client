@@ -38,16 +38,35 @@ export default function useOrderTypeLabelAPI(
     } else return '';
   };
 
+  function joinToString(labelParts: (string | undefined)[], delimiter: string, undefinedPartReplacement = '') {
+    return labelParts.map(label => {
+      if (undefinedPartReplacement.length == 0)
+        return label
+      else
+        return s(label, undefinedPartReplacement);
+    }).filter(label => label).join(delimiter);
+  }
+
   /**
    * @returns string representation of @param bts
    */
-  const btfServiceLabel = (bts: BtfService): string => {  
-    const btm = bts.message;    
-    return `${s(bts.serviceName)}|${s(bts.serviceOption)}|${s(
-      bts.scope
-    )}|${s(bts.containerType)}|${s(btm.messageName)}|${s(
-      btm.messageNameVariant
-    )}|${s(btm.messageNameVersion)}|${s(btm.messageNameFormat)}`;
+  const btfServiceLabel = (bts: BtfService): string => {
+    const btm = bts.message;
+
+    const messageLabel = joinToString([
+      btm.messageName,
+      btm.messageNameVariant,
+      btm.messageNameVersion,
+    ], '.', '_');
+
+    return joinToString([
+      bts.serviceName,
+      bts.serviceOption,
+      bts.scope,
+      bts.containerType,
+      messageLabel,
+      btm.messageNameFormat,
+    ], '|', '-');
   };
 
   return {
