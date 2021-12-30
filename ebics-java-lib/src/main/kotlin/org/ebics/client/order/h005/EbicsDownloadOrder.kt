@@ -13,4 +13,16 @@ import java.util.*
  */
 class EbicsDownloadOrder
 (adminOrderType: EbicsAdminOrderType = EbicsAdminOrderType.BTD, val orderService: IEbicsService?, startDate: Date?, endDate: Date?, params: Map<String, String> = emptyMap()) :
-    AbstractEbicsDownloadOrder(adminOrderType, startDate, endDate, params)
+    AbstractEbicsDownloadOrder(adminOrderType, startDate, endDate, params) {
+    override fun toString(): String {
+        return if (orderService == null)
+            "AdminOrderType=$adminOrderType"
+        else {
+            if (startDate == null && endDate == null)
+                "BTD=[$orderService]"
+            else
+                "BTD=[$orderService] start=$startDate end=$endDate"
+        }
+
+    }
+}

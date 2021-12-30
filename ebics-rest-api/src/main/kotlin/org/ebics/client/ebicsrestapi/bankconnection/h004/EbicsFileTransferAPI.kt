@@ -5,7 +5,7 @@ import org.ebics.client.ebicsrestapi.bankconnection.UploadResponse
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
 import org.ebics.client.ebicsrestapi.bankconnection.session.IEbicsSessionCache
 import org.ebics.client.ebicsrestapi.utils.IFileDownloadCache
-import org.ebics.client.filetransfer.h004.FileTransfer
+import org.ebics.client.filetransfer.h004.FileTransferSession
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.Product
 import org.ebics.client.order.EbicsAdminOrderType
@@ -14,6 +14,7 @@ import org.ebics.client.order.h004.EbicsUploadOrder
 import org.ebics.client.order.h004.OrderType
 import org.ebics.client.utils.toDate
 import org.ebics.client.utils.toHexString
+import org.ebics.client.xml.h004.HTDResponseOrderDataElement
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
@@ -32,7 +33,7 @@ class EbicsFileTransferAPI(
         val session = sessionCache.getSession(UserIdPass(userId, uploadRequest.password), product)
         val order =
             EbicsUploadOrder(uploadRequest.orderType, uploadRequest.attributeType, uploadRequest.params ?: emptyMap())
-        val response = FileTransfer(session).sendFile(uploadFile.bytes, order)
+        val response = FileTransferSession(session).sendFile(uploadFile.bytes, order)
         return UploadResponse(response.orderNumber, response.transactionId.toHexString())
     }
 
@@ -45,7 +46,7 @@ class EbicsFileTransferAPI(
             downloadRequest.endDate?.toDate(),
             downloadRequest.params
         )
-        val outputStream = FileTransfer(session).fetchFile(order)
+        val outputStream = FileTransferSession(session).fetchFile(order)
         val resource = ByteArrayResource(outputStream.toByteArray())
         return ResponseEntity.ok().contentLength(resource.contentLength()).body(resource)
     }
@@ -60,6 +61,6 @@ class EbicsFileTransferAPI(
             useCache
         )
 
-        return FileTransfer(session).getOrderTypes(htdFileContent)
+        return HTDResponseOrderDataElement.getOrderTypes(htdFileContent)
     }
 }

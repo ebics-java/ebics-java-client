@@ -55,8 +55,8 @@ class FileDownloadCacheTest(
         //Mock getting files from EBICS
         val bos = ByteArrayOutputStream()
         bos.write("firstLiveDownload".toByteArray())
-        mockkConstructor(org.ebics.client.filetransfer.h005.FileTransfer::class)
-        every { anyConstructed<org.ebics.client.filetransfer.h005.FileTransfer>().fetchFile(any()) } returns bos
+        mockkConstructor(org.ebics.client.filetransfer.h005.FileTransferSession::class)
+        every { anyConstructed<org.ebics.client.filetransfer.h005.FileTransferSession>().fetchFile(any()) } returns bos
 
         //Remove all stored entries from cache (the fileDownloadCache has state)
         fileService.removeAllFilesOlderThan(ZonedDateTime.now())

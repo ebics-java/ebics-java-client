@@ -75,7 +75,7 @@ import java.util.*
  *
  * @param session the user session
  */
-class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
+class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session) {
     /**
      * Initiates a file transfer to the bank.
      * @param content The bytes you want to send.
@@ -85,6 +85,10 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
      */
     @Throws(IOException::class, EbicsException::class)
     fun sendFile(content: ByteArray, uploadOrder: EbicsUploadOrder): EbicsUploadOrderResponse {
+        logger.info(
+            String.format("Start uploading file via EBICS sessionId=%s, userId=%s, partnerId=%s, bankURL=%s, order=%s, file length=%d",
+                session.sessionId, session.user.userId, session.user.partner.partnerId, session.user.partner.bank.bankURL, uploadOrder.toString(), content.size)
+        )
         val sender = HttpRequestSender(session)
         val initializer = UploadInitializationRequestElement(
             session,
@@ -112,6 +116,10 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
                 state.transactionId, uploadOrder.orderType ?: "FUL", traceSession
             )
         }
+        logger.info(
+            String.format("Finished uploading file via EBICS sessionId=%s, userId=%s, partnerId=%s, bankURL=%s, order=%s, file length=%d, orderNumber=%s, transactionId=%s",
+                session.sessionId, session.user.userId, session.user.partner.partnerId, session.user.partner.bank.bankURL, uploadOrder.toString(), content.size, response.orderNumber, response.transactionId)
+        )
         return EbicsUploadOrderResponse(response.orderNumber, response.transactionId)
     }
 
@@ -163,18 +171,6 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         traceSession.trace(response)
     }
 
-    private fun parseHtdAndGetOrderTypes(htdContent: ByteArray): List<OrderType> {
-        return HTDResponseOrderDataElement(ByteArrayContentFactory(htdContent)).apply {
-            build()
-            validate()
-        }.getOrderTypes()
-    }
-
-    /**
-     * Shortcut to ordertypes from HTD xml, for further processing
-     */
-    fun getOrderTypes(htdContent: ByteArray): List<OrderType> = parseHtdAndGetOrderTypes(htdContent)
-
     /**
      * Fetches a file of the given order type from the bank.
      * You may give an optional start and end date.
@@ -189,6 +185,10 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
     fun fetchFile(
         downloadOrder: EbicsDownloadOrder
     ): ByteArrayOutputStream {
+        logger.info(
+            String.format("Start downloading file via EBICS sessionId=%s, userId=%s, partnerId=%s, bankURL=%s, order=%s",
+                session.sessionId, session.user.userId, session.user.partner.partnerId, session.user.partner.bank.bankURL, downloadOrder.toString())
+        )
         val outputStream = ByteArrayOutputStream()
         val sender = HttpRequestSender(session)
         val initializer = DownloadInitializationRequestElement(
@@ -244,6 +244,10 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
         receiptResponse.build()
         traceSession.trace(receiptResponse)
         receiptResponse.report()
+        logger.info(
+            String.format("Finished downloading file via EBICS sessionId=%s, userId=%s, partnerId=%s, bankURL=%s, order=%s, transactionId=%s, fileLength=%d",
+                session.sessionId, session.user.userId, session.user.partner.partnerId, session.user.partner.bank.bankURL, downloadOrder.toString(), state.transactionId, outputStream.size())
+        )
         return outputStream
     }
 
@@ -291,6 +295,6 @@ class FileTransfer(session: EbicsSession) : AbstractFileTransfer(session) {
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(FileTransfer::class.java)
+        private val logger = LoggerFactory.getLogger(FileTransferSession::class.java)
     }
 }

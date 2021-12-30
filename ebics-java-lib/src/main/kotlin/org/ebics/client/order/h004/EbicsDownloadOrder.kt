@@ -15,5 +15,16 @@ class EbicsDownloadOrder(adminOrderType: EbicsAdminOrderType, val orderType: Str
         startDate,
         endDate,
         params
-    )
+    ) {
+    override fun toString(): String {
+        return if (orderType == null)
+            "AdminOrderType=$adminOrderType"
+        else {
+            if (startDate == null && endDate == null)
+                "Ordertype=$orderType"
+            else
+                "Ordertype=$orderType start=$startDate end=$endDate"
+        }
+    }
+}
 

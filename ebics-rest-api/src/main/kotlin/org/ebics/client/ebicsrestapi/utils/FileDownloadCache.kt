@@ -40,7 +40,7 @@ class FileDownloadCache(private val fileService: IFileService) : IFileDownloadCa
     ): ByteArray {
         val outputStream =
             if (ebicsVersion == EbicsVersion.H005) {
-                org.ebics.client.filetransfer.h005.FileTransfer(session).fetchFile(
+                org.ebics.client.filetransfer.h005.FileTransferSession(session).fetchFile(
                     org.ebics.client.order.h005.EbicsDownloadOrder(
                         orderType.adminOrderType,
                         orderType.ebicsServiceType,
@@ -49,7 +49,7 @@ class FileDownloadCache(private val fileService: IFileService) : IFileDownloadCa
                     )
                 )
             } else {
-                org.ebics.client.filetransfer.h004.FileTransfer(session).fetchFile(
+                org.ebics.client.filetransfer.h004.FileTransferSession(session).fetchFile(
                     org.ebics.client.order.h004.EbicsDownloadOrder(
                         orderType.adminOrderType,
                         orderType.businessOrderType,

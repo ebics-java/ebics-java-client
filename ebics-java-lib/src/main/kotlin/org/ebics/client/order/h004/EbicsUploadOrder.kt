@@ -16,7 +16,14 @@ class EbicsUploadOrder(
 ) : AbstractEbicsUploadOrder(
     if (orderType == null) EbicsAdminOrderType.FUL else EbicsAdminOrderType.UPL,
     params
-)
+) {
+    override fun toString(): String {
+        return if (orderType == null)
+            "AdminOrderType=$adminOrderType AttributeType=$attributeType"
+        else
+            "Ordertype=$orderType AttributeType=$attributeType"
+    }
+}
 
 
 

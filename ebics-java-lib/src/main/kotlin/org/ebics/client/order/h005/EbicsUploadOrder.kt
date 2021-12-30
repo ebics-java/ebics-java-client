@@ -17,4 +17,8 @@ class EbicsUploadOrder
     val edsFlag: Boolean,
     val fileName: String,
     params: Map<String, String>
-) : AbstractEbicsUploadOrder(EbicsAdminOrderType.BTU, params)
+) : AbstractEbicsUploadOrder(EbicsAdminOrderType.BTU, params) {
+    override fun toString(): String {
+        return "BTU=[$orderService] signatureFlag=$signatureFlag, edsFlag=$edsFlag, fileName=$fileName"
+    }
+}

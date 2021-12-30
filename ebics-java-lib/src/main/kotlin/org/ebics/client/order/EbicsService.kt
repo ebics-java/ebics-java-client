@@ -8,4 +8,15 @@ data class EbicsService(
     override val scope: String?,
     override val containerType: ContainerType?,
     override val message: EbicsMessage
-) : IEbicsService
+) : IEbicsService {
+    override fun toString(): String {
+        return listOf(
+            serviceName,
+            serviceOption,
+            scope,
+            containerType?.toString(),
+            message.messageNameFormat,
+            message.toString()
+        ).map {  part -> part ?: '-' }.joinToString("|")
+    }
+}

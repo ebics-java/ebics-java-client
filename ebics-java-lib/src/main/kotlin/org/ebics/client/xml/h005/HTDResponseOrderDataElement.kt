@@ -18,14 +18,12 @@
  */
 package org.ebics.client.xml.h005
 
-import org.apache.xmlbeans.XmlObject
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.interfaces.ContentFactory
-import org.ebics.client.order.AuthorisationLevel
+import org.ebics.client.io.ByteArrayContentFactory
 import org.ebics.client.order.EbicsAdminOrderType
 import org.ebics.client.order.EbicsMessage
 import org.ebics.client.order.EbicsService
-import org.ebics.client.order.h005.ContainerType
 import org.ebics.client.order.h005.OrderType
 import org.ebics.client.utils.equalXml
 import org.ebics.schema.h005.AuthOrderInfoType
@@ -107,5 +105,17 @@ class HTDResponseOrderDataElement(factory: ContentFactory) : DefaultResponseElem
 
     companion object {
         private const val serialVersionUID = -1305363936881364049L
+
+        private fun parseHtdAndGetOrderTypes(htdContent: ByteArray): List<OrderType> {
+            return HTDResponseOrderDataElement(ByteArrayContentFactory(htdContent)).apply {
+                build()
+                validate()
+            }.getOrderTypes()
+        }
+
+        /**
+         * Shortcut to ordertypes from HTD xml, for further processing
+         */
+        fun getOrderTypes(htdContent: ByteArray): List<OrderType> = parseHtdAndGetOrderTypes(htdContent)
     }
 }
