@@ -13,7 +13,6 @@ Main differences with this fork:
 - Web UI (SPA based on vue3), instead of console client
 - REST API exposing EBICS operations
 - Support of following EBICS versions 
-  - EBICS 2.4 (H003) 
   - EBICS 2.5 (H004)
   - EBICS 3.0 (H005)
 - Added API for HTD & HEV
