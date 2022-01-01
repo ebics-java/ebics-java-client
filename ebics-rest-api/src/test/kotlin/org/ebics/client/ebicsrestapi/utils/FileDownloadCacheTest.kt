@@ -8,10 +8,10 @@ import org.apache.xml.security.Init
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.api.trace.IFileService
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
+import org.ebics.client.ebicsrestapi.EbicsProduct
 import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
 import org.ebics.client.ebicsrestapi.MockSession
 import org.ebics.client.model.EbicsVersion
-import org.ebics.client.model.Product
 import org.ebics.client.order.EbicsAdminOrderType
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -48,7 +48,7 @@ class FileDownloadCacheTest(
         fun fileService(): IFileService = FileServiceMockImpl()
     }
 
-    val prod = Product("testProd", "de", "JTO")
+    val prod = EbicsProduct("testProd", "de", "JTO")
 
     @BeforeEach
     fun initTestContext() {

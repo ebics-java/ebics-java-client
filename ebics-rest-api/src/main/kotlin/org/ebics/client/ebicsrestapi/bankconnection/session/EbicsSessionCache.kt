@@ -2,6 +2,7 @@ package org.ebics.client.ebicsrestapi.bankconnection.session
 
 import org.ebics.client.api.user.UserService
 import org.ebics.client.api.user.permission.BankConnectionAccessType
+import org.ebics.client.ebicsrestapi.EbicsProduct
 import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
 import org.ebics.client.model.EbicsSession
@@ -12,12 +13,12 @@ import org.springframework.stereotype.Component
 @Component
 class EbicsSessionCache(
     private val userService: UserService,
-    private val configuration: EbicsRestConfiguration
+    private val configuration: EbicsRestConfiguration,
+    private val product: EbicsProduct,
 ) : IEbicsSessionCache {
     @Cacheable("sessions", key = "#userIdPass")
     override fun getSession(
         userIdPass: UserIdPass,
-        product: Product,
         bankKeysRequired: Boolean,
         accessType: BankConnectionAccessType
     ): EbicsSession {

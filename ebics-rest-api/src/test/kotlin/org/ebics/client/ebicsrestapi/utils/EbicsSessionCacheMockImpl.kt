@@ -8,10 +8,9 @@ import org.ebics.client.ebicsrestapi.bankconnection.session.IEbicsSessionCache
 import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.Product
 
-class EbicsSessionCacheMockImpl(private val configuration: Configuration) : IEbicsSessionCache {
+class EbicsSessionCacheMockImpl(private val configuration: Configuration, private val product: Product) : IEbicsSessionCache {
     override fun getSession(
         userIdPass: UserIdPass,
-        product: Product,
         bankKeysRequired: Boolean,
         accessType: BankConnectionAccessType
     ): EbicsSession {

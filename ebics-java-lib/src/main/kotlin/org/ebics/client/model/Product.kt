@@ -18,44 +18,25 @@
  */
 package org.ebics.client.model
 
-import java.io.Serializable
-
 /**
  * Optional information about the client product.
  *
  * @author Hachani
  */
-class Product
-/**
- * Creates a new product information element.
- * @param name this is the name of the product. It is a mandatory field.
- * @param language this is the language. If you use null, the language of the default locale is used.
- * @param instituteID the institute, this is an optional value, you can leave this parameter empty.
- */(
+interface Product
+{
     /**
-     * @param name the name to set
+     * @param name his is the name of the product. It is a mandatory field.
      */
-    val name: String,
+    val name: String
+
     /**
-     * @param language the language to set
+     * @param language this is the language. If you use null, the language of the default locale is used.
      */
-    val language: String,
+    val language: String
+
     /**
-     * @param instituteID the instituteID to set
+     * @param instituteID the institute, this is an optional value, you can leave this parameter empty.
      */
     val instituteID: String?
-) : Serializable {
-    /**
-     * @return the name
-     */
-    /**
-     * @return the language
-     */
-    /**
-     * @return the instituteID
-     */
-
-    companion object {
-        private const val serialVersionUID = 6400195827756653241L
-    }
 }
