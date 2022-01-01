@@ -38,7 +38,7 @@
         "
       >
         <q-list padding>
-          <q-item to="/banks" exact clickable v-ripple>
+          <q-item to="/banks" v-if="hasRoleAdmin || hasRoleUser" exact clickable v-ripple>
             <q-item-section avatar>
               <q-icon name="account_balance" />
             </q-item-section>
@@ -86,7 +86,7 @@
             <q-item-section> Settings </q-item-section>
           </q-item>
 
-          <q-item v-if="hasRoleAdmin" to="/traces" exact clickable v-ripple>
+          <q-item v-if="hasRoleAdmin || hasRoleUser" to="/traces" exact clickable v-ripple>
             <q-item-section avatar>
               <q-icon name="receipt_long" />
             </q-item-section>
@@ -114,7 +114,7 @@ export default defineComponent({
 
   setup() {
     const leftDrawerOpen = ref(false);
-    const { userContext, hasRoleAdmin } = useUserContextAPI();
+    const { userContext, hasRoleAdmin, hasRoleUser } = useUserContextAPI();
     const router = useRouter();
 
     const menuItemOfCurrentRoute = computed((): MenuItemRouteMeta[] => {
@@ -127,6 +127,7 @@ export default defineComponent({
       menuItemOfCurrentRoute,
       userContext,
       hasRoleAdmin,
+      hasRoleUser,
       leftDrawerOpen,
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;

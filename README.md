@@ -6,7 +6,7 @@ Thanks a lot for all previous contribution.
 
 How to get started:
 
-https://github.com/honza-toegel/ebics-java-client/wiki/EBICS-Client-HowTo
+https://github.com/honza-toegel/ebics-java-client/wiki/EBICS-Web-Client-Manual
 
 Main differences with this fork:
 
