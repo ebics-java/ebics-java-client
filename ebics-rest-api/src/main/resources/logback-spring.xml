@@ -1,32 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds">
     <!-- External log configuration -->
-    <include url="file:${EWC_CONFIG_HOME}/logback.xml"/>
+    <if condition='property("HOSTNAME").contains("torino")'>
+        <then>
+            <include url="file:${EWC_CONFIG_HOME}/logback.xml"/>
+        </then>
+        <else>
+            <!-- console log settings as default when no external configuration available -->
+            <appender name="Console"
+                      class="ch.qos.logback.core.ConsoleAppender">
+                <layout class="ch.qos.logback.classic.PatternLayout">
+                    <Pattern>
+                        %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
+                    </Pattern>
+                </layout>
+            </appender>
 
-    <!-- console log settings as default when no external configuration available -->
-    <springProfile name="console-log">
-        <appender name="Console"
-                  class="ch.qos.logback.core.ConsoleAppender">
-            <layout class="ch.qos.logback.classic.PatternLayout">
-                <Pattern>
-                    %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
-                </Pattern>
-            </layout>
-        </appender>
+            <!-- LOG everything at INFO level -->
+            <root level="info">
+                <appender-ref ref="Console"/>
+            </root>
 
-        <!-- LOG everything at INFO level -->
-        <root level="info">
-            <appender-ref ref="Console"/>
-        </root>
+            <!-- LOG "org.ebics*" at TRACE level -->
+            <logger name="org.ebics" level="trace" additivity="false">
+                <appender-ref ref="Console"/>
+            </logger>
 
-        <!-- LOG "org.ebics*" at TRACE level -->
-        <logger name="org.ebics" level="trace" additivity="false">
-            <appender-ref ref="Console"/>
-        </logger>
+            <logger name="org.springframework.security" level="info" additivity="false">
+                <appender-ref ref="Console"/>
+            </logger>
 
-        <logger name="org.springframework.security" level="info" additivity="false">
-            <appender-ref ref="Console"/>
-        </logger>
-
-    </springProfile>
+        </else>
+    </if>
 </configuration>
