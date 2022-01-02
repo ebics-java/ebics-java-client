@@ -13,7 +13,6 @@ import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import java.io.File
-import java.lang.IllegalArgumentException
 
 @SpringBootApplication
 @ComponentScan("org.ebics.client.api", "org.ebics.client.ebicsrestapi")
@@ -52,7 +51,8 @@ class EbicsRestApiApplication : SpringBootServletInitializer() {
                     if (!File(logbackFile).exists())
                         throw IllegalArgumentException("$logbackFile doesn't exist, please provide valid logback file")
                 } else {
-                    throw IllegalArgumentException("EWC_CONFIG_HOME is not set, please provide variable EWC_CONFIG_HOME, the value must be a valid directory containing config.yaml or config.properties and logback.xml")
+                    System.out.println("EWC_CONFIG_HOME is not set, all mandatory external properties must be set as system or environment variable")
+                    //throw IllegalArgumentException("EWC_CONFIG_HOME is not set, please provide variable EWC_CONFIG_HOME, the value must be a valid directory containing config.yaml or config.properties and logback.xml")
                 }
                 setLocations(*resources.toTypedArray())
             } catch (ex:Exception) {
