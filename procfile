@@ -1,0 +1,1 @@
+web: java -jar ebics-rest-api/target/ebics-rest-api-1.5.1.war
