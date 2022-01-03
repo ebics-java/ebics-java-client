@@ -40,6 +40,8 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.NoDownloadDataAvailableException;
@@ -66,7 +68,17 @@ import org.kopi.ebics.utils.Constants;
  *
  */
 public class EbicsClient {
+    private static File getRootDir() {
+        return new File(
+            System.getProperty("user.home") + File.separator + "ebics" + File.separator + "client");
+    }
 
+    static {
+        // this is for the logging config
+        System.setProperty("ebicsBasePath", getRootDir().getAbsolutePath());
+    }
+
+    private static final Logger logger = LogManager.getLogger(EbicsClient.class);
     private final Configuration configuration;
     private final Map<String, User> users = new HashMap<>();
     private final Map<String, Partner> partners = new HashMap<>();
@@ -93,7 +105,7 @@ public class EbicsClient {
         this.properties = properties;
         Messages.setLocale(configuration.getLocale());
         this.messages = new Messages(Constants.APPLICATION_BUNDLE_NAME, configuration.getLocale());
-        configuration.getLogger().info(messages.getString("init.configuration"));
+        logger.info(messages.getString("init.configuration"));
         configuration.init();
     }
 
@@ -110,7 +122,7 @@ public class EbicsClient {
      *            the concerned user
      */
     public void createUserDirectories(EbicsUser user) {
-        configuration.getLogger().info(
+        logger.info(
             messages.getString("user.create.directories", user.getUserId()));
         IOUtils.createDirectories(configuration.getUserDirectory(user));
         IOUtils.createDirectories(configuration.getTransferTraceDirectory(user));
@@ -187,7 +199,7 @@ public class EbicsClient {
         String userId, String name, String email, String country, String organization,
         boolean useCertificates, boolean saveCertificates, PasswordCallback passwordCallback)
         throws Exception {
-        configuration.getLogger().info(messages.getString("user.create.info", userId));
+        logger.info(messages.getString("user.create.info", userId));
 
         Bank bank = createBank(url, bankName, hostId, useCertificates);
         Partner partner = createPartner(bank, partnerId);
@@ -206,10 +218,10 @@ public class EbicsClient {
             partners.put(partner.getPartnerId(), partner);
             banks.put(bank.getHostId(), bank);
 
-            configuration.getLogger().info(messages.getString("user.create.success", userId));
+            logger.info(messages.getString("user.create.success", userId));
             return user;
         } catch (Exception e) {
-            configuration.getLogger().error(messages.getString("user.create.error"), e);
+            logger.error(messages.getString("user.create.error"), e);
             throw e;
         }
     }
@@ -236,7 +248,7 @@ public class EbicsClient {
      */
     public User loadUser(String hostId, String partnerId, String userId,
         PasswordCallback passwordCallback) throws Exception {
-        configuration.getLogger().info(messages.getString("user.load.info", userId));
+        logger.info(messages.getString("user.load.info", userId));
 
         try {
             Bank bank;
@@ -257,10 +269,10 @@ public class EbicsClient {
             users.put(userId, user);
             partners.put(partner.getPartnerId(), partner);
             banks.put(bank.getHostId(), bank);
-            configuration.getLogger().info(messages.getString("user.load.success", userId));
+            logger.info(messages.getString("user.load.success", userId));
             return user;
         } catch (Exception e) {
-            configuration.getLogger().error(messages.getString("user.load.error"), e);
+            logger.error(messages.getString("user.load.error"), e);
             throw e;
         }
     }
@@ -274,9 +286,9 @@ public class EbicsClient {
      */
     public void sendINIRequest(User user, Product product) throws Exception {
         String userId = user.getUserId();
-        configuration.getLogger().info(messages.getString("ini.request.send", userId));
+        logger.info(messages.getString("ini.request.send", userId));
         if (user.isInitialized()) {
-            configuration.getLogger().info(messages.getString("user.already.initialized", userId));
+            logger.info(messages.getString("user.already.initialized", userId));
             return;
         }
         EbicsSession session = createSession(user, product);
@@ -286,9 +298,9 @@ public class EbicsClient {
         try {
             keyManager.sendINI(null);
             user.setInitialized(true);
-            configuration.getLogger().info(messages.getString("ini.send.success", userId));
+            logger.info(messages.getString("ini.send.success", userId));
         } catch (Exception e) {
-            configuration.getLogger().error(messages.getString("ini.send.error", userId), e);
+            logger.error(messages.getString("ini.send.error", userId), e);
             throw e;
         }
     }
@@ -304,9 +316,9 @@ public class EbicsClient {
      */
     public void sendHIARequest(User user, Product product) throws Exception {
         String userId = user.getUserId();
-        configuration.getLogger().info(messages.getString("hia.request.send", userId));
+        logger.info(messages.getString("hia.request.send", userId));
         if (user.isInitializedHIA()) {
-            configuration.getLogger()
+            logger
                 .info(messages.getString("user.already.hia.initialized", userId));
             return;
         }
@@ -318,10 +330,10 @@ public class EbicsClient {
             keyManager.sendHIA(null);
             user.setInitializedHIA(true);
         } catch (Exception e) {
-            configuration.getLogger().error(messages.getString("hia.send.error", userId), e);
+            logger.error(messages.getString("hia.send.error", userId), e);
             throw e;
         }
-        configuration.getLogger().info(messages.getString("hia.send.success", userId));
+        logger.info(messages.getString("hia.send.success", userId));
     }
 
     /**
@@ -329,7 +341,7 @@ public class EbicsClient {
      */
     public void sendHPBRequest(User user, Product product) throws Exception {
         String userId = user.getUserId();
-        configuration.getLogger().info(messages.getString("hpb.request.send", userId));
+        logger.info(messages.getString("hpb.request.send", userId));
 
         EbicsSession session = createSession(user, product);
         KeyManagement keyManager = new KeyManagement(session);
@@ -339,9 +351,9 @@ public class EbicsClient {
 
         try {
             keyManager.sendHPB();
-            configuration.getLogger().info(messages.getString("hpb.send.success", userId));
+            logger.info(messages.getString("hpb.send.success", userId));
         } catch (Exception e) {
-            configuration.getLogger().error(messages.getString("hpb.send.error", userId), e);
+            logger.error(messages.getString("hpb.send.error", userId), e);
             throw e;
         }
     }
@@ -358,7 +370,7 @@ public class EbicsClient {
     public void revokeSubscriber(User user, Product product) throws Exception {
         String userId = user.getUserId();
 
-        configuration.getLogger().info(messages.getString("spr.request.send", userId));
+        logger.info(messages.getString("spr.request.send", userId));
 
         EbicsSession session = createSession(user, product);
         KeyManagement keyManager = new KeyManagement(session);
@@ -369,11 +381,11 @@ public class EbicsClient {
         try {
             keyManager.lockAccess();
         } catch (Exception e) {
-            configuration.getLogger().error(messages.getString("spr.send.error", userId), e);
+            logger.error(messages.getString("spr.send.error", userId), e);
             throw e;
         }
 
-        configuration.getLogger().info(messages.getString("spr.send.success", userId));
+        logger.info(messages.getString("spr.send.success", userId));
     }
 
     /**
@@ -392,7 +404,7 @@ public class EbicsClient {
         try {
             transferManager.sendFile(IOUtils.getFileContent(file), orderType, orderAttribute);
         } catch (IOException | EbicsException e) {
-            configuration.getLogger()
+            logger
                 .error(messages.getString("upload.file.error", file.getAbsolutePath()), e);
             throw e;
         }
@@ -421,7 +433,7 @@ public class EbicsClient {
             // don't log this exception as an error, caller can decide how to handle
             throw e;
         } catch (Exception e) {
-            configuration.getLogger().error(messages.getString("download.file.error"), e);
+            logger.error(messages.getString("download.file.error"), e);
             throw e;
         }
     }
@@ -438,7 +450,7 @@ public class EbicsClient {
         try {
             for (User user : users.values()) {
                 if (user.needsSave()) {
-                    configuration.getLogger()
+                    logger
                         .info(messages.getString("app.quit.users", user.getUserId()));
                     configuration.getSerializationManager().serialize(user);
                 }
@@ -446,7 +458,7 @@ public class EbicsClient {
 
             for (Partner partner : partners.values()) {
                 if (partner.needsSave()) {
-                    configuration.getLogger()
+                    logger
                         .info(messages.getString("app.quit.partners", partner.getPartnerId()));
                     configuration.getSerializationManager().serialize(partner);
                 }
@@ -454,20 +466,20 @@ public class EbicsClient {
 
             for (Bank bank : banks.values()) {
                 if (bank.needsSave()) {
-                    configuration.getLogger()
+                    logger
                         .info(messages.getString("app.quit.banks", bank.getHostId()));
                     configuration.getSerializationManager().serialize(bank);
                 }
             }
         } catch (EbicsException e) {
-            configuration.getLogger().info(messages.getString("app.quit.error"));
+            logger.info(messages.getString("app.quit.error"));
         }
 
         clearTraces();
     }
 
     public void clearTraces() {
-        configuration.getLogger().info(messages.getString("app.cache.clear"));
+        logger.info(messages.getString("app.cache.clear"));
         configuration.getTraceManager().clear();
     }
 
@@ -614,8 +626,7 @@ public class EbicsClient {
 
         CommandLine cmd = parseArguments(options, args);
 
-        File defaultRootDir = new File(System.getProperty("user.home") + File.separator + "ebics"
-            + File.separator + "client");
+        File defaultRootDir = getRootDir();
         File ebicsClientProperties = new File(defaultRootDir, "ebics.txt");
         EbicsClient client = createEbicsClient(defaultRootDir, ebicsClientProperties);
 

@@ -20,16 +20,12 @@
 package org.kopi.ebics.session;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
-import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.Configuration;
-import org.kopi.ebics.interfaces.EbicsLogger;
 import org.kopi.ebics.interfaces.EbicsUser;
 import org.kopi.ebics.interfaces.LetterManager;
 import org.kopi.ebics.interfaces.SerializationManager;
@@ -54,7 +50,6 @@ public class DefaultConfiguration implements Configuration {
     this.rootDir = rootDir;
     bundle = ResourceBundle.getBundle(RESOURCE_DIR);
     this.properties = properties;
-    logger = new DefaultEbicsLogger();
     serializationManager = new DefaultSerializationManager();
     traceManager = new DefaultTraceManager();
   }
@@ -81,8 +76,6 @@ public class DefaultConfiguration implements Configuration {
   public void init() {
     //Create the root directory
     IOUtils.createDirectories(getRootDirectory());
-    //Create the logs directory
-    IOUtils.createDirectories(getLogDirectory());
     //Create the serialization directory
     IOUtils.createDirectories(getSerializationDirectory());
     //create the SSL trusted stores directories
@@ -94,9 +87,6 @@ public class DefaultConfiguration implements Configuration {
     //Create users directory
     IOUtils.createDirectories(getUsersDirectory());
 
-    logger.setLogFile(getLogDirectory() + File.separator + getLogFileName());
-    ((DefaultEbicsLogger)logger).setFileLoggingEnabled(true);
-    ((DefaultEbicsLogger)logger).setLevel(DefaultEbicsLogger.ALL_LEVEL);
     serializationManager.setSerializationDirectory(getSerializationDirectory());
     traceManager.setTraceEnabled(isTraceEnabled());
     letterManager = new DefaultLetterManager(getLocale());
@@ -105,16 +95,6 @@ public class DefaultConfiguration implements Configuration {
   @Override
   public Locale getLocale() {
     return Locale.FRANCE;
-  }
-
-  @Override
-  public String getLogDirectory() {
-    return rootDir + File.separator + getString("log.dir.name");
-  }
-
-  @Override
-  public String getLogFileName() {
-    return getString("log.file.name");
   }
 
   @Override
@@ -188,11 +168,6 @@ public class DefaultConfiguration implements Configuration {
   }
 
   @Override
-  public EbicsLogger getLogger() {
-    return logger;
-  }
-
-  @Override
   public String getSignatureVersion() {
     return getString("signature.version");
   }
@@ -234,7 +209,6 @@ public class DefaultConfiguration implements Configuration {
   private final String rootDir;
   private final ResourceBundle bundle;
   private final Properties properties;
-  private final EbicsLogger logger;
   private final SerializationManager serializationManager;
   private final TraceManager traceManager;
   private LetterManager letterManager;
