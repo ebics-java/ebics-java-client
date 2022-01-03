@@ -7,9 +7,9 @@ You can use the `EbicsClient` as command line tool or use it from your Java appl
 
 How to get started:
 
-https://github.com/uwemaurer/ebics-java-client/wiki/EBICS-Client-HowTo
+https://github.com/ebics-java/ebics-java-client/wiki/EBICS-Client-HowTo
 
-You can build it directly from the source with maven or use the releases from [JitPack](https://jitpack.io/#uwemaurer/ebics-java-client/).
+You can build it directly from the source with maven or use the releases from [JitPack](https://jitpack.io/#ebics-java/ebics-java-client/).
 
 Gradle:
 ```
@@ -21,7 +21,7 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.uwemaurer:ebics-java-client:97867ac56e'
+    implementation 'com.github.ebics-java:ebics-java-client:master-SNAPSHOT'
 }
 ```
 Maven
@@ -34,9 +34,9 @@ Maven
 </repositories>
 
 <dependency>
-    <groupId>com.github.uwemaurer</groupId>
+    <groupId>com.github.ebics-java</groupId>
     <artifactId>ebics-java-client</artifactId>
-    <version>97867ac56e</version>
+    <version>master-SNAPSHOT</version>
 </dependency>
 ```
  
