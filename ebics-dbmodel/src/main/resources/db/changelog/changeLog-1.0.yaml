@@ -419,7 +419,7 @@ databaseChangeLog:
       id: 1633145648844-2
       author: honza (generated)
       changes:
-        - sql: update UserSettings set adjustmentOptions_swift_idPrefix=adjustmentOptions_pain00x_idPrefix
+        - sql: update usersettings set adjustmentOptions_swift_idPrefix=adjustmentOptions_pain00x_idPrefix
 - changeSet:
     id: 1633207140210-1
     author: honza (generated)
