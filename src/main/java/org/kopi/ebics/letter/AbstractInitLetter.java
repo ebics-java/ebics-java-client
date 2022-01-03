@@ -370,7 +370,7 @@ public abstract class AbstractInitLetter implements InitLetter {
 
     /**
      * Returns the letter content
-     * @return
+     * @return letter content as a <code>byte[]</code>
      */
     public byte[] getLetter() {
       return out.toByteArray();

@@ -72,7 +72,7 @@ public final class Utils {
    * 
    * @param toZip the input to be compressed
    * @return the compressed input data
-   * @throws IOException compression failed
+   * @throws EbicsException compression failed
    */
   public static byte[] zip(byte[] toZip) throws EbicsException {
 

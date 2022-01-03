@@ -192,7 +192,7 @@ public class EbicsClient {
      * @param passwordCallback
      *            a callback-handler that supplies us with the password. This
      *            parameter can be null, in this case no password is used.
-     * @return
+     * @return Ebics <code>User</code>
      * @throws Exception
      */
     public User createUser(URL url, String bankName, String hostId, String partnerId,

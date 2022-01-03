@@ -294,7 +294,7 @@ public class EbicsXmlFactory {
   /**
    * Creates a new <code>SignaturePubKeyOrderDataDocument</code> XML object
    * @param signaturePubKeyOrderData the <code>SignaturePubKeyOrderDataType</code> element
-   * @return
+   * @return the <code>SignaturePubKeyOrderDataDocument</code> XML object
    */
   public static SignaturePubKeyOrderDataDocument createSignaturePubKeyOrderDataDocument(SignaturePubKeyOrderDataType signaturePubKeyOrderData) {
     SignaturePubKeyOrderDataDocument newSignaturePubKeyOrderDataDocument = SignaturePubKeyOrderDataDocument.Factory.newInstance();
@@ -689,7 +689,7 @@ public class EbicsXmlFactory {
    * @param product the <code>ProductElementType</code> element
    * @param orderDetails the <code>OrderDetailsType</code> element
    * @param securityMedium the user security medium
-   * @return
+   * @return <code>NoPubKeyDigestsRequestStaticHeaderType</code>
    */
   public static NoPubKeyDigestsRequestStaticHeaderType createNoPubKeyDigestsRequestStaticHeaderType(String hostId,
                                                                                                     byte[] nonce,
@@ -864,7 +864,6 @@ public class EbicsXmlFactory {
    * Creates a new <code>StaticHeaderType</code> XML object
    * @param hostId the host ID
    * @param nonce the random nonce
-   * @param numSegments the segments number
    * @param partnerId the partner ID
    * @param product the <code>Product</code> element
    * @param securityMedium the security medium
@@ -989,7 +988,6 @@ public class EbicsXmlFactory {
 
   /**
    * Creates a new <code>StandardOrderParamsType</code> XML object
-   * @param fileFormat the <code>FileFormatType</code> element
    * @return the <code>StandardOrderParamsType</code> XML object
    */
   public static StandardOrderParamsType createStandardOrderParamsType() {
