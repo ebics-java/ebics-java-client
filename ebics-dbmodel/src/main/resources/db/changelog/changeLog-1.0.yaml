@@ -1,4 +1,5 @@
 databaseChangeLog:
+- objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
 - changeSet:
     id: 1627782315944-1
     author: honza.toegel (generated)
@@ -419,14 +420,7 @@ databaseChangeLog:
       id: 1633145648844-2
       author: honza (generated)
       changes:
-        - dbms:  !postgresql
         - sql: update UserSettings set adjustmentOptions_swift_idPrefix=adjustmentOptions_pain00x_idPrefix
-- changeSet:
-      id: 1633145648844-2-postgresql
-      author: honza (generated)
-      changes:
-          - dbms:  postgresql
-          - sql: update "UserSettings" set adjustmentOptions_swift_idPrefix=adjustmentOptions_pain00x_idPrefix
 - changeSet:
     id: 1633207140210-1
     author: honza (generated)
