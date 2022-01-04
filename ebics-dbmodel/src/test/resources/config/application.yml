@@ -10,6 +10,8 @@ spring:
   datasource:
     driver-class-name: "org.h2.Driver"
     url: "jdbc:h2:mem:testonly"
+    #This bellow doesn't effectively change to PG, its still h2 mem
+    #url: "jdbc:postgresql:ewc_test?user=test&password=test"
     initialization-mode: "never"
 logging:
   level:

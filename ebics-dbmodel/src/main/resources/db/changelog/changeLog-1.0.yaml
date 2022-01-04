@@ -480,18 +480,18 @@ databaseChangeLog:
       author: honza
       changes:
           - renameColumn:
-                oldColumnName: ISDEFAULT
+                oldColumnName: isDefault
                 newColumnName: isPreferredForUse
-                tableName: EBICSVERSIONSUPPORT
+                tableName: EbicsVersionSupport
                 type: boolean
 - changeSet:
       id: 1634550506090-1
       author: honza
       changes:
           - renameColumn:
-                oldColumnName: ISALLOWED
+                oldColumnName: isAllowed
                 newColumnName: isAllowedForUse
-                tableName: EBICSVERSIONSUPPORT
+                tableName: EbicsVersionSupport
                 type: boolean
 - changeSet:
     id: 1640007586105-1
@@ -651,3 +651,10 @@ databaseChangeLog:
                           name: traceType
                           type: integer
                 tableName: TraceEntry
+- changeSet:
+      id:  1640187568445-11
+      author:  honza.toegel
+      changes:
+          -  renameTable:
+                 newTableName:  EbicsUser
+                 oldTableName:  User

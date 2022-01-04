@@ -2,15 +2,15 @@ package org.ebics.client.api.user
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.ebics.client.api.EbicsUser
-import org.ebics.client.api.user.cert.UserKeyStore
 import org.ebics.client.api.partner.Partner
 import org.ebics.client.api.trace.TraceEntry
+import org.ebics.client.api.user.cert.UserKeyStore
 import org.ebics.client.api.user.permission.BankConnectionAccessRightsController
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.user.EbicsUserStatusEnum
 import javax.persistence.*
 
-@Entity
+@Entity(name = "EbicsUser")
 data class User (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

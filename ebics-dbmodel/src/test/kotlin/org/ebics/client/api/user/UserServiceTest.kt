@@ -3,14 +3,15 @@ package org.ebics.client.api.user
 import org.assertj.core.api.Assertions.assertThat
 import org.ebics.client.api.bank.BankData
 import org.ebics.client.api.bank.BankService
-import org.ebics.client.api.user.cert.UserKeyStoreService
 import org.ebics.client.api.partner.PartnerService
+import org.ebics.client.api.user.cert.UserKeyStoreService
 import org.ebics.client.model.EbicsVersion
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.AutoConfigurationPackage
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URL
@@ -24,6 +25,7 @@ class UserServiceTest(
     @Autowired private val bankService: BankService,
 ) {
     @Test
+    @WithMockUser(username = "user_xxx", roles = ["USER"])
     fun createAndGetUser() {
         val bank = BankData(  URL("https://ebics.ubs.com/ebicsweb/ebicsweb"),  "EBXUBSCH", "UBS-PROD-CH")
         val bankId = bankService.createBank(bank)
