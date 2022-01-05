@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import java.time.ZonedDateTime
 
 interface TraceRepository : JpaRepository<TraceEntry, Long>, JpaSpecificationExecutor<TraceEntry> {
-    fun deleteByDateTimeLessThan(dateTime: ZonedDateTime)
+    fun deleteByDateTimeLessThan(dateTime: ZonedDateTime): Long
 }

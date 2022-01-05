@@ -59,7 +59,8 @@ class FileService(private val traceRepository: TraceRepository,
     }
 
     override fun removeAllFilesOlderThan(@Value("$\\{value.from.file\\}") dateTime: ZonedDateTime) {
-        traceRepository.deleteByDateTimeLessThan(dateTime)
+        val numberOfRemovedEntries = traceRepository.deleteByDateTimeLessThan(dateTime)
+        logger.info("Total '{}' TraceEntries removed", numberOfRemovedEntries)
     }
 
     @Scheduled(cron = "0 0 1 * * *")
