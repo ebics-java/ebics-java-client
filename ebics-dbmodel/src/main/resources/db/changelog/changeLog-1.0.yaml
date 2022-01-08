@@ -478,6 +478,7 @@ databaseChangeLog:
 - changeSet:
       id: 1634550506090-0
       author: honza
+      validCheckSum: 8:0cd7f398c2a7b5c4ac070db0e3645e47
       changes:
           - renameColumn:
                 oldColumnName: isDefault
@@ -487,6 +488,7 @@ databaseChangeLog:
 - changeSet:
       id: 1634550506090-1
       author: honza
+      validCheckSum: 8:85526a80c784e4b78d20cc0accecd6eb
       changes:
           - renameColumn:
                 oldColumnName: isAllowed
@@ -658,3 +660,18 @@ databaseChangeLog:
           -  renameTable:
                  newTableName:  EbicsUser
                  oldTableName:  User
+- changeSet:
+    id: 1641615979972-2
+    author: honza.toegel (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: httpClientConfigurationName
+            type: varchar(255)
+        tableName: Bank
+- changeSet:
+      id: 1633145648844-3
+      author: honza (generated)
+      changes:
+          - sql: update Bank set httpClientConfigurationName='default'

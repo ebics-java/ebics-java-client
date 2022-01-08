@@ -24,14 +24,12 @@ import org.ebics.client.api.trace.h005.ITraceSession
 import org.ebics.client.api.trace.h005.TraceSession
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.filetransfer.AbstractFileTransfer
-import org.ebics.client.http.HttpRequestSender
+import org.ebics.client.http.HttpTransferSession
 import org.ebics.client.interfaces.ContentFactory
 import org.ebics.client.io.ByteArrayContentFactory
 import org.ebics.client.io.Joiner
-import org.ebics.client.messages.Messages.getString
 import org.ebics.client.order.EbicsAdminOrderType
 import org.ebics.client.order.h005.*
-import org.ebics.client.utils.Constants
 import org.ebics.client.utils.toHexString
 import org.ebics.client.xml.h005.*
 import org.slf4j.LoggerFactory
@@ -85,18 +83,16 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
      */
     @Throws(IOException::class, EbicsException::class)
     fun sendFile(content: ByteArray, ebicsUploadOrder: EbicsUploadOrder): EbicsUploadOrderResponse {
-        logger.info(
-            String.format("Start uploading file via EBICS sessionId=%s, userId=%s, partnerId=%s, bankURL=%s, order=%s, file length=%d",
-                session.sessionId, session.user.userId, session.user.partner.partnerId, session.user.partner.bank.bankURL, ebicsUploadOrder.toString(), content.size)
-        )
+        logger.info("Start uploading file via EBICS sessionId=${session.sessionId}, userId=${session.user.userId}, partnerId=${session.user.partner.partnerId}, bankURL=${session.user.partner.bank.bankURL}, order=$ebicsUploadOrder, file length=${content.size}")
         val orderType = ebicsUploadOrder.adminOrderType
-        val sender = HttpRequestSender(session)
+        val sender = HttpTransferSession(session)
         val initializer = UploadInitializationRequestElement(
             session,
             ebicsUploadOrder,
             content
         ).apply { build(); validate() }
-        val traceSession = TraceSession(session, OrderTypeDefinition(ebicsUploadOrder.adminOrderType, ebicsUploadOrder.orderService))
+        val traceSession =
+            TraceSession(session, OrderTypeDefinition(ebicsUploadOrder.adminOrderType, ebicsUploadOrder.orderService))
         traceSession.trace(initializer.userSignature)
         traceSession.trace(initializer)
         val responseBody = sender.send(ByteArrayContentFactory(initializer.prettyPrint()))
@@ -116,10 +112,7 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
                 state.transactionId, orderType, traceSession
             )
         }
-        logger.info(
-            String.format("Finished uploading file via EBICS sessionId=%s, userId=%s, partnerId=%s, bankURL=%s, order=%s, file length=%d, orderNumber=%s, transactionId=%s",
-                session.sessionId, session.user.userId, session.user.partner.partnerId, session.user.partner.bank.bankURL, ebicsUploadOrder.toString(), content.size, response.orderNumber, response.transactionId.toHexString())
-        )
+        logger.info("Finished uploading file via EBICS sessionId=${session.sessionId}, userId=${session.user.userId}, partnerId=${session.user.partner.partnerId}, bankURL=${session.user.partner.bank.bankURL}, order=$ebicsUploadOrder, file length=${content.size}, orderNumber=${response.orderNumber}, transactionId=${response.transactionId.toHexString()}")
         return EbicsUploadOrderResponse(response.orderNumber, response.transactionId.toHexString())
     }
 
@@ -142,12 +135,9 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
         orderType: EbicsAdminOrderType,
         traceSession: TraceSession
     ) {
+        val segmentStr = if (lastSegment) "last segment ($segmentNumber)" else "segment ($segmentNumber)"
         logger.info(
-            getString(
-                "upload.segment",
-                Constants.APPLICATION_BUNDLE_NAME,
-                segmentNumber
-            )
+            "Uploading $segmentStr of file via EBICS sessionId=${session.sessionId}, userId=${session.user.userId}, partnerId=${session.user.partner.partnerId}, bankURL=${session.user.partner.bank.bankURL}"
         )
         val uploader = UploadTransferRequestElement(
             session,
@@ -157,7 +147,7 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
             transactionId,
             factory
         ).apply { build(); validate() }
-        val sender = HttpRequestSender(session)
+        val sender = HttpTransferSession(session)
         traceSession.trace(uploader)
         val responseBody = sender.send(ByteArrayContentFactory(uploader.prettyPrint()))
 
@@ -184,17 +174,24 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
         downloadOrder: EbicsDownloadOrder
     ): ByteArrayOutputStream {
         logger.info(
-            String.format("Start downloading file via EBICS sessionId=%s, userId=%s, partnerId=%s, bankURL=%s, order=%s",
-                session.sessionId, session.user.userId, session.user.partner.partnerId, session.user.partner.bank.bankURL, downloadOrder.toString())
+            String.format(
+                "Start downloading file via EBICS sessionId=%s, userId=%s, partnerId=%s, bankURL=%s, order=%s",
+                session.sessionId,
+                session.user.userId,
+                session.user.partner.partnerId,
+                session.user.partner.bank.bankURL,
+                downloadOrder.toString()
+            )
         )
         val outputStream = ByteArrayOutputStream()
         val orderType = downloadOrder.adminOrderType
-        val sender = HttpRequestSender(session)
+        val sender = HttpTransferSession(session)
         val initializer =
             DownloadInitializationRequestElement(session, downloadOrder)
         initializer.build()
         initializer.validate()
-        val traceSession = TraceSession(session, OrderTypeDefinition(downloadOrder.adminOrderType, downloadOrder.orderService), false)
+        val traceSession =
+            TraceSession(session, OrderTypeDefinition(downloadOrder.adminOrderType, downloadOrder.orderService), false)
         traceSession.trace(initializer)
         val responseBody = sender.send(ByteArrayContentFactory(initializer.prettyPrint()))
 
@@ -240,8 +237,16 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
         traceSession.trace(receiptResponse)
         receiptResponse.report()
         logger.info(
-            String.format("Finished downloading file via EBICS sessionId=%s, userId=%s, partnerId=%s, bankURL=%s, order=%s, transactionId=%s, fileLength=%d",
-                session.sessionId, session.user.userId, session.user.partner.partnerId, session.user.partner.bank.bankURL, downloadOrder.toString(), state.transactionId.toHexString(), outputStream.size())
+            String.format(
+                "Finished downloading file via EBICS sessionId=%s, userId=%s, partnerId=%s, bankURL=%s, order=%s, transactionId=%s, fileLength=%d",
+                session.sessionId,
+                session.user.userId,
+                session.user.partner.partnerId,
+                session.user.partner.bank.bankURL,
+                downloadOrder.toString(),
+                state.transactionId.toHexString(),
+                outputStream.size()
+            )
         )
         return outputStream
     }
@@ -265,7 +270,7 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
         joiner: Joiner,
         traceSession: ITraceSession
     ) {
-        val sender = HttpRequestSender(session)
+        val sender = HttpTransferSession(session)
         val downloader = DownloadTransferRequestElement(
             session,
             orderType,

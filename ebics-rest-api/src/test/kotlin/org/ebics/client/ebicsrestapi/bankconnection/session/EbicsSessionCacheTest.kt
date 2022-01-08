@@ -4,9 +4,9 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.junit5.MockKExtension
 import org.ebics.client.api.bank.Bank
 import org.ebics.client.ebicsrestapi.EbicsProduct
-import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
 import org.ebics.client.ebicsrestapi.bankconnection.UserServiceTestImpl
+import org.ebics.client.ebicsrestapi.configuration.EbicsRestConfiguration
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

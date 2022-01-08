@@ -4,7 +4,6 @@ import org.ebics.client.certificate.BankCertificateManager
 import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.model.Product
-import java.util.*
 
 interface EbicsSession {
     val sessionId: String
@@ -15,7 +14,7 @@ interface EbicsSession {
     /**
      * The client application configuration.
      */
-    val configuration: Configuration
+    val configuration: EbicsConfiguration
     /**
      * Sets the optional product identification that will be sent to the bank during each request.
      */

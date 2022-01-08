@@ -23,7 +23,7 @@ import org.ebics.client.api.trace.h005.TraceSession
 import org.ebics.client.certificate.BankCertificateManager
 import org.ebics.client.certificate.BankCertificateManager.Companion.createFromCertificates
 import org.ebics.client.exception.EbicsException
-import org.ebics.client.http.HttpRequestSender
+import org.ebics.client.http.HttpTransferSession
 
 import org.ebics.client.io.ByteArrayContentFactory
 import org.ebics.client.keymgmt.KeyManagement
@@ -59,7 +59,7 @@ class KeyManagementImpl(session: EbicsSession) : KeyManagement(session) {
     @Throws(EbicsException::class, IOException::class)
     override fun sendINI(orderId: String?) {
         session.user.checkAction(EbicsUserAction.INI)
-        val sender = HttpRequestSender(session)
+        val sender = HttpTransferSession(session)
         val request = INIRequestElement(session).apply { build(); validate() }
         val traceSession = TraceSession(session, OrderTypeDefinition(EbicsAdminOrderType.INI))
         traceSession.trace(request)
@@ -80,7 +80,7 @@ class KeyManagementImpl(session: EbicsSession) : KeyManagement(session) {
     @Throws(IOException::class, EbicsException::class)
     override fun sendHIA(orderId: String?) {
         session.user.checkAction(EbicsUserAction.HIA)
-        val sender = HttpRequestSender(session)
+        val sender = HttpTransferSession(session)
         val request = HIARequestElement(session).apply { build(); validate() }
         val traceSession = TraceSession(session, OrderTypeDefinition(EbicsAdminOrderType.HIA))
         traceSession.trace(request)
@@ -103,7 +103,7 @@ class KeyManagementImpl(session: EbicsSession) : KeyManagement(session) {
     @Throws(IOException::class, GeneralSecurityException::class, EbicsException::class)
     override fun sendHPB(password: String): BankCertificateManager {
         session.user.checkAction(EbicsUserAction.HPB)
-        val sender = HttpRequestSender(session)
+        val sender = HttpTransferSession(session)
         val request = HPBRequestElement(session).apply { build(); validate() }
         val traceSession = TraceSession(session, OrderTypeDefinition(EbicsAdminOrderType.HPB))
         traceSession.trace(request)
@@ -131,7 +131,7 @@ class KeyManagementImpl(session: EbicsSession) : KeyManagement(session) {
     @Throws(IOException::class, EbicsException::class)
     override fun lockAccess() {
         session.user.checkAction(EbicsUserAction.SPR)
-        val sender = HttpRequestSender(session)
+        val sender = HttpTransferSession(session)
         val request = SPRRequestElement(session).apply { build(); validate() }
         val traceSession = TraceSession(session, OrderTypeDefinition(EbicsAdminOrderType.SPR))
         traceSession.trace(request)

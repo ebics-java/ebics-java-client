@@ -20,7 +20,6 @@ package org.ebics.client.api
 
 import java.io.Serializable
 import java.net.URL
-import java.security.interfaces.RSAPublicKey
 
 /**
  * Details about EBICS communication with a given bank.
@@ -45,4 +44,9 @@ interface EbicsBank : Serializable {
      * @return the bank's name.
      */
     val name: String
+
+    /**
+     * The name of the HTTP configuration which is used for this bank
+     */
+    val httpClientConfigurationName: String
 }

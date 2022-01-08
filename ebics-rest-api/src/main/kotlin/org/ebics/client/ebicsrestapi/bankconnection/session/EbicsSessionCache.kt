@@ -3,8 +3,8 @@ package org.ebics.client.ebicsrestapi.bankconnection.session
 import org.ebics.client.api.user.UserService
 import org.ebics.client.api.user.permission.BankConnectionAccessType
 import org.ebics.client.ebicsrestapi.EbicsProduct
-import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
+import org.ebics.client.ebicsrestapi.configuration.EbicsRestConfiguration
 import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.Product
 import org.springframework.cache.annotation.Cacheable

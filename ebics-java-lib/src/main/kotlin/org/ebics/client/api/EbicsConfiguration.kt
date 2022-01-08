@@ -19,6 +19,7 @@
 package org.ebics.client.api
 
 import org.ebics.client.api.trace.TraceManager
+import org.ebics.client.http.HttpClientFactory
 import java.util.*
 
 /**
@@ -26,30 +27,18 @@ import java.util.*
  *
  * @author hachani
  */
-interface Configuration {
+interface EbicsConfiguration {
 
     /**
-     * Returns the SSL trusted store, used for establishing connections if needed (usually for no public EBICS servers only).
-     * @return the SSL trusted store.
+     * Returns the global HTTP client factory
      */
-    val sslTrustedStoreFile: String?
-
-    val httpProxyHost: String?
-    val httpProxyPort: Int?
-    val httpProxyUser: String?
-    val httpProxyPassword: String?
+    val httpClientFactory: HttpClientFactory
 
     /**
      * Returns the Ebics client trace manager.
      * @return the Ebics client trace manager.
      */
     val traceManager: TraceManager
-
-    /**
-     * Returns the letter manager.
-     * @return the letter manager.
-     */
-    val letterManager: LetterManager
 
     /**
      * Returns the application locale.

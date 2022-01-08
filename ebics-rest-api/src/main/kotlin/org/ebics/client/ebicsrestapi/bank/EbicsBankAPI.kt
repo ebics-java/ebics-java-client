@@ -6,9 +6,9 @@ import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.bank.versions.VersionSupport
 import org.ebics.client.api.bank.versions.VersionSupportBase
 import org.ebics.client.api.bank.versions.VersionSupportService
-import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
 import org.ebics.client.bank.BankOperations
 import org.ebics.client.ebicsrestapi.EbicsAccessMode
+import org.ebics.client.ebicsrestapi.configuration.EbicsRestConfiguration
 import org.ebics.client.model.EbicsVersion
 import org.springframework.stereotype.Component
 import java.net.URL
@@ -76,7 +76,7 @@ class EbicsBankAPI(private val configuration: EbicsRestConfiguration, private va
     }
 
     private fun getVersions(bank: Bank): List<EbicsVersion> {
-        val versions = BankOperations(configuration).sendHEV(bank.bankURL.toString(), bank.hostId)
+        val versions = BankOperations(configuration).sendHEV(bank.bankURL, bank.hostId)
         if (versions.isEmpty())
             throw FunctionException(
                 "The bank ${bank.bankURL} with hostID: ${bank.hostId} doen't support any EBICS version, HEV return empty list",

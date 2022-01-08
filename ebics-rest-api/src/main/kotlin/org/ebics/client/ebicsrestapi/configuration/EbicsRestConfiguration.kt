@@ -1,28 +1,17 @@
-package org.ebics.client.ebicsrestapi
+package org.ebics.client.ebicsrestapi.configuration
 
-import org.ebics.client.api.Configuration
-import org.ebics.client.api.LetterManager
+import org.ebics.client.api.EbicsConfiguration
 import org.ebics.client.api.trace.TraceManager
 import org.ebics.client.api.trace.TraceService
+import org.ebics.client.http.HttpClientFactory
+import org.ebics.client.http.HttpClientGlobalConfiguration
+import org.ebics.client.http.PooledHttpClientFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Configuration
 import java.util.*
 
-@org.springframework.context.annotation.Configuration
+@Configuration
 class EbicsRestConfiguration(
-    @Value("\${http.proxy.host:#{null}}")
-    override val httpProxyHost: String?,
-
-    @Value("\${http.proxy.port:#{null}}")
-    override val httpProxyPort: Int?,
-
-    @Value("\${http.proxy.user:#{null}}")
-    override val httpProxyUser: String?,
-
-    @Value("\${http.proxy.password:#{null}}")
-    override val httpProxyPassword: String?,
-
-    @Value("\${ssl.truststore:#{null}}")
-    override val sslTrustedStoreFile: String?,
 
     @Value("\${ebics.signatureVersion:A005}")
     override val signatureVersion: String,
@@ -42,13 +31,12 @@ class EbicsRestConfiguration(
     @Value("\${ebics.locale.language:en}")
     private val localeLanguage:String,
 
-    traceService: TraceService
-) : Configuration {
+    traceService: TraceService,
+    httpClientConfiguration: HttpClientGlobalConfiguration
+) : EbicsConfiguration {
 
     override val traceManager: TraceManager = traceService
-    override val letterManager: LetterManager
-        get() = TODO("Not yet implemented")
-
+    override val httpClientFactory: HttpClientFactory = PooledHttpClientFactory(httpClientConfiguration)
 
     final override val locale: Locale = Locale(localeLanguage)
 

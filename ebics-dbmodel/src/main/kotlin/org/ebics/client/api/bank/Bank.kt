@@ -1,6 +1,5 @@
 package org.ebics.client.api.bank
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import org.ebics.client.api.EbicsBank
 import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.bank.versions.VersionSupport
@@ -22,5 +21,7 @@ data class Bank(
     var keyStore: BankKeyStore?,
 
     @OneToMany(cascade = [CascadeType.ALL], mappedBy = "bank")
-    val ebicsVersions: List<VersionSupport>? = emptyList()
+    val ebicsVersions: List<VersionSupport>? = emptyList(),
+
+    override val httpClientConfigurationName: String = "default"
 ) : EbicsBank

@@ -36,3 +36,13 @@ fun LocalDate.toDate(): Date {
 }
 
 fun XmlObject.equalXml(xmlObject: XmlObject): Boolean = this.xmlText().equals(xmlObject.xmlText())
+
+
+inline fun requireNotNullAndNotBlank(value: String?, lazyMessage: () -> Any = {"The string must not be blank or null"}): String {
+    val notNullValue = requireNotNull(value, lazyMessage)
+    require(value.isNotBlank(), lazyMessage)
+    return notNullValue
+}
+
+fun requireNotNullAndNotBlank(value: String?, stringName: String): String = requireNotNullAndNotBlank(value) {"The $stringName must not be null or blank" }
+fun<T> requireNotNull(value: T?, paramName: String): T = requireNotNull(value) {"The $paramName must not be null"}

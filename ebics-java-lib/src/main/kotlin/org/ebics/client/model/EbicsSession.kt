@@ -18,13 +18,12 @@
  */
 package org.ebics.client.model
 
+import org.ebics.client.api.EbicsConfiguration
 import org.ebics.client.api.EbicsSession
-import org.ebics.client.api.Configuration
 import org.ebics.client.api.EbicsUser
 import org.ebics.client.certificate.BankCertificateManager
 import org.ebics.client.certificate.UserCertificateManager
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * The EBICS Session for EBICS API requests
@@ -42,7 +41,7 @@ class EbicsSession(
     /**
      * The client application configuration.
      */
-    override val configuration: Configuration,
+    override val configuration: EbicsConfiguration,
     /**
      * Sets the optional product identification that will be sent to the bank during each request.
      */

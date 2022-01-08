@@ -18,22 +18,21 @@
  */
 package org.ebics.client.bank
 
-import org.ebics.client.api.Configuration
+import org.ebics.client.api.EbicsConfiguration
 import org.ebics.client.exception.EbicsException
-import org.ebics.client.http.HttpRequestSender
 
 import org.ebics.client.io.ByteArrayContentFactory
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.xml.h000.HEVRequest
 import org.ebics.client.xml.h000.HEVResponse
 import java.io.IOException
+import java.net.URL
 
-class BankOperations(val configuration: Configuration)  {
+class BankOperations(val configuration: EbicsConfiguration)  {
     @Throws(EbicsException::class, IOException::class)
-    fun sendHEV(bankURL: String, bankHostId: String): List<EbicsVersion> {
-        val sender = HttpRequestSender(configuration, bankURL)
+    fun sendHEV(bankURL: URL, bankHostId: String): List<EbicsVersion> {
         val request = HEVRequest(bankHostId).apply { build(); validate() }
-        val responseBody = sender.send(ByteArrayContentFactory(request.prettyPrint()))
+        val responseBody = configuration.httpClientFactory.getHttpClient("default").send(bankURL, ByteArrayContentFactory(request.prettyPrint()))
         val response =  HEVResponse(responseBody).apply {
             build()
             validate()

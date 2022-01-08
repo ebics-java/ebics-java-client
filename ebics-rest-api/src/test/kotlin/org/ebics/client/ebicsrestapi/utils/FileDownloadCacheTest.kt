@@ -9,8 +9,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.api.trace.IFileService
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
 import org.ebics.client.ebicsrestapi.EbicsProduct
-import org.ebics.client.ebicsrestapi.EbicsRestConfiguration
 import org.ebics.client.ebicsrestapi.MockSession
+import org.ebics.client.ebicsrestapi.configuration.EbicsRestConfiguration
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.order.EbicsAdminOrderType
 import org.junit.jupiter.api.Assertions
