@@ -48,10 +48,8 @@ class UserCertificateManagerTest {
         println("Signed SHAwithRSA in one step : ${signed.toHexString()}")
         //SHA256
         val sha256 = manager.createSHA256hash(test.toByteArray())
-        println("SHA256: ${sha256.toHexString()}")
         //+withRSA
         val signed2 = manager.signSHA256hash(sha256)
-        println("Signed SHAwithRSA in two steps: ${signed.toHexString()}")
 
         Assertions.assertArrayEquals(signed, signed2)
     }

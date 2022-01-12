@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
 
 @Service
@@ -58,6 +59,8 @@ class FileService(private val traceRepository: TraceRepository,
         )
     }
 
+    //Transactional here should solve error: No EntityManager with actual transaction available for current thread
+    @Transactional
     override fun removeAllFilesOlderThan(@Value("$\\{value.from.file\\}") dateTime: ZonedDateTime) {
         val numberOfRemovedEntries = traceRepository.deleteByDateTimeLessThan(dateTime)
         logger.info("Total '{}' TraceEntries removed", numberOfRemovedEntries)

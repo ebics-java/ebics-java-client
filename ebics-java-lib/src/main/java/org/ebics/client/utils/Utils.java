@@ -19,6 +19,24 @@
 
 package org.ebics.client.utils;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.util.EntityUtils;
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.utils.IgnoreAllErrorHandler;
+import org.apache.xpath.XPathAPI;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.ebics.client.exception.EbicsException;
+import org.ebics.client.messages.Messages;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.traversal.NodeIterator;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,23 +50,6 @@ import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.xml.security.c14n.Canonicalizer;
-import org.apache.xml.security.utils.IgnoreAllErrorHandler;
-import org.apache.xpath.XPathAPI;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.ebics.client.exception.EbicsException;
-import org.ebics.client.messages.Messages;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.traversal.NodeIterator;
 
 
 /**
@@ -313,8 +314,16 @@ public class Utils {
         int httpCode = response.getStatusLine().getStatusCode();
         if (httpCode != 200) {
             //Log detail response in server log
-            Logger.getLogger(Utils.class.getName()).log(Level.WARNING,
-                    "Wrong HTTP Code for EBICS response, Response detail: {0}", response.toString());
+            try {
+                HttpEntity entity = response.getEntity();
+                String responseString = EntityUtils.toString(entity, "UTF-8");
+
+                Logger.getLogger(Utils.class.getName()).log(Level.WARNING,
+                        "Unexpected HTTP Code: {0} returned as EBICS response, reason: {1}, response content: {2}", new Object[]{httpCode, response.getStatusLine().getReasonPhrase(), responseString});
+            } catch (IOException e) {
+                Logger.getLogger(Utils.class.getName()).log(Level.WARNING,
+                        "Unexpected HTTP Code: {0} returned as EBICS response, reason: {1}, response content can't be read", new Object[]{httpCode, response.getStatusLine().getReasonPhrase()});
+            }
             //Return only error code to client
             throw new EbicsException(Messages.getString("http.code.error",
                     Constants.APPLICATION_BUNDLE_NAME,

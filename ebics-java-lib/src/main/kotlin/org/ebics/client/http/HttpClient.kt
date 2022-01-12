@@ -9,7 +9,7 @@ interface HttpClient {
     /**
      * Actual configuration of the client
      */
-    val configuration: HttpClientConfiguration
+    val configuration: HttpClientRequestConfiguration
 
     /**
      * Send HTTP request to given URL, using header if indicated

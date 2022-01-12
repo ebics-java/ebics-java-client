@@ -12,15 +12,15 @@ import javax.annotation.PreDestroy
 
 class SimpleHttpClient(
     private val httpClient: CloseableHttpClient,
-    override val configuration: HttpClientConfiguration
+    override val configuration: HttpClientRequestConfiguration
 ) : HttpClient {
     override fun send(request: HttpClientRequest): ByteArrayContentFactory {
         logger.trace("Sending HTTP POST request to URL: ${request.requestURL}")
         val method = HttpPost(request.requestURL.toURI())
         method.entity = EntityBuilder.create().setStream(request.content.content).build()
-        if (!configuration.httpContentHeader.isNullOrBlank()) {
-            logger.trace("Setting HTTP POST content header: ${configuration.httpContentHeader}")
-            method.setHeader(HttpHeaders.CONTENT_TYPE, configuration.httpContentHeader)
+        if (!configuration.httpContentType.isNullOrBlank()) {
+            logger.trace("Setting HTTP POST content header: ${configuration.httpContentType}")
+            method.setHeader(HttpHeaders.CONTENT_TYPE, configuration.httpContentType)
         }
         httpClient.execute(method).use { response ->
             logger.trace("Received HTTP POST response code ${response.statusLine.statusCode} from URL: ${request.requestURL}")

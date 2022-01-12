@@ -1,6 +1,6 @@
 package org.ebics.client.http
 
-interface HttpClientConfiguration {
+interface HttpClientConfiguration : HttpClientRequestConfiguration {
     /**
      * The SSL trusted store, used for establishing connections if needed (usually for no public EBICS servers only).
      */
@@ -14,12 +14,6 @@ interface HttpClientConfiguration {
     val httpProxyPort: Int?
     val httpProxyUser: String?
     val httpProxyPassword: String?
-
-    /**
-     * Specific HTTP header (if null then no header will be provided)
-     * Example: "text/xml; charset=ISO-8859-1"
-     */
-    val httpContentHeader: String?
 
     /**
      * Timeouts in milli-seconds (or -1)

@@ -28,7 +28,7 @@ class PooledHttpClientFactory(
     private val httpClients: Map<String, SimpleHttpClient>
 
     init {
-        val configurations = config.namedClientConfigurations.ifEmpty {
+        val configurations = config.configurations.ifEmpty {
             mapOf("default" to object : HttpClientConfiguration {
                 override val sslTrustedStoreFile: String? = null
                 override val sslTrustedStoreFilePassword: String? = null
@@ -36,7 +36,7 @@ class PooledHttpClientFactory(
                 override val httpProxyPort: Int? = null
                 override val httpProxyUser: String? = null
                 override val httpProxyPassword: String? = null
-                override val httpContentHeader: String = "text/xml; charset=ISO-8859-1"
+                override val httpContentType: String = "text/xml; charset=ISO-8859-1"
                 override val socketTimeoutMilliseconds: Int = 300 * 1000
                 override val connectionTimeoutMilliseconds: Int = 300 * 1000
             })

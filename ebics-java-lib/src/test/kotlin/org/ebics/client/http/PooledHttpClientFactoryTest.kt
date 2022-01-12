@@ -13,14 +13,14 @@ class PooledHttpClientFactoryTest {
             override val httpProxyPort: Int? = null
             override val httpProxyUser: String? = null
             override val httpProxyPassword: String? = null
-            override val httpContentHeader: String = ""
+            override val httpContentType: String = ""
             override val socketTimeoutMilliseconds: Int = 300000
             override val connectionTimeoutMilliseconds: Int = 300000
         }
         val poolConfig = object  : HttpClientGlobalConfiguration {
             override val connectionPoolMaxTotal = 5
             override val connectionPoolDefaultMaxPerRoute = 10
-            override val namedClientConfigurations: Map<String, HttpClientConfiguration> = mapOf("default" to configuration)
+            override val configurations: Map<String, HttpClientConfiguration> = mapOf("default" to configuration)
         }
         val factory = PooledHttpClientFactory(poolConfig)
         val client = factory.getHttpClient("default")
@@ -32,7 +32,7 @@ class PooledHttpClientFactoryTest {
         val poolConfig = object  : HttpClientGlobalConfiguration {
             override val connectionPoolMaxTotal = 5
             override val connectionPoolDefaultMaxPerRoute = 10
-            override val namedClientConfigurations: Map<String, HttpClientConfiguration> = emptyMap()
+            override val configurations: Map<String, HttpClientConfiguration> = emptyMap()
         }
         val factory = PooledHttpClientFactory(poolConfig)
         val client = factory.getHttpClient("default")
@@ -48,14 +48,14 @@ class PooledHttpClientFactoryTest {
             override val httpProxyPort: Int? = null
             override val httpProxyUser: String? = null
             override val httpProxyPassword: String? = null
-            override val httpContentHeader: String = ""
+            override val httpContentType: String = ""
             override val socketTimeoutMilliseconds: Int = 300000
             override val connectionTimeoutMilliseconds: Int = 300000
         }
         val poolConfig = object  : HttpClientGlobalConfiguration {
             override val connectionPoolMaxTotal = 5
             override val connectionPoolDefaultMaxPerRoute = 10
-            override val namedClientConfigurations: Map<String, HttpClientConfiguration> = mapOf("default" to configuration)
+            override val configurations: Map<String, HttpClientConfiguration> = mapOf("default" to configuration)
         }
         val factory = PooledHttpClientFactory(poolConfig)
         Assertions.assertThrows(IllegalArgumentException::class.java) {

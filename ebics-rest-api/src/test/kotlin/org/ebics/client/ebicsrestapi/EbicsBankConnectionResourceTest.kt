@@ -2,8 +2,8 @@ package org.ebics.client.ebicsrestapi
 
 import org.assertj.core.api.Assertions.assertThat
 import org.ebics.client.api.bank.Bank
-import org.ebics.client.api.user.User
 import org.ebics.client.api.user.BankConnection
+import org.ebics.client.api.user.User
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.junit.jupiter.api.Test
@@ -19,7 +19,7 @@ import java.net.URL
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class EbicsUserResourceTest (@Autowired private val restTemplate: TestRestTemplate) {
+class EbicsBankConnectionResourceTest (@Autowired private val restTemplate: TestRestTemplate) {
     @Test
     fun greetingShouldReturnDefaultMessage() {
         assertThat(restTemplate.getForObject("/users/test", String::class.java))
@@ -27,7 +27,7 @@ class EbicsUserResourceTest (@Autowired private val restTemplate: TestRestTempla
     }
 
     @Test
-    fun addUserAndGet() {
+    fun addAndGetBankConnection() {
         //Save bank
         val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), "EBXUBSCH", "UBS-PROD-CH", null)
         val requestBank: HttpEntity<Bank> = HttpEntity(bank)
