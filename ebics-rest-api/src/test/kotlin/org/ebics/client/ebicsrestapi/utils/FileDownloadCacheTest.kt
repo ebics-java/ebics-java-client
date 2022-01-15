@@ -1,6 +1,5 @@
 package org.ebics.client.ebicsrestapi.utils
 
-import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockkConstructor
@@ -10,6 +9,7 @@ import org.ebics.client.api.trace.IFileService
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
 import org.ebics.client.ebicsrestapi.EbicsProduct
 import org.ebics.client.ebicsrestapi.MockSession
+import org.ebics.client.ebicsrestapi.TestContext
 import org.ebics.client.ebicsrestapi.configuration.EbicsRestConfiguration
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.order.EbicsAdminOrderType
@@ -18,36 +18,23 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
+import org.springframework.test.context.ContextConfiguration
 import java.io.ByteArrayOutputStream
 import java.security.Security
 import java.time.ZonedDateTime
 
 @SpringBootTest
 @ExtendWith(MockKExtension::class)
+@ContextConfiguration(classes = [TestContext::class])
 class FileDownloadCacheTest(
-    @Qualifier("TestFileDownloadCache")
     @Autowired private val fileDownloadCache: IFileDownloadCache,
-    @Autowired private val fileService: IFileService
+    @Autowired private val fileService: IFileService,
+    @Autowired private val configuration: EbicsRestConfiguration
 ) {
     init {
         Init.init()
         Security.addProvider(BouncyCastleProvider())
-    }
-
-    @MockkBean
-    private lateinit var configuration: EbicsRestConfiguration
-
-    @Configuration
-    internal class TestContextConfiguration {
-        @Bean(name = ["TestFileDownloadCache"])
-        fun fileDownloadCache(): IFileDownloadCache = FileDownloadCache(fileService())
-
-        @Bean(name = ["FileServiceMockImpl"])
-        fun fileService(): IFileService = FileServiceMockImpl()
     }
 
     val prod = EbicsProduct("testProd", "de", "JTO")
