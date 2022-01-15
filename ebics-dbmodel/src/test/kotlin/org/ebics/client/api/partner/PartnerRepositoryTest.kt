@@ -1,12 +1,12 @@
 package org.ebics.client.api.partner
 
+import DbTestContext
 import org.ebics.client.api.bank.BankData
 import org.ebics.client.api.bank.BankService
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.AutoConfigurationPackage
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -14,8 +14,7 @@ import java.net.URL
 
 @ExtendWith(SpringExtension::class)
 @DataJpaTest
-@AutoConfigurationPackage(basePackages = ["org.ebics.client.api.*"])
-@ContextConfiguration(classes = [BankService::class, PartnerService::class])
+@ContextConfiguration(classes = [DbTestContext::class])
 class PartnerRepositoryTest(
     @Autowired private val bankService: BankService,
     @Autowired private val partnerService: PartnerService

@@ -1,13 +1,11 @@
 package org.ebics.client.api.user
 
-import org.aspectj.lang.annotation.Before
 import org.ebics.client.api.user.permission.BankConnectionAccessRightsController
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
 
 
 @ExtendWith(SpringExtension::class)

@@ -1,20 +1,18 @@
 package org.ebics.client.api.trace
 
+import DbTestContext
 import org.ebics.client.api.bank.BankData
 import org.ebics.client.api.bank.BankService
-import org.ebics.client.api.partner.PartnerService
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
 import org.ebics.client.api.user.BankConnection
 import org.ebics.client.api.user.User
 import org.ebics.client.api.user.UserServiceImpl
-import org.ebics.client.api.user.cert.UserKeyStoreService
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.order.EbicsAdminOrderType
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.AutoConfigurationPackage
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ContextConfiguration
@@ -23,8 +21,7 @@ import java.net.URL
 
 @ExtendWith(SpringExtension::class)
 @DataJpaTest
-@AutoConfigurationPackage(basePackages = ["org.ebics.client.api.*"])
-@ContextConfiguration(classes = [BankService::class, UserKeyStoreService::class, PartnerService::class, UserServiceImpl::class, FileService::class])
+@ContextConfiguration(classes = [DbTestContext::class])
 class FileServiceTest(
     @Autowired private val IFileService: IFileService,
     @Autowired private val userService: UserServiceImpl,
