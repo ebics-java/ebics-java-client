@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.AutoConfigurationPackage
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URL
@@ -27,6 +28,7 @@ open class UserKeyStoreServiceTest (
     @Autowired private val keyStoreService: UserKeyStoreService)
 {
     @Test
+    @WithMockUser(username = "user_xxx", roles = ["USER"])
     fun createStoreAndLoad() {
         //Create and store bank, partner, user
         val bank = BankData( URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), "EBXUBSCH", "UBS-PROD-CH")
