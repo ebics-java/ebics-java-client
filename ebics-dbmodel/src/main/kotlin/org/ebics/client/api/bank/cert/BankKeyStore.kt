@@ -6,7 +6,6 @@ import org.ebics.client.certificate.BankCertificateManager
 import org.ebics.client.utils.addSpaces
 import java.security.interfaces.RSAPublicKey
 import javax.persistence.*
-import kotlin.jvm.Transient
 
 @Entity
 class BankKeyStore(

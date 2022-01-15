@@ -2,7 +2,6 @@ package org.ebics.client.api
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.certificate.UserCertificateManager
-import org.ebics.client.utils.toHexString
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
@@ -44,8 +43,6 @@ class UserCertificateManagerTest {
 
         //SHA256withRSA
         val signed = manager.sign(test.toByteArray())
-
-        println("Signed SHAwithRSA in one step : ${signed.toHexString()}")
         //SHA256
         val sha256 = manager.createSHA256hash(test.toByteArray())
         //+withRSA

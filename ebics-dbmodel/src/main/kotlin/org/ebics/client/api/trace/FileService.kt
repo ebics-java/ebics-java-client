@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
 
 @Service
-class FileService(private val traceRepository: TraceRepository,
+open class FileService(private val traceRepository: TraceRepository,
                   @Value("\${housekeeping.trace.older-than-days}")
                   private val houseKeepOlderThanDays: Long) : IFileService {
 
