@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -28,6 +29,7 @@ import java.time.ZonedDateTime
 @SpringBootTest
 @ExtendWith(MockKExtension::class)
 class FileDownloadCacheTest(
+    @Qualifier("TestFileDownloadCache")
     @Autowired private val fileDownloadCache: IFileDownloadCache,
     @Autowired private val fileService: IFileService
 ) {
@@ -41,10 +43,10 @@ class FileDownloadCacheTest(
 
     @Configuration
     internal class TestContextConfiguration {
-        @Bean
+        @Bean(name = ["TestFileDownloadCache"])
         fun fileDownloadCache(): IFileDownloadCache = FileDownloadCache(fileService())
 
-        @Bean
+        @Bean(name = ["FileServiceMockImpl"])
         fun fileService(): IFileService = FileServiceMockImpl()
     }
 

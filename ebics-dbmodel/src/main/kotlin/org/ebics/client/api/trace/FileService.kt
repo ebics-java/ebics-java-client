@@ -67,7 +67,7 @@ open class FileService(private val traceRepository: TraceRepository,
     }
 
     @Scheduled(cron = "0 0 1 * * *")
-    private fun houseKeeping() {
+    fun houseKeeping() {
         logger.info("House keeping of TraceEntries older than {} days", houseKeepOlderThanDays)
         removeAllFilesOlderThan(ZonedDateTime.now().minusDays(houseKeepOlderThanDays))
     }

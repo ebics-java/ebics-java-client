@@ -1,44 +1,21 @@
 package org.ebics.client.ebicsrestapi.bankconnection.session
 
-import com.ninjasquad.springmockk.MockkBean
 import io.mockk.junit5.MockKExtension
 import org.ebics.client.api.bank.Bank
-import org.ebics.client.ebicsrestapi.EbicsProduct
+import org.ebics.client.ebicsrestapi.TestContext
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
-import org.ebics.client.ebicsrestapi.bankconnection.UserServiceTestImpl
-import org.ebics.client.ebicsrestapi.configuration.EbicsRestConfiguration
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.cache.CacheManager
-import org.springframework.cache.annotation.EnableCaching
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
+import org.springframework.test.context.ContextConfiguration
 
 
 @SpringBootTest
 @ExtendWith(MockKExtension::class)
+@ContextConfiguration(classes=[TestContext::class])
 class EbicsSessionCacheTest(@Autowired private val ebicsSessionCache: IEbicsSessionCache) {
-
-    @Configuration
-    @EnableCaching
-    internal class ContextConfiguration {
-        @Bean
-        fun cacheManager(): CacheManager {
-            return ConcurrentMapCacheManager("sessions")
-        }
-
-        @MockkBean
-        private lateinit var configuration: EbicsRestConfiguration
-
-        @Bean
-        fun sessionCache(): IEbicsSessionCache = EbicsSessionCache(
-            UserServiceTestImpl(), configuration, EbicsProduct("testProd", "de", "JTO")
-        )
-    }
 
     @Test
     fun ifSessionRequestedWithWrongPwd_Then_ThrowIoException() {
