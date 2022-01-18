@@ -2,6 +2,11 @@ package org.ebics.client.http
 
 interface HttpClientConfiguration : HttpClientRequestConfiguration {
     /**
+     * The configuration display name
+     */
+    override val displayName: String
+
+    /**
      * The SSL trusted store, used for establishing connections if needed (usually for no public EBICS servers only).
      */
     val sslTrustedStoreFile: String?

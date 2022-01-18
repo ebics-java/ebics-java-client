@@ -3,6 +3,7 @@ package org.ebics.client.ebicsrestapi.configuration
 import org.ebics.client.http.HttpClientConfiguration
 
 class HttpClientConfigurationSpringWrapper(
+    override var displayName: String = "default",
     override var sslTrustedStoreFile: String? = null,
     override var sslTrustedStoreFilePassword: String?  = null,
     override var httpProxyHost: String? = null,

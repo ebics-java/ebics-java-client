@@ -30,9 +30,9 @@ import java.net.URL
 
 class BankOperations(val configuration: EbicsConfiguration)  {
     @Throws(EbicsException::class, IOException::class)
-    fun sendHEV(bankURL: URL, bankHostId: String): List<EbicsVersion> {
+    fun sendHEV(bankURL: URL, bankHostId: String, configurationName: String = "default"): List<EbicsVersion> {
         val request = HEVRequest(bankHostId).apply { build(); validate() }
-        val responseBody = configuration.httpClientFactory.getHttpClient("default").send(bankURL, ByteArrayContentFactory(request.prettyPrint()))
+        val responseBody = configuration.httpClientFactory.getHttpClient(configurationName).send(bankURL, ByteArrayContentFactory(request.prettyPrint()))
         val response =  HEVResponse(responseBody).apply {
             build()
             validate()

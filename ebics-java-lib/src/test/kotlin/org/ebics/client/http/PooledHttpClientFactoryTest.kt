@@ -7,6 +7,7 @@ class PooledHttpClientFactoryTest {
     @Test
     fun createSimpleHttpClientWithoutProxyAndSllTSFromFactory() {
         val configuration = object : HttpClientConfiguration {
+            override val displayName: String = "default"
             override val sslTrustedStoreFile: String? = null
             override val sslTrustedStoreFilePassword: String? = null
             override val httpProxyHost: String? = null
@@ -42,6 +43,7 @@ class PooledHttpClientFactoryTest {
     @Test
     fun gettingClientFromFactoryForNonExistingConfiguration() {
         val configuration = object : HttpClientConfiguration {
+            override val displayName: String = "default"
             override val sslTrustedStoreFile: String? = null
             override val sslTrustedStoreFilePassword: String? = null
             override val httpProxyHost: String? = null

@@ -24,7 +24,8 @@ class SimpleHttpClientTest {
     @Test
     fun sendRequestWithoutHeaderAndWithResponse200_then_getResponse() {
         val configuration: HttpClientRequestConfiguration = object : HttpClientRequestConfiguration {
-             override val httpContentType: String? = null
+            override val displayName: String = "default"
+            override val httpContentType: String? = null
         }
         val mockedClientResponse = mockk<CloseableHttpResponse>()
         every { httpClient.execute(allAny()) } returns mockedClientResponse
@@ -40,6 +41,7 @@ class SimpleHttpClientTest {
     @Test
     fun sendRequestWithHeaderAndResponse200_then_setHeaderAndGetResponse() {
         val configuration: HttpClientRequestConfiguration = object : HttpClientRequestConfiguration {
+            override val displayName: String = "default"
             override val httpContentType: String = "text/xml; charset=ISO-8859-1"
         }
         val mockedClientResponse = mockk<CloseableHttpResponse>()
@@ -56,11 +58,16 @@ class SimpleHttpClientTest {
     @Test
     fun sendRequestWithResponseNon200_then_throwException() {
         val configuration: HttpClientRequestConfiguration = object : HttpClientRequestConfiguration {
+            override val displayName: String = "default"
             override val httpContentType: String = "text/xml; charset=ISO-8859-1"
         }
         val mockedClientResponse = mockk<CloseableHttpResponse>()
         every { httpClient.execute(allAny()) } returns mockedClientResponse
-        every { mockedClientResponse.statusLine } returns BasicStatusLine(ProtocolVersion("HTTP", 1, 1), 500, "Error 500")
+        every { mockedClientResponse.statusLine } returns BasicStatusLine(
+            ProtocolVersion("HTTP", 1, 1),
+            500,
+            "Error 500"
+        )
         every { mockedClientResponse.entity } returns ByteArrayEntity("Some strange server HTTP error 500".toByteArray())
         every { mockedClientResponse.close() } returns Unit
 

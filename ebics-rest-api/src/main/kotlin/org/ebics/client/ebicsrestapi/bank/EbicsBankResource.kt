@@ -8,6 +8,7 @@ import org.ebics.client.api.bank.versions.VersionSupportBase
 import org.ebics.client.ebicsrestapi.EbicsAccessMode
 import org.ebics.client.model.EbicsVersion
 import org.springframework.web.bind.annotation.*
+import java.net.URL
 
 @RestController
 @RequestMapping("banks")
@@ -32,12 +33,18 @@ class EbicsBankResource(val bankService: BankService, val ebicsBankAPI: EbicsBan
     @GetMapping("{bankId}/supportedVersions")
     fun getSupportedVersions(
         @PathVariable bankId: Long,
-        @RequestParam mode: EbicsAccessMode = EbicsAccessMode.OptionalOnline
+        @RequestParam(defaultValue = "OptionalOnline") mode: EbicsAccessMode
     ): List<VersionSupport> = ebicsBankAPI.getSupportedVersions(bankId, mode)
 
     @GetMapping("supportedVersions")
-    fun getSupportedVersionsOnline(@RequestParam bankURL: String, @RequestParam hostId: String): List<VersionSupport> =
-        ebicsBankAPI.getSupportedVersionsLive(bankURL, hostId)
+    fun getSupportedVersionsOnline(
+        @RequestParam(required = false) bankId: Long?,
+        @RequestParam bankURL: String,
+        @RequestParam hostId: String,
+        @RequestParam httpClientConfigurationName: String,
+        @RequestParam(defaultValue = "OptionalOnline") mode: EbicsAccessMode
+    ): List<VersionSupport> =
+        ebicsBankAPI.getSupportedVersions(bankId, URL(bankURL), hostId, httpClientConfigurationName, mode)
 
     @PutMapping("{bankId}/supportedVersions/{ebicsVersion}")
     fun updateSupportedVersion(

@@ -30,6 +30,7 @@ class PooledHttpClientFactory(
     init {
         val configurations = config.configurations.ifEmpty {
             mapOf("default" to object : HttpClientConfiguration {
+                override val displayName: String = "default"
                 override val sslTrustedStoreFile: String? = null
                 override val sslTrustedStoreFilePassword: String? = null
                 override val httpProxyHost: String? = null
@@ -43,7 +44,6 @@ class PooledHttpClientFactory(
         }
         httpClients = createHttpClients(configurations)
     }
-
 
     @PreDestroy
     fun preDestroy() {
@@ -62,7 +62,8 @@ class PooledHttpClientFactory(
         return namedClientConfigurations.map { config ->
             config.key to SimpleHttpClient(
                 createHttpClient(config.key, config.value),
-                config.value
+                config.value,
+                config.key
             )
         }.toMap()
     }
@@ -75,7 +76,7 @@ class PooledHttpClientFactory(
         configuration: HttpClientConfiguration
     ): CloseableHttpClient {
         with(configuration) {
-            val logPrefix = "HttpClient '$configurationName'"
+            val logPrefix = "HttpClient '$configurationName:${configuration.displayName}'"
             logger.info("Creating $logPrefix")
             with(HttpClientBuilder.create()) {
                 with(RequestConfig.copy(RequestConfig.DEFAULT)) {

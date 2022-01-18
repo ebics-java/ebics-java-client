@@ -12,10 +12,11 @@ import javax.annotation.PreDestroy
 
 class SimpleHttpClient(
     private val httpClient: CloseableHttpClient,
-    override val configuration: HttpClientRequestConfiguration
+    override val configuration: HttpClientRequestConfiguration,
+    val configurationName: String = "default"
 ) : HttpClient {
     override fun send(request: HttpClientRequest): ByteArrayContentFactory {
-        logger.trace("Sending HTTP POST request to URL: ${request.requestURL}")
+        logger.trace("Sending HTTP POST request to URL: ${request.requestURL} using config: $configurationName")
         val method = HttpPost(request.requestURL.toURI())
         method.entity = EntityBuilder.create().setStream(request.content.content).build()
         if (!configuration.httpContentType.isNullOrBlank()) {
@@ -23,7 +24,7 @@ class SimpleHttpClient(
             method.setHeader(HttpHeaders.CONTENT_TYPE, configuration.httpContentType)
         }
         httpClient.execute(method).use { response ->
-            logger.trace("Received HTTP POST response code ${response.statusLine.statusCode} from URL: ${request.requestURL}")
+            logger.trace("Received HTTP POST response code ${response.statusLine.statusCode} from URL: ${request.requestURL} using config: $configurationName")
             //Check the HTTP return code (must be 200)
             Utils.checkHttpCode(response)
             //If ok returning content
