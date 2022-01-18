@@ -2,7 +2,7 @@
   <q-page class="justify-evenly">
     <div class="q-pa-md">
       <div class="q-pa-md" style="max-width: 400px">
-        <q-form @submit="onSubmitBank" @reset="onCancel" class="q-gutter-md">
+        <q-form @submit="onSubmit" @reset="onCancel" class="q-gutter-md">
           <q-input
             filled
             v-model="bank.name"
@@ -68,6 +68,20 @@
             </template>
           </q-field>
 
+          <q-select
+            filled
+            v-model="bank.httpClientConfigurationName"
+            :options="configurationNames"
+            option-value="name"
+            option-label="displayName"
+            emit-value
+            map-options
+            label="HTTP client configuration"
+            hint="Can be used to customize parameters like SSL, proxy, timeouts, content header,.."
+            lazy-rules
+            :rules="[(val) => val.id != 0 || 'Please select valid http client configuration']"
+          />
+
           <div>
             <q-btn
               v-if="id === undefined"
@@ -94,6 +108,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import useBankAPI from 'components/bank';
+import useConfigurationAPI from 'components/configuration';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
@@ -108,15 +123,19 @@ export default defineComponent({
   methods: {},
   setup(props) {
     const router = useRouter();
+    const { configurationNames } = useConfigurationAPI();
     const { bank, versionSettings, saveVersionsSettings, createOrUpdateBank, loadVersionsSettings, allowedVersionsCount } =
       useBankAPI(props.id);
     const onCancel = (): void => {
       router.go(-1);
     };
-    const onSubmitBank = async (): Promise<void> => {
-      await saveVersionsSettings();
-      await createOrUpdateBank();
-    };
+    const onSubmit = async () => {
+      if (await createOrUpdateBank()) {
+        if (await saveVersionsSettings()) {
+          router.go(-1);
+        }
+      }
+    }
     const validateUrl = (url: string): boolean => {
       const regex =
         /^(http(s)?:\/\/.)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{0,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/;
@@ -126,12 +145,12 @@ export default defineComponent({
       bank,
       versionSettings,
       onCancel,
-      onSubmitBank,
       validateUrl,
       loadVersionsSettings,
       saveVersionsSettings,
-      createOrUpdateBank,
+      onSubmit,
       allowedVersionsCount,
+      configurationNames,
     };
   },
 });

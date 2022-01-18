@@ -3,7 +3,6 @@ import { Bank, EbicsVersionSettings } from 'components/models';
 import { api } from 'boot/axios';
 import { AxiosResponse } from 'axios';
 import useBaseAPI from './base-api';
-import { useRouter } from 'vue-router';
 
 /**
  * Bank Connections composition API for bank connection list operations with backend REST API
@@ -14,7 +13,6 @@ import { useRouter } from 'vue-router';
  */
 export default function useBankAPI(bankId: number | undefined) {
   const { apiErrorHandler, apiOkHandler } = useBaseAPI();
-  const router = useRouter();
 
   const bank = ref<Bank>({
     id: bankId,
@@ -35,7 +33,7 @@ export default function useBankAPI(bankId: number | undefined) {
     }
   };
 
-  const createOrUpdateBank = async () => {
+  const createOrUpdateBank = async ():Promise<boolean> => {
     if (bank.value.id === undefined) {
       try {
         const response = await api.post<Bank, AxiosResponse<number>>(
@@ -43,32 +41,37 @@ export default function useBankAPI(bankId: number | undefined) {
           bank.value
         );
         bank.value.id = response.data; //Store id of the bank
-        router.go(-1);
+        console.log(`Bank created id=${bank.value?.id}`);
         apiOkHandler('Bank connection created');
+        return true;
       } catch (error) {
         apiErrorHandler('Bank connection creation failed', error);
+        return false;
       }
     } else {
       try {
         await api.put<Bank>(`banks/${bank.value.id}`, bank.value);
-        router.go(-1);
         apiOkHandler('Bank connection updated');
+        return true;
       } catch (error) {
         apiErrorHandler('Bank connection update failed', error);
+        return false;
       }
     }
   };
 
   const loadVersionsSettings = async (forceOnline = false): Promise<void> => {
     try {
-      if (bank.value.id != undefined) {
+      if (bank.value?.hostId && bank.value?.bankURL) {
+        console.log('Versions live: ' + bank.value?.httpClientConfigurationName);
         const response = await api.get<EbicsVersionSettings[]>(
-          `banks/${bank.value.id}/supportedVersions?mode=${forceOnline ? 'ForcedOnline' : 'Offline'}`
-        );
-        versionSettings.value = response.data;
-      } else if (bank.value?.bankURL?.length && bank.value?.hostId?.length) {
-        const response = await api.get<EbicsVersionSettings[]>(
-          `banks/supportedVersions?hostId=${bank.value?.hostId}&bankURL=${bank.value?.bankURL}`
+          `banks/supportedVersions?bankId=${bank.value?.id ?? ''}&hostId=${
+            bank.value?.hostId
+          }&httpClientConfigurationName=${
+            bank.value?.httpClientConfigurationName
+          }&bankURL=${bank.value?.bankURL}&mode=${
+            forceOnline ? 'ForcedOnline' : 'Offline'
+          }`
         );
         versionSettings.value = response.data;
       }
@@ -77,25 +80,27 @@ export default function useBankAPI(bankId: number | undefined) {
     }
   };
 
-  const saveVersionsSettings = async (): Promise<void> => {
+  const saveVersionsSettings = async (): Promise<boolean> => {
     try {
-      console.log('Save versions');
+      console.log(`Save versions for bank id: ${bank.value?.id}`);
       if (bank.value.id != undefined && versionSettings.value?.length) {
         for (const versionSett of versionSettings.value) {
           await api.put<EbicsVersionSettings[]>(
             `banks/${bank.value.id}/supportedVersions/${versionSett.version}`,
             versionSett
           );
-          console.log(`Save version ${JSON.stringify(versionSett)}`)
+          console.log(`Save version ${JSON.stringify(versionSett)}`);
         }
       }
+      return true;
     } catch (error) {
       apiErrorHandler('Saving of supported EBICS versions failed', error);
+      return false;
     }
   };
 
-  const allowedVersionsCount = computed(():number => {
-    return versionSettings.value.filter(v => v.isAllowedForUse).length;
+  const allowedVersionsCount = computed((): number => {
+    return versionSettings.value.filter((v) => v.isAllowedForUse).length;
   });
 
   onMounted(async () => {

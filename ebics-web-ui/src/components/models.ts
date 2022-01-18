@@ -9,6 +9,7 @@ export interface Bank {
     x002DigestHex: string;
   }
   ebicsVersions: EbicsVersionSettings[];
+  httpClientConfigurationName: string;
 }
 
 export enum EbicsVersion {
@@ -96,58 +97,6 @@ export interface BtfMessage {
   messageNameVersion?: string;
   messageNameFormat?: string;
 }
-
-/*
-export class Btf implements BtfService {
-  constructor(
-    serviceName: string,
-    serviceOption: string | undefined = undefined,
-    scope: string | undefined = undefined,
-    containerType: string | undefined = undefined,
-    message: BtfMessage
-  ) {
-    this.serviceName = serviceName;
-    this.serviceOption = serviceOption;
-    this.scope = scope;
-    this.containerType = containerType;
-    this.message = message;
-  }
-  serviceName: string;
-  serviceOption?: string;
-  scope?: string;
-  containerType?: string;
-  message: BtfMessage;
-  label(): string {
-    return `${this.serviceName}|${s(this.serviceOption)}|${s(this.scope)}|${
-      s(this.containerType)
-    }|${this.message.label()}`;
-  }
-}
-
-function s(txt: string | undefined): string {
-  return txt ? txt : '-'
-}
-
-export class BtfMessage implements BtfMessage {
-  constructor(
-    messageName: string,
-    messageNameVariant: string | undefined = undefined,
-    messageNameVersion: string | undefined = undefined,
-    messageNameFormat: string | undefined = undefined,
-  ) {
-    this.messageName = messageName;
-    this.messageNameFormat = messageNameFormat;
-    this.messageNameVariant = messageNameVariant;
-    this.messageNameVersion = messageNameVersion;
-  }
-  messageName: string;
-  messageNameVariant?: string;
-  messageNameVersion?: string;
-  messageNameFormat?: string;
-  label(): string {
-    return `${this.messageName}.${s(this.messageNameVariant)}.${s(this.messageNameVersion)}.${s(this.messageNameFormat)}`;
-  }
-}*/
 
 export enum AdminOrderType {
   INI = 'INI',
@@ -316,14 +265,6 @@ export interface OrderType {
   description?: string;
   authorizationLevel?: AuthorisationLevel;
   numSigRequired?: BigInteger;
-}
-
-/**
- * H003, H004, H005 order type descriptions
- */
-export interface OrderTypesCache {
-  btfTypes: BTFType[];
-  orderTypes: OrderType[];
 }
 
 export enum TransferType {
