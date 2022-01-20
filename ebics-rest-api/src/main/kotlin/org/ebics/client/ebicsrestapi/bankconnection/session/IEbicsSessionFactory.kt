@@ -4,7 +4,7 @@ import org.ebics.client.api.user.permission.BankConnectionAccessType
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
 import org.ebics.client.model.EbicsSession
 
-interface IEbicsSessionCache {
+interface IEbicsSessionFactory {
     fun getSession(
         userIdPass: UserIdPass,
         bankKeysRequired: Boolean = true,

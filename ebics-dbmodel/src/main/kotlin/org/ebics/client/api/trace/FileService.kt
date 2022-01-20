@@ -15,7 +15,7 @@ import java.time.ZonedDateTime
 
 @Service
 open class FileService(private val traceRepository: TraceRepository,
-                  @Value("\${housekeeping.trace.older-than-days}")
+                  @Value("\${housekeeping.trace.older-than-days:30}")
                   private val houseKeepOlderThanDays: Long) : IFileService {
 
     override fun getLastDownloadedFile(

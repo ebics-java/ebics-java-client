@@ -3,7 +3,7 @@ package org.ebics.client.ebicsrestapi.bankconnection.h005
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
 import org.ebics.client.ebicsrestapi.bankconnection.UploadResponse
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
-import org.ebics.client.ebicsrestapi.bankconnection.session.IEbicsSessionCache
+import org.ebics.client.ebicsrestapi.bankconnection.session.IEbicsSessionFactory
 import org.ebics.client.ebicsrestapi.utils.IFileDownloadCache
 import org.ebics.client.filetransfer.h005.FileTransferSession
 import org.ebics.client.model.EbicsVersion
@@ -21,12 +21,12 @@ import org.springframework.web.multipart.MultipartFile
 
 @Component("EbicsFileAPIH005")
 class EbicsFileTransferAPI(
-    private val sessionCache: IEbicsSessionCache,
+    private val sessionFactory: IEbicsSessionFactory,
     private val fileDownloadCache: IFileDownloadCache,
 ) {
 
     fun uploadFile(userId: Long, uploadRequest: UploadRequest, uploadFile: MultipartFile): UploadResponse {
-        val session = sessionCache.getSession(UserIdPass(userId, uploadRequest.password))
+        val session = sessionFactory.getSession(UserIdPass(userId, uploadRequest.password))
         val order = EbicsUploadOrder(
             uploadRequest.orderService,
             uploadRequest.signatureFlag,
@@ -39,7 +39,7 @@ class EbicsFileTransferAPI(
     }
 
     fun downloadFile(userId: Long, downloadRequest: DownloadRequest): ResponseEntity<Resource> {
-        val session = sessionCache.getSession(UserIdPass(userId, downloadRequest.password))
+        val session = sessionFactory.getSession(UserIdPass(userId, downloadRequest.password))
 
         val order = EbicsDownloadOrder(
             downloadRequest.adminOrderType,
@@ -54,7 +54,7 @@ class EbicsFileTransferAPI(
     }
 
     fun getOrderTypes(userId: Long, password: String, useCache: Boolean): List<OrderType> {
-        val session = sessionCache.getSession(UserIdPass(userId, password))
+        val session = sessionFactory.getSession(UserIdPass(userId, password))
 
         val htdFileContent = fileDownloadCache.getLastFileCached(
             session,

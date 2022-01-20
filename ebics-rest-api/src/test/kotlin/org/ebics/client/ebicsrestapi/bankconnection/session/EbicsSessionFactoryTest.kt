@@ -15,12 +15,12 @@ import org.springframework.test.context.ContextConfiguration
 @SpringBootTest
 @ExtendWith(MockKExtension::class)
 @ContextConfiguration(classes=[TestContext::class])
-class EbicsSessionCacheTest(@Autowired private val ebicsSessionCache: IEbicsSessionCache) {
+class EbicsSessionFactoryTest(@Autowired private val ebicsSessionFactory: IEbicsSessionFactory) {
 
     @Test
     fun ifSessionRequestedWithWrongPwd_Then_ThrowIoException() {
         Assertions.assertThrows(Exception::class.java) {
-            ebicsSessionCache.getSession(
+            ebicsSessionFactory.getSession(
                 UserIdPass(1, "WRONG_pass")
             )
         }
@@ -29,7 +29,7 @@ class EbicsSessionCacheTest(@Autowired private val ebicsSessionCache: IEbicsSess
     @Test
     fun ifSessionWithBankKeysRequestedAndEmptyCache_Then_NewSessionCreated() {
         with(
-            ebicsSessionCache.getSession(
+            ebicsSessionFactory.getSession(
                 UserIdPass(1, "pass1")
             )
         ) {
@@ -45,7 +45,7 @@ class EbicsSessionCacheTest(@Autowired private val ebicsSessionCache: IEbicsSess
     @Test
     fun ifSessionWithoutBankKeysRequestedAndEmptyCache_Then_NewSessionCreated() {
         with(
-            ebicsSessionCache.getSession(
+            ebicsSessionFactory.getSession(
                 UserIdPass(2, "pass2"), false
             )
         ) {
@@ -62,41 +62,43 @@ class EbicsSessionCacheTest(@Autowired private val ebicsSessionCache: IEbicsSess
     @Test
     fun ifTwoSessionsRequested_Then_TwoDifferentIdsMustBeReturned() {
         val s1 =
-            ebicsSessionCache.getSession(
+            ebicsSessionFactory.getSession(
                 UserIdPass(1, "pass1"), true
             )
         val s2 =
-            ebicsSessionCache.getSession(
+            ebicsSessionFactory.getSession(
                 UserIdPass(2, "pass2"), false
             )
 
         Assertions.assertNotEquals(s1.sessionId, s2.sessionId, "Session ID must be unique")
     }
 
+    //Session can't be cached, this must be done on DB layer (User, Partner, Bank entities),
+    //otherwise would create lot of unnecessary dependencies how to evict the cache properly
     @Test
-    fun ifTheNewSessionIsRequestedAndThenSameSessionOnceMore_Then_TheCachedSessionIsReturned() {
+    fun ifTheNewSessionIsRequestedAndThenSameSessionOnceMore_Then_TheNewSessionIsReturned_NO_CACHE() {
         val s1 =
-            ebicsSessionCache.getSession(
+            ebicsSessionFactory.getSession(
                 UserIdPass(1, "pass1"), true
             )
         val s2 =
-            ebicsSessionCache.getSession(
+            ebicsSessionFactory.getSession(
                 UserIdPass(1, "pass1"), true
             )
 
-        Assertions.assertEquals(s1.sessionId, s2.sessionId, "Session ID must same")
-        Assertions.assertEquals(s1, s2, "The returned session must be same")
+        Assertions.assertNotEquals(s1.sessionId, s2.sessionId, "Session ID must different")
+        //Assertions.assertEquals(s1, s2, "The returned session must be same")
     }
 
     @Test
     fun ifTheNewSessionIsRequestedAndThenSameSessionOnceMore_withWrongPwd_Then_IOException() {
         val s1 =
-            ebicsSessionCache.getSession(
+            ebicsSessionFactory.getSession(
                 UserIdPass(1, "pass1"), true
             )
         Assertions.assertThrows(Exception::class.java) {
             val s2 =
-                ebicsSessionCache.getSession(
+                ebicsSessionFactory.getSession(
                     UserIdPass(1, "pass1_WRONG"), true
                 )
         }

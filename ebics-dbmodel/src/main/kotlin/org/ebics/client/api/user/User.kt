@@ -39,9 +39,6 @@ data class User (
     @OneToMany(cascade = [CascadeType.ALL], mappedBy = "user")
     val traces: List<TraceEntry> = emptyList(),
 
-    //@JsonIgnore
-    //@OneToMany(cascade = [CascadeType.ALL], mappedBy = "user")
-    //val orderTypes: List<OrderType>
 ) : EbicsUser, BankConnectionAccessRightsController {
     @JsonIgnore
     override fun getCreatorName(): String = creator

@@ -4,11 +4,11 @@ import org.ebics.client.api.EbicsConfiguration
 import org.ebics.client.api.user.permission.BankConnectionAccessType
 import org.ebics.client.ebicsrestapi.MockUser
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
-import org.ebics.client.ebicsrestapi.bankconnection.session.IEbicsSessionCache
+import org.ebics.client.ebicsrestapi.bankconnection.session.IEbicsSessionFactory
 import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.Product
 
-class EbicsSessionCacheMockImpl(private val configuration: EbicsConfiguration, private val product: Product) : IEbicsSessionCache {
+class EbicsSessionFactoryMockImpl(private val configuration: EbicsConfiguration, private val product: Product) : IEbicsSessionFactory {
     override fun getSession(
         userIdPass: UserIdPass,
         bankKeysRequired: Boolean,
