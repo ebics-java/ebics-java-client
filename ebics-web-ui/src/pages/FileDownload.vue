@@ -24,7 +24,7 @@
               <q-checkbox v-model="displaySharedBankConnections"/>
             </q-item-section>
             <q-item-section>
-              <q-item-label>Show shared connections</q-item-label>
+              <q-item-label>Show shared bank connections</q-item-label>
               <q-item-label caption>
                 If enabled, the shared connection are listed as well,
                 If disabled, only your private connections are listed

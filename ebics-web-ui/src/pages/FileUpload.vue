@@ -7,7 +7,7 @@
           <q-select
             filled
             v-model="bankConnection"
-            :options="activeBankConnections"
+            :options="activeDisplayedBankConnections"
             :option-label="bankConnectionLabel"
             label="EBICS Bank connection"
             hint="Select EBICS bank connection"
@@ -18,6 +18,23 @@
             ]"
           />
 
+          <q-item
+            tag="label"
+            v-ripple
+            v-if="hasActivePrivateConnections && hasActiveSharedConnections"
+          >
+            <q-item-section avatar>
+              <q-checkbox v-model="displaySharedBankConnections" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Show shared bank connections</q-item-label>
+              <q-item-label caption>
+                If enabled, the shared connection are listed as well, If
+                disabled, only your private connections are listed
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+
           <div v-if="bankConnection" class="q-gutter-sm">
             <!-- q-radio
               v-model="bankConnection.ebicsVersion"
@@ -26,13 +43,23 @@
             /-->
             <q-radio
               v-model="bankConnection.ebicsVersion"
-              :disable="!isEbicsVersionAllowedForUse(bankConnection.partner.bank, EbicsVersion.H004)"
+              :disable="
+                !isEbicsVersionAllowedForUse(
+                  bankConnection.partner.bank,
+                  EbicsVersion.H004
+                )
+              "
               val="H004"
               label="EBICS 2.5 (H004)"
             />
             <q-radio
               v-model="bankConnection.ebicsVersion"
-              :disable="!isEbicsVersionAllowedForUse(bankConnection.partner.bank, EbicsVersion.H005)"
+              :disable="
+                !isEbicsVersionAllowedForUse(
+                  bankConnection.partner.bank,
+                  EbicsVersion.H005
+                )
+              "
               val="H005"
               label="EBICS 3.0 (H005)"
             />
@@ -53,7 +80,13 @@
             :rules="[(val) => val || 'Please select valid EBICS Order Type']"
           >
             <template v-slot:append>
-              <q-btn round dense flat icon="refresh" @click.stop="refreshOrderTypes(bankConnection)" />
+              <q-btn
+                round
+                dense
+                flat
+                icon="refresh"
+                @click.stop="refreshOrderTypes(bankConnection)"
+              />
             </template>
             <template v-slot:option="scope">
               <q-item v-bind="scope.itemProps">
@@ -76,12 +109,16 @@
             label="Business Transaction Format"
             hint="Select EBICS Business Transaction Format (BTF)"
             lazy-rules
-            :rules="[
-              (val) => val || 'Please select valid EBICS BTF',
-            ]"
+            :rules="[(val) => val || 'Please select valid EBICS BTF']"
           >
             <template v-slot:append>
-              <q-btn round dense flat icon="refresh" @click.stop="refreshBtfTypes(bankConnection)" />
+              <q-btn
+                round
+                dense
+                flat
+                icon="refresh"
+                @click.stop="refreshBtfTypes(bankConnection)"
+              />
             </template>
             <template v-slot:option="scope">
               <q-item v-bind="scope.itemProps">
@@ -288,15 +325,26 @@ export default defineComponent({
     //Selected bank connection
     const bankConnection = ref<BankConnection>();
     const replaceMsgId = ref(true);
-    const { activeBankConnections, hasActiveConnections, bankConnectionLabel } =
-      useBankConnectionsAPI(BankConnectionAccess.USE);
+    const {
+      activeBankConnections,
+      activeDisplayedBankConnections,
+      hasActiveConnections,
+      hasActivePrivateConnections,
+      hasActiveSharedConnections,
+      displaySharedBankConnections,
+      bankConnectionLabel,
+    } = useBankConnectionsAPI(BankConnectionAccess.USE);
     const { ebicsUploadRequest } = useFileTransferAPI();
     const { applySmartAdjustments, detectFileFormat } = useTextUtils();
     const { isEbicsVersionAllowedForUse } = useBanksAPI(true);
     const { userSettings } = useUserSettings();
     const { orderTypeLabel, btfTypeLabel } = useOrderTypeLabelAPI();
     const { btfTypes, orderTypes, refreshOrderTypes, refreshBtfTypes } =
-      useOrderTypesAPI(bankConnection, activeBankConnections, ref(OrderTypeFilter.UploadOnly));
+      useOrderTypesAPI(
+        bankConnection,
+        activeBankConnections,
+        ref(OrderTypeFilter.UploadOnly)
+      );
 
     //Single file setup
     const testInput = ref(null);
@@ -318,7 +366,7 @@ export default defineComponent({
     };
 
     //Reference to upload Form because of validation
-    const uploadForm = ref<QForm>()
+    const uploadForm = ref<QForm>();
 
     const q = useQuasar();
 
@@ -419,7 +467,7 @@ export default defineComponent({
             );
           } else {
             fileText.value = fileRawText.value;
-          } 
+          }
         }
       } catch (error) {
         q.notify({
@@ -431,7 +479,7 @@ export default defineComponent({
       }
     };
 
-    const applySmartAdjustmentsForSingleFile =  async() => {
+    const applySmartAdjustmentsForSingleFile = async () => {
       fileText.value = await applySmartAdjustments(
         fileText.value,
         fileFormat.value,
@@ -439,14 +487,12 @@ export default defineComponent({
       );
     };
 
-    const onUpdateInputFiles = async(inputFiles: File[]) => {
+    const onUpdateInputFiles = async (inputFiles: File[]) => {
       console.log(inputFiles);
       files.value = inputFiles;
 
       if (userSettings.value.uploadOnDrop) {
-        const validationResult = await (
-          uploadForm.value as QForm
-        ).validate();
+        const validationResult = await (uploadForm.value as QForm).validate();
         if (!validationResult) {
           files.value = [];
           q.notify({
@@ -464,15 +510,20 @@ export default defineComponent({
     const onRejectedMessage = (multiple: boolean) => {
       q.notify({
         type: 'negative',
-        message:
-          `File must smaller than ${multiple ? '1.2GB' : '20MB'}, for bigger files use 'Simple file upload'`
+        message: `File must smaller than ${
+          multiple ? '1.2GB' : '20MB'
+        }, for bigger files use 'Simple file upload'`,
       });
     };
 
     return {
       bankConnection,
       activeBankConnections,
+      activeDisplayedBankConnections,
       hasActiveConnections,
+      hasActivePrivateConnections,
+      hasActiveSharedConnections,
+      displaySharedBankConnections,
       bankConnectionLabel,
       isEbicsVersionAllowedForUse,
       EbicsVersion,
