@@ -8,6 +8,7 @@
         :columns="columns"
         row-key="id"
         selection="single"
+        :pagination="{rowsPerPage: 10}"
       >
         <template v-slot:header="props">
           <q-tr :props="props">
