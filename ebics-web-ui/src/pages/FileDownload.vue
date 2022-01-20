@@ -17,7 +17,20 @@
               (val) =>
                 bankConnection || 'Please select valid EBICS bank connection',
             ]"
-          />
+          >
+            <template v-slot:option="bankConnection">
+              <q-item v-bind="bankConnection.itemProps">
+                <q-item-section avatar>
+                  <q-icon v-if="bankConnection.opt.guestAccess" name="lock_open" />
+                  <q-icon v-else name="lock" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>{{ bankConnection.opt.name }}</q-item-label>
+                  <q-item-label caption>{{ `${bankConnection.opt.userId} | ${bankConnection.opt.partner?.partnerId}` }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
 
           <q-item tag="label" v-ripple v-if="hasActivePrivateConnections && hasActiveSharedConnections">
             <q-item-section avatar>
