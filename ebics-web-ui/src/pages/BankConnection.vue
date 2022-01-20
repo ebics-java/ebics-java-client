@@ -87,16 +87,19 @@
 
           <q-item tag="label" v-ripple :disable="userStatusInitializing">
             <q-item-section avatar>
-              <q-checkbox :disable="userStatusInitializing"
+              <q-checkbox :disable="userStatusInitializing || (bankConnection.ebicsVersion == EbicsVersion.H005)"
                 v-model="bankConnection.useCertificate"
               />
             </q-item-section>
             <q-item-section>
               <q-item-label>Use client certificates for EBICS initialization</q-item-label>
-              <q-item-label caption
-                >If enabled X509 Certificates will be used for initialization.
-                If disabled, clasic EBICS keys will be used for initialization.</q-item-label
-              >
+              <q-item-label v-if="bankConnection.ebicsVersion == EbicsVersion.H005" caption>
+                X509 Certificates will be used for initialization, as per EBICS 3.0 standard.
+              </q-item-label>
+              <q-item-label v-if="bankConnection.ebicsVersion == EbicsVersion.H004" caption>
+                If enabled, X509 Certificates will be used for initialization instead of clasical keys. 
+                X509 Certificates are rarelly supported by EBICS 2.5 Servers.
+              </q-item-label>
             </q-item-section>
           </q-item>
 
@@ -137,7 +140,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { defineComponent, computed, watch } from 'vue';
 import useBankConnectionAPI from 'components/bankconnection';
 import useBanksDataAPI from 'src/components/banks';
 import {EbicsVersion} from 'src/components/models'
@@ -168,6 +171,15 @@ export default defineComponent({
         bankConnection.value.userStatus != 'CREATED' && bankConnection.value.userStatus != 'NEW'
       );
     });
+    const ebicsVersionRef = computed((): EbicsVersion => {
+      return bankConnection.value.ebicsVersion
+    });
+    watch(ebicsVersionRef, (currentEbicsVersion) => {
+      if (currentEbicsVersion == EbicsVersion.H005)
+        bankConnection.value.useCertificate = true
+      else
+        bankConnection.value.useCertificate = false
+    })
     return { banks, bankConnection, createOrUpdateUserData, userStatusInitializing, isEbicsVersionAllowedForUse, EbicsVersion };
   },
 });

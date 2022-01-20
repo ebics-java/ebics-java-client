@@ -8,7 +8,7 @@
           <q-select
             filled
             v-model="bankConnection"
-            :options="activeBankConnections"
+            :options="activeDisplayedBankConnections"
             :option-label="bankConnectionLabel"
             label="EBICS Bank connection"
             hint="Select EBICS bank connection"
@@ -18,6 +18,19 @@
                 bankConnection || 'Please select valid EBICS bank connection',
             ]"
           />
+
+          <q-item tag="label" v-ripple v-if="hasActivePrivateConnections && hasActiveSharedConnections">
+            <q-item-section avatar>
+              <q-checkbox v-model="displaySharedBankConnections"/>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Show shared connections</q-item-label>
+              <q-item-label caption>
+                If enabled, the shared connection are listed as well,
+                If disabled, only your private connections are listed
+              </q-item-label>
+            </q-item-section>
+          </q-item>
 
           <div v-if="bankConnection" class="q-gutter-sm">
             <!-- q-radio
@@ -174,7 +187,7 @@ export default defineComponent({
     //Selected bank connection
     const bankConnection = ref<BankConnection>();
     const replaceMsgId = ref(true);
-    const { activeBankConnections, hasActiveConnections, bankConnectionLabel } =
+    const { activeBankConnections, activeDisplayedBankConnections, hasActiveConnections, hasActivePrivateConnections, hasActiveSharedConnections, displaySharedBankConnections, bankConnectionLabel } =
       useBankConnectionsAPI(BankConnectionAccess.USE);
     const { ebicsDownloadRequest } = useFileTransferAPI();
     const { applySmartAdjustments, detectFileFormat, getFileExtension, currentDate } = useTextUtils();
@@ -242,7 +255,11 @@ export default defineComponent({
     return {
       bankConnection,
       activeBankConnections,
+      activeDisplayedBankConnections,
       hasActiveConnections,
+      hasActivePrivateConnections,
+      hasActiveSharedConnections,
+      displaySharedBankConnections,
       bankConnectionLabel,
 
       isEbicsVersionAllowedForUse,

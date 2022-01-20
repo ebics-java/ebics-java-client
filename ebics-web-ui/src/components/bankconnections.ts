@@ -1,4 +1,4 @@
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { BankConnection, BankConnectionAccess } from 'components/models';
 import { api } from 'boot/axios';
 import useBaseAPI from './base-api';
@@ -94,12 +94,36 @@ export default function useBankConnectionsAPI(accessRight: BankConnectionAccess 
     }
   };
 
+  const hasActivePrivateConnections = computed((): boolean => {
+    return activeBankConnections.value?.some(bc => !bc.guestAccess) ?? false
+  });
+
+  const hasActiveSharedConnections = computed((): boolean => {
+    return activeBankConnections.value?.some(bc => bc.guestAccess) ?? false
+  });
+
+  const displaySharedBankConnections = ref(true);
+  watch(hasActivePrivateConnections, (hasActivePrivateConnectionsValue: boolean) => {
+    if (hasActivePrivateConnectionsValue)
+      displaySharedBankConnections.value = false
+    else
+      displaySharedBankConnections.value = true
+  })
+
+  const activeDisplayedBankConnections = computed<BankConnection[] | undefined>(() => {
+    return activeBankConnections.value?.filter((bc) => !bc.guestAccess || displaySharedBankConnections.value);
+  });
+
   onMounted(loadBankConnections);
 
   return {
     bankConnections,
     activeBankConnections,
+    activeDisplayedBankConnections,
     hasActiveConnections,
+    hasActivePrivateConnections,
+    hasActiveSharedConnections,
+    displaySharedBankConnections,
     loadBankConnections,
     deleteBankConnection,
     bankConnectionLabel,
