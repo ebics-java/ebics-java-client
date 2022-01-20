@@ -1,5 +1,7 @@
 package org.ebics.client.ebicsrestapi.bankconnection.h005
 
+import org.ebics.client.api.trace.IFileService
+import org.ebics.client.api.trace.orderType.EbicsService
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
 import org.ebics.client.ebicsrestapi.bankconnection.UploadResponse
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
@@ -23,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile
 class EbicsFileTransferAPI(
     private val sessionFactory: IEbicsSessionFactory,
     private val fileDownloadCache: IFileDownloadCache,
+    private val fileService: IFileService,
 ) {
 
     fun uploadFile(userId: Long, uploadRequest: UploadRequest, uploadFile: MultipartFile): UploadResponse {
@@ -35,6 +38,13 @@ class EbicsFileTransferAPI(
             uploadRequest.params ?: emptyMap()
         )
         val response = FileTransferSession(session).sendFile(uploadFile.bytes, order)
+        fileService.addUploadedTextFile(
+            session,
+            OrderTypeDefinition(EbicsAdminOrderType.BTU, EbicsService.fromEbicsService(uploadRequest.orderService)),
+            String(uploadFile.bytes),
+            response.orderNumber,
+            EbicsVersion.H005
+        )
         return UploadResponse(response.orderNumber, response.transactionId)
     }
 

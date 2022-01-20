@@ -1,6 +1,7 @@
 package org.ebics.client.utils
 
 import org.apache.xmlbeans.XmlObject
+import java.nio.charset.Charset
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
@@ -38,11 +39,25 @@ fun LocalDate.toDate(): Date {
 fun XmlObject.equalXml(xmlObject: XmlObject): Boolean = this.xmlText().equals(xmlObject.xmlText())
 
 
-inline fun requireNotNullAndNotBlank(value: String?, lazyMessage: () -> Any = {"The string must not be blank or null"}): String {
+inline fun requireNotNullAndNotBlank(
+    value: String?,
+    lazyMessage: () -> Any = { "The string must not be blank or null" }
+): String {
     val notNullValue = requireNotNull(value, lazyMessage)
     require(value.isNotBlank(), lazyMessage)
     return notNullValue
 }
 
-fun requireNotNullAndNotBlank(value: String?, stringName: String): String = requireNotNullAndNotBlank(value) {"The $stringName must not be null or blank" }
-fun<T> requireNotNull(value: T?, paramName: String): T = requireNotNull(value) {"The $paramName must not be null"}
+fun requireNotNullAndNotBlank(value: String?, stringName: String): String =
+    requireNotNullAndNotBlank(value) { "The $stringName must not be null or blank" }
+
+fun <T> requireNotNull(value: T?, paramName: String): T = requireNotNull(value) { "The $paramName must not be null" }
+
+fun ByteArray.toStringSafe(
+    charset: Charset = Charsets.UTF_8,
+    nonUTF8default: String = "This is probably binary string for given encoding ${charset.displayName()}"
+): String {
+    val str = String(this, charset)
+    val isUtf8 = str.toByteArray(charset).contentEquals(this)
+    return if (isUtf8) str else nonUTF8default
+}

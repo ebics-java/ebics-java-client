@@ -1,5 +1,6 @@
 package org.ebics.client.api.trace
 
+import org.ebics.client.api.EbicsSession
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
 import org.ebics.client.api.user.User
 import org.ebics.client.model.EbicsVersion
@@ -20,6 +21,14 @@ interface IFileService {
         sessionId: String,
         ebicsVersion: EbicsVersion,
     ) = addTextFile(user, orderType, fileContent, sessionId, null, ebicsVersion, false)
+
+    fun addUploadedTextFile(
+        session: EbicsSession,
+        orderType: OrderTypeDefinition,
+        fileContent: String,
+        orderNumber: String,
+        ebicsVersion: EbicsVersion,
+    ) = addTextFile(session.user as User, orderType, fileContent, session.sessionId, orderNumber, ebicsVersion, true)
 
     fun addTextFile(
         user: User,
