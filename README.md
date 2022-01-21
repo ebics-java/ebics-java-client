@@ -5,9 +5,9 @@ The core EBICS API is fork of the Java open source [EBICS java client](https://g
 Thanks a lot for all contributions, otherwise this repo would not be here :-)
 
 ### Demo application
-Check the following demo to get idea about functionality, here is the latest version of app deployed.
+Check the following [demo](https://ebics-web-client.herokuapp.com/) to get idea about functionality, here is the latest version of app deployed.
 
-https://ebics-web-client.herokuapp.com/
+![Demo](demo.gif)
 
 ### Wiki pages
 - [Installation manual](https://github.com/honza-toegel/ebics-java-client/wiki/Installation-Manual)
