@@ -1,17 +1,19 @@
-#EBICS Web Client
+# EBICS Web Client
 
-Core EBICS API is fork of the Java open source EBICS client project - https://github.com/uwemaurer/ebics-java-client/
-Thanks a lot for all contribution.
+EBICS Web Client is a web UI to work with EBICS connection to the bank(s) supporting EBICS. The web UI uses REST API backend to execute EBICS orders.   
+The core EBICS API is fork of the Java open source [EBICS java client](https://github.com/uwemaurer/ebics-java-client/) repository.
+Thanks a lot for all contributions, otherwise this repo would not be here :-)
 
-###Demo application
+### Demo application
 Check the following demo to get idea about functionality, here is the latest version of app deployed.
 
 https://ebics-web-client.herokuapp.com/
 
-###Wiki pages
+### Wiki pages
 - [Installation manual](https://github.com/honza-toegel/ebics-java-client/wiki/Installation-Manual)
 - [Getting started](https://github.com/honza-toegel/ebics-java-client/wiki/Getting-Started)
 
+### Functionality
 Main differences with this fork:
 
 - Web UI (SPA based on vue3), instead of console client
@@ -23,7 +25,7 @@ Main differences with this fork:
 - Support of bcprov-jdk15on
 - Some core API refactored to kotlin in order to increase readability, encapsulation and immutability and consistence
 
-Ideas for roadmap:
+### Ideas for roadmap:
 
 - Display hash of X509 Bank Certificates
 - Better unit test coverage
@@ -31,3 +33,6 @@ Ideas for roadmap:
 - Implementing UserDetailService to maintain user data  
 - Download file indexing in order to find relevant data (like payment status by id, account statement by transaction,..) 
 - Replace xmlbeans with JAXB
+- Enhance re-usability of the submodules
+  - Ensure that ebics-java-lib can be used standalone if somebody need completely other use-case
+  - Reduce tight coupling between ebics-dbmodel and ebics-rest-api
