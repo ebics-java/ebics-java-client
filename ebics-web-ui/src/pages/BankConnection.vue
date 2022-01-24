@@ -63,24 +63,19 @@
             hint="Can be changed or set any time later manually"
           >
             <template v-slot:control>
-              <!-- q-radio
-                  v-model="bankConnection.ebicsVersion"
-                  :disable="userStatusInitializing"
-                  val="H003"
-                  contextmenu="test"
-                  label="EBICS 2.4 (H003)"
-                /-->
               <q-radio
                 v-model="bankConnection.ebicsVersion"
                 val="H004"
                 label="EBICS 2.5 (H004)"
                 :disable="!isEbicsVersionAllowedForUse(bankConnection.partner.bank, EbicsVersion.H004)"
+                @change="refreshUseCertificates"
               />
               <q-radio
                 v-model="bankConnection.ebicsVersion"
                 val="H005"
                 label="EBICS 3.0 (H005)"
                 :disable="!isEbicsVersionAllowedForUse(bankConnection.partner.bank, EbicsVersion.H005)"
+                @change="refreshUseCertificates"
               />
             </template>
           </q-field>
@@ -171,16 +166,13 @@ export default defineComponent({
         bankConnection.value.userStatus != 'CREATED' && bankConnection.value.userStatus != 'NEW'
       );
     });
-    const ebicsVersionRef = computed((): EbicsVersion => {
-      return bankConnection.value.ebicsVersion
-    });
-    watch(ebicsVersionRef, (currentEbicsVersion) => {
-      if (currentEbicsVersion == EbicsVersion.H005)
+    const refreshUseCertificates = ():void => {
+      if (bankConnection.value?.ebicsVersion == EbicsVersion.H005)
         bankConnection.value.useCertificate = true
-      else
+      else if (bankConnection.value?.ebicsVersion == EbicsVersion.H004)
         bankConnection.value.useCertificate = false
-    })
-    return { banks, bankConnection, createOrUpdateUserData, userStatusInitializing, isEbicsVersionAllowedForUse, EbicsVersion };
+    }
+    return { banks, bankConnection, createOrUpdateUserData, userStatusInitializing, isEbicsVersionAllowedForUse, EbicsVersion, refreshUseCertificates };
   },
 });
 </script>
