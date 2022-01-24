@@ -51,7 +51,8 @@ class EbicsReturnCode (
      * Tells if the return code is an OK one.
      * @return True if the return code is OK one.
      */
-    val isOk: Boolean = code == EBICS_OK.code
+    val isOk: Boolean
+        get() = code == EBICS_OK.code
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -89,6 +90,7 @@ class EbicsReturnCode (
                 )
             )
         }
+        private val returnCodes: MutableMap<String, EbicsReturnCode> = HashMap()
 
         val EBICS_OK: EbicsReturnCode = create("000000", "EBICS_OK")
         @JvmField
@@ -130,7 +132,6 @@ class EbicsReturnCode (
 
         private const val BUNDLE_NAME = "org.ebics.client.exception.messages"
         private const val serialVersionUID = -497883146384363199L
-        private val returnCodes: MutableMap<String, EbicsReturnCode> = HashMap()
         private fun create(code: String, symbolicName: String): EbicsReturnCode {
             val returnCode = EbicsReturnCode(code, symbolicName)
             returnCodes[code] = returnCode

@@ -14,7 +14,7 @@ import org.springframework.test.context.ContextConfiguration
 
 @SpringBootTest
 @ExtendWith(MockKExtension::class)
-@ContextConfiguration(classes=[TestContext::class])
+@ContextConfiguration(classes = [TestContext::class])
 class EbicsSessionFactoryTest(@Autowired private val ebicsSessionFactory: IEbicsSessionFactory) {
 
     @Test
@@ -92,15 +92,13 @@ class EbicsSessionFactoryTest(@Autowired private val ebicsSessionFactory: IEbics
 
     @Test
     fun ifTheNewSessionIsRequestedAndThenSameSessionOnceMore_withWrongPwd_Then_IOException() {
-        val s1 =
-            ebicsSessionFactory.getSession(
-                UserIdPass(1, "pass1"), true
-            )
+        ebicsSessionFactory.getSession(
+            UserIdPass(1, "pass1"), true
+        )
         Assertions.assertThrows(Exception::class.java) {
-            val s2 =
-                ebicsSessionFactory.getSession(
-                    UserIdPass(1, "pass1_WRONG"), true
-                )
+            ebicsSessionFactory.getSession(
+                UserIdPass(1, "pass1_WRONG"), true
+            )
         }
     }
 }

@@ -31,7 +31,7 @@ export default function useBankConnectionAPI(userId: number | undefined) {
     userStatus: 'CREATED',
     guestAccess: false,
     usePassword: false,
-    useCertificate: false,
+    useCertificate: true,
   } as BankConnection);
 
   const refreshUserData = async () => {

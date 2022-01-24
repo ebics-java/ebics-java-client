@@ -74,6 +74,13 @@ public class KeyManagementResponseElement extends DefaultResponseElement {
     text = response.getHeader().getMutable().getReportText();
     returnCode = EbicsReturnCode.toReturnCode(code, text);
     report();
+    processBodyReturnCode();
+  }
+
+  protected void processBodyReturnCode() throws EbicsException {
+    String bodyRetCode = response.getBody().getReturnCode().getStringValue();
+    EbicsReturnCode returnCode = EbicsReturnCode.toReturnCode(bodyRetCode);
+    checkReturnCode(returnCode);
   }
 
   // --------------------------------------------------------------------

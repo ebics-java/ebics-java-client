@@ -63,8 +63,8 @@ class KeyManagementImpl(session: EbicsSession) : KeyManagement(session) {
         val response: KeyManagementResponseElement
         session.user.checkAction(EbicsUserAction.INI)
         val sender = HttpTransferSession(session)
-        val request = INIRequestElement(session).apply { build(); validate() }
         val traceSession = TraceSession(session, OrderTypeDefinition(EbicsAdminOrderType.INI))
+        val request = INIRequestElement(session, traceSession).apply { build(); validate() }
         traceSession.trace(request)
         val responseBody = sender.send(ByteArrayContentFactory(request.prettyPrint()))
         
@@ -86,8 +86,8 @@ class KeyManagementImpl(session: EbicsSession) : KeyManagement(session) {
         val response: KeyManagementResponseElement
         session.user.checkAction(EbicsUserAction.HIA)
         val sender = HttpTransferSession(session)
-        val request = HIARequestElement(session).apply { build(); validate() }
         val traceSession = TraceSession(session, OrderTypeDefinition(EbicsAdminOrderType.HIA))
+        val request = HIARequestElement(session, traceSession).apply { build(); validate() }
         traceSession.trace(request)
         val responseBody = sender.send(ByteArrayContentFactory(request.prettyPrint()))
         
