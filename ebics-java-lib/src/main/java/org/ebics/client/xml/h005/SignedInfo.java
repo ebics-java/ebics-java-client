@@ -25,8 +25,6 @@ import org.apache.xml.security.utils.IgnoreAllErrorHandler;
 import org.apache.xpath.XPathAPI;
 import org.ebics.client.api.UserCertificateManager;
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.api.EbicsUser;
-import org.ebics.client.api.EbicsUserInfo;
 import org.ebics.schema.xmldsig.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

@@ -20,10 +20,9 @@
 package org.ebics.client.xml.h004;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.exception.NoDownloadDataAvailableException;
-import org.ebics.client.exception.ReturnCode;
+import org.ebics.client.exception.h004.EbicsReturnCode;
+import org.ebics.client.exception.h004.NoDownloadDataAvailableException;
 import org.ebics.client.interfaces.ContentFactory;
-import org.ebics.client.order.EbicsAdminOrderType;
 
 /**
  * The <code>DInitializationResponseElement</code> is the response element
@@ -48,8 +47,8 @@ public class DownloadInitializationResponseElement extends InitializationRespons
   @Override
   protected void processBodyReturnCode() throws NoDownloadDataAvailableException {
       String bodyRetCode = response.getBody().getReturnCode().getStringValue();
-      returnCode = ReturnCode.toReturnCode(bodyRetCode, "");
-      if (returnCode.equals(ReturnCode.EBICS_NO_DOWNLOAD_DATA_AVAILABLE)) {
+      returnCode = EbicsReturnCode.toReturnCode(bodyRetCode);
+      if (returnCode.equals(EbicsReturnCode.EBICS_NO_DOWNLOAD_DATA_AVAILABLE)) {
         throw new NoDownloadDataAvailableException();
       }
   }

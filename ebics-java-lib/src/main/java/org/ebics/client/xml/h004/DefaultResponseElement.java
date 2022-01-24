@@ -22,7 +22,7 @@ package org.ebics.client.xml.h004;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.exception.ReturnCode;
+import org.ebics.client.exception.h004.EbicsReturnCode;
 import org.ebics.client.interfaces.ContentFactory;
 
 import java.io.IOException;
@@ -70,7 +70,7 @@ public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
     checkReturnCode(returnCode);
   }
 
-  protected void checkReturnCode(ReturnCode returnCode) throws EbicsException {
+  protected void checkReturnCode(EbicsReturnCode returnCode) throws EbicsException {
     if (!returnCode.isOk()) {
       returnCode.throwException();
     }
@@ -87,6 +87,6 @@ public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
 
   private String 			name;
   protected ContentFactory		factory;
-  protected ReturnCode			returnCode;
+  protected EbicsReturnCode returnCode;
   private static final long 		serialVersionUID = 4014595046719645090L;
 }

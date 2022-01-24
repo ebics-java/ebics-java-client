@@ -20,9 +20,8 @@
 package org.ebics.client.xml.h004;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.exception.ReturnCode;
+import org.ebics.client.exception.h004.EbicsReturnCode;
 import org.ebics.client.interfaces.ContentFactory;
-import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.schema.h004.EbicsResponseDocument;
 import org.ebics.schema.h004.EbicsResponseDocument.EbicsResponse;
 
@@ -52,7 +51,7 @@ public class InitializationResponseElement extends DefaultResponseElement {
     response = ((EbicsResponseDocument)document).getEbicsResponse();
     String code = response.getHeader().getMutable().getReturnCode();
     String text = response.getHeader().getMutable().getReportText();
-    returnCode = ReturnCode.toReturnCode(code, text);
+    returnCode = EbicsReturnCode.toReturnCode(code, text);
     checkReturnCode(returnCode);
     processBodyReturnCode();
     transactionId = response.getHeader().getStatic().getTransactionID();
@@ -61,7 +60,7 @@ public class InitializationResponseElement extends DefaultResponseElement {
 
   protected void processBodyReturnCode() throws EbicsException {
       String bodyRetCode = response.getBody().getReturnCode().getStringValue();
-      ReturnCode returnCode = ReturnCode.toReturnCode(bodyRetCode, "");
+      EbicsReturnCode returnCode = EbicsReturnCode.toReturnCode(bodyRetCode);
       checkReturnCode(returnCode);
   }
 

@@ -1,6 +1,8 @@
 package org.ebics.client.certificate
 
-import java.io.*
+import java.io.ByteArrayInputStream
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.math.BigInteger
 import java.security.cert.X509Certificate
 import java.security.interfaces.RSAPublicKey
@@ -42,12 +44,6 @@ open class BankCertificateManager(
                 KeyUtil.getKeyDigest(x002Key),
                 e002Key, x002Key,
             )
-        }
-
-        @JvmStatic
-        fun load(ins: InputStream): BankCertificateManager {
-            TODO("Loading from stream to be implemented")
-            //val publicKey: PublicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(bytes))
         }
     }
 

@@ -19,11 +19,10 @@
 
 package org.ebics.client.xml.h004;
 
+import org.ebics.client.api.EbicsSession;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.client.io.IOUtils;
-import org.ebics.client.api.EbicsSession;
-import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.schema.h004.DataTransferRequestType;
 import org.ebics.schema.h004.DataTransferRequestType.OrderData;
 import org.ebics.schema.h004.EbicsRequestDocument.EbicsRequest;

@@ -19,7 +19,7 @@
 package org.ebics.client.xml.h000
 
 import org.ebics.client.exception.EbicsException
-import org.ebics.client.exception.ReturnCode
+import org.ebics.client.exception.h005.EbicsReturnCode
 import org.ebics.client.interfaces.ContentFactory
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.xml.h005.DefaultResponseElement
@@ -33,7 +33,7 @@ class HEVResponse(factory: ContentFactory) : DefaultResponseElement(factory, "HE
     override fun build() {
         parse(factory)
         response = (document as EbicsHEVResponseDocument).ebicsHEVResponse
-        returnCode = ReturnCode.toReturnCode(response.systemReturnCode.returnCode, "")
+        returnCode = EbicsReturnCode.toReturnCode(response.systemReturnCode.returnCode, "")
     }
 
     fun getSupportedVersions(): List<EbicsVersion> = EnumUtil.toEbicsVersions(response)

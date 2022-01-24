@@ -20,7 +20,7 @@
 package org.ebics.client.xml.h004;
 
 import org.ebics.client.exception.EbicsException;
-import org.ebics.client.exception.ReturnCode;
+import org.ebics.client.exception.h004.EbicsReturnCode;
 import org.ebics.client.interfaces.ContentFactory;
 import org.ebics.schema.h004.EbicsResponseDocument;
 import org.ebics.schema.h004.EbicsResponseDocument.EbicsResponse;
@@ -52,7 +52,7 @@ public class TransferResponseElement extends DefaultResponseElement {
     response = ((EbicsResponseDocument)document).getEbicsResponse();
     code = response.getHeader().getMutable().getReturnCode();
     text = response.getHeader().getMutable().getReportText();
-    returnCode = ReturnCode.toReturnCode(code, text);
+    returnCode = EbicsReturnCode.toReturnCode(code, text);
     report();
   }
 
