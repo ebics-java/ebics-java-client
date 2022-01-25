@@ -1,9 +1,8 @@
 package org.ebics.client.certificate
 
 import java.io.ByteArrayInputStream
-import java.io.FileOutputStream
-import java.io.OutputStream
 import java.math.BigInteger
+import java.security.MessageDigest
 import java.security.cert.X509Certificate
 import java.security.interfaces.RSAPublicKey
 
@@ -15,6 +14,8 @@ open class BankCertificateManager(
     val x002Key: RSAPublicKey,
     private val e002Certificate:X509Certificate? = null,
     private val x002Certificate:X509Certificate? = null,
+    private val e002CertificateDigest: ByteArray? = null,
+    private val x002CertificateDigest: ByteArray? = null,
 )  {
     val useCertificates: Boolean = e002Certificate != null && x002Certificate != null
 
@@ -23,6 +24,9 @@ open class BankCertificateManager(
         fun createFromCertificates(bankE002Certificate:ByteArray, bankX002Certificate: ByteArray): BankCertificateManager {
             val e002Certificate: X509Certificate = KeyStoreManager.readCertificate(ByteArrayInputStream(bankE002Certificate))
             val x002Certificate: X509Certificate = KeyStoreManager.readCertificate(ByteArrayInputStream(bankX002Certificate))
+            val sha256digest = MessageDigest.getInstance("SHA-256", "BC");
+            val e002CertificateDigest = sha256digest.digest(bankE002Certificate)
+            val x002CertificateDigest = sha256digest.digest(bankX002Certificate)
             val e002Key: RSAPublicKey = e002Certificate.publicKey as RSAPublicKey
             val x002Key: RSAPublicKey = x002Certificate.publicKey as RSAPublicKey
             return BankCertificateManager(
@@ -31,6 +35,8 @@ open class BankCertificateManager(
                 e002Key, x002Key,
                 e002Certificate,
                 x002Certificate,
+                e002CertificateDigest,
+                x002CertificateDigest,
             )
         }
 
@@ -45,21 +51,5 @@ open class BankCertificateManager(
                 e002Key, x002Key,
             )
         }
-    }
-
-    fun saveCertificates(os:OutputStream, bankId:String, password: String) {
-        require (e002Certificate != null && x002Certificate != null) {"No certificates found in order to be saved (Create instance with certificates)"}
-        val manager = KeyStoreManager.create(password)
-        manager.setCertificateEntry("$bankId-E002", e002Certificate)
-        manager.setCertificateEntry("$bankId-X002", x002Certificate)
-        manager.save(os)
-    }
-
-    fun save(os: FileOutputStream) {
-        os.write(e002Digest)
-        os.write(x002Digest)
-        os.write(e002Key.encoded)
-        os.write(x002Key.encoded)
-        TODO("Store lengths of digest, keys: e002Key, x002Key")
     }
 }
