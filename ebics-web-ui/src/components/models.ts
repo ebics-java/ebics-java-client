@@ -7,6 +7,8 @@ export interface Bank {
     id: number;
     e002DigestHex: string;
     x002DigestHex: string;
+    e002CertDigestHex: string;
+    x002CertDigestHex: string;
   }
   ebicsVersions: EbicsVersionSettings[];
   httpClientConfigurationName: string;

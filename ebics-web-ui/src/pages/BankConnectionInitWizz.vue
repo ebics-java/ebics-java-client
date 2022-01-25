@@ -205,7 +205,7 @@
             <q-list bordered padding class="rounded-borders">
               <q-item v-ripple>
                 <q-item-section>
-                  <q-item-label lines="1">Authentication (X002)</q-item-label>
+                  <q-item-label lines="1">Authentication key hash (X002)</q-item-label>
                   <q-item-label caption>{{
                     bankConnection.partner.bank.keyStore.x002DigestHex
                   }}</q-item-label>
@@ -227,7 +227,7 @@
               </q-item>
               <q-item v-ripple>
                 <q-item-section>
-                  <q-item-label lines="1">Encryption (E002)</q-item-label>
+                  <q-item-label lines="1">Encryption key hash (E002)</q-item-label>
                   <q-item-label caption>{{
                     bankConnection.partner.bank.keyStore.e002DigestHex
                   }}</q-item-label>
@@ -242,6 +242,50 @@
                     @click="
                       copyToClipboard(
                         bankConnection.partner.bank.keyStore.e002DigestHex
+                      )
+                    "
+                  ></q-btn>
+                </q-item-section>
+              </q-item>
+              <q-item v-if="bankConnection.partner.bank.keyStore.x002CertDigestHex" v-ripple>
+                <q-item-section>
+                  <q-item-label lines="1">Authentication X509 certificate hash (X002)</q-item-label>
+                  <q-item-label caption>{{
+                    bankConnection.partner.bank.keyStore.x002CertDigestHex
+                  }}</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-btn
+                    class="gt-xs"
+                    size="15px"
+                    flat
+                    dense
+                    icon="content_copy"
+                    @click="
+                      copyToClipboard(
+                        bankConnection.partner.bank.keyStore.x002CertDigestHex
+                      )
+                    "
+                  ></q-btn>
+                </q-item-section>
+              </q-item>
+              <q-item v-if="bankConnection.partner.bank.keyStore.e002CertDigestHex" v-ripple>
+                <q-item-section>
+                  <q-item-label lines="1">Encryption X509 certificate hash (E002)</q-item-label>
+                  <q-item-label caption>{{
+                    bankConnection.partner.bank.keyStore.e002CertDigestHex
+                  }}</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-btn
+                    class="gt-xs"
+                    size="15px"
+                    flat
+                    dense
+                    icon="content_copy"
+                    @click="
+                      copyToClipboard(
+                        bankConnection.partner.bank.keyStore.e002CertDigestHex
                       )
                     "
                   ></q-btn>

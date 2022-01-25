@@ -135,7 +135,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, watch } from 'vue';
+import { defineComponent, computed } from 'vue';
 import useBankConnectionAPI from 'components/bankconnection';
 import useBanksDataAPI from 'src/components/banks';
 import {EbicsVersion} from 'src/components/models'

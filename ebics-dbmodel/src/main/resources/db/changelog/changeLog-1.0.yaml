@@ -675,3 +675,23 @@ databaseChangeLog:
       author: honza (generated)
       changes:
           - sql: update Bank set httpClientConfigurationName='default'
+- changeSet:
+    id: 1643094176905-1
+    author: honza.toegel (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: e002CertDigest
+            type: BLOB
+        tableName: BankKeyStore
+- changeSet:
+    id: 1643094176905-2
+    author: honza.toegel (generated)
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: x002CertDigest
+            type: BLOB
+        tableName: BankKeyStore

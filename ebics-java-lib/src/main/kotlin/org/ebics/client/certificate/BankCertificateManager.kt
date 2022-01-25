@@ -14,8 +14,8 @@ open class BankCertificateManager(
     val x002Key: RSAPublicKey,
     private val e002Certificate:X509Certificate? = null,
     private val x002Certificate:X509Certificate? = null,
-    private val e002CertificateDigest: ByteArray? = null,
-    private val x002CertificateDigest: ByteArray? = null,
+    val e002CertificateDigest: ByteArray? = null,
+    val x002CertificateDigest: ByteArray? = null,
 )  {
     val useCertificates: Boolean = e002Certificate != null && x002Certificate != null
 
