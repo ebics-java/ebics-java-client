@@ -74,18 +74,19 @@ export default function useFileTransferAPI() {
      * Executest EBICS HTD request in order to get avaialable order types  
      * @param bankConnection bank connection for this request
      * @param ebicsVersion ebics version used, if other that from bank connection default
+     * @param useServerCache if true then try to find result in server cache first, otherwise goes directly for EBICS request without cache
      * @returns available order types, in case of error emtpty list
      */
     const ebicsOrderTypes = async (
       bankConnection: BankConnection,
       ebicsVersion: string = bankConnection.ebicsVersion,
-      useCache: boolean,
+      useServerCache: boolean,
     ): Promise<BTFType[] | OrderType[]> => {
       try {
         const password = await promptCertPassword(bankConnection, false);
         const response = await api.post<UserPassword, AxiosResponse<BTFType[]>>(
           `bankconnections/${bankConnection.id}/${ebicsVersion}/orderTypes`,
-          {password: password, useCache: useCache},
+          {password: password, useCache: useServerCache},
         );
         console.debug(
           `Order types ${ebicsVersion} loaded for bank connection ${

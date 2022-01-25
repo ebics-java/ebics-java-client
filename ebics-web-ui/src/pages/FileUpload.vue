@@ -419,11 +419,11 @@ export default defineComponent({
       }
     };
 
-    const getUploadContent = (): Blob => {
-      if (fileFormat.value == FileFormat.BINARY && file.value) {
-        return file.value;
-      } else if (fileFormat.value != FileFormat.BINARY && fileText.value) {
-        return new Blob([fileText.value], { type: 'text/html' });
+    const getUploadContent = (fileFormat: FileFormat, file: File | undefined, fileContent: string): Blob => {
+      if (fileFormat == FileFormat.BINARY && file) {
+        return file;
+      } else if (fileFormat != FileFormat.BINARY && fileContent) {
+        return new Blob([fileContent], { type: 'text/html' });
       } else {
         throw new Error(
           'Invalid input combination, no file content available to upload'
@@ -431,22 +431,40 @@ export default defineComponent({
       }
     };
 
+    const getUploadContentSingle = (): Blob => {
+      return getUploadContent(fileFormat.value, file.value, fileText.value);
+    };
+
+    const processOneFileUpload = async(file: File, bankConnection: BankConnection) => {
+      let fileContent = await file.text()
+      const detectedFileFormat = detectFileFormat(fileContent);
+      if (userSettings.value.adjustmentOptions.applyAutomatically && detectedFileFormat != FileFormat.BINARY) {
+        fileContent = await applySmartAdjustments(
+          fileContent,
+          detectedFileFormat,
+          userSettings.value
+        );
+      } 
+      await ebicsUploadRequest(
+        bankConnection,
+        getUploadRequest(file.name),
+        getUploadContent(detectedFileFormat, file, fileContent)
+      );
+    }
+
     const processUpload = async (): Promise<void> => {
       if (bankConnection.value) {
         if (!props.fileEditor) {
+          //Multiple files upload
           for (let file of files.value) {
-            await ebicsUploadRequest(
-              bankConnection.value,
-              getUploadRequest(file.name),
-              file
-            );
+            await processOneFileUpload(file, bankConnection.value)
           }
         } else {
           //Single file upload
           await ebicsUploadRequest(
             bankConnection.value,
             getUploadRequest(),
-            getUploadContent()
+            getUploadContentSingle()
           );
         }
       }

@@ -147,7 +147,7 @@ export default function useTextUtils() {
       s.f20 ? '(:20:.*)' : null,
       s.f21 ? '(:21:.*)' : null,
       s.f30 ? '(:30:.*)' : null,
-      s.uetr ? '({121:.*})' : null,
+      s.uetr ? '({121:.*?})' : null,
     ].filter(Boolean);
     if (regExpParts.length) {
       const regExp = new RegExp(regExpParts.join('|'), 'g');
@@ -200,7 +200,7 @@ export default function useTextUtils() {
         : null,
       s.instrId ? '(<InstrId>.*</InstrId>)' : null,
       s.endToEndId || s.nbOfTrxsCalc ? '(<EndToEndId>.*</EndToEndId>)' : null,
-      s.uetr ? '(<InstrInf>UETR/.*</InstrInf>)' : null,
+      s.uetr ? '(<InstrInf>UETR/.*</InstrInf>)|(<UETR>.*</UETR>)' : null,
       s.ctrlSumCalc
         ? '(<InstdAmt Ccy="\\w{3}">.*<\\/InstdAmt>)|(<Amt Ccy="\\w{3}">.*<\\/Amt>)'
         : null,
@@ -233,6 +233,8 @@ export default function useTextUtils() {
             : match;
         } else if (s.uetr && match.startsWith('<InstrInf>')) {
           return `<InstrInf>UETR/${uuid.v4()}</InstrInf>`;
+        } else if (s.uetr && match.startsWith('<UETR>')) {
+          return `<UETR>${uuid.v4()}</UETR>`;
         } else if (
           s.ctrlSumCalc &&
           (match.startsWith('<InstdAmt') || match.startsWith('<Amt'))

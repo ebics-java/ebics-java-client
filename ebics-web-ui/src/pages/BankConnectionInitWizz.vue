@@ -327,11 +327,11 @@ export default defineComponent({
 
     const resetUserStatus = async (): Promise<void> => {
       try {
-        const del = await confirmDialog(
+        const confirmReset = await confirmDialog(
           'Confirm reset',
           'Do you really want to reset bank connection? (it must be then newly initialized in order to upload/download files)'
         );
-        if (del) {
+        if (confirmReset) {
           //Get password for user certificates
           await resetUserStatusRequest();
           //Reset the password for certificates
