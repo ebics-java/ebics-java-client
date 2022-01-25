@@ -24,7 +24,7 @@ class TestContext {
 
     @Bean(name = ["testSessionFactory"])
     fun sessionFactory(): IEbicsSessionFactory = EbicsSessionFactory(
-        UserServiceTestImpl(), configuration, EbicsProduct("testProd", "de", "JTO")
+        UserServiceTestImpl(), configuration, EbicsProductConfiguration("testProd", "de", "JTO", "3.5")
     )
 
     @Bean

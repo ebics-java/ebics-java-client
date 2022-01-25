@@ -7,7 +7,7 @@ import org.apache.xml.security.Init
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.api.trace.IFileService
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
-import org.ebics.client.ebicsrestapi.EbicsProduct
+import org.ebics.client.ebicsrestapi.EbicsProductConfiguration
 import org.ebics.client.ebicsrestapi.MockSession
 import org.ebics.client.ebicsrestapi.TestContext
 import org.ebics.client.ebicsrestapi.configuration.EbicsRestConfiguration
@@ -37,7 +37,7 @@ class FileDownloadCacheTest(
         Security.addProvider(BouncyCastleProvider())
     }
 
-    val prod = EbicsProduct("testProd", "de", "JTO")
+    val prod = EbicsProductConfiguration("testProd", "de", "JTO", "3.5")
 
     @BeforeEach
     fun initTestContext() {

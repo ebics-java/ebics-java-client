@@ -3,7 +3,7 @@ package org.ebics.client.api
 import org.ebics.client.certificate.BankCertificateManager
 import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.exception.EbicsException
-import org.ebics.client.model.Product
+import org.ebics.client.model.EbicsProduct
 
 interface EbicsSession {
     val sessionId: String
@@ -18,7 +18,7 @@ interface EbicsSession {
     /**
      * Sets the optional product identification that will be sent to the bank during each request.
      */
-    val product: Product
+    val product: EbicsProduct
 
     /**
      * User key-pairs (A005, X002, E002)

@@ -19,8 +19,8 @@
 
 package org.ebics.client.xml.h004;
 
-import org.ebics.client.exception.EbicsException;
 import org.ebics.client.api.EbicsSession;
+import org.ebics.client.exception.EbicsException;
 import org.ebics.client.order.EbicsAdminOrderType;
 import org.ebics.schema.h004.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest;
 import org.ebics.schema.h004.EbicsUnsecuredRequestDocument.EbicsUnsecuredRequest.Body;
@@ -70,8 +70,7 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
     orderDetails = EbicsXmlFactory.createOrderDetailsType("DZNNN",
 	                                                  orderType.toString());
 
-    productType = EbicsXmlFactory.creatProductElementType(session.getProduct().getLanguage(),
-	                                                  session.getProduct().getName());
+    productType = EbicsXmlFactory.createProductElementType(session.getProduct());
 
     xstatic = EbicsXmlFactory.createUnsecuredRequestStaticHeaderType(session.getBankID(),
 								     session.getUser().getPartner().getPartnerId(),

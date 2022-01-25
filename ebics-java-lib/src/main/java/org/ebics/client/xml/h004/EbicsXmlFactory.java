@@ -22,6 +22,7 @@ package org.ebics.client.xml.h004;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
+import org.ebics.client.model.EbicsProduct;
 import org.ebics.schema.h004.*;
 import org.ebics.schema.h004.DataEncryptionInfoType.EncryptionPubKeyDigest;
 import org.ebics.schema.h004.DataTransferRequestType.DataEncryptionInfo;
@@ -436,14 +437,14 @@ public class EbicsXmlFactory {
 
   /**
    * Creates a new <code>ProductElementType</code> XML object
-   * @param language the language
-   * @param product the product name
+   * @param product the product infos
    * @return the <code>ProductElementType</code> XML object
    */
-  public static ProductElementType creatProductElementType(String language, String product) {
+  public static ProductElementType createProductElementType(EbicsProduct product) {
     ProductElementType newProductElementType = ProductElementType.Factory.newInstance();
-    newProductElementType.setLanguage(language);
-    newProductElementType.setStringValue(product);
+    newProductElementType.setLanguage(product.getLanguage());
+    newProductElementType.setStringValue(product.getName());
+    newProductElementType.setInstituteID(product.getInstituteID());
 
     return newProductElementType;
   }
@@ -1007,14 +1008,14 @@ public class EbicsXmlFactory {
 
   /**
    * Create the <code>Product</code> XML object
-   * @param language the product language
-   * @param value the product value
+   * @param product the product infos
    * @return the <code>Product</code> XML object
    */
-  public static Product createProduct(String language, String value) {
+  public static Product createProduct(EbicsProduct product) {
     Product newProduct = Product.Factory.newInstance();
-    newProduct.setLanguage(language);
-    newProduct.setStringValue(value);
+    newProduct.setLanguage(product.getLanguage());
+    newProduct.setStringValue(product.getName());
+    newProduct.setInstituteID(product.getInstituteID());
 
     return newProduct;
   }

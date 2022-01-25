@@ -23,7 +23,7 @@ package org.ebics.client.model
  *
  * @author Hachani
  */
-interface Product
+interface EbicsProduct
 {
     /**
      * @param name his is the name of the product. It is a mandatory field.

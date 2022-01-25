@@ -19,9 +19,9 @@
 
 package org.ebics.client.xml.h004;
 
+import org.ebics.client.api.EbicsSession;
 import org.ebics.client.exception.EbicsException;
 import org.ebics.client.order.EbicsAdminOrderType;
-import org.ebics.client.api.EbicsSession;
 import org.ebics.client.utils.Utils;
 import org.ebics.schema.h004.DataEncryptionInfoType.EncryptionPubKeyDigest;
 import org.ebics.schema.h004.*;
@@ -86,7 +86,7 @@ public class SPRRequestElement extends InitializationRequestElement {
     userSignature.validate();
 
     mutable = EbicsXmlFactory.createMutableHeaderType("Initialisation", null);
-    product = EbicsXmlFactory.createProduct(session.getProduct().getLanguage(), session.getProduct().getName());
+    product = EbicsXmlFactory.createProduct(session.getProduct());
     authentication = EbicsXmlFactory.createAuthentication(session.getConfiguration().getAuthenticationVersion(),
 	                                                  "http://www.w3.org/2001/04/xmlenc#sha256",
 	                                                  decodeHex(session.getBankCert().getX002Digest()));

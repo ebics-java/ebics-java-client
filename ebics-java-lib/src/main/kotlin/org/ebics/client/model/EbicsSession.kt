@@ -45,7 +45,7 @@ class EbicsSession(
     /**
      * Sets the optional product identification that will be sent to the bank during each request.
      */
-    override val product: Product,
+    override val product: EbicsProduct,
 
     /**
      * User key-pairs (A005, X002, E002)
