@@ -12,7 +12,7 @@ data class EbicsProductConfiguration(
     @Value("\${ebics.product.language:en}")
     override val language: String,
 
-    @Value("\${ebics.product.instituteID:org.jto.ebics}")
+    @Value("\${ebics.product.instituteID:org.ebics.client}")
     override val instituteID: String?,
 
     @Value("\${build.revision}")
