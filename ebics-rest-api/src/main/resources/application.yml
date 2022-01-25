@@ -21,3 +21,7 @@ spring:
         implicit-strategy: "org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl"
   datasource:
     initialization-mode: "never"
+  servlet:
+    multipart:
+      max-file-size: "100MB"
+      max-request-size: "100MB"
