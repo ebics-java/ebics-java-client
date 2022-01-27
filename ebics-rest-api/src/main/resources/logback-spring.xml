@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds">
-    <!-- External log configuration -->
-    <if condition='property("HOSTNAME").contains("torino")'>
+    <if condition='isDefined("EWC_CONFIG_HOME")'>
         <then>
+            <!-- External log configuration is case there is EWC_CONFIG_HOME defined -->
             <include url="file:${EWC_CONFIG_HOME}/logback.xml"/>
         </then>
         <else>
-            <!-- console log settings as default when no external configuration available -->
+            <!-- Console log settings as default when no external configuration EWC_CONFIG_HOME available -->
             <appender name="Console"
                       class="ch.qos.logback.core.ConsoleAppender">
                 <layout class="ch.qos.logback.classic.PatternLayout">
