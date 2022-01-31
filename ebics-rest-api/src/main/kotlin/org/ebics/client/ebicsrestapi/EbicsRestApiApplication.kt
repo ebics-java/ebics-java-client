@@ -40,19 +40,16 @@ class EbicsRestApiApplication : SpringBootServletInitializer() {
                 if (configHome != null) {
                     val configFileNameProp = "$configHome/config.properties"
                     val configFileNameYaml = "$configHome/config.yaml"
-                    if (File(configFileNameProp).exists())
-                        resources.add(FileSystemResource(configFileNameProp))
-                    else if (File(configFileNameYaml).exists())
-                        resources.add(FileSystemResource(configFileNameYaml))
-                    else
-                        throw IllegalArgumentException("Config file not found, please check your config folder $configHome, non of $configFileNameProp, $configFileNameYaml exist")
-
+                    when {
+                        File(configFileNameProp).exists() -> resources.add(FileSystemResource(configFileNameProp))
+                        File(configFileNameYaml).exists() -> resources.add(FileSystemResource(configFileNameYaml))
+                        else -> throw IllegalArgumentException("Config file not found, please check your config folder $configHome, non of $configFileNameProp, $configFileNameYaml exist")
+                    }
                     val logbackFile = "$configHome/logback.xml"
                     if (!File(logbackFile).exists())
                         throw IllegalArgumentException("$logbackFile doesn't exist, please provide valid logback file")
                 } else {
-                    System.out.println("EWC_CONFIG_HOME is not set, all mandatory external properties must be set as system or environment variable")
-                    //throw IllegalArgumentException("EWC_CONFIG_HOME is not set, please provide variable EWC_CONFIG_HOME, the value must be a valid directory containing config.yaml or config.properties and logback.xml")
+                    println("EWC_CONFIG_HOME is not set, all mandatory external properties must be set as system or environment variable")
                 }
                 setLocations(*resources.toTypedArray())
             } catch (ex:Exception) {
