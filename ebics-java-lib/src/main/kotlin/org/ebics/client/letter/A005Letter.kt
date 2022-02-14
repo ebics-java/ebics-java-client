@@ -21,9 +21,7 @@ package org.ebics.client.letter
 import org.apache.commons.codec.binary.Base64
 import org.ebics.client.api.EbicsUser
 import org.ebics.client.api.UserCertificateManager
-import org.ebics.client.exception.EbicsException
-import java.io.IOException
-import java.security.GeneralSecurityException
+import org.ebics.client.certificate.KeyUtil
 import java.util.*
 
 /**
@@ -48,7 +46,7 @@ class A005Letter(
     getString("INILetter.certificate", BUNDLE_NAME, locale),
     if (useCert) Base64.encodeBase64(userCert.getA005CertificateBytes(), true) else null,
     getString("INILetter.digest", BUNDLE_NAME, locale),
-    if (useCert) getHash(userCert.getA005CertificateBytes()) else getHash(userCert.a005PublicKey)
+    if (useCert) KeyUtil.getCertificateHash(userCert.getA005CertificateBytes()) else KeyUtil.getKeyHash(userCert.a005PublicKey)
 ) {
 
     override val title: String

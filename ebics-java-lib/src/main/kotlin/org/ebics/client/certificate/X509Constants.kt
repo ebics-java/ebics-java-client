@@ -16,36 +16,35 @@
  *
  * $Id$
  */
-
-package org.ebics.client.certificate;
+package org.ebics.client.certificate
 
 /**
  * X509 certificate constants
  *
  * @author hachani
- *
  */
-public interface X509Constants {
+interface X509Constants {
+    companion object {
+        /**
+         * Certificates key usage
+         */
+        const val SIGNATURE_KEY_USAGE = 1
+        const val AUTHENTICATION_KEY_USAGE = 2
+        const val ENCRYPTION_KEY_USAGE = 3
 
-  /**
-   * Certificates key usage
-   */
-  int			SIGNATURE_KEY_USAGE			= 1;
-  int			AUTHENTICATION_KEY_USAGE		= 2;
-  int			ENCRYPTION_KEY_USAGE			= 3;
+        /**
+         * Certificate signature algorithm
+         */
+        const val SIGNATURE_ALGORITHM = "SHA256WithRSAEncryption"
 
-  /**
-   * Certificate signature algorithm
-   */
-  String		SIGNATURE_ALGORITHM			= "SHA256WithRSAEncryption";
+        /**
+         * Default days validity of a certificate
+         */
+        const val DEFAULT_DURATION = 10 * 365
 
-  /**
-   * Default days validity of a certificate
-   */
-  int			DEFAULT_DURATION			= 10 * 365;
-
-  /**
-   * EBICS key size
-   */
-  int			EBICS_KEY_SIZE				= 2048;
+        /**
+         * EBICS key size
+         */
+        const val EBICS_KEY_SIZE = 2048
+    }
 }

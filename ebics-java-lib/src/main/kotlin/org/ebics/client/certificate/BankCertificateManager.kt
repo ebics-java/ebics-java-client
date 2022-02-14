@@ -30,8 +30,8 @@ open class BankCertificateManager(
             val e002Key: RSAPublicKey = e002Certificate.publicKey as RSAPublicKey
             val x002Key: RSAPublicKey = x002Certificate.publicKey as RSAPublicKey
             return BankCertificateManager(
-                KeyUtil.getKeyDigest(e002Key),
-                KeyUtil.getKeyDigest(x002Key),
+                KeyUtil.getKeyHash(e002Key),
+                KeyUtil.getKeyHash(x002Key),
                 e002Key, x002Key,
                 e002Certificate,
                 x002Certificate,
@@ -46,8 +46,8 @@ open class BankCertificateManager(
             val e002Key: RSAPublicKey = KeyStoreManager.getPublicKey(BigInteger(bankE002PublicKeyExponent), BigInteger(bankE002PublicKeyModulus))
             val x002Key: RSAPublicKey = KeyStoreManager.getPublicKey(BigInteger(bankX002PublicKeyExponent), BigInteger(bankX002PublicKeyModulus))
             return BankCertificateManager(
-                KeyUtil.getKeyDigest(e002Key),
-                KeyUtil.getKeyDigest(x002Key),
+                KeyUtil.getKeyHash(e002Key),
+                KeyUtil.getKeyHash(x002Key),
                 e002Key, x002Key,
             )
         }

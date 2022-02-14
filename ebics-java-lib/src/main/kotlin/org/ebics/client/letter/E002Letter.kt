@@ -21,9 +21,7 @@ package org.ebics.client.letter
 import org.apache.commons.codec.binary.Base64
 import org.ebics.client.api.EbicsUser
 import org.ebics.client.api.UserCertificateManager
-import org.ebics.client.exception.EbicsException
-import java.io.IOException
-import java.security.GeneralSecurityException
+import org.ebics.client.certificate.KeyUtil
 import java.util.*
 
 /**
@@ -48,7 +46,7 @@ class E002Letter(
     getString("HIALetter.e002.certificate", BUNDLE_NAME, locale),
     if (useCert) Base64.encodeBase64(userCert.getE002CertificateBytes(), true) else null,
     getString("HIALetter.e002.digest", BUNDLE_NAME, locale),
-    if (useCert) getHash(userCert.getE002CertificateBytes()) else getHash(userCert.e002PublicKey)
+    if (useCert) KeyUtil.getCertificateHash(userCert.getE002CertificateBytes()) else KeyUtil.getKeyHash(userCert.e002PublicKey)
 ) {
     override val title: String
         get() = getString("HIALetter.e002.title", BUNDLE_NAME, locale)
