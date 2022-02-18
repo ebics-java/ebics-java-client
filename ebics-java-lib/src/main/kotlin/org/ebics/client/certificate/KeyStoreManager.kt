@@ -26,7 +26,6 @@ import java.io.OutputStream
 import java.security.*
 import java.security.cert.Certificate
 import java.security.cert.X509Certificate
-import java.util.*
 
 
 /**
@@ -110,7 +109,6 @@ class KeyStoreManager private constructor(
     @Throws(GeneralSecurityException::class, IOException::class)
     private fun load(ins: InputStream) {
         keyStore.load(ins, password.toCharArray())
-        readCertificates()
     }
 
     /**
@@ -132,25 +130,4 @@ class KeyStoreManager private constructor(
     fun save(output: OutputStream) {
         keyStore.store(output, password.toCharArray())
     }
-
-    /**
-     * Reads all certificate existing in a given key store
-     * @return A `Map` of certificate,
-     * the key of the map is the certificate alias
-     * @throws KeyStoreException
-     */
-    @Throws(KeyStoreException::class)
-    private fun readCertificates() {
-        val enumeration: Enumeration<String> = keyStore.aliases()
-        while (enumeration.hasMoreElements()) {
-            val alias: String = enumeration.nextElement()
-            (certificates as MutableMap)[alias] = keyStore.getCertificate(alias) as X509Certificate
-        }
-    }
-
-    /**
-     * Returns the certificates contained in the key store.
-     * @return the certificates contained in the key store.
-     */
-    private val certificates: Map<String, X509Certificate> = mutableMapOf()
 }
