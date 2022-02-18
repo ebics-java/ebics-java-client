@@ -18,11 +18,9 @@
  */
 package org.ebics.client.certificate
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.io.*
 import java.security.GeneralSecurityException
 import java.security.KeyPair
-import java.security.KeyStore
 import java.security.PrivateKey
 import java.security.cert.X509Certificate
 import java.util.*
@@ -99,15 +97,15 @@ class UserCertificateManager(
          * @throws IOException
          */
         @Throws(GeneralSecurityException::class, IOException::class)
-        fun load(ins: InputStream, password: String, userId: String): UserCertificateManager {
+        fun load(ins: InputStream, password: String, keyStoreAliasPrefix: String): UserCertificateManager {
             val manager = KeyStoreManager.load(ins, password)
             return UserCertificateManager(
-                a005Certificate = manager.getCertificate("$userId-A005"),
-                x002Certificate = manager.getCertificate("$userId-X002"),
-                e002Certificate = manager.getCertificate("$userId-E002"),
-                a005PrivateKey = manager.getPrivateKey("$userId-A005"),
-                x002PrivateKey = manager.getPrivateKey("$userId-X002"),
-                e002PrivateKey = manager.getPrivateKey("$userId-E002"),
+                a005Certificate = manager.getCertificate("$keyStoreAliasPrefix-A005"),
+                x002Certificate = manager.getCertificate("$keyStoreAliasPrefix-X002"),
+                e002Certificate = manager.getCertificate("$keyStoreAliasPrefix-E002"),
+                a005PrivateKey = manager.getPrivateKey("$keyStoreAliasPrefix-A005"),
+                x002PrivateKey = manager.getPrivateKey("$keyStoreAliasPrefix-X002"),
+                e002PrivateKey = manager.getPrivateKey("$keyStoreAliasPrefix-E002"),
             )
         }
     }
@@ -134,13 +132,12 @@ class UserCertificateManager(
      * @throws IOException
      */
     @Throws(GeneralSecurityException::class, IOException::class)
-    fun save(fos: OutputStream, password: String, userId: String) {
-        with(KeyStore.getInstance("PKCS12", BouncyCastleProvider.PROVIDER_NAME)) {
-            load(null, null)
-            setKeyEntry("$userId-A005", a005PrivateKey, password.toCharArray(), arrayOf(a005Certificate))
-            setKeyEntry("$userId-X002", x002PrivateKey, password.toCharArray(), arrayOf(x002Certificate))
-            setKeyEntry("$userId-E002", e002PrivateKey, password.toCharArray(), arrayOf(e002Certificate))
-            store(fos, password.toCharArray())
+    fun save(fos: OutputStream, password: String, keyStoreAliasPrefix: String) {
+        with(KeyStoreManager.create(password)) {
+            setKeyEntry("$keyStoreAliasPrefix-A005", a005PrivateKey, a005Certificate)
+            setKeyEntry("$keyStoreAliasPrefix-X002", x002PrivateKey, x002Certificate)
+            setKeyEntry("$keyStoreAliasPrefix-E002", e002PrivateKey, e002Certificate)
+            save(fos)
         }
     }
 }

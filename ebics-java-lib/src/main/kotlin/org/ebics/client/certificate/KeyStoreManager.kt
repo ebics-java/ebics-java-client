@@ -19,21 +19,14 @@
 package org.ebics.client.certificate
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.bouncycastle.openssl.PEMParser
-import sun.security.krb5.Confounder.bytes
-import java.io.*
-import java.math.BigInteger
+import java.io.FileInputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.security.*
 import java.security.cert.Certificate
-import java.security.cert.CertificateException
-import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
-import java.security.interfaces.RSAPublicKey
-import java.security.spec.RSAPublicKeySpec
-import java.security.spec.X509EncodedKeySpec
 import java.util.*
-import java.util.logging.Level
-import java.util.logging.Logger
 
 
 /**
@@ -45,9 +38,6 @@ import java.util.logging.Logger
  * @author hachani
  */
 class KeyStoreManager private constructor(
-    // --------------------------------------------------------------------
-    // DATA MEMBERS
-    // --------------------------------------------------------------------
     private val keyStore: KeyStore,
     private val password: String
 ) {
@@ -96,7 +86,8 @@ class KeyStoreManager private constructor(
          * @throws IOException
          */
         @Throws(GeneralSecurityException::class, IOException::class)
-        fun load(ins: InputStream, password: String): KeyStoreManager = createKeyStoreManager(password).apply { load(ins) }
+        fun load(ins: InputStream, password: String): KeyStoreManager =
+            createKeyStoreManager(password).apply { load(ins) }
 
         /**
          * Creates a key store
@@ -107,52 +98,6 @@ class KeyStoreManager private constructor(
         private fun createKeyStoreManager(password: String) =
             KeyStoreManager(KeyStore.getInstance("PKCS12", BouncyCastleProvider.PROVIDER_NAME), password)
 
-        /**
-         * Reads a certificate from an input stream for a given provider
-         * @param input the input stream
-         * @return the certificate
-         * @throws CertificateException
-         * @throws IOException
-         */
-        @Throws(CertificateException::class, IOException::class)
-        fun readCertificate(input: InputStream): X509Certificate = readCertificate(input, Security.getProvider(BouncyCastleProvider.PROVIDER_NAME))
-
-
-        /**
-         * Reads a certificate from an input stream for a given provider
-         * @param input the input stream
-         * @param provider the certificate provider
-         * @return the certificate
-         * @throws CertificateException
-         * @throws IOException
-         */
-        @Throws(CertificateException::class, IOException::class)
-        fun readCertificate(input: InputStream, provider: Provider): X509Certificate {
-            val certificate = CertificateFactory.getInstance("X.509", provider).generateCertificate(input)
-            return if (certificate == null) {
-                PEMParser(InputStreamReader(input)).readObject() as X509Certificate
-            } else {
-                certificate as X509Certificate
-            }
-        }
-
-        @JvmStatic
-        fun getPublicKey(publicExponent: BigInteger, modulus: BigInteger): RSAPublicKey {
-            return try {
-                KeyFactory.getInstance("RSA").generatePublic(RSAPublicKeySpec(modulus, publicExponent)) as RSAPublicKey
-            } catch (ex: Exception) {
-                Logger.getLogger(KeyStoreManager::class.java.name).log(Level.SEVERE, "Exception creating bank public key from exponent & modulus", ex)
-                throw ex
-            }
-        }
-
-        /**
-         * Reconstruct the RSAPublicKey from its encoded version (RSAPublicKey.getEncoded())
-         */
-        @JvmStatic
-        fun getPublicKey(pubKeyEncoded: ByteArray): RSAPublicKey {
-            return KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(pubKeyEncoded)) as RSAPublicKey
-        }
     }
 
 
@@ -175,33 +120,8 @@ class KeyStoreManager private constructor(
         keyStore.load(null, null)
     }
 
-    /**
-     * Returns the public key of a given certificate.
-     * @param input the given certificate
-     * @return The RSA public key of the given certificate
-     * @throws GeneralSecurityException
-     * @throws IOException
-     */
-    @Throws(GeneralSecurityException::class, IOException::class)
-    fun getPublicKey(input: InputStream): RSAPublicKey {
-        val cert: X509Certificate = readCertificate(input, keyStore.provider)
-        return cert.publicKey as RSAPublicKey
-    }
-
-    /**
-     * Writes the given certificate into the key store.
-     * @param alias the certificate alias
-     * @param input the given certificate.
-     * @throws GeneralSecurityException
-     * @throws IOException
-     */
-    @Throws(GeneralSecurityException::class, IOException::class)
-    fun setCertificateEntry(alias: String, input: InputStream) {
-        keyStore.setCertificateEntry(alias, readCertificate(input, keyStore.provider))
-    }
-
-    fun setCertificateEntry(alias: String, certificate: X509Certificate) {
-        keyStore.setCertificateEntry(alias, certificate)
+    fun setKeyEntry(alias: String, key: Key, certificate: X509Certificate) {
+        keyStore.setKeyEntry(alias, key, password.toCharArray(), arrayOf(certificate))
     }
 
     /**

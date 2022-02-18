@@ -20,6 +20,7 @@ package org.ebics.client.certificate
 
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.codec.binary.Hex
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.exception.EbicsException
 import java.io.IOException
 import java.io.InputStream
@@ -87,7 +88,7 @@ object KeyUtil {
         val modulus: String = Hex.encodeHexString(removeFirstByte(publicKey.modulus.toByteArray()))
         val hash: String = "$exponent $modulus".removePrefix("0")
         val digest: ByteArray = try {
-            MessageDigest.getInstance("SHA-256", "BC").digest(hash.toByteArray(charset("US-ASCII")))
+            MessageDigest.getInstance("SHA-256", BouncyCastleProvider.PROVIDER_NAME).digest(hash.toByteArray(charset("US-ASCII")))
         } catch (e: GeneralSecurityException) {
             throw EbicsException(e.message)
         } catch (e: UnsupportedEncodingException) {
