@@ -19,9 +19,7 @@
 package org.ebics.client.certificate
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider
-
 import java.io.*
-import java.lang.IllegalArgumentException
 import java.security.GeneralSecurityException
 import java.security.KeyPair
 import java.security.KeyStore
@@ -57,11 +55,10 @@ class UserCertificateManager(
             try {
                 val calendar: Calendar = Calendar.getInstance()
                 calendar.add(Calendar.DAY_OF_YEAR, X509Constants.DEFAULT_DURATION)
-                val generator = X509Generator()
                 val endDate = Date(calendar.timeInMillis)
-                val a005pair = createCertificate(KeyType.A005, generator, userDn, endDate)
-                val x002pair = createCertificate(KeyType.X002, generator, userDn, endDate)
-                val e002pair = createCertificate(KeyType.E002, generator, userDn, endDate)
+                val a005pair = createCertificate(KeyType.A005, userDn, endDate)
+                val x002pair = createCertificate(KeyType.X002, userDn, endDate)
+                val e002pair = createCertificate(KeyType.E002, userDn, endDate)
                 return UserCertificateManager(
                     a005pair.certificate,
                     x002pair.certificate,
@@ -78,15 +75,14 @@ class UserCertificateManager(
         @Throws(GeneralSecurityException::class, IOException::class)
         private fun createCertificate(
             keyType: KeyType,
-            generator: X509Generator,
             userDn: String,
             end: Date
         ): CertKeyPair {
             val keypair: KeyPair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE)
             val cert = when (keyType) {
-                KeyType.A005 -> generator.generateA005Certificate(keypair, userDn, Date(), end)
-                KeyType.X002 -> generator.generateX002Certificate(keypair, userDn, Date(), end)
-                KeyType.E002 -> generator.generateE002Certificate(keypair, userDn, Date(), end)
+                KeyType.A005 -> X509Generator.generateA005Certificate(keypair, userDn, Date(), end)
+                KeyType.X002 -> X509Generator.generateX002Certificate(keypair, userDn, Date(), end)
+                KeyType.E002 -> X509Generator.generateE002Certificate(keypair, userDn, Date(), end)
             }
             return CertKeyPair(cert, keypair.private)
         }

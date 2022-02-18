@@ -35,7 +35,7 @@ interface X509Constants {
         /**
          * Certificate signature algorithm
          */
-        const val SIGNATURE_ALGORITHM = "SHA256WithRSAEncryption"
+        const val SIGNATURE_ALGORITHM = "SHA256WithRSA"
 
         /**
          * Default days validity of a certificate
