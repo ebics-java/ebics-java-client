@@ -34,20 +34,4 @@ class UserCertificateManagerTest {
         Assertions.assertArrayEquals(manager.x002PrivateKey.encoded, managerLoaded.x002PrivateKey.encoded)
         Assertions.assertArrayEquals(manager.e002PrivateKey.encoded, managerLoaded.e002PrivateKey.encoded)
     }
-
-    @Test
-    fun testCreateAndSign() {
-        //Create and save
-        val manager = UserCertificateManager.create("cn=test,o=google,c=de")
-        val test = "teststr"
-
-        //SHA256withRSA
-        val signed = manager.sign(test.toByteArray())
-        //SHA256
-        val sha256 = manager.createSHA256hash(test.toByteArray())
-        //+withRSA
-        val signed2 = manager.signSHA256hash(sha256)
-
-        Assertions.assertArrayEquals(signed, signed2)
-    }
 }
