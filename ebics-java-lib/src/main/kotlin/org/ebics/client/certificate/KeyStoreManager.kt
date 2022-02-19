@@ -26,6 +26,7 @@ import java.io.OutputStream
 import java.security.*
 import java.security.cert.Certificate
 import java.security.cert.X509Certificate
+import java.util.*
 
 
 /**
@@ -130,4 +131,6 @@ class KeyStoreManager private constructor(
     fun save(output: OutputStream) {
         keyStore.store(output, password.toCharArray())
     }
+
+    fun aliases(): Enumeration<String> = keyStore.aliases()
 }
