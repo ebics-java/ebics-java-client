@@ -11,7 +11,6 @@ import java.util.*
 
 class EbicsUserCertificateManager(private val certs: MutableMap<String, EbicsUserCertificates>) :
     Map<String, EbicsUserCertificates> by certs {
-    private enum class KeyType { A005, X002, E002, }
     private class CertKeyPair(val certificate: X509Certificate, val privateKey: PrivateKey)
 
     companion object {
@@ -44,9 +43,9 @@ class EbicsUserCertificateManager(private val certs: MutableMap<String, EbicsUse
             val calendar: Calendar = Calendar.getInstance()
             calendar.add(Calendar.DAY_OF_YEAR, X509Constants.DEFAULT_DURATION)
             val endDate = Date(calendar.timeInMillis)
-            val a005pair = createCertificate(KeyType.A005, userDn, endDate)
-            val x002pair = createCertificate(KeyType.X002, userDn, endDate)
-            val e002pair = createCertificate(KeyType.E002, userDn, endDate)
+            val a005pair = createCertificate(EbicsKeyType.A005, userDn, endDate)
+            val x002pair = createCertificate(EbicsKeyType.X002, userDn, endDate)
+            val e002pair = createCertificate(EbicsKeyType.E002, userDn, endDate)
             return EbicsUserCertificates(
                 a005pair.certificate,
                 x002pair.certificate,
@@ -62,16 +61,12 @@ class EbicsUserCertificateManager(private val certs: MutableMap<String, EbicsUse
 
     @Throws(GeneralSecurityException::class, IOException::class)
     private fun createCertificate(
-        keyType: KeyType,
+        keyType: EbicsKeyType,
         userDn: String,
         end: Date
     ): CertKeyPair {
         val keypair: KeyPair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE)
-        val cert = when (keyType) {
-            KeyType.A005 -> X509Generator.generateA005Certificate(keypair, userDn, Date(), end)
-            KeyType.X002 -> X509Generator.generateX002Certificate(keypair, userDn, Date(), end)
-            KeyType.E002 -> X509Generator.generateE002Certificate(keypair, userDn, Date(), end)
-        }
+        val cert = X509Generator.generateCertificate(keypair, userDn, Date(), end, keyType)
         return CertKeyPair(cert, keypair.private)
     }
 

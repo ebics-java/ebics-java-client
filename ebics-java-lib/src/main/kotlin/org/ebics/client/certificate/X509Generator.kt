@@ -64,12 +64,12 @@ object X509Generator {
         notBefore: Date,
         notAfter: Date
     ): X509Certificate {
-        return generate(
+        return generateCertificate(
             keypair,
             issuer,
             notBefore,
             notAfter,
-            X509Constants.SIGNATURE_KEY_USAGE
+            EbicsKeyType.A005
         )
     }
 
@@ -90,12 +90,12 @@ object X509Generator {
         notBefore: Date,
         notAfter: Date
     ): X509Certificate {
-        return generate(
+        return generateCertificate(
             keypair,
             issuer,
             notBefore,
             notAfter,
-            X509Constants.AUTHENTICATION_KEY_USAGE
+            EbicsKeyType.X002
         )
     }
 
@@ -116,12 +116,12 @@ object X509Generator {
         notBefore: Date,
         notAfter: Date
     ): X509Certificate {
-        return generate(
+        return generateCertificate(
             keypair,
             issuer,
             notBefore,
             notAfter,
-            X509Constants.ENCRYPTION_KEY_USAGE
+            EbicsKeyType.E002
         )
     }
 
@@ -132,18 +132,18 @@ object X509Generator {
      * @param issuer the certificate issuer
      * @param notBefore the begin validity date
      * @param notAfter the end validity date
-     * @param keyUsage the certificate key usage
+     * @param keyType the EBICS certificate type usage
      * @return the X509 certificate
      * @throws GeneralSecurityException
      * @throws IOException
      */
     @Throws(GeneralSecurityException::class, IOException::class)
-    fun generate(
+    fun generateCertificate(
         keypair: KeyPair,
         issuer: String,
         notBefore: Date,
         notAfter: Date,
-        keyUsage: Int
+        keyType: EbicsKeyType
     ): X509Certificate {
 
         val serial: BigInteger = BigInteger.valueOf(generateSerial())
@@ -177,26 +177,21 @@ object X509Generator {
             false,
             ExtendedKeyUsage.getInstance(DERSequence(vector))
         )
-        when (keyUsage) {
-            X509Constants.SIGNATURE_KEY_USAGE -> builder.addExtension(
+        when (keyType) {
+            EbicsKeyType.A005 -> builder.addExtension(
                 Extension.keyUsage, false, KeyUsage(
                     KeyUsage.nonRepudiation
                 )
             )
-            X509Constants.AUTHENTICATION_KEY_USAGE -> builder.addExtension(
+            EbicsKeyType.X002 -> builder.addExtension(
                 Extension.keyUsage, false, KeyUsage(
                     KeyUsage.digitalSignature
                 )
             )
-            X509Constants.ENCRYPTION_KEY_USAGE -> builder.addExtension(
+            EbicsKeyType.E002 -> builder.addExtension(
                 Extension.keyUsage, false, KeyUsage(
                     KeyUsage.keyAgreement
                 )
-            )
-            else -> builder.addExtension(
-                Extension.keyUsage,
-                false,
-                KeyUsage(KeyUsage.keyEncipherment or KeyUsage.digitalSignature)
             )
         }
         val signer: ContentSigner =

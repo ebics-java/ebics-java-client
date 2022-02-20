@@ -26,13 +26,6 @@ package org.ebics.client.certificate
 interface X509Constants {
     companion object {
         /**
-         * Certificates key usage
-         */
-        const val SIGNATURE_KEY_USAGE = 1
-        const val AUTHENTICATION_KEY_USAGE = 2
-        const val ENCRYPTION_KEY_USAGE = 3
-
-        /**
          * Certificate signature algorithm
          */
         const val SIGNATURE_ALGORITHM = "SHA256WithRSA"
