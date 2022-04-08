@@ -21,8 +21,6 @@ package org.kopi.ebics.xml;
 
 import java.util.Calendar;
 
-import javax.crypto.spec.SecretKeySpec;
-
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.schema.h003.DataEncryptionInfoType.EncryptionPubKeyDigest;
 import org.kopi.ebics.schema.h003.DataTransferRequestType;
@@ -60,7 +58,6 @@ public class SPRRequestElement extends InitializationRequestElement {
    */
   public SPRRequestElement(EbicsSession session) throws EbicsException {
     super(session, org.kopi.ebics.session.OrderType.SPR, "SPRRequest.xml");
-    keySpec = new SecretKeySpec(nonce, "EAS");
   }
 
   @Override
@@ -136,6 +133,5 @@ public class SPRRequestElement extends InitializationRequestElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private SecretKeySpec			keySpec;
   private static final long 		serialVersionUID = -6742241777786111337L;
 }

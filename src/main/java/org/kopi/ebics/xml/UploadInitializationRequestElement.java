@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.crypto.spec.SecretKeySpec;
-
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.ContentFactory;
 import org.kopi.ebics.interfaces.EbicsOrderType;
@@ -78,7 +76,6 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
   {
     super(session, orderType, generateName(orderType));
     this.userData = userData;
-    keySpec = new SecretKeySpec(nonce, "EAS");
     splitter = new Splitter(userData);
     this.orderAttribute = orderAttribute;
   }
@@ -130,13 +127,13 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
         FULOrderParamsType fULOrderParams = EbicsXmlFactory.createFULOrderParamsType(fileFormat);
 
         List<Parameter> parameters = new ArrayList<>();
-        if (Boolean.valueOf(session.getSessionParam("TEST")).booleanValue()) {
+        if (Boolean.parseBoolean(session.getSessionParam("TEST"))) {
           Value value = EbicsXmlFactory.createValue("String", "TRUE");
           Parameter parameter = EbicsXmlFactory.createParameter("TEST", value);
           parameters.add(parameter);
         }
 
-        if (Boolean.valueOf(session.getSessionParam("EBCDIC")).booleanValue()) {
+        if (Boolean.parseBoolean(session.getSessionParam("EBCDIC"))) {
           Value value = EbicsXmlFactory.createValue("String", "TRUE");
           Parameter parameter = EbicsXmlFactory.createParameter("EBCDIC", value);
           parameters.add(parameter);
@@ -221,9 +218,8 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
   // --------------------------------------------------------------------
 
   private final OrderAttributeType.Enum orderAttribute;
-  private byte[]			userData;
+  private final byte[] userData;
   private UserSignature			userSignature;
-  private SecretKeySpec			keySpec;
-  private Splitter			splitter;
+  private final Splitter splitter;
   private static final long 		serialVersionUID = -8083183483311283608L;
 }

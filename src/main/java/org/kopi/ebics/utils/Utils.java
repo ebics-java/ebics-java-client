@@ -60,6 +60,8 @@ public final class Utils {
     org.apache.xml.security.Init.init();
   }
 
+  public static final SecureRandom secureRandom = new SecureRandom();
+
   private Utils() {
   }
 
@@ -119,23 +121,19 @@ public final class Utils {
    * be at least 100 bits.
    * 
    * @return a random nonce.
-   * @throws EbicsException nonce generation fails.
    */
-  public static byte[] generateNonce() throws EbicsException {
-    SecureRandom 		secureRandom;
+  public static byte[] generateNonce() {
+    return secureRandom.generateSeed(16);
+  }
 
-    try {
-      secureRandom = SecureRandom.getInstance("SHA1PRNG");
-      return secureRandom.generateSeed(16);
-    } catch (NoSuchAlgorithmException e) {
-      throw new EbicsException(e.getMessage());
-    }
+  public static byte[] generateKey() {
+    return secureRandom.generateSeed(16);
   }
 
   /**
    * Uncompresses a given byte array input.
    * 
-   * <p>The Decompression is ensured via Universal compression 
+   * The Decompression is ensured via Universal compression
    * algorithm (RFC 1950, RFC 1951) As specified in the EBICS 
    * specification (16 Appendix: Standards and references)
    * 

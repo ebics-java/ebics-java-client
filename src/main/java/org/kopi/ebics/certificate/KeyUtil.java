@@ -31,6 +31,7 @@ import java.security.interfaces.RSAPublicKey;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.kopi.ebics.exception.EbicsException;
+import org.kopi.ebics.utils.Utils;
 
 /**
  * Some key utilities
@@ -50,15 +51,13 @@ public class KeyUtil {
    * @return KeyPair the key pair
    * @throws NoSuchAlgorithmException
    */
-  public static KeyPair makeKeyPair(int keyLen) throws NoSuchAlgorithmException{
+  public static KeyPair makeKeyPair(int keyLen) throws NoSuchAlgorithmException {
     KeyPairGenerator 		keyGen;
 
     keyGen = KeyPairGenerator.getInstance("RSA");
-    keyGen.initialize(keyLen, new SecureRandom());
+    keyGen.initialize(keyLen, Utils.secureRandom);
 
-    KeyPair keypair = keyGen.generateKeyPair();
-
-    return keypair;
+    return keyGen.generateKeyPair();
 
   }
 
@@ -68,16 +67,8 @@ public class KeyUtil {
    * @return the password
    */
   public static String generatePassword() {
-    SecureRandom 		random;
-
-    try {
-      random = SecureRandom.getInstance("SHA1PRNG");
-      String pwd = Base64.encodeBase64String(random.generateSeed(5));
-
+      String pwd = Base64.encodeBase64String(Utils.secureRandom.generateSeed(5));
       return pwd.substring(0, pwd.length() - 2);
-    } catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   /**
