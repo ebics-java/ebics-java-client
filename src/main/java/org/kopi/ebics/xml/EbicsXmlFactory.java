@@ -864,7 +864,6 @@ public class EbicsXmlFactory {
    * Creates a new <code>StaticHeaderType</code> XML object
    * @param hostId the host ID
    * @param nonce the random nonce
-   * @param numSegments the segments number
    * @param partnerId the partner ID
    * @param product the <code>Product</code> element
    * @param securityMedium the security medium
@@ -989,7 +988,6 @@ public class EbicsXmlFactory {
 
   /**
    * Creates a new <code>StandardOrderParamsType</code> XML object
-   * @param fileFormat the <code>FileFormatType</code> element
    * @return the <code>StandardOrderParamsType</code> XML object
    */
   public static StandardOrderParamsType createStandardOrderParamsType() {

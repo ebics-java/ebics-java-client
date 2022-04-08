@@ -122,10 +122,17 @@ public final class Utils {
    * @throws EbicsException nonce generation fails.
    */
   public static byte[] generateNonce() throws EbicsException {
-    SecureRandom 		secureRandom;
-
     try {
-      secureRandom = SecureRandom.getInstance("SHA1PRNG");
+      SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
+      return secureRandom.generateSeed(16);
+    } catch (NoSuchAlgorithmException e) {
+      throw new EbicsException(e.getMessage());
+    }
+  }
+
+  public static byte[] generateKey() throws EbicsException {
+    try {
+      SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
       return secureRandom.generateSeed(16);
     } catch (NoSuchAlgorithmException e) {
       throw new EbicsException(e.getMessage());
@@ -135,7 +142,7 @@ public final class Utils {
   /**
    * Uncompresses a given byte array input.
    * 
-   * <p>The Decompression is ensured via Universal compression 
+   * The Decompression is ensured via Universal compression
    * algorithm (RFC 1950, RFC 1951) As specified in the EBICS 
    * specification (16 Appendix: Standards and references)
    * 

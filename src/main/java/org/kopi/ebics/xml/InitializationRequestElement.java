@@ -24,6 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
@@ -61,6 +62,8 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
     this.type = type;
     this.name = name;
     nonce = Utils.generateNonce();
+    key = Utils.generateKey();
+    keySpec = new SecretKeySpec(key, "EAS");
   }
 
   @Override
@@ -96,9 +99,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
 
     try {
       return MessageDigest.getInstance("SHA-256", "BC").digest(Utils.canonize(toByteArray()));
-    } catch (NoSuchAlgorithmException e) {
-      throw new EbicsException(e.getMessage());
-    } catch (NoSuchProviderException e) {
+    } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
       throw new EbicsException(e.getMessage());
     }
   }
@@ -135,12 +136,10 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
    */
   protected byte[] generateTransactionKey() throws EbicsException {
     try {
-      Cipher			cipher;
-
-      cipher = Cipher.getInstance("RSA/NONE/PKCS1Padding", BouncyCastleProvider.PROVIDER_NAME);
+      Cipher cipher = Cipher.getInstance("RSA/NONE/PKCS1Padding", BouncyCastleProvider.PROVIDER_NAME);
       cipher.init(Cipher.ENCRYPT_MODE, session.getBankE002Key());
 
-      return cipher.doFinal(nonce);
+      return cipher.doFinal(key);
     } catch (Exception e) {
       throw new EbicsException(e.getMessage());
     }
@@ -157,8 +156,10 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private String			name;
+  private final String name;
   protected EbicsOrderType type;
-  protected byte[]			nonce;
-  private static final long 		serialVersionUID = 8983807819242699280L;
+  protected final byte[] nonce;
+  private final byte[] key;
+  protected final SecretKeySpec keySpec;
+  private static final long serialVersionUID = 8983807819242699280L;
 }
