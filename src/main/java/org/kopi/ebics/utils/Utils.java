@@ -60,6 +60,8 @@ public final class Utils {
     org.apache.xml.security.Init.init();
   }
 
+  public static final SecureRandom secureRandom = new SecureRandom();
+
   private Utils() {
   }
 
@@ -119,24 +121,13 @@ public final class Utils {
    * be at least 100 bits.
    * 
    * @return a random nonce.
-   * @throws EbicsException nonce generation fails.
    */
-  public static byte[] generateNonce() throws EbicsException {
-    try {
-      SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
-      return secureRandom.generateSeed(16);
-    } catch (NoSuchAlgorithmException e) {
-      throw new EbicsException(e.getMessage());
-    }
+  public static byte[] generateNonce() {
+    return secureRandom.generateSeed(16);
   }
 
-  public static byte[] generateKey() throws EbicsException {
-    try {
-      SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
-      return secureRandom.generateSeed(16);
-    } catch (NoSuchAlgorithmException e) {
-      throw new EbicsException(e.getMessage());
-    }
+  public static byte[] generateKey() {
+    return secureRandom.generateSeed(16);
   }
 
   /**

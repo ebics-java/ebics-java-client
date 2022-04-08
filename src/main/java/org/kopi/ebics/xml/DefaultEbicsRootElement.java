@@ -26,7 +26,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,6 +46,7 @@ import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.interfaces.EbicsRootElement;
 import org.kopi.ebics.session.EbicsSession;
+import org.kopi.ebics.utils.Utils;
 
 public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 
@@ -134,7 +134,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
    * @return the generated file name.
    */
   public static String generateName(EbicsOrderType type) {
-    return type.getCode() + new BigInteger(130, new SecureRandom()).toString(32);
+    return type.getCode() + new BigInteger(130, Utils.secureRandom).toString(32);
   }
   
   /**
@@ -143,7 +143,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
    * @return the generated file name.
    */
   public static String generateName(String prefix) {
-    return prefix + new BigInteger(130, new SecureRandom()).toString(32);
+    return prefix + new BigInteger(130, Utils.secureRandom).toString(32);
   }
 
   @Override

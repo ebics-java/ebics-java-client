@@ -26,12 +26,13 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.SecureRandom;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
+
+import org.kopi.ebics.utils.Utils;
 
 /**
  * A simple SSL socket factory for EBICS client.
@@ -81,7 +82,7 @@ public class EbicsSocketFactory extends SSLSocketFactory {
    * Returns the <code>SSLContext</code> from key store information.
    * @param keystore the key store
    * @param keystoreType the key store type
-   * @param keystrorePass the key store password
+   * @param keystorePass the key store password
    * @param truststore the trust store
    * @param truststoreType the trust store type
    * @param truststorePass the trust store password
@@ -91,7 +92,7 @@ public class EbicsSocketFactory extends SSLSocketFactory {
    */
   public SSLContext getSSLContext(byte[] keystore,
                                   String keystoreType,
-                                  char[] keystrorePass,
+                                  char[] keystorePass,
                                   byte[] truststore,
                                   String truststoreType,
                                   char[] truststorePass)
@@ -103,15 +104,15 @@ public class EbicsSocketFactory extends SSLSocketFactory {
     TrustManagerFactory 	tmf;
     SSLContext			context;
 
-    kstore = initKeyStore(keystore, keystrorePass, keystoreType);
+    kstore = initKeyStore(keystore, keystorePass, keystoreType);
     kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-    kmf.init(kstore, keystrorePass);
+    kmf.init(kstore, keystorePass);
 
     tstore = initKeyStore(truststore, truststorePass, truststoreType);
     tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
     tmf.init(tstore);
     context = SSLContext.getInstance("TLS");
-    context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
+    context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), Utils.secureRandom);
 
     return context;
   }

@@ -26,7 +26,6 @@ import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -49,6 +48,7 @@ import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
+import org.kopi.ebics.utils.Utils;
 
 /**
  * An X509 certificate generator for EBICS protocol.
@@ -194,7 +194,7 @@ public class X509Generator {
       break;
     }
 
-    certificate = generator.generate(keypair.getPrivate(), "BC", new SecureRandom());
+    certificate = generator.generate(keypair.getPrivate(), "BC", Utils.secureRandom);
     certificate.checkValidity(new Date());
     certificate.verify(keypair.getPublic());
 
