@@ -123,11 +123,17 @@ public final class Utils {
    * @return a random nonce.
    */
   public static byte[] generateNonce() {
-    return secureRandom.generateSeed(16);
+    return nextRandomBytes(16);
   }
 
   public static byte[] generateKey() {
-    return secureRandom.generateSeed(16);
+    return nextRandomBytes(16);
+  }
+
+  private static byte[] nextRandomBytes(int n) {
+    byte[] data = new byte[n];
+    secureRandom.nextBytes(data);
+    return data;
   }
 
   /**

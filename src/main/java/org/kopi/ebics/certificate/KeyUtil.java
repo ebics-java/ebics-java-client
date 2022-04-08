@@ -62,16 +62,6 @@ public class KeyUtil {
   }
 
   /**
-   * Generates a random password
-   *
-   * @return the password
-   */
-  public static String generatePassword() {
-      String pwd = Base64.encodeBase64String(Utils.secureRandom.generateSeed(5));
-      return pwd.substring(0, pwd.length() - 2);
-  }
-
-  /**
    * Returns the digest value of a given public key.
    *
    *
