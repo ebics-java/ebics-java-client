@@ -11,7 +11,6 @@ import java.util.*
 
 class EbicsUserCertificateManager(private val certs: MutableMap<String, EbicsUserCertificates>) :
     Map<String, EbicsUserCertificates> by certs {
-    private class CertKeyPair(val certificate: X509Certificate, val privateKey: PrivateKey)
 
     companion object {
         fun createEmpty(): EbicsUserCertificateManager =
@@ -37,42 +36,9 @@ class EbicsUserCertificateManager(private val certs: MutableMap<String, EbicsUse
         }
     }
 
-    @Throws(GeneralSecurityException::class, IOException::class)
-    private fun create(userDn: String): EbicsUserCertificates {
-        try {
-            val calendar: Calendar = Calendar.getInstance()
-            calendar.add(Calendar.DAY_OF_YEAR, X509Constants.DEFAULT_DURATION)
-            val endDate = Date(calendar.timeInMillis)
-            val a005pair = createCertificate(EbicsKeyType.A005, userDn, endDate)
-            val x002pair = createCertificate(EbicsKeyType.X002, userDn, endDate)
-            val e002pair = createCertificate(EbicsKeyType.E002, userDn, endDate)
-            return EbicsUserCertificates(
-                a005pair.certificate,
-                x002pair.certificate,
-                e002pair.certificate,
-                a005pair.privateKey,
-                x002pair.privateKey,
-                e002pair.privateKey,
-            )
-        } catch (ex: Exception) {
-            throw IllegalArgumentException("Cant create certificate for dn='$userDn' error: ${ex.message}", ex)
-        }
-    }
-
-    @Throws(GeneralSecurityException::class, IOException::class)
-    private fun createCertificate(
-        keyType: EbicsKeyType,
-        userDn: String,
-        end: Date
-    ): CertKeyPair {
-        val keypair: KeyPair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE)
-        val cert = X509Generator.generateCertificate(keypair, userDn, Date(), end, keyType)
-        return CertKeyPair(cert, keypair.private)
-    }
-
     fun add(userDn: String, aliasPrefix: String = userDn) {
         require(!certs.containsKey(aliasPrefix)) { "The alias $aliasPrefix exists already" }
-        certs[aliasPrefix] = create(userDn)
+        certs[aliasPrefix] = EbicsUserCertificates.create(userDn)
     }
 
     fun remove(aliasPrefix: String) {

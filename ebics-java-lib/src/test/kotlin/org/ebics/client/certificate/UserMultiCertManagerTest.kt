@@ -13,6 +13,21 @@ class UserMultiCertManagerTest {
     }
 
     @Test
+    fun testCreateCertMan_mustBeEmpty() {
+        val userCertMan = EbicsUserCertificateManager.createEmpty()
+        Assertions.assertTrue(userCertMan.isEmpty())
+    }
+
+    @Test
+    fun testAddTwoCertWithSameDn_mustCauseException() {
+        val userCertMan = EbicsUserCertificateManager.createEmpty()
+        userCertMan.add("cn=test1")
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            userCertMan.add("cn=test1")
+        }
+    }
+
+    @Test
     fun testGenerateSaveAndLoadUserCert() {
         val userCertMan = EbicsUserCertificateManager.createEmpty()
         userCertMan.add("cn=test1")
