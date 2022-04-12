@@ -29,7 +29,26 @@ class EbicsUserCertificates(
         } else false
     }
 
+    fun save(manager: KeyStoreManager, aliasPrefix: String) {
+        with(manager) {
+            setKeyEntry("$aliasPrefix-A005", a005PrivateKey, a005Certificate)
+            setKeyEntry("$aliasPrefix-X002", x002PrivateKey, x002Certificate)
+            setKeyEntry("$aliasPrefix-E002", e002PrivateKey, e002Certificate)
+        }
+    }
+
     companion object {
+        fun load(manager: KeyStoreManager, aliasPrefix: String): EbicsUserCertificates {
+            return EbicsUserCertificates(
+                manager.getCertificate("$aliasPrefix-A005"),
+                manager.getCertificate("$aliasPrefix-X002"),
+                manager.getCertificate("$aliasPrefix-E002"),
+                manager.getPrivateKey("$aliasPrefix-A005"),
+                manager.getPrivateKey("$aliasPrefix-X002"),
+                manager.getPrivateKey("$aliasPrefix-E002")
+            )
+        }
+
         @Throws(GeneralSecurityException::class, IOException::class)
         fun create(userDn: String): EbicsUserCertificates {
             try {
