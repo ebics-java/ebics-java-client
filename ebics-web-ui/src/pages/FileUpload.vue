@@ -169,15 +169,6 @@
             label="Request EDS"
           />
 
-          <q-btn-dropdown
-            v-if="!fileEditor && userSettings.uploadOnDrop"
-            :split="fileEditor"
-            color="primary"
-            label="Smart Adjustment Settings"
-          >
-            <user-preferences section-filter="ContentOptions" />
-          </q-btn-dropdown>
-
           <q-file
             v-if="fileEditor"
             style="max-width: 300px"
@@ -201,10 +192,7 @@
             outlined
             multiple
             use-chips
-            :label="
-              'Drop file(s) here' +
-              (userSettings.uploadOnDrop ? ' to upload' : '')
-            "
+            label='Drop file(s) here to upload'
             hint="Max file size (1GB)"
             max-file-size="1200000000"
             @rejected="onRejectedMessage(true)"
@@ -249,7 +237,6 @@
 
           <div class="q-pa-md q-gutter-sm">
             <q-btn-dropdown
-              v-if="fileEditor || !userSettings.uploadOnDrop"
               :split="fileEditor"
               color="primary"
               label="Smart Adjust"
@@ -261,7 +248,6 @@
                 "
               />
             </q-btn-dropdown>
-
             <q-btn
               v-if="fileEditor || !userSettings.uploadOnDrop"
               label="Upload"
@@ -511,11 +497,13 @@ export default defineComponent({
     };
 
     const applySmartAdjustmentsForSingleFile = async () => {
-      fileText.value = await applySmartAdjustments(
-        fileText.value,
-        fileFormat.value,
-        userSettings.value
-      );
+      if (props.fileEditor) {
+        fileText.value = await applySmartAdjustments(
+          fileText.value,
+          fileFormat.value,
+          userSettings.value
+        );
+      }
     };
 
     const onUpdateInputFiles = async (inputFiles: File[]) => {

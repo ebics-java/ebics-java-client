@@ -70,6 +70,14 @@ interface UserSettingsAccessRightsController : WriteAccessRightsController, Read
                     )
                     true
                 }
+                authCtx.hasRole(BusinessRole.ROLE_GUEST) -> {
+                    logger.debug(
+                        "Read permission for '{}' granted through guest access for '{}'",
+                        getObjectName(),
+                        authCtx.name
+                    )
+                    true
+                }
                 else -> {
                     logger.debug(
                         "Read permission for '{}' denied, no role available '{}' for '{}'",
