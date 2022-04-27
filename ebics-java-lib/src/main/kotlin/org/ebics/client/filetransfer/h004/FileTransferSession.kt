@@ -118,7 +118,7 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
 
     /**
      * Sends a segment to the ebics bank server.
-     * @param factory the content factory that contain the segment data.
+     * @param contentFactory the content factory that contain the segment data.
      * @param segmentNumber the segment number
      * @param lastSegment is it the last segment?
      * @param transactionId the transaction Id
@@ -128,16 +128,16 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
      */
     @Throws(IOException::class, EbicsException::class)
     protected fun sendFileSegment(
-        factory: ContentFactory,
+        contentFactory: ContentFactory,
         segmentNumber: Int,
         lastSegment: Boolean,
         transactionId: ByteArray,
         orderType: String,
         traceSession: ITraceSession
     ) {
-        val segmentStr = if (lastSegment) "last segment" else "segment $segmentNumber"
+        val segmentStr = if (lastSegment) "last segment ($segmentNumber)" else "segment ($segmentNumber)"
         logger.info(
-            "Uploading $segmentStr of file via EBICS sessionId=${session.sessionId}, userId=${session.user.userId}, partnerId=${session.user.partner.partnerId}, bankURL=${session.user.partner.bank.bankURL}"
+            "Uploading $segmentStr of file via EBICS sessionId=${session.sessionId}, userId=${session.user.userId}, partnerId=${session.user.partner.partnerId}, bankURL=${session.user.partner.bank.bankURL}, segmentLength=${contentFactory.content.available()} Bytes"
         )
         val uploader = UploadTransferRequestElement(
             session,
@@ -145,7 +145,7 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
             segmentNumber,
             lastSegment,
             transactionId,
-            factory
+            contentFactory
         )
         val sender = HttpTransferSession(session)
         uploader.build()

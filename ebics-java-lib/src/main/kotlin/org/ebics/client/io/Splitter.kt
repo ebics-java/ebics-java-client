@@ -78,6 +78,11 @@ class Splitter(
     val segmentNumber: Int
 
     /**
+     * Maximum size of the segment (1MB)
+     */
+    val maxSegmentSize: Int = 1024 * 1024
+
+    /**
      * Slits the input into 1MB portions.
      *
      *
@@ -93,8 +98,8 @@ class Splitter(
         try {
             val compressedInput = if (isCompressionEnabled) Utils.zip(input) else input
             content = Utils.encrypt(compressedInput, keySpec)
-            val lastSegmentNotFull = content.size % 1048576 != 0
-            segmentNumber = content.size / 1048576 + if (lastSegmentNotFull) 1 else 0
+            val lastSegmentNotFull = content.size % maxSegmentSize != 0
+            segmentNumber = content.size / maxSegmentSize + if (lastSegmentNotFull) 1 else 0
             segmentSize = content.size / segmentNumber
         } catch (e: Exception) {
             throw EbicsException(e.message)
@@ -119,6 +124,4 @@ class Splitter(
         System.arraycopy(content, offset, segment, 0, segment.size)
         return ByteArrayContentFactory(segment)
     }
-
-
 }
