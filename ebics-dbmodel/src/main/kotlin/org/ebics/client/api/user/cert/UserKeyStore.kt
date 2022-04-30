@@ -1,7 +1,7 @@
 package org.ebics.client.api.user.cert
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import org.ebics.client.api.user.User
+import org.ebics.client.api.user.BankConnectionEntity
 import org.ebics.client.certificate.UserCertificateManager
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -24,7 +24,7 @@ data class UserKeyStore(
 
     @JsonIgnore
     @OneToOne(mappedBy = "keyStore")
-    val user: User
+    val user: BankConnectionEntity
 ) {
     fun toUserCertMgr(password: String):UserCertificateManager {
         val ins = ByteArrayInputStream(keyStoreBytes)
@@ -32,7 +32,7 @@ data class UserKeyStore(
     }
 
     companion object {
-        fun fromUserCertMgr(user:User, userCertMgr:UserCertificateManager, password: String):UserKeyStore {
+        fun fromUserCertMgr(user:BankConnectionEntity, userCertMgr:UserCertificateManager, password: String):UserKeyStore {
             val bos = ByteArrayOutputStream(4096)
             userCertMgr.save(bos, password, user.userId)
             return UserKeyStore(null, bos.toByteArray(), user)

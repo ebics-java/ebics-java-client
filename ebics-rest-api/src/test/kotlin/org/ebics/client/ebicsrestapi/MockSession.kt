@@ -1,7 +1,7 @@
 package org.ebics.client.ebicsrestapi
 
 import org.ebics.client.api.EbicsConfiguration
-import org.ebics.client.api.user.User
+import org.ebics.client.api.user.BankConnectionEntity
 import org.ebics.client.model.EbicsProduct
 import org.ebics.client.model.EbicsSession
 
@@ -12,7 +12,7 @@ class MockSession {
             return getSession(user, prod, configuration, bankCerts)
         }
 
-        fun getSession(user: User, prod: EbicsProduct, configuration: EbicsConfiguration, bankCerts: Boolean = true): EbicsSession {
+        fun getSession(user: BankConnectionEntity, prod: EbicsProduct, configuration: EbicsConfiguration, bankCerts: Boolean = true): EbicsSession {
             return EbicsSession(
                 user,
                 configuration,

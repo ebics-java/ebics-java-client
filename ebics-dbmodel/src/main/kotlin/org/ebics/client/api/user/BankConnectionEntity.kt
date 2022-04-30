@@ -11,7 +11,7 @@ import org.ebics.client.model.user.EbicsUserStatusEnum
 import javax.persistence.*
 
 @Entity(name = "EbicsUser")
-data class User (
+data class BankConnectionEntity (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id:Long? = null,

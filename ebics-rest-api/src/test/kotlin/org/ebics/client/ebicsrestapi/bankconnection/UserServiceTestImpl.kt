@@ -1,8 +1,8 @@
 package org.ebics.client.ebicsrestapi.bankconnection
 
 import org.ebics.client.api.user.BankConnection
-import org.ebics.client.api.user.User
-import org.ebics.client.api.user.UserService
+import org.ebics.client.api.user.BankConnectionEntity
+import org.ebics.client.api.user.BankConnectionService
 import org.ebics.client.api.user.permission.BankConnectionAccessType
 import org.ebics.client.ebicsrestapi.MockUser
 import org.springframework.context.annotation.Primary
@@ -10,22 +10,22 @@ import org.springframework.stereotype.Service
 
 @Primary
 @Service
-class UserServiceTestImpl : UserService {
+class UserServiceTestImpl : BankConnectionService {
 
     private val mockUsers = mapOf(
         1L to MockUser.createMockUser(1, true),
         2L to MockUser.createMockUser(2, false)
     )
 
-    override fun findUsers(permission: BankConnectionAccessType): List<User> {
+    override fun findUsers(permission: BankConnectionAccessType): List<BankConnectionEntity> {
         TODO("Not yet implemented")
     }
 
-    override fun getUserById(userId: Long, permission: BankConnectionAccessType): User {
+    override fun getUserById(userId: Long, permission: BankConnectionAccessType): BankConnectionEntity {
         return mockUsers[userId]!!
     }
 
-    override fun saveUser(bankConnection: User): Long {
+    override fun saveUser(bankConnection: BankConnectionEntity): Long {
         TODO("Not yet implemented")
     }
 

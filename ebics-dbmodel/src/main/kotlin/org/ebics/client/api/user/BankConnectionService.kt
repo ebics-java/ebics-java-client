@@ -2,10 +2,10 @@ package org.ebics.client.api.user
 
 import org.ebics.client.api.user.permission.BankConnectionAccessType
 
-interface UserService {
-    fun findUsers(permission: BankConnectionAccessType): List<User>
-    fun getUserById(userId: Long, permission: BankConnectionAccessType = BankConnectionAccessType.READ): User
-    fun saveUser(bankConnection: User): Long
+interface BankConnectionService {
+    fun findUsers(permission: BankConnectionAccessType): List<BankConnectionEntity>
+    fun getUserById(userId: Long, permission: BankConnectionAccessType = BankConnectionAccessType.READ): BankConnectionEntity
+    fun saveUser(bankConnection: BankConnectionEntity): Long
     fun createUserAndPartner(bankConnection: BankConnection): Long
     fun updateUserAndPartner(id: Long, bankConnection: BankConnection): Long
     fun deleteUser(userId: Long)

@@ -6,8 +6,8 @@ import org.ebics.client.api.bank.Bank
 import org.ebics.client.api.bank.BankRepository
 import org.ebics.client.api.partner.Partner
 import org.ebics.client.api.partner.PartnerRepository
-import org.ebics.client.api.user.User
-import org.ebics.client.api.user.UserRepository
+import org.ebics.client.api.user.BankConnectionEntity
+import org.ebics.client.api.user.BankConnectionRepository
 import org.ebics.client.model.EbicsVersion
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -23,7 +23,7 @@ import java.net.URL
 class UserKeyStoreRepositoryTest (
     @Autowired private val bankRepo: BankRepository,
     @Autowired private val partnerRepo: PartnerRepository,
-    @Autowired private val userRepo: UserRepository,
+    @Autowired private val userRepo: BankConnectionRepository,
     @Autowired private val keyStoreRepo: UserKeyStoreRepository)
 {
     @Test
@@ -32,7 +32,7 @@ class UserKeyStoreRepositoryTest (
         bankRepo.save(bank)
         val partner = Partner(null, bank, "CH100001", 0)
         partnerRepo.save(partner)
-        val user = User(null, EbicsVersion.H005, "CHT10001", "Jan", "org=jto", keyStore = null, partner = partner, usePassword = false, useCertificate = true, creator = "Jan", guestAccess = true)
+        val user = BankConnectionEntity(null, EbicsVersion.H005, "CHT10001", "Jan", "org=jto", keyStore = null, partner = partner, usePassword = false, useCertificate = true, creator = "Jan", guestAccess = true)
         userRepo.saveAndFlush(user)
         val userId:Long = requireNotNull(user.id) {"User id must be not null"}
         val userKeyStore = UserKeyStore(null, "abc".toByteArray(), user)

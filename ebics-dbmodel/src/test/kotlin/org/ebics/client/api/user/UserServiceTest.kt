@@ -18,7 +18,7 @@ import java.net.URL
 @DataJpaTest
 @ContextConfiguration(classes = [DbTestContext::class])
 class UserServiceTest(
-    @Autowired private val userService: UserServiceImpl,
+    @Autowired private val userService: BankConnectionServiceImpl,
     @Autowired private val bankService: BankService,
 ) {
     @Test

@@ -3,7 +3,7 @@ package org.ebics.client.ebicsrestapi.utils
 import org.ebics.client.api.trace.IFileService
 import org.ebics.client.api.trace.TraceEntry
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
-import org.ebics.client.api.user.User
+import org.ebics.client.api.user.BankConnectionEntity
 import org.ebics.client.model.EbicsVersion
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
@@ -14,7 +14,7 @@ class FileServiceMockImpl : IFileService {
 
     override fun getLastDownloadedFile(
         orderType: OrderTypeDefinition,
-        user: User,
+        user: BankConnectionEntity,
         ebicsVersion: EbicsVersion,
         useSharedPartnerData: Boolean
     ): TraceEntry {
@@ -26,7 +26,7 @@ class FileServiceMockImpl : IFileService {
     }
 
     override fun addTextFile(
-        user: User,
+        user: BankConnectionEntity,
         orderType: OrderTypeDefinition,
         fileContent: String,
         sessionId: String,

@@ -2,7 +2,7 @@ package org.ebics.client.api.trace
 
 import org.ebics.client.api.bank.Bank
 import org.ebics.client.api.partner.Partner
-import org.ebics.client.api.user.User
+import org.ebics.client.api.user.BankConnectionEntity
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.model.user.EbicsUserStatusEnum
 import org.junit.jupiter.api.Assertions
@@ -14,10 +14,10 @@ import java.net.URL
 
 @ExtendWith(SpringExtension::class)
 class TraceEntryAccessTest {
-    private fun getMockUser(creator: String): User {
+    private fun getMockUser(creator: String): BankConnectionEntity {
         val bank = Bank(null, URL("https://test.com"), "id", "name", null)
         val partner = Partner(null, bank, "1", 1)
-        return User(null, EbicsVersion.H005, "1", "1", "cn=jan", EbicsUserStatusEnum.CREATED, false, false, partner, null, creator, false)
+        return BankConnectionEntity(null, EbicsVersion.H005, "1", "1", "cn=jan", EbicsUserStatusEnum.CREATED, false, false, partner, null, creator, false)
     }
 
     @Test

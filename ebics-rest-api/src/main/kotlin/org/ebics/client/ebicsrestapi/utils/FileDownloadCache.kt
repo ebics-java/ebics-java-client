@@ -2,7 +2,7 @@ package org.ebics.client.ebicsrestapi.utils
 
 import org.ebics.client.api.trace.IFileService
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
-import org.ebics.client.api.user.User
+import org.ebics.client.api.user.BankConnectionEntity
 import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.EbicsVersion
 import org.springframework.stereotype.Service
@@ -20,7 +20,7 @@ class FileDownloadCache(private val fileService: IFileService) : IFileDownloadCa
                 //Try to get file from cache
                 fileService.getLastDownloadedFile(
                     orderType,
-                    session.user as User,
+                    session.user as BankConnectionEntity,
                     ebicsVersion
                 ).messageBody.toByteArray()
             } catch (e: NoSuchElementException) {
@@ -59,7 +59,7 @@ class FileDownloadCache(private val fileService: IFileService) : IFileDownloadCa
                 )
             }
         fileService.addDownloadedTextFile(
-            session.user as User,
+            session.user as BankConnectionEntity,
             orderType,
             String(outputStream.toByteArray()),
             session.sessionId,

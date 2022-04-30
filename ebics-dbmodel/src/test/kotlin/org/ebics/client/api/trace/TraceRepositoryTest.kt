@@ -7,8 +7,8 @@ import org.ebics.client.api.trace.orderType.EbicsMessage
 import org.ebics.client.api.trace.orderType.EbicsService
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
 import org.ebics.client.api.user.BankConnection
-import org.ebics.client.api.user.User
-import org.ebics.client.api.user.UserServiceImpl
+import org.ebics.client.api.user.BankConnectionEntity
+import org.ebics.client.api.user.BankConnectionServiceImpl
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.order.EbicsAdminOrderType
 import org.junit.jupiter.api.Assertions
@@ -25,7 +25,7 @@ import java.net.URL
 @DataJpaTest
 @ContextConfiguration(classes = [DbTestContext::class])
 class TraceRepositoryTest(
-    @Autowired private val userService: UserServiceImpl,
+    @Autowired private val userService: BankConnectionServiceImpl,
     @Autowired private val bankService: BankService,
     @Autowired private val traceRepository: TraceRepository,
 ) {
@@ -38,7 +38,7 @@ class TraceRepositoryTest(
         userId: String = "CHT10001",
         partnerId: String = "CH100001",
         bankId: Long = getMockBank()
-    ): User {
+    ): BankConnectionEntity {
         val userInfo = BankConnection(EbicsVersion.H004, userId, "Jan", partnerId, bankId, false, false)
         val bcId = userService.createUserAndPartner(userInfo)
         return userService.getUserById(bcId)

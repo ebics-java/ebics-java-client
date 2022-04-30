@@ -3,7 +3,7 @@ package org.ebics.client.api.user.cert
 import org.ebics.client.api.EbicsUser
 import org.ebics.client.api.FunctionException
 import org.ebics.client.api.getById
-import org.ebics.client.api.user.UserRepository
+import org.ebics.client.api.user.BankConnectionRepository
 import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.letter.DefaultLetterManager
 import org.ebics.client.model.user.EbicsUserAction
@@ -12,10 +12,10 @@ import java.lang.IllegalArgumentException
 import java.util.*
 
 @Service
-class UserCertificateService(val userRepository: UserRepository, val userKeyStoreService: UserKeyStoreService) {
+class UserCertificateService(val bankConnectionRepository: BankConnectionRepository, val userKeyStoreService: UserKeyStoreService) {
     fun createOrUpdateUserCertificates(userId: Long, certRequest: CertRequest): Long {
         try {
-            val user = userRepository.getById(userId, "bankconnection")
+            val user = bankConnectionRepository.getById(userId, "bankconnection")
             user.checkWriteAccess()
             user.checkAction(EbicsUserAction.CREATE_KEYS)
             val userCertMgr = UserCertificateManager.create(certRequest.dn)
@@ -25,7 +25,7 @@ class UserCertificateService(val userRepository: UserRepository, val userKeyStor
             user.keyStore = userKeyStore
             user.usePassword = certRequest.usePassword
             user.updateStatus(EbicsUserAction.CREATE_KEYS)
-            userRepository.saveAndFlush(user)
+            bankConnectionRepository.saveAndFlush(user)
             return userKeyStore.id!!
         } catch (ex: IllegalArgumentException) {
             throw FunctionException("Error creating certificate for user $userId", ex)
@@ -46,7 +46,7 @@ class UserCertificateService(val userRepository: UserRepository, val userKeyStor
     }
 
     fun getUserLetters(userId: Long, password: String): CertificateLetters {
-        val user = userRepository.getById(userId, "bankconnection")
+        val user = bankConnectionRepository.getById(userId, "bankconnection")
         user.checkWriteAccess()
         user.checkAction(EbicsUserAction.CREATE_LETTERS)
         with(requireNotNull(user.keyStore) { "User certificates must be first initialized" }) {

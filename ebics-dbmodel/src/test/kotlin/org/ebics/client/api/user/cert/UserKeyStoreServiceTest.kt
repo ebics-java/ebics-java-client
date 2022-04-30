@@ -5,7 +5,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.ebics.client.api.bank.BankData
 import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.user.BankConnection
-import org.ebics.client.api.user.UserServiceImpl
+import org.ebics.client.api.user.BankConnectionServiceImpl
 import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.model.EbicsVersion
 import org.junit.jupiter.api.Test
@@ -21,7 +21,7 @@ import java.net.URL
 @DataJpaTest
 @ContextConfiguration(classes = [DbTestContext::class])
 open class UserKeyStoreServiceTest (
-    @Autowired private val userService: UserServiceImpl,
+    @Autowired private val userService: BankConnectionServiceImpl,
     @Autowired private val bankService: BankService,
     @Autowired private val keyStoreService: UserKeyStoreService)
 {

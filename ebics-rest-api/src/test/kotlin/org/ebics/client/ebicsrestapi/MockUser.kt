@@ -5,7 +5,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.api.bank.Bank
 import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.partner.Partner
-import org.ebics.client.api.user.User
+import org.ebics.client.api.user.BankConnectionEntity
 import org.ebics.client.api.user.cert.UserKeyStore
 import org.ebics.client.certificate.BankCertificateManager
 import org.ebics.client.certificate.UserCertificateManager
@@ -20,7 +20,7 @@ class MockUser {
             Security.addProvider(BouncyCastleProvider())
         }
 
-        fun createMockUser(userId: Long, bankCerts: Boolean = true): User {
+        fun createMockUser(userId: Long, bankCerts: Boolean = true): BankConnectionEntity {
             val bank = Bank(null, URL("https://ebics.ubs.com/ebicsweb/ebicsweb"), "EBXUBSCH", "UBS-PROD-CH", null)
 
             if (bankCerts) {
@@ -41,7 +41,7 @@ class MockUser {
                 bank.keyStore = bankKeyStore
             }
             val partner = Partner(null, bank, "CH10000$userId", 0)
-            val user = User(
+            val user = BankConnectionEntity(
                 userId,
                 EbicsVersion.H005,
                 "CHT10001",

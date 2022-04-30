@@ -2,7 +2,7 @@ package org.ebics.client.api.trace
 
 import org.ebics.client.api.security.AuthenticationContext
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
-import org.ebics.client.api.user.User
+import org.ebics.client.api.user.BankConnectionEntity
 import org.ebics.client.model.EbicsVersion
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -20,7 +20,7 @@ open class FileService(private val traceRepository: TraceRepository,
 
     override fun getLastDownloadedFile(
         orderType: OrderTypeDefinition,
-        user: User,
+        user: BankConnectionEntity,
         ebicsVersion: EbicsVersion,
         useSharedPartnerData: Boolean
     ): TraceEntry {
@@ -36,7 +36,7 @@ open class FileService(private val traceRepository: TraceRepository,
     }
 
     override fun addTextFile(
-        user: User,
+        user: BankConnectionEntity,
         orderType: OrderTypeDefinition,
         fileContent: String,
         sessionId: String,

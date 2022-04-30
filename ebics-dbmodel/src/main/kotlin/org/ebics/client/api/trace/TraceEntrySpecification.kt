@@ -1,7 +1,7 @@
 package org.ebics.client.api.trace
 
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
-import org.ebics.client.api.user.User
+import org.ebics.client.api.user.BankConnectionEntity
 import org.ebics.client.model.EbicsVersion
 import org.springframework.data.jpa.domain.Specification
 import javax.persistence.criteria.CriteriaBuilder
@@ -25,7 +25,7 @@ fun <T, X> CriteriaBuilder.attributeEquals(path: Path<X>, attributeName: String,
     return equal(path.get<SingularAttribute<X, T>>(attributeName), value)
 }
 
-fun bankConnectionEquals(user: User, useSharedPartnerData: Boolean = true): Specification<TraceEntry> {
+fun bankConnectionEquals(user: BankConnectionEntity, useSharedPartnerData: Boolean = true): Specification<TraceEntry> {
     return Specification<TraceEntry> { root, _, builder ->
         val p = builder.disjunction()
         val userAttr = root.get<SingularAttribute<TraceEntry, String>>("user")
@@ -96,7 +96,7 @@ fun traceTypeEquals(traceType: TraceType): Specification<TraceEntry> {
     }
 }
 
-fun fileDownloadFilter(creator: String, orderType: OrderTypeDefinition, user: User, ebicsVersion: EbicsVersion, useSharedPartnerData: Boolean = true): Specification<TraceEntry> {
+fun fileDownloadFilter(creator: String, orderType: OrderTypeDefinition, user: BankConnectionEntity, ebicsVersion: EbicsVersion, useSharedPartnerData: Boolean = true): Specification<TraceEntry> {
     return creatorEquals(creator)
         .and(orderTypeEquals(orderType))
         .and(bankConnectionEquals(user, useSharedPartnerData))

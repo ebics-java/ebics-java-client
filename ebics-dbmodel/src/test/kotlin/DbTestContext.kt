@@ -5,8 +5,8 @@ import org.ebics.client.api.partner.PartnerService
 import org.ebics.client.api.trace.FileService
 import org.ebics.client.api.trace.IFileService
 import org.ebics.client.api.trace.TraceRepository
-import org.ebics.client.api.user.UserRepository
-import org.ebics.client.api.user.UserServiceImpl
+import org.ebics.client.api.user.BankConnectionRepository
+import org.ebics.client.api.user.BankConnectionServiceImpl
 import org.ebics.client.api.user.cert.UserKeyStoreRepository
 import org.ebics.client.api.user.cert.UserKeyStoreService
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,7 +24,7 @@ open class DbTestContext(
     @Autowired val bankRepository: BankRepository,
     @Autowired val partnerRepository: PartnerRepository,
     @Autowired val userKeyStoreRepository: UserKeyStoreRepository,
-    @Autowired val userRepository: UserRepository,
+    @Autowired val userRepository: BankConnectionRepository,
     @Autowired val traceRepository: TraceRepository,
 ) {
     @Bean
@@ -37,7 +37,7 @@ open class DbTestContext(
     open fun userKeyStoreService() = UserKeyStoreService(userKeyStoreRepository)
 
     @Bean
-    open fun userService() = UserServiceImpl(userRepository, partnerService(), userKeyStoreService())
+    open fun userService() = BankConnectionServiceImpl(userRepository, partnerService(), userKeyStoreService())
 
     @Bean
     open fun fileService(): IFileService = FileService(traceRepository, 10)
