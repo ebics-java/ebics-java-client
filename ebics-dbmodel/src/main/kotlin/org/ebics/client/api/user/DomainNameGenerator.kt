@@ -14,7 +14,7 @@ class DomainNameGenerator(userName: String, country: String?) {
         )
     }
 
-    private fun String.sanitizeForDn():String = toLowerCase().removeNonAZazDigits().replaceSpaceByMinus()
+    private fun String.sanitizeForDn():String = lowercase(Locale.getDefault()).removeNonAZazDigits().replaceSpaceByMinus()
     private fun String.removeNonAZazDigits(): String = replace("[^A-Za-z0-9\\s]".toRegex(), "")
     private fun String.replaceSpaceByMinus(): String = replace("\\s".toRegex(), "-")
 
