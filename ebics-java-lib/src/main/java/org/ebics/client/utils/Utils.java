@@ -291,20 +291,6 @@ public class Utils {
     }
 
     /**
-     * Parses a string date
-     *
-     * @param date the given string date
-     * @return the date value
-     */
-    public static Date parse(String date) throws EbicsException {
-        try {
-            return Constants.DEFAULT_DATE_FORMAT.parse(date);
-        } catch (ParseException e) {
-            throw new EbicsException(e.getMessage());
-        }
-    }
-
-    /**
      * Checks for the returned http code
      *
      * @param response the http response
@@ -326,7 +312,7 @@ public class Utils {
             }
             //Return only error code to client
             throw new EbicsException(Messages.getString("http.code.error",
-                    Constants.APPLICATION_BUNDLE_NAME,
+                    "org.ebics.client.api.messages",
                     httpCode));
         }
     }
