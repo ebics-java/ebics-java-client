@@ -1,7 +1,7 @@
 package org.ebics.client.ebicsrestapi
 
 import org.ebics.client.api.EbicsConfiguration
-import org.ebics.client.api.user.BankConnectionEntity
+import org.ebics.client.api.bankconnection.BankConnectionEntity
 import org.ebics.client.model.EbicsProduct
 import org.ebics.client.model.EbicsSession
 

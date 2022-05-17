@@ -1,7 +1,7 @@
 package org.ebics.client.api.trace
 
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
-import org.ebics.client.api.user.BankConnectionEntity
+import org.ebics.client.api.bankconnection.BankConnectionEntity
 import org.ebics.client.model.EbicsVersion
 import org.springframework.data.jpa.domain.Specification
 import javax.persistence.criteria.CriteriaBuilder

@@ -6,9 +6,9 @@ import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.trace.orderType.EbicsMessage
 import org.ebics.client.api.trace.orderType.EbicsService
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
-import org.ebics.client.api.user.BankConnection
-import org.ebics.client.api.user.BankConnectionEntity
-import org.ebics.client.api.user.BankConnectionServiceImpl
+import org.ebics.client.api.bankconnection.BankConnection
+import org.ebics.client.api.bankconnection.BankConnectionEntity
+import org.ebics.client.api.bankconnection.BankConnectionServiceImpl
 import org.ebics.client.model.EbicsVersion
 import org.ebics.client.order.EbicsAdminOrderType
 import org.junit.jupiter.api.Assertions

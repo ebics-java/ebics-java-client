@@ -3,7 +3,7 @@ package org.ebics.client.api.trace
 import org.ebics.client.api.security.AuthenticationContext
 import org.ebics.client.api.trace.orderType.EbicsService
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
-import org.ebics.client.api.user.BankConnectionEntity
+import org.ebics.client.api.bankconnection.BankConnectionEntity
 import org.ebics.client.interfaces.EbicsRootElement
 import org.springframework.stereotype.Service
 

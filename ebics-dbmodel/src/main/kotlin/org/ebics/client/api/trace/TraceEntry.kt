@@ -3,7 +3,7 @@ package org.ebics.client.api.trace
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.ebics.client.api.security.AuthenticationContext
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
-import org.ebics.client.api.user.BankConnectionEntity
+import org.ebics.client.api.bankconnection.BankConnectionEntity
 import org.ebics.client.model.EbicsVersion
 import java.time.ZonedDateTime
 import javax.persistence.*

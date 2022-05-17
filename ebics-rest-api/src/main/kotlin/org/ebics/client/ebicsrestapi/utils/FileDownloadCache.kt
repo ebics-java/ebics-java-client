@@ -2,7 +2,7 @@ package org.ebics.client.ebicsrestapi.utils
 
 import org.ebics.client.api.trace.IFileService
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
-import org.ebics.client.api.user.BankConnectionEntity
+import org.ebics.client.api.bankconnection.BankConnectionEntity
 import org.ebics.client.model.EbicsSession
 import org.ebics.client.model.EbicsVersion
 import org.springframework.stereotype.Service

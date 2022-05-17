@@ -1,7 +1,7 @@
 package org.ebics.client.ebicsrestapi.bankconnection
 
-import org.ebics.client.api.user.permission.BankConnectionAccessType
-import org.ebics.client.api.user.*
+import org.ebics.client.api.bankconnection.permission.BankConnectionAccessType
+import org.ebics.client.api.bankconnection.*
 import org.springframework.web.bind.annotation.*
 
 @RestController

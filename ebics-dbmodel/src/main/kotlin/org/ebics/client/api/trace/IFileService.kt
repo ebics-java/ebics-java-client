@@ -2,7 +2,7 @@ package org.ebics.client.api.trace
 
 import org.ebics.client.api.EbicsSession
 import org.ebics.client.api.trace.orderType.OrderTypeDefinition
-import org.ebics.client.api.user.BankConnectionEntity
+import org.ebics.client.api.bankconnection.BankConnectionEntity
 import org.ebics.client.model.EbicsVersion
 import java.time.ZonedDateTime
 

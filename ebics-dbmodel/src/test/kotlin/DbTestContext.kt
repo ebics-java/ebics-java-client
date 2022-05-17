@@ -5,10 +5,10 @@ import org.ebics.client.api.partner.PartnerService
 import org.ebics.client.api.trace.FileService
 import org.ebics.client.api.trace.IFileService
 import org.ebics.client.api.trace.TraceRepository
-import org.ebics.client.api.user.BankConnectionRepository
-import org.ebics.client.api.user.BankConnectionServiceImpl
-import org.ebics.client.api.user.cert.UserKeyStoreRepository
-import org.ebics.client.api.user.cert.UserKeyStoreService
+import org.ebics.client.api.bankconnection.BankConnectionRepository
+import org.ebics.client.api.bankconnection.BankConnectionServiceImpl
+import org.ebics.client.api.bankconnection.cert.UserKeyStoreRepository
+import org.ebics.client.api.bankconnection.cert.UserKeyStoreService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.context.annotation.Bean

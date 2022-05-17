@@ -1,9 +1,9 @@
 package org.ebics.client.ebicsrestapi.bankconnection
 
-import org.ebics.client.api.user.BankConnection
-import org.ebics.client.api.user.BankConnectionEntity
-import org.ebics.client.api.user.BankConnectionService
-import org.ebics.client.api.user.permission.BankConnectionAccessType
+import org.ebics.client.api.bankconnection.BankConnection
+import org.ebics.client.api.bankconnection.BankConnectionEntity
+import org.ebics.client.api.bankconnection.BankConnectionService
+import org.ebics.client.api.bankconnection.permission.BankConnectionAccessType
 import org.ebics.client.ebicsrestapi.MockUser
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Service

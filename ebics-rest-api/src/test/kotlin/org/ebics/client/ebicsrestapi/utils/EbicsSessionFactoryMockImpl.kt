@@ -1,7 +1,7 @@
 package org.ebics.client.ebicsrestapi.utils
 
 import org.ebics.client.api.EbicsConfiguration
-import org.ebics.client.api.user.permission.BankConnectionAccessType
+import org.ebics.client.api.bankconnection.permission.BankConnectionAccessType
 import org.ebics.client.ebicsrestapi.MockUser
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
 import org.ebics.client.ebicsrestapi.bankconnection.session.IEbicsSessionFactory

@@ -3,8 +3,8 @@ package org.ebics.client.ebicsrestapi.bankconnection.h004
 import org.ebics.client.api.bank.BankService
 import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.bank.cert.BankKeyStoreService
-import org.ebics.client.api.user.BankConnectionEntity
-import org.ebics.client.api.user.BankConnectionServiceImpl
+import org.ebics.client.api.bankconnection.BankConnectionEntity
+import org.ebics.client.api.bankconnection.BankConnectionServiceImpl
 import org.ebics.client.ebicsrestapi.bankconnection.UserIdPass
 import org.ebics.client.ebicsrestapi.bankconnection.session.IEbicsSessionFactory
 import org.ebics.client.keymgmt.h004.KeyManagementImpl

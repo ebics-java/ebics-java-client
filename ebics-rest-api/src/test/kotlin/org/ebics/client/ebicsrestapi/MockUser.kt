@@ -5,8 +5,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.api.bank.Bank
 import org.ebics.client.api.bank.cert.BankKeyStore
 import org.ebics.client.api.partner.Partner
-import org.ebics.client.api.user.BankConnectionEntity
-import org.ebics.client.api.user.cert.UserKeyStore
+import org.ebics.client.api.bankconnection.BankConnectionEntity
+import org.ebics.client.api.bankconnection.cert.UserKeyStore
 import org.ebics.client.certificate.BankCertificateManager
 import org.ebics.client.certificate.UserCertificateManager
 import org.ebics.client.model.EbicsVersion

@@ -1,8 +1,8 @@
 package org.ebics.client.ebicsrestapi.user.settings
 
-import org.ebics.client.api.user.settings.UserSettings
-import org.ebics.client.api.user.settings.UserSettingsData
-import org.ebics.client.api.user.settings.UserSettingsService
+import org.ebics.client.api.bankconnection.settings.UserSettings
+import org.ebics.client.api.bankconnection.settings.UserSettingsData
+import org.ebics.client.api.bankconnection.settings.UserSettingsService
 import org.springframework.web.bind.annotation.*
 
 @RestController

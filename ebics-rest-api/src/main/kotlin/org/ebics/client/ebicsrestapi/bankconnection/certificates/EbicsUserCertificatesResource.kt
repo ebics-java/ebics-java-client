@@ -1,7 +1,7 @@
 package org.ebics.client.ebicsrestapi.bankconnection.certificates
 
-import org.ebics.client.api.user.cert.CertRequest
-import org.ebics.client.api.user.cert.UserCertificateService
+import org.ebics.client.api.bankconnection.cert.CertRequest
+import org.ebics.client.api.bankconnection.cert.UserCertificateService
 import org.ebics.client.ebicsrestapi.bankconnection.UserPass
 import org.springframework.web.bind.annotation.*
 
