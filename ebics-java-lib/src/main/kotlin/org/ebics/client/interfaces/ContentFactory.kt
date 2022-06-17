@@ -18,9 +18,9 @@
  */
 package org.ebics.client.interfaces
 
+import org.ebics.client.exception.EbicsException
 import java.io.IOException
 import java.io.InputStream
-import java.io.Serializable
 
 interface ContentFactory {
     /**
@@ -33,4 +33,18 @@ interface ContentFactory {
      */
     @get:Throws(IOException::class)
     val content: InputStream
+
+    /**
+     * Returns the content of a `ContentFactory` as a byte array
+     * @return
+     * @throws EbicsException
+     */
+    @Throws(EbicsException::class)
+    fun getFactoryContent(): ByteArray {
+        try {
+            content.use { inputStream -> return inputStream.readBytes() }
+        } catch (e: IOException) {
+            throw EbicsException(e.message)
+        }
+    }
 }
