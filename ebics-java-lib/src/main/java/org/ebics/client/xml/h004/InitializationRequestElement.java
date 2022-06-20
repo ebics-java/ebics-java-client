@@ -52,13 +52,11 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
    * @throws EbicsException
    */
   public InitializationRequestElement(EbicsSession session,
-                                      EbicsAdminOrderType type,
-                                      String name)
+                                      EbicsAdminOrderType type)
     throws EbicsException
   {
     super(session);
     this.type = type;
-    this.name = name;
     nonce = Utils.generateNonce();
   }
 
@@ -71,11 +69,6 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
     signedInfo.build();
     ((EbicsRequestDocument)document).getEbicsRequest().setAuthSignature(signedInfo.getSignatureType());
     ((EbicsRequestDocument)document).getEbicsRequest().getAuthSignature().setSignatureValue(EbicsXmlFactory.createSignatureValueType(signedInfo.sign(toByteArray())));
-  }
-
-  @Override
-  public String getName() {
-    return name + ".xml";
   }
 
   @Override

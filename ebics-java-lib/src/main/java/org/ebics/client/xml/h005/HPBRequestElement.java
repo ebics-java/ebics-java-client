@@ -40,11 +40,6 @@ public class HPBRequestElement extends DefaultEbicsRootElement {
   }
 
   @Override
-  public String getName() {
-    return "HPBRequest.xml";
-  }
-
-  @Override
   public void build() throws EbicsException {
     SignedInfo signedInfo;
     byte[]			signature;

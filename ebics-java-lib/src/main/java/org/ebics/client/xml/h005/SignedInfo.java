@@ -150,11 +150,6 @@ public class SignedInfo extends DefaultEbicsRootElement {
     return super.toByteArray();
   }
 
-  @Override
-  public String getName() {
-    return "SignedInfo.xml";
-  }
-
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------

@@ -27,7 +27,7 @@ import org.ebics.schema.h000.EbicsHEVResponseDocument
 import org.ebics.schema.h000.HEVResponseDataType
 
 
-class HEVResponse(factory: ContentFactory) : DefaultResponseElement(factory, "HEVData") {
+class HEVResponse(factory: ContentFactory) : DefaultResponseElement(factory) {
 
     @Throws(EbicsException::class)
     override fun build() {
@@ -37,8 +37,6 @@ class HEVResponse(factory: ContentFactory) : DefaultResponseElement(factory, "HE
     }
 
     fun getSupportedVersions(): List<EbicsVersion> = EnumUtil.toEbicsVersions(response)
-
-    override val name: String = "HEVData.xml"
 
     // --------------------------------------------------------------------
     // DATA MEMBERS

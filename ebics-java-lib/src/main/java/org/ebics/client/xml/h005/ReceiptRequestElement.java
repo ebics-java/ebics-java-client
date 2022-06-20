@@ -50,12 +50,10 @@ public class ReceiptRequestElement extends DefaultEbicsRootElement {
    * @param name the element name
    */
   public ReceiptRequestElement(EbicsSession session,
-                               byte[] transactionId,
-                               String name)
+                               byte[] transactionId)
   {
     super(session);
     this.transactionId = transactionId;
-    this.name = name;
   }
 
   @Override
@@ -88,16 +86,10 @@ public class ReceiptRequestElement extends DefaultEbicsRootElement {
     return super.toByteArray();
   }
 
-  @Override
-  public String getName() {
-    return name  + ".xml";
-  }
-
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
   private byte[] 			transactionId;
-  private String			name;
   private static final long 		serialVersionUID = -1969616441705744725L;
 }

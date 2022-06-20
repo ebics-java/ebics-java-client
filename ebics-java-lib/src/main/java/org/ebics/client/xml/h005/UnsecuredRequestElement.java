@@ -91,11 +91,6 @@ public class UnsecuredRequestElement extends DefaultEbicsRootElement {
     document = EbicsXmlFactory.createEbicsUnsecuredRequestDocument(request);
   }
 
-  @Override
-  public String getName() {
-    return "UnsecuredRequest.xml";
-  }
-
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------

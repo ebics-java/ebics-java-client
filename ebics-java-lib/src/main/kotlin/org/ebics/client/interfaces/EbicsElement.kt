@@ -23,11 +23,6 @@ import java.io.PrintStream
 import java.io.Serializable
 
 interface EbicsElement : Serializable {
-    /**
-     * Returns the name of this `EbicsElement`
-     * @return the name of the element
-     */
-    val name: String
 
     /**
      * Builds the `EbicsElement` XML fragment

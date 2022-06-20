@@ -39,10 +39,9 @@ public class DownloadTransferResponseElement extends TransferResponseElement {
    * @param name the element name.
    */
   public DownloadTransferResponseElement(ContentFactory factory,
-                                         EbicsAdminOrderType orderType,
-                                         String name)
+                                         EbicsAdminOrderType orderType)
   {
-    super(factory, name);
+    super(factory);
   }
 
   @Override

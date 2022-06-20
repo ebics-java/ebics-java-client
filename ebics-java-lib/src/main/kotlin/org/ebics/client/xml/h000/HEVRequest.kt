@@ -38,8 +38,6 @@ class HEVRequest(val ebicsHostID: String) : DefaultEbicsRootElement() {
         }
     }
 
-    override val name: String = "EbicsHEVRequestDocument.xml"
-
     override fun toByteArray(): ByteArray {
         setSaveSuggestedPrefixes("http://www.ebics.org/h000", "")
         return super.toByteArray()

@@ -88,11 +88,6 @@ public class HIARequestOrderDataElement extends DefaultEbicsRootElement {
   }
 
   @Override
-  public String getName() {
-    return "HIARequestOrderData.xml";
-  }
-
-  @Override
   public byte[] toByteArray() {
     addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
     setSaveSuggestedPrefixes("http://www.ebics.org/S001", "");

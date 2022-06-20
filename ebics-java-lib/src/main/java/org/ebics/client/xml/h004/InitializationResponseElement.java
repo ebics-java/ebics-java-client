@@ -37,12 +37,10 @@ public class InitializationResponseElement extends DefaultResponseElement {
   /**
    * Constructs a new <code>InitializationResponseElement</code> element.
    * @param factory the content factory
-   * @param name the element name
    */
-  public InitializationResponseElement(ContentFactory factory,
-                                       String name)
+  public InitializationResponseElement(ContentFactory factory)
   {
-    super(factory, name);
+    super(factory);
   }
 
   @Override

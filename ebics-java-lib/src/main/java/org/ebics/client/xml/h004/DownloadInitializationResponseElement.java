@@ -36,12 +36,10 @@ public class DownloadInitializationResponseElement extends InitializationRespons
   /**
    * Constructs a new <code>DInitializationResponseElement</code> object
    * @param factory the content factory
-   * @param name the element name
    */
-  public DownloadInitializationResponseElement(ContentFactory factory,
-                                               String name)
+  public DownloadInitializationResponseElement(ContentFactory factory)
   {
-    super(factory, name);
+    super(factory);
   }
 
   @Override

@@ -82,11 +82,6 @@ public class UserSignature extends DefaultEbicsRootElement {
   }
 
   @Override
-  public String getName() {
-    return name + ".xml";
-  }
-
-  @Override
   public byte[] toByteArray() {
     setSaveSuggestedPrefixes("http://www.ebics.org/S002", "");
 

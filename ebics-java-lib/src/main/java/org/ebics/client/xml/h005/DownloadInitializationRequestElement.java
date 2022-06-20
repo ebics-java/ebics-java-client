@@ -56,7 +56,7 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
     public DownloadInitializationRequestElement(EbicsSession session,
                                                 EbicsDownloadOrder ebicsOrder)
             throws EbicsException {
-        super(session, ebicsOrder, generateName(ebicsOrder.getAdminOrderType()));
+        super(session, ebicsOrder);
     }
 
     @Override

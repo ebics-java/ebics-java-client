@@ -99,8 +99,7 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
 
         val response = InitializationResponseElement(
             responseBody,
-            orderType,
-            DefaultEbicsRootElement.generateName(orderType)
+            orderType
         )
         response.build()
         traceSession.trace(response)
@@ -151,10 +150,7 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
         traceSession.trace(uploader)
         val responseBody = sender.send(ByteArrayContentFactory(uploader.prettyPrint()))
 
-        val response = TransferResponseElement(
-            responseBody,
-            DefaultEbicsRootElement.generateName(orderType)
-        )
+        val response = TransferResponseElement(responseBody)
         response.build()
         traceSession.trace(response)
     }
@@ -197,8 +193,7 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
 
         val response = DownloadInitializationResponseElement(
             responseBody,
-            orderType,
-            DefaultEbicsRootElement.generateName(orderType)
+            orderType
         )
         response.build()
         traceSession.trace(response)
@@ -221,18 +216,14 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
         outputStream.use { dest -> joiner.writeTo(dest, response.transactionKey) }
         val receipt = ReceiptRequestElement(
             session,
-            state.transactionId,
-            DefaultEbicsRootElement.generateName(orderType)
+            state.transactionId
         )
         receipt.build()
         receipt.validate()
         traceSession.trace(receipt)
         val receiptResponseBody = sender.send(ByteArrayContentFactory(receipt.prettyPrint()))
 
-        val receiptResponse = ReceiptResponseElement(
-            receiptResponseBody,
-            DefaultEbicsRootElement.generateName(orderType)
-        )
+        val receiptResponse = ReceiptResponseElement(receiptResponseBody)
         receiptResponse.build()
         traceSession.trace(receiptResponse)
         receiptResponse.report()
@@ -285,8 +276,7 @@ class FileTransferSession(session: EbicsSession) : AbstractFileTransfer(session)
 
         val response = DownloadTransferResponseElement(
             responseBody,
-            orderType,
-            DefaultEbicsRootElement.generateName(orderType)
+            orderType
         )
         response.build()
         traceSession.trace(response)

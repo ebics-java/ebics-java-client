@@ -39,7 +39,7 @@ public class SPRResponseElement extends DefaultResponseElement {
    * @param factory the content factory
    */
   public SPRResponseElement(ContentFactory factory) {
-    super(factory, "SPRResponse.xml");
+    super(factory);
   }
 
   @Override

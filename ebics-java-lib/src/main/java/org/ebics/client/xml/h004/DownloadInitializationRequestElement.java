@@ -61,7 +61,7 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
                                                 Date startRange,
                                                 Date endRange)
             throws EbicsException {
-        super(session, adminOrderType, generateName(adminOrderType));
+        super(session, adminOrderType);
         this.orderType = orderType;
         this.startRange = startRange;
         this.endRange = endRange;

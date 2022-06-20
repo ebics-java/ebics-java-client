@@ -70,11 +70,6 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
     ((EbicsRequestDocument)document).getEbicsRequest().getAuthSignature().setSignatureValue(EbicsXmlFactory.createSignatureValueType(signedInfo.sign(toByteArray())));
   }
 
-  @Override
-  public String getName() {
-    return name + ".xml";
-  }
-
 
   @Override
   public byte[] toByteArray() {

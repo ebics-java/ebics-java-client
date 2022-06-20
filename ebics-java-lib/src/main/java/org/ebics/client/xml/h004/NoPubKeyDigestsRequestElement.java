@@ -102,11 +102,6 @@ public class NoPubKeyDigestsRequestElement extends DefaultEbicsRootElement {
     return super.toByteArray();
   }
 
-  @Override
-  public String getName() {
-    return "NoPubKeyDigestsRequest.xml";
-  }
-
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------

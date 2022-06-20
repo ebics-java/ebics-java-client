@@ -52,13 +52,11 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
    * @throws EbicsException
    */
   public InitializationRequestElement(EbicsSession session,
-                                      EbicsOrder ebicsOrder,
-                                      String name)
+                                      EbicsOrder ebicsOrder)
     throws EbicsException
   {
     super(session);
     this.ebicsOrder = ebicsOrder;
-    this.name = name;
     nonce = Utils.generateNonce();
   }
 
@@ -71,11 +69,6 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
     signedInfo.build();
     ((EbicsRequestDocument)document).getEbicsRequest().setAuthSignature(signedInfo.getSignatureType());
     ((EbicsRequestDocument)document).getEbicsRequest().getAuthSignature().setSignatureValue(EbicsXmlFactory.createSignatureValueType(signedInfo.sign(toByteArray())));
-  }
-
-  @Override
-  public String getName() {
-    return name + ".xml";
   }
 
   @Override
@@ -131,7 +124,6 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private String			name;
   protected EbicsOrder ebicsOrder;
   protected byte[]			nonce;
   private static final long 		serialVersionUID = 8983807819242699280L;

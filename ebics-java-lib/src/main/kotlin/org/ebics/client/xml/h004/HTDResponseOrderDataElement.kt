@@ -39,15 +39,13 @@ import org.ebics.schema.h004.HTDResponseOrderDataDocument
  * content factory.
  * @param factory the content factory.
  */
-class HTDResponseOrderDataElement(factory: ContentFactory) : DefaultResponseElement(factory, "HTDData") {
+class HTDResponseOrderDataElement(factory: ContentFactory) : DefaultResponseElement(factory) {
 
     @Throws(EbicsException::class)
     override fun build() {
         parse(factory)
         response = (document as HTDResponseOrderDataDocument).htdResponseOrderData
     }
-
-    override val name: String = "HTDData.xml"
 
     /**
      * Return list of order-types available for user

@@ -45,11 +45,6 @@ public class HIARequestElement extends DefaultEbicsRootElement {
   }
 
   @Override
-  public String getName() {
-    return "HIARequest.xml";
-  }
-
-  @Override
   public void build() throws EbicsException {
     HIARequestOrderDataElement requestOrderData;
 

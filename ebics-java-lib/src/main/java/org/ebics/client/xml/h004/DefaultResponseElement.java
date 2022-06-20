@@ -40,11 +40,9 @@ public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
   /**
    * Constructs a new ebics response element.
    * @param factory the content factory containing the response.
-   * @param name the element name
    */
-  public DefaultResponseElement(ContentFactory factory, String name) {
+  public DefaultResponseElement(ContentFactory factory) {
     this.factory = factory;
-    this.name = name;
   }
 
   /**
@@ -74,18 +72,12 @@ public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
     if (!returnCode.isOk()) {
       returnCode.throwException();
     }
-}
-
-  @Override
-  public String getName() {
-    return name + ".xml";
   }
 
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private String 			name;
   protected ContentFactory		factory;
   protected EbicsReturnCode returnCode;
   private static final long 		serialVersionUID = 4014595046719645090L;

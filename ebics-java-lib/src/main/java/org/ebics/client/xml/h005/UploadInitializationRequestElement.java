@@ -69,7 +69,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
                                             byte[] userData)
     throws EbicsException
   {
-    super(session, ebicsOrder, generateName(ebicsOrder.getAdminOrderType()));
+    super(session, ebicsOrder);
     this.userData = userData;
     keySpec = new SecretKeySpec(nonce, "EAS");
     splitter = new Splitter(userData, session.getConfiguration().isCompressionEnabled(), keySpec);

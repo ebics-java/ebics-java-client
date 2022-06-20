@@ -37,10 +37,9 @@ public class ReceiptResponseElement extends DefaultResponseElement {
   /**
    * Constructs a new <code>ReceiptResponseElement</code> object
    * @param factory the content factory
-   * @param name the element name
    */
-  public ReceiptResponseElement(ContentFactory factory, String name) {
-    super(factory, name);
+  public ReceiptResponseElement(ContentFactory factory) {
+    super(factory);
   }
 
   @Override

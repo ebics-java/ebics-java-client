@@ -40,7 +40,7 @@ public class HPBResponseOrderDataElement extends DefaultResponseElement {
    * @param factory the content factory.
    */
   public HPBResponseOrderDataElement(ContentFactory factory) {
-    super(factory, "HPBData");
+    super(factory);
   }
 
   /**
@@ -79,11 +79,6 @@ public class HPBResponseOrderDataElement extends DefaultResponseElement {
   public void build() throws EbicsException {
     parse(factory);
     response = ((HPBResponseOrderDataDocument)document).getHPBResponseOrderData();
-  }
-
-  @Override
-  public String getName() {
-    return "HPBData.xml";
   }
 
   // --------------------------------------------------------------------

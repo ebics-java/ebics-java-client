@@ -60,11 +60,6 @@ public class SignaturePubKeyOrderDataElement extends DefaultEbicsRootElement {
   }
 
   @Override
-  public String getName() {
-    return "SignaturePubKeyOrderData.xml";
-  }
-
-  @Override
   public byte[] toByteArray() {
     addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
     setSaveSuggestedPrefixes("http://www.ebics.org/S002", "");

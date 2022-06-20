@@ -44,11 +44,6 @@ public class INIRequestElement extends DefaultEbicsRootElement {
   }
 
   @Override
-  public String getName() {
-    return "INIRequest.xml";
-  }
-
-  @Override
   public void build() throws EbicsException {
     SignaturePubKeyOrderDataElement signaturePubKey;
 

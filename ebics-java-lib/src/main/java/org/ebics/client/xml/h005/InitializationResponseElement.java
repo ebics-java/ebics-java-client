@@ -39,13 +39,11 @@ public class InitializationResponseElement extends DefaultResponseElement {
    * Constructs a new <code>InitializationResponseElement</code> element.
    * @param factory the content factory
    * @param orderType the order type
-   * @param name the element name
    */
   public InitializationResponseElement(ContentFactory factory,
-                                       EbicsAdminOrderType orderType,
-                                       String name)
+                                       EbicsAdminOrderType orderType)
   {
-    super(factory, name);
+    super(factory);
     this.orderType = orderType;
   }
 

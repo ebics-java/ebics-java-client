@@ -40,10 +40,9 @@ public class KeyManagementResponseElement extends DefaultResponseElement {
    * Creates a new <code>KeyManagementResponseElement</code>
    * from a given <code>ContentFactory</code>
    * @param factory the content factory enclosing the ebics response
-   * @param name the element name
    */
-  public KeyManagementResponseElement(ContentFactory factory, String name) {
-    super(factory, name);
+  public KeyManagementResponseElement(ContentFactory factory) {
+    super(factory);
   }
 
   /**

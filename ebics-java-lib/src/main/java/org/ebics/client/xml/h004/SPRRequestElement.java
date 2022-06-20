@@ -55,7 +55,7 @@ public class SPRRequestElement extends InitializationRequestElement {
    * @param session the current ebic session.
    */
   public SPRRequestElement(EbicsSession session) throws EbicsException {
-    super(session, EbicsAdminOrderType.SPR, "SPRRequest.xml");
+    super(session, EbicsAdminOrderType.SPR);
     keySpec = new SecretKeySpec(nonce, "EAS");
   }
 

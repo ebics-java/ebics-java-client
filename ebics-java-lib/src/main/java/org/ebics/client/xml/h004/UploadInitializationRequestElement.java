@@ -70,7 +70,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
                                             byte[] userData)
     throws EbicsException
   {
-    super(session, adminOrderType, generateName(adminOrderType));
+    super(session, adminOrderType);
     this.userData = userData;
     this.orderType = orderType;
     keySpec = new SecretKeySpec(nonce, "EAS");
