@@ -5,8 +5,14 @@ import org.junit.jupiter.api.Test
 
 class EbicsReturnCodeTest {
     @Test
-    fun testReturnCode() {
+    fun testOkReturnCode() {
         val ok = EbicsReturnCode("000000", "OK")
         Assertions.assertTrue(ok.isOk)
+    }
+
+    @Test
+    fun testErrorReturnCode() {
+        val ok = EbicsReturnCode("000001", "OK")
+        Assertions.assertFalse(ok.isOk)
     }
 }

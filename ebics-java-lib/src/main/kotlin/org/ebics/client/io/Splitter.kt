@@ -20,6 +20,7 @@ package org.ebics.client.io
 
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.interfaces.ContentFactory
+import org.ebics.client.utils.CryptoUtils
 import org.ebics.client.utils.Utils
 import javax.crypto.spec.SecretKeySpec
 
@@ -97,7 +98,7 @@ class Splitter(
     init {
         try {
             val compressedInput = if (isCompressionEnabled) Utils.zip(input) else input
-            content = Utils.encrypt(compressedInput, keySpec)
+            content = CryptoUtils.encrypt(compressedInput, keySpec)
             val lastSegmentNotFull = content.size % maxSegmentSize != 0
             segmentNumber = content.size / maxSegmentSize + if (lastSegmentNotFull) 1 else 0
             segmentSize = content.size / segmentNumber

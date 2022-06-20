@@ -2,6 +2,7 @@ package org.ebics.client.api
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.ebics.client.exception.EbicsException
+import org.ebics.client.utils.CryptoUtils
 import org.ebics.client.utils.Utils
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -221,7 +222,7 @@ interface UserCertificateManager {
      */
     @Throws(EbicsException::class)
     private fun decryptData(input: ByteArray, key: ByteArray): ByteArray {
-        return Utils.decrypt(input, SecretKeySpec(key, "EAS"))
+        return CryptoUtils.decrypt(input, SecretKeySpec(key, "EAS"))
     }
 
     /**
