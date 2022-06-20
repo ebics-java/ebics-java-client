@@ -27,6 +27,7 @@ import org.ebics.client.exception.EbicsException;
 import org.ebics.client.interfaces.EbicsRootElement;
 import org.ebics.client.api.EbicsSession;
 import org.ebics.client.order.EbicsAdminOrderType;
+import org.ebics.client.utils.Utils;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
@@ -36,6 +37,9 @@ import org.jdom2.output.XMLOutputter;
 import javax.xml.namespace.QName;
 import java.io.*;
 import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -214,6 +218,23 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
   @Override
   public void print(PrintStream stream) {
     stream.println(document.toString());
+  }
+
+  /**
+   * Returns the digest value of the authenticated XML portions.
+   * @return  the digest value.
+   * @throws EbicsException Failed to retrieve the digest value.
+   */
+  public byte[] getDigest() throws EbicsException {
+    addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
+
+    try {
+      return MessageDigest.getInstance("SHA-256", "BC").digest(Utils.canonize(toByteArray()));
+    } catch (NoSuchAlgorithmException e) {
+      throw new EbicsException(e.getMessage());
+    } catch (NoSuchProviderException e) {
+      throw new EbicsException(e.getMessage());
+    }
   }
 
   // --------------------------------------------------------------------

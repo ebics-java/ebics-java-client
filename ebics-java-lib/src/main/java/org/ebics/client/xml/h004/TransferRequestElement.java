@@ -75,23 +75,6 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
     return name + ".xml";
   }
 
-  /**
-   * Returns the digest value of the authenticated XML portions.
-   * @return  the digest value.
-   * @throws EbicsException Failed to retrieve the digest value.
-   */
-  public byte[] getDigest() throws EbicsException {
-    addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
-
-    try {
-      return MessageDigest.getInstance("SHA-256", "BC").digest(Utils.canonize(toByteArray()));
-    } catch (NoSuchAlgorithmException e) {
-      throw new EbicsException(e.getMessage());
-    } catch (NoSuchProviderException e) {
-      throw new EbicsException(e.getMessage());
-    }
-  }
-
 
   @Override
   public byte[] toByteArray() {
