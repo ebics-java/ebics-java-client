@@ -49,6 +49,7 @@ class SimpleHttpClient(
     @Throws(EbicsException::class)
     private fun checkHttpCode(response: CloseableHttpResponse) {
         val httpCode = response.statusLine.statusCode
+        val reasonPhrase = response.statusLine.reasonPhrase
         if (httpCode != 200) {
             //Log detail response in server log
             try {
@@ -56,21 +57,20 @@ class SimpleHttpClient(
                 val responseString = EntityUtils.toString(entity, "UTF-8")
                 logger.warn(
                     "Unexpected HTTP Code: {0} returned as EBICS response, reason: {1}, response content: {2}",
-                    httpCode, response.statusLine.reasonPhrase, responseString
+                    httpCode, reasonPhrase, responseString
+                )
+                throw EbicsException(
+                    String.format("Wrong returned HTTP code: %d %s, with the response content '%s'", httpCode, reasonPhrase, responseString)
                 )
             } catch (e: IOException) {
                 logger.warn(
                     "Unexpected HTTP Code: {0} returned as EBICS response, reason: {1}, response content can't be read",
-                    httpCode, response.statusLine.reasonPhrase
+                    httpCode, reasonPhrase
+                )
+                throw EbicsException(
+                    String.format("Wrong returned HTTP code: %d %s (no response content available) ", httpCode, reasonPhrase)
                 )
             }
-            throw EbicsException(
-                Messages.getString(
-                    "http.code.error",
-                    "org.ebics.client.api.messages",
-                    httpCode
-                )
-            )
         }
     }
 

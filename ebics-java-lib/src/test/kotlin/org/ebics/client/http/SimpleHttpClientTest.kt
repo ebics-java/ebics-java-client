@@ -56,7 +56,7 @@ class SimpleHttpClientTest {
     }
 
     @Test
-    fun sendRequestWithResponseNon200_then_throwException() {
+    fun sendRequestWithResponse500_then_throwException() {
         val configuration: HttpClientRequestConfiguration = object : HttpClientRequestConfiguration {
             override val displayName: String = "default"
             override val httpContentType: String = "text/xml; charset=ISO-8859-1"
@@ -72,8 +72,32 @@ class SimpleHttpClientTest {
         every { mockedClientResponse.close() } returns Unit
 
         val client = SimpleHttpClient(httpClient, configuration)
-        Assertions.assertThrows(EbicsException::class.java) {
+        val exception = Assertions.assertThrows(EbicsException::class.java) {
             client.send(URL("http://not.existing.url.com.xx"), ByteArrayContentFactory("aaa".toByteArray()))
         }
+        Assertions.assertEquals("Wrong returned HTTP code: 500 Error 500, with the response content 'Some strange server HTTP error 500'", exception.message)
+    }
+
+    @Test
+    fun sendRequestWithResponse302_then_throwException() {
+        val configuration: HttpClientRequestConfiguration = object : HttpClientRequestConfiguration {
+            override val displayName: String = "default"
+            override val httpContentType: String = "text/xml; charset=ISO-8859-1"
+        }
+        val mockedClientResponse = mockk<CloseableHttpResponse>()
+        every { httpClient.execute(allAny()) } returns mockedClientResponse
+        every { mockedClientResponse.statusLine } returns BasicStatusLine(
+            ProtocolVersion("HTTP", 1, 1),
+            302,
+            "Error 302"
+        )
+        every { mockedClientResponse.entity } returns ByteArrayEntity("Some strange server HTTP error 302".toByteArray())
+        every { mockedClientResponse.close() } returns Unit
+
+        val client = SimpleHttpClient(httpClient, configuration)
+        val exception = Assertions.assertThrows(EbicsException::class.java) {
+            client.send(URL("http://not.existing.url.com.xx"), ByteArrayContentFactory("aaa".toByteArray()))
+        }
+        Assertions.assertEquals("Wrong returned HTTP code: 302 Error 302, with the response content 'Some strange server HTTP error 302'", exception.message)
     }
 }

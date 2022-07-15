@@ -2,7 +2,6 @@ package org.ebics.client.ebicsrestapi.partner
 
 import org.ebics.client.api.partner.Partner
 import org.ebics.client.api.partner.PartnerService
-import org.ebics.client.api.user.*
 import org.springframework.web.bind.annotation.*
 
 @RestController
