@@ -8,12 +8,8 @@ import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.util.EntityUtils
 import org.ebics.client.exception.EbicsException
 import org.ebics.client.io.ByteArrayContentFactory
-import org.ebics.client.messages.Messages
-import org.ebics.client.utils.Utils
 import org.slf4j.LoggerFactory
-import java.io.IOException
-import java.util.logging.Level
-import java.util.logging.Logger
+import java.lang.Exception
 import javax.annotation.PreDestroy
 
 class SimpleHttpClient(
@@ -51,26 +47,35 @@ class SimpleHttpClient(
         val httpCode = response.statusLine.statusCode
         val reasonPhrase = response.statusLine.reasonPhrase
         if (httpCode != 200) {
-            //Log detail response in server log
-            try {
-                val entity = response.entity
-                val responseString = EntityUtils.toString(entity, "UTF-8")
+            //Log detail response in server log & throw new exception
+
+            //Try to get response content if there is something
+            val responseContent = try {
+                EntityUtils.toString(response.entity, "UTF-8")
+            } catch (ex:Exception) {
+                ""
+            }
+
+            //Get response headers
+            val responseHeaders = response.allHeaders?.asList()?.joinToString(";") ?: ""
+
+            if (!responseContent.isNullOrBlank()) {
                 logger.warn(
-                    "Unexpected HTTP Code: {0} returned as EBICS response, reason: {1}, response content: {2}",
-                    httpCode, reasonPhrase, responseString
-                )
-                throw EbicsException(
-                    String.format("Wrong returned HTTP code: %d %s, with the response content '%s'", httpCode, reasonPhrase, responseString)
-                )
-            } catch (e: IOException) {
+                    "Unexpected HTTP Code: {0} returned as EBICS response, reason: {1}, response headers '{2}', response content: '{3}'",
+                    httpCode, reasonPhrase, responseHeaders, responseContent)
+            } else {
                 logger.warn(
-                    "Unexpected HTTP Code: {0} returned as EBICS response, reason: {1}, response content can't be read",
-                    httpCode, reasonPhrase
-                )
-                throw EbicsException(
-                    String.format("Wrong returned HTTP code: %d %s (no response content available) ", httpCode, reasonPhrase)
+                    "Unexpected HTTP Code: {0} returned as EBICS response, reason: {1}, response headers '{2}' (no response content available)",
+                    httpCode, reasonPhrase, responseHeaders
                 )
             }
+            throw EbicsException(
+                String.format(
+                    "Wrong returned HTTP code: %d %s",
+                    httpCode,
+                    reasonPhrase
+                )
+            )
         }
     }
 
