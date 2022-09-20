@@ -81,6 +81,12 @@
             <version>3.2.4</version>
             <scope>test</scope>
         </dependency>
+        <!-- https://search.maven.org/artifact/xerces/xercesImpl/ -->
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.12.2</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -108,8 +114,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
             <plugin>
