@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
@@ -46,6 +47,7 @@ import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.kopi.ebics.utils.Utils;
@@ -177,7 +179,7 @@ public class X509Generator {
     vector = new ASN1EncodableVector();
     vector.add(KeyPurposeId.id_kp_emailProtection);
 
-    generator.addExtension(X509Extensions.ExtendedKeyUsage, false, new ExtendedKeyUsage(new DERSequence(vector)));
+    generator.addExtension(X509Extensions.ExtendedKeyUsage, false, ExtendedKeyUsage.getInstance(new DERSequence(vector)));
 
     switch (keyusage) {
     case X509Constants.SIGNATURE_KEY_USAGE:
@@ -224,7 +226,7 @@ public class X509Generator {
     vector = new ASN1EncodableVector();
     vector.add(new GeneralName(new X509Name(issuer)));
 
-    return new AuthorityKeyIdentifier(keyInfo, new GeneralNames(new DERSequence(vector)), serial);
+    return new AuthorityKeyIdentifier(keyInfo, GeneralNames.getInstance(new DERSequence(vector)), serial);
   }
 
   /**
@@ -235,15 +237,15 @@ public class X509Generator {
    * @throws IOException
    */
   private SubjectKeyIdentifier getSubjectKeyIdentifier(PublicKey publicKey)
-    throws IOException
+    throws IOException, NoSuchAlgorithmException
   {
     InputStream			input;
     SubjectPublicKeyInfo	keyInfo;
 
     input = new ByteArrayInputStream(publicKey.getEncoded());
-    keyInfo = new SubjectPublicKeyInfo((ASN1Sequence)new ASN1InputStream(input).readObject());
+    keyInfo = SubjectPublicKeyInfo.getInstance(new ASN1InputStream(input).readObject());
 
-    return new SubjectKeyIdentifier(keyInfo);
+    return new JcaX509ExtensionUtils().createSubjectKeyIdentifier(keyInfo);
   }
 
   /**

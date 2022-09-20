@@ -43,7 +43,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PEMParser;
 
 /**
  * Key store loader. This class loads a key store from
@@ -137,7 +137,7 @@ public class KeyStoreManager {
     certificate = (X509Certificate) CertificateFactory.getInstance("X.509", provider).generateCertificate(input);
 
     if (certificate == null) {
-      certificate = (X509Certificate)(new PEMReader(new InputStreamReader(input))).readObject();
+      certificate = (X509Certificate)(new PEMParser(new InputStreamReader(input))).readObject();
     }
 
     return certificate;
