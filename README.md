@@ -1,4 +1,4 @@
-EBICS Java Client adapted to Swiss Banks and more security around Private Key handling
+EBICS Java Client adapted to Swiss Banks with support of smart cards (PKCS11)
 =====
 
 This library allows to interact with banks using the EBICS (Electronic Banking Internet Communication Standard)
