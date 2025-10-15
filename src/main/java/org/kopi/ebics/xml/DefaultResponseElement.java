@@ -55,9 +55,7 @@ public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
   protected void parse(ContentFactory factory) throws EbicsException {
     try {
       document = XmlObject.Factory.parse(factory.getContent());
-    } catch (XmlException e) {
-      throw new EbicsException(e.getMessage());
-    } catch (IOException e) {
+    } catch (XmlException | IOException e) {
       throw new EbicsException(e.getMessage());
     }
   }
@@ -85,7 +83,7 @@ public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private String 			name;
+  private final String 			name;
   protected ContentFactory		factory;
   protected ReturnCode			returnCode;
   private static final long 		serialVersionUID = 4014595046719645090L;

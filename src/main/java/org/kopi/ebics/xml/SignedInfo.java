@@ -20,14 +20,16 @@
 package org.kopi.ebics.xml;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.utils.IgnoreAllErrorHandler;
-import org.apache.xpath.XPathAPI;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsUser;
 import org.kopi.ebics.schema.xmldsig.CanonicalizationMethodType;
@@ -132,7 +134,6 @@ public class SignedInfo extends DefaultEbicsRootElement {
       DocumentBuilderFactory 		factory;
       DocumentBuilder			builder;
       Document				document;
-      Node 				node;
       Canonicalizer 			canonicalizer;
 
       factory = DocumentBuilderFactory.newInstance();
@@ -141,9 +142,12 @@ public class SignedInfo extends DefaultEbicsRootElement {
       builder = factory.newDocumentBuilder();
       builder.setErrorHandler(new IgnoreAllErrorHandler());
       document = builder.parse(new ByteArrayInputStream(toSign));
-      node = XPathAPI.selectSingleNode(document, "//ds:SignedInfo");
+      Node node = (Node) XPathFactory.newInstance().newXPath()
+           .evaluate("//*[name()='ds:SignedInfo']", document, XPathConstants.NODE);
       canonicalizer = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
-      return user.authenticate(canonicalizer.canonicalizeSubtree(node));
+      var bos = new ByteArrayOutputStream();
+      canonicalizer.canonicalizeSubtree(node, bos);
+      return user.authenticate(bos.toByteArray());
     } catch(Exception e) {
       throw new EbicsException(e.getMessage());
     }
@@ -166,7 +170,7 @@ public class SignedInfo extends DefaultEbicsRootElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private byte[]			digest;
-  private EbicsUser 			user;
+  private final byte[]			digest;
+  private final EbicsUser 			user;
   private static final long 		serialVersionUID = 4194924578678778580L;
 }

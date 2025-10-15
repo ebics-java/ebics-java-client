@@ -26,16 +26,13 @@ package org.kopi.ebics.exception;
  *
  */
 public class NoDownloadDataAvailableException extends EbicsException {
+    public NoDownloadDataAvailableException() {
+        super(ReturnCode.EBICS_NO_DOWNLOAD_DATA_AVAILABLE);
+    }
+    public NoDownloadDataAvailableException(String message) {
+        super(ReturnCode.EBICS_NO_DOWNLOAD_DATA_AVAILABLE, message);
+    }
 
-  @Override
-  public ReturnCode getReturnCode() {
-    return ReturnCode.EBICS_NO_DOWNLOAD_DATA_AVAILABLE;
-  }
-
-  @Override
-  public String getMessage() {
-    return getReturnCode().getText();
-  }
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------

@@ -22,6 +22,7 @@ package org.kopi.ebics.io;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.kopi.ebics.interfaces.ContentFactory;
 
@@ -50,10 +51,16 @@ public class ByteArrayContentFactory implements ContentFactory {
     return new ByteArrayInputStream(content);
   }
 
+
+  @Override
+  public String toString() {
+    return new String(content, StandardCharsets.UTF_8);
+  }
+
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private byte[]		content;
+  private final byte[]		content;
   private static final long 	serialVersionUID = 4708928447888655116L;
 }

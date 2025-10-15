@@ -96,9 +96,9 @@ public class UserSignature extends DefaultEbicsRootElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private EbicsUser 			user;
-  private String 			signatureVersion;
-  private byte[]			toSign;
-  private String			name;
+  private final EbicsUser 			user;
+  private final String 			signatureVersion;
+  private final byte[]			toSign;
+  private final String			name;
   private static final long 		serialVersionUID = 2992372604876703738L;
 }

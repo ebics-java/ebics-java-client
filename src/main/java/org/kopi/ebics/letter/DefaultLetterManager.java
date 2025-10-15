@@ -83,5 +83,5 @@ public class DefaultLetterManager implements LetterManager {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private Locale				locale;
+  private final Locale				locale;
 }

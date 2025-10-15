@@ -264,7 +264,7 @@ public class X509Generator {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private static SimpleDateFormat 			sdfSerial;
+  private static final SimpleDateFormat 			sdfSerial;
 
   static {
     sdfSerial = new SimpleDateFormat("yyyyMMddHHmmssSSS");

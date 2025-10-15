@@ -20,6 +20,7 @@
 package org.kopi.ebics.client;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -29,6 +30,7 @@ import java.security.Signature;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
+import java.util.StringJoiner;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -131,7 +133,7 @@ public class User implements EbicsUser, Savable {
   public User(EbicsPartner partner,
               String userId,
               String name,
-              String keystorePath,
+              File keystorePath,
               PasswordCallback passwordCallback)
     throws GeneralSecurityException, IOException
   {
@@ -155,17 +157,15 @@ public class User implements EbicsUser, Savable {
   }
 
   /**
-   * Saves the user certificates in a given path
-   * @param path the certificates path
-   * @throws GeneralSecurityException
-   * @throws IOException
+   * Saves the user certificates in a given directory
+   *
    */
-  public void saveUserCertificates(String path) throws GeneralSecurityException, IOException {
+  public void saveUserCertificates(File directory) throws GeneralSecurityException, IOException {
     if (manager == null) {
       throw new GeneralSecurityException("Cannot save user certificates");
     }
 
-    manager.save(path, passwordCallback);
+    manager.save(directory, passwordCallback);
   }
 
   /**
@@ -174,7 +174,7 @@ public class User implements EbicsUser, Savable {
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  private void loadCertificates(String keyStorePath)
+  private void loadCertificates(File keyStorePath)
     throws GeneralSecurityException, IOException
   {
     manager = new CertificateManager(this);
@@ -290,22 +290,18 @@ public class User implements EbicsUser, Savable {
                         String country,
                         String organization)
   {
-    StringBuffer		buffer;
-
-    buffer = new StringBuffer();
-
-    buffer.append("CN=" + name);
+    StringBuilder sb = new StringBuilder();
+    sb.append("CN=").append(name);
     if (country != null) {
-      buffer.append(", " + "C=" + country.toUpperCase());
+      sb.append(", " + "C=").append(country.toUpperCase());
     }
     if (organization != null) {
-      buffer.append(", " + "O=" + organization);
+      sb.append(", " + "O=").append(organization);
     }
     if (email != null) {
-      buffer.append(", " + "E=" + email);
+      sb.append(", " + "E=").append(email);
     }
-
-    return buffer.toString();
+    return sb.toString();
   }
 
   /**
@@ -517,7 +513,7 @@ public class User implements EbicsUser, Savable {
    * will be sent to the EBICS server.
    */
   @Override
-  public byte[] sign(byte[] digest) throws IOException, GeneralSecurityException {
+  public byte[] sign(byte[] digest) throws GeneralSecurityException {
     Signature signature = Signature.getInstance("SHA256WithRSA", BouncyCastleProvider.PROVIDER_NAME);
     signature.initSign(a005PrivateKey);
     signature.update(removeOSSpecificChars(digest));
@@ -585,13 +581,13 @@ public class User implements EbicsUser, Savable {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private EbicsPartner				partner;
-  private String				userId;
-  private String				name;
-  private String				dn;
+  private final EbicsPartner				partner;
+  private final String				userId;
+  private final String				name;
+  private final String				dn;
   private boolean				isInitializedHIA;
   private boolean				isInitialized;
-  private PasswordCallback 			passwordCallback;
+  private final PasswordCallback 			passwordCallback;
   private transient boolean			needSave;
   private CertificateManager			manager;
 

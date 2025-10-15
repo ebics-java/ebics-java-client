@@ -33,5 +33,5 @@ public interface ContentFactory extends Serializable {
    * @return a new data source of the data to be sent.
    * @throws IOException
    */
-  public InputStream getContent() throws IOException;
+  InputStream getContent() throws IOException;
 }

@@ -55,6 +55,6 @@ public class FileContentFactory implements ContentFactory {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private File			input;
+  private final File			input;
   private static final long 	serialVersionUID = -7041705645994170039L;
 }

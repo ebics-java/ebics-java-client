@@ -78,7 +78,7 @@ public class HIARequestElement extends DefaultEbicsRootElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private String			orderId;
+  private final String			orderId;
   private UnsecuredRequestElement	unsecuredRequest;
   private static final long 		serialVersionUID = 1130436605993828777L;
 }

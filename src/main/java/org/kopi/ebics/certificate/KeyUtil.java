@@ -20,6 +20,7 @@
 package org.kopi.ebics.certificate;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -92,14 +93,13 @@ public class KeyUtil {
     }
 
     try {
-      digest = MessageDigest.getInstance("SHA-256", "BC").digest(hash.getBytes("US-ASCII"));
+      digest = MessageDigest.getInstance("SHA-256", "BC").digest(hash.getBytes(
+          StandardCharsets.US_ASCII));
     } catch (GeneralSecurityException e) {
-      throw new EbicsException(e.getMessage());
-    } catch (UnsupportedEncodingException e) {
       throw new EbicsException(e.getMessage());
     }
 
-    return new String(Hex.encodeHex(digest, false)).getBytes();
+      return new String(Hex.encodeHex(digest, false)).getBytes();
   }
 
   /**

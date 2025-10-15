@@ -156,7 +156,7 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private Date					startRange;
-  private Date					endRange;
+  private final Date					startRange;
+  private final Date					endRange;
   private static final long 			serialVersionUID = 3776072549761880272L;
 }

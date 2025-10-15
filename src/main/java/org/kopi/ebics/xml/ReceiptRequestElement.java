@@ -117,7 +117,7 @@ public class ReceiptRequestElement extends DefaultEbicsRootElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private byte[] 			transactionId;
-  private String			name;
+  private final byte[] 			transactionId;
+  private final String			name;
   private static final long 		serialVersionUID = -1969616441705744725L;
 }

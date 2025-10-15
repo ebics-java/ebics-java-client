@@ -19,6 +19,7 @@
 
 package org.kopi.ebics.interfaces;
 
+import java.io.File;
 import java.io.ObjectInputStream;
 
 import org.kopi.ebics.exception.EbicsException;
@@ -39,7 +40,7 @@ public interface SerializationManager {
    * @param object the <code>Savable</code> object$
    * @throws EbicsException serialization fails
    */
-  public void serialize(Savable object) throws EbicsException;
+  void serialize(Savable object) throws EbicsException;
 
   /**
    * Deserializes the given object input stream.
@@ -47,11 +48,11 @@ public interface SerializationManager {
    * @return the corresponding object input stream
    * @throws EbicsException deserialization fails
    */
-  public ObjectInputStream deserialize(String name) throws EbicsException;
+  ObjectInputStream deserialize(String name) throws EbicsException;
 
   /**
    * Sets the serialization directory
    * @param serializationDir the serialization directory
    */
-  public void setSerializationDirectory(String serializationDir);
+  void setSerializationDirectory(File serializationDir);
 }

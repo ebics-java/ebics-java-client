@@ -60,9 +60,7 @@ public class DefaultSerializationManager implements SerializationManager {
   @Override
   public void serialize(Savable object) throws EbicsException {
     try {
-      ObjectOutputStream	out;
-
-      out = new ObjectOutputStream(new FileOutputStream(IOUtils.createFile(serializationDir, object.getSaveName())));
+      var out = new ObjectOutputStream(new FileOutputStream(new File(serializationDir, object.getSaveName())));
       object.save(out);
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
@@ -72,18 +70,15 @@ public class DefaultSerializationManager implements SerializationManager {
   @Override
   public ObjectInputStream deserialize(String name) throws EbicsException {
     try {
-      ObjectInputStream		input;
-
-      input = new ObjectInputStream(new FileInputStream(IOUtils.createFile(serializationDir, name + ".cer")));
-      return input;
+      return new ObjectInputStream(new FileInputStream(new File(serializationDir, name + ".cer")));
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
     }
   }
 
   @Override
-  public void setSerializationDirectory(String serializationDir) {
-    this.serializationDir = new File(serializationDir);
+  public void setSerializationDirectory(File serializationDir) {
+    this.serializationDir = serializationDir;
   }
 
   // --------------------------------------------------------------------

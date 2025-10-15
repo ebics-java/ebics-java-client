@@ -53,6 +53,6 @@ public class UserPasswordHandler implements PasswordCallback {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private String		userId;
-  private String		suffix;
+  private final String		userId;
+  private final String		suffix;
 }

@@ -129,7 +129,7 @@ public class KeyManagement {
     HPBResponseOrderDataElement		orderData;
     ContentFactory			factory;
     KeyStoreManager			keystoreManager;
-    String				path;
+
     RSAPublicKey			e002PubKey;
     RSAPublicKey			x002PubKey;
     int					httpCode;
@@ -140,8 +140,9 @@ public class KeyManagement {
     request.validate();
     session.getConfiguration().getTraceManager().trace(request);
     httpCode = sender.send(new ByteArrayContentFactory(request.prettyPrint()));
+    var body = sender.getResponseBody();
     Utils.checkHttpCode(httpCode);
-    response = new KeyManagementResponseElement(sender.getResponseBody(), "HBPResponse");
+    response = new KeyManagementResponseElement(body, "HBPResponse");
     response.build();
     session.getConfiguration().getTraceManager().trace(response);
     response.report();
@@ -150,8 +151,8 @@ public class KeyManagement {
     orderData.build();
     session.getConfiguration().getTraceManager().trace(orderData);
     keystoreManager = new KeyStoreManager();
-    path = session.getConfiguration().getKeystoreDirectory(session.getUser());
-    keystoreManager.load("" , session.getUser().getPasswordCallback().getPassword());
+    var path = session.getConfiguration().getKeystoreDirectory(session.getUser());
+    keystoreManager.load(null, session.getUser().getPasswordCallback().getPassword());
 
     if (session.getUser().getPartner().getBank().useCertificate())
     {
@@ -161,7 +162,7 @@ public class KeyManagement {
         session.getUser().getPartner().getBank().setDigests(KeyUtil.getKeyDigest(e002PubKey), KeyUtil.getKeyDigest(x002PubKey));
         keystoreManager.setCertificateEntry(session.getBankID() + "-E002", new ByteArrayInputStream(orderData.getBankE002Certificate()));
         keystoreManager.setCertificateEntry(session.getBankID() + "-X002", new ByteArrayInputStream(orderData.getBankX002Certificate()));
-        keystoreManager.save(new FileOutputStream(path + File.separator + session.getBankID() + ".p12"));
+        keystoreManager.save(new FileOutputStream(new File(path, session.getBankID() + ".p12")));
     }
     else
     {
@@ -171,7 +172,7 @@ public class KeyManagement {
         session.getUser().getPartner().getBank().setDigests(KeyUtil.getKeyDigest(e002PubKey), KeyUtil.getKeyDigest(x002PubKey));
         //keystoreManager.setCertificateEntry(session.getBankID() + "-E002", new ByteArrayInputStream(orderData.getBankE002Certificate()));
         //keystoreManager.setCertificateEntry(session.getBankID() + "-X002", new ByteArrayInputStream(orderData.getBankX002Certificate()));
-        keystoreManager.save(new FileOutputStream(path + File.separator + session.getBankID() + ".p12"));
+        keystoreManager.save(new FileOutputStream(new File(path, session.getBankID() + ".p12")));
     }
   }
 
@@ -204,5 +205,5 @@ public class KeyManagement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private EbicsSession 				session;
+  private final EbicsSession 				session;
 }

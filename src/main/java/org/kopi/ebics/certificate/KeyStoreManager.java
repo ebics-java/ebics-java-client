@@ -19,6 +19,7 @@
 
 package org.kopi.ebics.certificate;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,7 +99,7 @@ public class KeyStoreManager {
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  public void load(String path, char[] password)
+  public void load(File path, char[] password)
     throws GeneralSecurityException, IOException
   {
     keyStore = KeyStore.getInstance("PKCS12", "BC");
@@ -112,8 +113,8 @@ public class KeyStoreManager {
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  private void load(String path) throws GeneralSecurityException, IOException {
-    if (path.equals("")) {
+  private void load(File path) throws GeneralSecurityException, IOException {
+    if (path == null) {
       this.keyStore.load(null, null);
     } else {
       this.keyStore.load(new FileInputStream(path), password);

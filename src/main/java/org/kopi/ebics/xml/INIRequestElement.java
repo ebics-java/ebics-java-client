@@ -77,7 +77,7 @@ public class INIRequestElement extends DefaultEbicsRootElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private String			orderId;
+  private final String			orderId;
   private UnsecuredRequestElement	unsecuredRequest;
   private static final long 		serialVersionUID = -1966559247739923555L;
 }

@@ -46,15 +46,12 @@ public class HPBRequestElement extends DefaultEbicsRootElement {
 
   @Override
   public void build() throws EbicsException {
-    SignedInfo			signedInfo;
-    byte[]			signature;
-
     noPubKeyDigestsRequest = new NoPubKeyDigestsRequestElement(session);
     noPubKeyDigestsRequest.build();
-    signedInfo = new SignedInfo(session.getUser(), noPubKeyDigestsRequest.getDigest());
+    var signedInfo = new SignedInfo(session.getUser(), noPubKeyDigestsRequest.getDigest());
     signedInfo.build();
     noPubKeyDigestsRequest.setAuthSignature(signedInfo.getSignatureType());
-    signature = signedInfo.sign(noPubKeyDigestsRequest.toByteArray());
+    var signature = signedInfo.sign(noPubKeyDigestsRequest.toByteArray());
     noPubKeyDigestsRequest.setSignatureValue(signature);
   }
 

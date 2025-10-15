@@ -19,6 +19,7 @@
 
 package org.kopi.ebics.certificate;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -131,15 +132,11 @@ public class CertificateManager {
 
   /**
    * Saves the certificates in PKCS12 format
-   * @param path the certificates path
-   * @param pwdCallBack the password call back
-   * @throws GeneralSecurityException
-   * @throws IOException
    */
-  public void save(String path, PasswordCallback pwdCallBack)
+  public void save(File directory, PasswordCallback pwdCallBack)
     throws GeneralSecurityException, IOException
   {
-    writePKCS12Certificate(path + "/" + user.getUserId(), pwdCallBack.getPassword());
+    writePKCS12Certificate(new File(directory, user.getUserId()), pwdCallBack.getPassword());
   }
 
   /**
@@ -149,7 +146,7 @@ public class CertificateManager {
    * @throws GeneralSecurityException
    * @throws IOException
    */
-  public void load(String path, PasswordCallback pwdCallBack)
+  public void load(File path, PasswordCallback pwdCallBack)
     throws GeneralSecurityException, IOException
   {
     KeyStoreManager		loader;
@@ -169,24 +166,20 @@ public class CertificateManager {
 
   /**
    * Writes a the generated certificates into a PKCS12 key store.
-   * @param filename the key store file name
+   * @param file the key store file
    * @param password the key password
    * @throws IOException
    */
-  public void writePKCS12Certificate(String filename, char[] password)
+  public void writePKCS12Certificate(File file, char[] password)
     throws GeneralSecurityException, IOException
   {
-    if (filename == null || "".equals(filename)) {
-      throw new IOException("The file name cannot be empty");
-    }
-
-    if (!filename.toLowerCase().endsWith(".p12")) {
-      filename += ".p12";
-    }
-
-    FileOutputStream fos = new FileOutputStream(filename);
-    writePKCS12Certificate(password, fos);
-    fos.close();
+      var outFile = file;
+      if (!file.getName().toLowerCase().endsWith(".p12")) {
+          outFile = new File(file.getParentFile(), file.getName() + ".p12");
+      }
+      try (FileOutputStream fos = new FileOutputStream(outFile)) {
+          writePKCS12Certificate(password, fos);
+      }
   }
 
   /**
@@ -222,8 +215,8 @@ public class CertificateManager {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private X509Generator					generator;
-  private EbicsUser					user;
+  private final X509Generator					generator;
+  private final EbicsUser					user;
 
   private X509Certificate				a005Certificate;
   private X509Certificate				e002Certificate;

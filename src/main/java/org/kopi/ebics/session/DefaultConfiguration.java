@@ -46,7 +46,7 @@ public class DefaultConfiguration implements Configuration {
    * Creates a new application configuration.
    * @param rootDir the root directory
    */
-  public DefaultConfiguration(String rootDir, Properties properties) {
+  public DefaultConfiguration(File rootDir, Properties properties) {
     this.rootDir = rootDir;
     bundle = ResourceBundle.getBundle(RESOURCE_DIR);
     this.properties = properties;
@@ -68,7 +68,7 @@ public class DefaultConfiguration implements Configuration {
   }
 
   @Override
-  public String getRootDirectory() {
+  public File getRootDirectory() {
     return rootDir;
   }
 
@@ -98,8 +98,8 @@ public class DefaultConfiguration implements Configuration {
   }
 
   @Override
-  public String getConfigurationFile() {
-    return rootDir + File.separator + getString("conf.file.name");
+  public File getConfigurationFile() {
+    return rootDir(getString("conf.file.name"));
   }
 
   @Override
@@ -108,38 +108,42 @@ public class DefaultConfiguration implements Configuration {
   }
 
   @Override
-  public String getKeystoreDirectory(EbicsUser user) {
-    return getUserDirectory(user) + File.separator + getString("keystore.dir.name");
+  public File getKeystoreDirectory(EbicsUser user) {
+      return new File(getUserDirectory(user), getString("keystore.dir.name"));
   }
 
   @Override
-  public String getTransferTraceDirectory(EbicsUser user) {
-    return getUserDirectory(user) + File.separator + getString("traces.dir.name");
+  public File getTransferTraceDirectory(EbicsUser user) {
+    return new File(getUserDirectory(user), getString("traces.dir.name"));
   }
 
   @Override
-  public String getSerializationDirectory() {
-    return rootDir + File.separator + getString("serialization.dir.name");
+  public File getSerializationDirectory() {
+    return rootDir(getString("serialization.dir.name"));
   }
 
   @Override
-  public String getSSLTrustedStoreDirectory() {
-    return rootDir + File.separator + getString("ssltruststore.dir.name");
+  public File getSSLTrustedStoreDirectory() {
+    return rootDir(getString("ssltruststore.dir.name"));
   }
 
   @Override
-  public String getSSLKeyStoreDirectory() {
-    return rootDir + File.separator + getString("sslkeystore.dir.name");
+  public File getSSLKeyStoreDirectory() {
+    return rootDir(getString("sslkeystore.dir.name"));
   }
 
   @Override
-  public String getSSLBankCertificates() {
-    return rootDir + File.separator + getString("sslbankcert.dir.name");
+  public File getSSLBankCertificates() {
+    return rootDir(getString("sslbankcert.dir.name"));
   }
 
   @Override
-  public String getUsersDirectory() {
-    return rootDir + File.separator + getString("users.dir.name");
+  public File getUsersDirectory() {
+    return rootDir(getString("users.dir.name"));
+  }
+
+  private File rootDir(String name ) {
+    return new File(rootDir, name);
   }
 
   @Override
@@ -158,13 +162,13 @@ public class DefaultConfiguration implements Configuration {
   }
 
   @Override
-  public String getLettersDirectory(EbicsUser user) {
-    return getUserDirectory(user) + File.separator + getString("letters.dir.name");
+  public File getLettersDirectory(EbicsUser user) {
+    return new File(getUserDirectory(user), getString("letters.dir.name"));
   }
 
   @Override
-  public String getUserDirectory(EbicsUser user) {
-    return getUsersDirectory() + File.separator + user.getUserId();
+  public File getUserDirectory(EbicsUser user) {
+    return new File(getUsersDirectory(), user.getUserId());
   }
 
   @Override
@@ -206,7 +210,7 @@ public class DefaultConfiguration implements Configuration {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private final String rootDir;
+  private final File rootDir;
   private final ResourceBundle bundle;
   private final Properties properties;
   private final SerializationManager serializationManager;

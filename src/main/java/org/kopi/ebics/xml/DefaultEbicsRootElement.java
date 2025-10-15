@@ -19,10 +19,8 @@
 
 package org.kopi.ebics.xml;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.math.BigInteger;
@@ -33,15 +31,11 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
-import org.jdom2.Document;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.interfaces.EbicsRootElement;
@@ -76,30 +70,18 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
   }
 
   /**
-   * Prints a pretty XML document using jdom framework.
-   * @return the pretty XML document.
-   * @throws EbicsException pretty print fails
+   * Prints a pretty XML document in Canonical XML.
+   * @return the canonical XML document.
    */
-  public byte[] prettyPrint() throws EbicsException {
-    Document document;
-    XMLOutputter xmlOutputter;
-    SAXBuilder                	sxb;
-    ByteArrayOutputStream	output;
-
-    sxb = new SAXBuilder();
-    output = new ByteArrayOutputStream();
-    xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
-
-    try {
-      document = sxb.build(new InputStreamReader(new ByteArrayInputStream(toByteArray()), "UTF-8"));
-      xmlOutputter.output(document, output);
-    } catch (JDOMException e) {
-      throw new EbicsException(e.getMessage());
-    } catch (IOException e) {
-      throw new EbicsException(e.getMessage());
-    }
-
-    return output.toByteArray();
+  public byte[] prettyPrint() {
+      try {
+          Canonicalizer canon = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
+          var bos = new ByteArrayOutputStream();
+          canon.canonicalize(toByteArray(), bos, true);
+          return bos.toByteArray();
+      } catch (Exception e) {
+          throw new RuntimeException("Failed to canonicalize XML", e);
+      }
   }
 
   /**

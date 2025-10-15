@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.interfaces.RSAPublicKey;
@@ -127,8 +128,9 @@ public abstract class AbstractInitLetter implements InitLetter {
         }
 
         try {
-          digest = MessageDigest.getInstance("SHA-256", "BC").digest(hash.getBytes("US-ASCII"));
-        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+          digest = MessageDigest.getInstance("SHA-256", "BC").digest(hash.getBytes(
+              StandardCharsets.US_ASCII));
+        } catch (GeneralSecurityException e) {
           throw new EbicsException(e.getMessage());
         }
 
@@ -147,13 +149,13 @@ public abstract class AbstractInitLetter implements InitLetter {
    * @return the formatted hash
    */
   private String format(String hash256) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     for (int i = 0; i < hash256.length(); i += 2) {
-      buffer.append(hash256.charAt(i));
-      buffer.append(hash256.charAt(i + 1));
-      buffer.append(' ');
+      sb.append(hash256.charAt(i));
+      sb.append(hash256.charAt(i + 1));
+      sb.append(' ');
     }
-    return buffer.substring(0, 48) + LINE_SEPARATOR + buffer.substring(48) + LINE_SEPARATOR;
+    return sb.substring(0, 48) + LINE_SEPARATOR + sb.substring(48) + LINE_SEPARATOR;
   }
 
   // --------------------------------------------------------------------

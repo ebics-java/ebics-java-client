@@ -37,11 +37,11 @@ public interface Savable {
    * @param oos the given stream.
    * @throws IOException save process failed
    */
-  public void save(ObjectOutputStream oos) throws IOException;
+  void save(ObjectOutputStream oos) throws IOException;
 
   /**
    * Returns the save name of this savable object.
    * @return the save name
    */
-  public String getSaveName();
+  String getSaveName();
 }

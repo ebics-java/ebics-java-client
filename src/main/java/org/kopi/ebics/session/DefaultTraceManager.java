@@ -72,11 +72,8 @@ public class DefaultTraceManager implements TraceManager {
   @Override
   public void trace(EbicsRootElement element) throws EbicsException {
     try {
-      FileOutputStream		out;
-      File			file;
-
-      file = IOUtils.createFile(traceDir, element.getName());
-      out = new FileOutputStream(file);
+      var file = new File(traceDir, element.getName());
+      var out = new FileOutputStream(file);
       element.save(out);
       cache.add(file);
     } catch (IOException e) {
@@ -95,8 +92,8 @@ public class DefaultTraceManager implements TraceManager {
   }
 
   @Override
-  public void setTraceDirectory(String traceDir) {
-    this.traceDir = new File(traceDir);
+  public void setTraceDirectory(File traceDir) {
+    this.traceDir = traceDir;
   }
 
   @Override
@@ -109,5 +106,5 @@ public class DefaultTraceManager implements TraceManager {
   // --------------------------------------------------------------------
 
   private File				traceDir;
-  private FileCache			cache;
+  private final FileCache			cache;
 }

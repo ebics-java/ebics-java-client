@@ -44,7 +44,7 @@ public interface LetterManager {
    * @throws IOException
    * @throws GeneralSecurityException
    */
-  public InitLetter createA005Letter(EbicsUser user)
+  InitLetter createA005Letter(EbicsUser user)
     throws GeneralSecurityException, IOException, EbicsException;
 
   /**
@@ -57,7 +57,7 @@ public interface LetterManager {
    * @throws IOException
    * @throws GeneralSecurityException
    */
-  public InitLetter createE002Letter(EbicsUser user)
+  InitLetter createE002Letter(EbicsUser user)
     throws GeneralSecurityException, IOException, EbicsException;
 
   /**
@@ -70,6 +70,6 @@ public interface LetterManager {
    * @throws IOException
    * @throws GeneralSecurityException
    */
-  public InitLetter createX002Letter(EbicsUser user)
+  InitLetter createX002Letter(EbicsUser user)
     throws GeneralSecurityException, IOException, EbicsException;
 }

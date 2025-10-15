@@ -32,5 +32,5 @@ public interface PasswordCallback {
    * This may be done via user interaction or by passing a stored password.
    * @return the password
    */
-  public char[] getPassword();
+  char[] getPassword();
 }

@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.text.ParseException;
 import java.util.Date;
@@ -34,18 +33,17 @@ import java.util.zip.Inflater;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.utils.IgnoreAllErrorHandler;
-import org.apache.xpath.XPathAPI;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.messages.Messages;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.traversal.NodeIterator;
+import org.w3c.dom.NodeList;
 
 
 /**
@@ -147,35 +145,35 @@ public final class Utils {
    * @return the uncompressed data.
    */
   public static byte[] unzip(byte[] zip) throws EbicsException {
-    Inflater 			decompressor;
-    ByteArrayOutputStream 	output;
-    byte[] 			buf;
+      Inflater decompressor;
+      ByteArrayOutputStream output;
+      byte[] buf;
 
-    decompressor = new Inflater();
-    output = new ByteArrayOutputStream(zip.length);
-    decompressor.setInput(zip);
-    buf = new byte[1024];
+      decompressor = new Inflater();
+      output = new ByteArrayOutputStream(zip.length);
+      decompressor.setInput(zip);
+      buf = new byte[1024];
 
-    while (!decompressor.finished()) {
-      int 		count;
+      while (!decompressor.finished()) {
+          int count;
+
+          try {
+              count = decompressor.inflate(buf);
+          } catch (DataFormatException e) {
+              throw new EbicsException(e.getMessage());
+          }
+          output.write(buf, 0, count);
+      }
 
       try {
-	count = decompressor.inflate(buf);
-      } catch (DataFormatException e) {
-	throw new EbicsException(e.getMessage());
+          output.close();
+      } catch (IOException e) {
+          throw new EbicsException(e.getMessage());
       }
-      output.write(buf, 0, count);
-    }
 
-    try {
-      output.close();
-    } catch (IOException e) {
-      throw new EbicsException(e.getMessage());
-    }
+      decompressor.end();
 
-    decompressor.end();
-
-    return output.toByteArray();
+      return output.toByteArray();
   }
 
   /**
@@ -190,41 +188,34 @@ public final class Utils {
    * need to be signed.
    * 
    * <p>Thus, All the Elements with the attribute authenticate = true and their 
-   * sub elements are considered for the canonization process. This is performed 
-   * via the {@link XPathAPI#selectNodeIterator(Node, String) selectNodeIterator(Node, String)}.
+   * sub elements are considered for the canonization process.
    * 
    * @param input the byte array XML input.
    * @return the canonized form of the given XML
    * @throws EbicsException
    */
   public static byte[] canonize(byte[] input) throws EbicsException {
-    DocumentBuilderFactory 		factory;
-    DocumentBuilder			builder;
-    Document				document;
-    NodeIterator			iter;
-    ByteArrayOutputStream		output;
-    Node 				node;
+      try {
+          var factory = DocumentBuilderFactory.newInstance();
+          factory.setNamespaceAware(true);
+          factory.setValidating(true);
+          var builder = factory.newDocumentBuilder();
+          builder.setErrorHandler(new IgnoreAllErrorHandler());
+          var document = builder.parse(new ByteArrayInputStream(input));
 
-    try {
-      factory = DocumentBuilderFactory.newInstance();
-      factory.setNamespaceAware(true);
-      factory.setValidating(true);
-      builder = factory.newDocumentBuilder();
-      builder.setErrorHandler(new IgnoreAllErrorHandler());
-      document = builder.parse(new ByteArrayInputStream(input));
-      iter = XPathAPI.selectNodeIterator(document, "//*[@authenticate='true']");
-      output = new ByteArrayOutputStream();
-      while ((node = iter.nextNode()) != null) {
-        Canonicalizer 		canonicalizer;
-
-        canonicalizer = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
-        output.write(canonicalizer.canonicalizeSubtree(node));
+          var output = new ByteArrayOutputStream();
+          var nodeList = (NodeList) XPathFactory.newInstance().newXPath()
+              .evaluate("//*[@authenticate='true']", document, XPathConstants.NODESET);
+          for (int i = 0; i < nodeList.getLength(); i++) {
+              Node node = nodeList.item(i);
+              var canonicalizer = Canonicalizer.getInstance(
+                  Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
+              canonicalizer.canonicalizeSubtree(node, output);
+          }
+          return output.toByteArray();
+      } catch (Exception e) {
+          throw new EbicsException(e.getMessage());
       }
-
-      return output.toByteArray();
-    } catch (Exception e) {
-      throw new EbicsException(e.getMessage());
-    }
   }
 
   /**

@@ -19,6 +19,8 @@
 
 package org.kopi.ebics.interfaces;
 
+import java.io.File;
+
 import org.kopi.ebics.exception.EbicsException;
 
 /**
@@ -58,7 +60,7 @@ public interface TraceManager {
   /**
    * Sets the trace directory
    */
-  void setTraceDirectory(String traceDir);
+  void setTraceDirectory(File traceDir);
 
   /**
    * Enables or disables the trace feature

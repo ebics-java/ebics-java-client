@@ -89,7 +89,7 @@ public class InitializationResponseElement extends DefaultResponseElement {
   // --------------------------------------------------------------------
 
   protected EbicsResponse			response;
-  private EbicsOrderType orderType;
+  private final EbicsOrderType orderType;
   private byte[]				transactionId;
   private static final long 			serialVersionUID = 7684048385353175772L;
 }

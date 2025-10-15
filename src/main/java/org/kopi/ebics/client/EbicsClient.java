@@ -69,8 +69,7 @@ import org.kopi.ebics.utils.Constants;
  */
 public class EbicsClient {
     private static File getRootDir() {
-        return new File(
-            System.getProperty("user.home") + File.separator + "ebics" + File.separator + "client");
+        return new File(System.getProperty("user.home"), "ebics" + File.separator + "client");
     }
 
     static {
@@ -233,7 +232,7 @@ public class EbicsClient {
         List<InitLetter> letters = Arrays.asList(letterManager.createA005Letter(user),
             letterManager.createE002Letter(user), letterManager.createX002Letter(user));
 
-        File directory = new File(configuration.getLettersDirectory(user));
+        File directory = configuration.getLettersDirectory(user);
         for (InitLetter letter : letters) {
             try (FileOutputStream out = new FileOutputStream(new File(directory, letter.getName()))) {
                 letter.writeTo(out);
@@ -243,8 +242,6 @@ public class EbicsClient {
 
     /**
      * Loads a user knowing its ID
-     *
-     * @throws Exception
      */
     public User loadUser(String hostId, String partnerId, String userId,
         PasswordCallback passwordCallback) throws Exception {
@@ -282,15 +279,14 @@ public class EbicsClient {
      *
      * @param user the user
      * @param product the application product
-     * @throws Exception
      */
     public void sendINIRequest(User user, Product product) throws Exception {
         String userId = user.getUserId();
         logger.info(messages.getString("ini.request.send", userId));
-        if (user.isInitialized()) {
-            logger.info(messages.getString("user.already.initialized", userId));
-            return;
-        }
+//        if (user.isInitialized()) {
+//            logger.info(messages.getString("user.already.initialized", userId));
+//            return;
+//        }
         EbicsSession session = createSession(user, product);
         KeyManagement keyManager = new KeyManagement(session);
         configuration.getTraceManager().setTraceDirectory(
@@ -312,16 +308,15 @@ public class EbicsClient {
      *            the user ID.
      * @param product
      *            the application product.
-     * @throws Exception
      */
     public void sendHIARequest(User user, Product product) throws Exception {
         String userId = user.getUserId();
         logger.info(messages.getString("hia.request.send", userId));
-        if (user.isInitializedHIA()) {
-            logger
-                .info(messages.getString("user.already.hia.initialized", userId));
-            return;
-        }
+//        if (user.isInitializedHIA()) {
+//            logger
+//                .info(messages.getString("user.already.hia.initialized", userId));
+//            return;
+//        }
         EbicsSession session = createSession(user, product);
         KeyManagement keyManager = new KeyManagement(session);
         configuration.getTraceManager().setTraceDirectory(
@@ -433,7 +428,7 @@ public class EbicsClient {
             // don't log this exception as an error, caller can decide how to handle
             throw e;
         } catch (Exception e) {
-            logger.error(messages.getString("download.file.error"), e);
+            logger.error("{} {}", messages.getString("download.file.error"), e.getMessage(), e);
             throw e;
         }
     }
@@ -538,7 +533,7 @@ public class EbicsClient {
 
         final Locale locale = new Locale(language, country);
 
-        DefaultConfiguration configuration = new DefaultConfiguration(rootDir.getAbsolutePath(),
+        DefaultConfiguration configuration = new DefaultConfiguration(rootDir,
             properties.properties) {
 
             @Override
@@ -653,7 +648,7 @@ public class EbicsClient {
         String outputFileValue = cmd.getOptionValue("o");
         String inputFileValue = cmd.getOptionValue("i");
 
-        List<? extends EbicsOrderType> fetchFileOrders = Arrays.asList(OrderType.STA, OrderType.VMK,
+        var fetchFileOrders = List.of(OrderType.STA, OrderType.VMK,
             OrderType.C52, OrderType.C53, OrderType.C54,
             OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
 
@@ -665,7 +660,7 @@ public class EbicsClient {
             }
         }
 
-        List<? extends EbicsOrderType> sendFileOrders = Arrays.asList(OrderType.XKD, OrderType.FUL, OrderType.XCT,
+        var sendFileOrders = List.of(OrderType.XKD, OrderType.FUL, OrderType.XCT,
             OrderType.XE2, OrderType.CCT);
         for (EbicsOrderType type : sendFileOrders) {
             if (hasOption(cmd, type)) {

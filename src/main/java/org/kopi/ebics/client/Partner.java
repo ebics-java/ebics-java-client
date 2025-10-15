@@ -66,7 +66,7 @@ public class Partner implements EbicsPartner, Savable {
    * @return the next order ID
    */
   public Integer getNextOrderId() {
-    return new Integer(orderId);
+    return Integer.valueOf(orderId);
   }
 
   /**
@@ -144,9 +144,9 @@ public class Partner implements EbicsPartner, Savable {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private EbicsBank			bank;
+  private final EbicsBank			bank;
   private int				orderId = 10*36*36*36;
-  private String			partnerId;
+  private final String			partnerId;
   private transient boolean		needSave;
 
   private static final String		ALPHA_NUM_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";

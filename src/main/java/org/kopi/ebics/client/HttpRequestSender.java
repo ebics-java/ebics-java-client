@@ -51,42 +51,33 @@ public class HttpRequestSender {
 
     private final EbicsSession session;
     private ContentFactory response;
+    private final CloseableHttpClient httpClient;
 
     /**
      * Constructs a new <code>HttpRequestSender</code> with a given ebics
      * session.
      *
-     * @param session
-     *            the ebics session
+     * @param session the ebics session
      */
     public HttpRequestSender(EbicsSession session) {
         this.session = session;
+        this.httpClient = createClient();
     }
 
-    /**
-     * Sends the request contained in the <code>ContentFactory</code>. The
-     * <code>ContentFactory</code> will deliver the request as an
-     * <code>InputStream</code>.
-     *
-     * @param request
-     *            the ebics request
-     * @return the HTTP return code
-     */
-    public final int send(ContentFactory request) throws IOException {
-        RequestConfig.Builder configBuilder = RequestConfig.copy(RequestConfig.DEFAULT).setSocketTimeout(
-            300_000).setConnectTimeout(300_000);
-
+    private CloseableHttpClient createClient() {
+        RequestConfig.Builder configBuilder = RequestConfig.copy(RequestConfig.DEFAULT)
+            .setSocketTimeout(300_000).setConnectTimeout(300_000);
         Configuration conf = session.getConfiguration();
         String proxyHost = conf.getProperty("http.proxy.host");
         CredentialsProvider credsProvider = null;
 
-        if (proxyHost != null && !proxyHost.equals("")) {
+        if (proxyHost != null && !proxyHost.isEmpty()) {
             int proxyPort = Integer.parseInt(conf.getProperty("http.proxy.port").trim());
             HttpHost proxy = new HttpHost(proxyHost.trim(), proxyPort);
             configBuilder.setProxy(proxy);
 
             String user = conf.getProperty("http.proxy.user");
-            if (user != null && !user.equals("")) {
+            if (user != null && !user.isEmpty()) {
                 user = user.trim();
                 String pwd = conf.getProperty("http.proxy.password").trim();
                 credsProvider = new BasicCredentialsProvider();
@@ -94,16 +85,27 @@ public class HttpRequestSender {
                     new UsernamePasswordCredentials(user, pwd));
             }
         }
-        HttpClientBuilder builder = HttpClientBuilder.create().setDefaultRequestConfig(
-            configBuilder.build());
+        HttpClientBuilder builder = HttpClientBuilder.create()
+            .setDefaultRequestConfig(configBuilder.build());
         if (credsProvider != null) {
             builder.setDefaultCredentialsProvider(credsProvider);
             builder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
         }
-        CloseableHttpClient httpClient = builder.build();
+        return builder.build();
+    }
 
+    /**
+     * Sends the request contained in the <code>ContentFactory</code>. The
+     * <code>ContentFactory</code> will deliver the request as an
+     * <code>InputStream</code>.
+     *
+     * @param request the ebics request
+     * @return the HTTP return code
+     */
+    public final int send(ContentFactory request) throws IOException {
         InputStream input = request.getContent();
-        HttpPost method = new HttpPost(session.getUser().getPartner().getBank().getURL().toString());
+        HttpPost method = new HttpPost(
+            session.getUser().getPartner().getBank().getURL().toString());
 
         HttpEntity requestEntity = EntityBuilder.create().setStream(input).build();
         method.setEntity(requestEntity);

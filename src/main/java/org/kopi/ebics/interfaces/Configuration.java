@@ -19,6 +19,7 @@
 
 package org.kopi.ebics.interfaces;
 
+import java.io.File;
 import java.util.Locale;
 
 
@@ -34,13 +35,13 @@ public interface Configuration {
    * Returns the root directory of the client application.
    * @return the root directory of the client application.
    */
-  String getRootDirectory();
+  File getRootDirectory();
 
   /**
    * Returns the EBICS configuration file.
    * @return the EBICS configuration file.
    */
-  String getConfigurationFile();
+  File getConfigurationFile();
 
   /**
    * Returns the property value of a given key from
@@ -56,7 +57,7 @@ public interface Configuration {
    * @param user the ebics user.
    * @return the key store directory of a given user.
    */
-  String getKeystoreDirectory(EbicsUser user);
+  File getKeystoreDirectory(EbicsUser user);
 
   /**
    * Returns the directory path that contains the traces
@@ -64,37 +65,37 @@ public interface Configuration {
    * @param user the ebics user
    * @return the transfer trace directory
    */
-  String getTransferTraceDirectory(EbicsUser user);
+  File getTransferTraceDirectory(EbicsUser user);
 
   /**
    * Returns the object serialization directory.
    * @return the object serialization directory.
    */
-  String getSerializationDirectory();
+  File getSerializationDirectory();
 
   /**
    * Returns the SSL trusted store directory.
    * @return the SSL trusted store directory.
    */
-  String getSSLTrustedStoreDirectory();
+  File getSSLTrustedStoreDirectory();
 
   /**
    * Return the SSL key store directory
    * @return the SSL key store directory
    */
-  String getSSLKeyStoreDirectory();
+  File getSSLKeyStoreDirectory();
 
   /**
    * Returns the SSL bank server certificates.
    * @return the SSL bank server certificates.
    */
-  String getSSLBankCertificates();
+  File getSSLBankCertificates();
 
   /**
    * Returns the users directory.
    * @return the users directory.
    */
-  String getUsersDirectory();
+  File getUsersDirectory();
 
   /**
    * Returns the Ebics client serialization manager.
@@ -118,13 +119,13 @@ public interface Configuration {
    * Returns the initializations letters directory.
    * @return the initializations letters directory.
    */
-  String getLettersDirectory(EbicsUser user);
+  File getLettersDirectory(EbicsUser user);
 
   /**
    * Returns the users directory.
    * @return the users directory.
    */
-  String getUserDirectory(EbicsUser user);
+  File getUserDirectory(EbicsUser user);
 
   /**
    * Configuration initialization.

@@ -185,17 +185,8 @@ public class FileTransfer {
                         File outputFile)
     throws IOException, EbicsException
   {
-    HttpRequestSender			sender;
-    DownloadInitializationRequestElement	initializer;
-    DownloadInitializationResponseElement	response;
-    ReceiptRequestElement		receipt;
-    ReceiptResponseElement		receiptResponse;
-    int					httpCode;
-    TransferState			state;
-    Joiner				joiner;
-
-    sender = new HttpRequestSender(session);
-    initializer = new DownloadInitializationRequestElement(session,
+    var sender = new HttpRequestSender(session);
+    var initializer = new DownloadInitializationRequestElement(session,
 	                                            orderType,
 	                                            start,
 	                                            end);
@@ -203,23 +194,22 @@ public class FileTransfer {
     initializer.validate();
 
     session.getConfiguration().getTraceManager().trace(initializer);
-    httpCode = sender.send(new ByteArrayContentFactory(initializer.prettyPrint()));
+    var request = initializer.prettyPrint();
+    var httpCode = sender.send(new ByteArrayContentFactory(request));
     Utils.checkHttpCode(httpCode);
-    response = new DownloadInitializationResponseElement(sender.getResponseBody(),
+    var response = new DownloadInitializationResponseElement(sender.getResponseBody(),
 	                                          orderType,
 	                                          DefaultEbicsRootElement.generateName(orderType));
 
     response.build();
     session.getConfiguration().getTraceManager().trace(response);
     response.report();
-    state = new TransferState(response.getSegmentsNumber(), response.getTransactionId());
+    var state = new TransferState(response.getSegmentsNumber(), response.getTransactionId());
     state.setSegmentNumber(response.getSegmentNumber());
-    joiner = new Joiner(session.getUser());
+    var joiner = new Joiner(session.getUser());
     joiner.append(response.getOrderData());
     while(state.hasNext()) {
-      int		segmentNumber;
-
-      segmentNumber = state.next();
+      int segmentNumber = state.next();
       fetchFile(orderType,
 	        segmentNumber,
 	        state.isLastSegment(),
@@ -230,7 +220,7 @@ public class FileTransfer {
     try (FileOutputStream dest = new FileOutputStream(outputFile)) {
         joiner.writeTo(dest, response.getTransactionKey());
     }
-    receipt = new ReceiptRequestElement(session,
+    var receipt = new ReceiptRequestElement(session,
 	                                state.getTransactionId(),
 	                                DefaultEbicsRootElement.generateName(orderType));
     receipt.build();
@@ -238,7 +228,7 @@ public class FileTransfer {
     session.getConfiguration().getTraceManager().trace(receipt);
     httpCode = sender.send(new ByteArrayContentFactory(receipt.prettyPrint()));
     Utils.checkHttpCode(httpCode);
-    receiptResponse = new ReceiptResponseElement(sender.getResponseBody(),
+    var receiptResponse = new ReceiptResponseElement(sender.getResponseBody(),
 	                                         DefaultEbicsRootElement.generateName(orderType));
     receiptResponse.build();
     session.getConfiguration().getTraceManager().trace(receiptResponse);

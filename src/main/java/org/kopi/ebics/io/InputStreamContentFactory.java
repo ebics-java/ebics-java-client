@@ -53,6 +53,6 @@ public class InputStreamContentFactory implements ContentFactory {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private InputStream			input;
+  private final InputStream			input;
   private static final long 		serialVersionUID = 2357104115203917168L;
 }

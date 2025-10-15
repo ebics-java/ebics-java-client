@@ -91,6 +91,6 @@ public class UploadTransferRequestElement extends TransferRequestElement {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private ContentFactory		content;
+  private final ContentFactory		content;
   private static final long 		serialVersionUID = 8465397978597444978L;
 }

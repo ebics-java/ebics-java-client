@@ -95,6 +95,6 @@ public class FileCache {
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private Map<String, File>			cache;
+  private final Map<String, File>			cache;
   private boolean 				isTraceEnabled;
 }
