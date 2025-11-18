@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
@@ -44,7 +43,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.bouncycastle.openssl.PEMReader;
 
 /**
  * Key store loader. This class loads a key store from
@@ -82,14 +80,11 @@ public class KeyStoreManager {
    * @throws GeneralSecurityException
    */
   public final PrivateKey getPrivateKey(String alias) throws GeneralSecurityException {
-    PrivateKey			key;
-
-    key = (PrivateKey) keyStore.getKey(alias, password);
-    if (key == null) {
-      throw new IllegalArgumentException("private key not found for alias " + alias);
-    }
-
-    return key;
+      PrivateKey key = (PrivateKey) keyStore.getKey(alias, password);
+      if (key == null) {
+          throw new IllegalArgumentException("private key not found for alias " + alias);
+      }
+      return key;
   }
 
   /**
@@ -128,20 +123,11 @@ public class KeyStoreManager {
    * @param provider the certificate provider
    * @return the certificate
    * @throws CertificateException
-   * @throws IOException
    */
   public X509Certificate read(InputStream input, Provider provider)
-    throws CertificateException, IOException
-  {
-    X509Certificate		certificate;
-
-    certificate = (X509Certificate) CertificateFactory.getInstance("X.509", provider).generateCertificate(input);
-
-    if (certificate == null) {
-      certificate = (X509Certificate)(new PEMReader(new InputStreamReader(input))).readObject();
-    }
-
-    return certificate;
+      throws CertificateException {
+      return (X509Certificate) CertificateFactory.getInstance("X.509",
+          provider).generateCertificate(input);
   }
 
   /**
@@ -149,15 +135,11 @@ public class KeyStoreManager {
    * @param input the given certificate
    * @return The RSA public key of the given certificate
    * @throws GeneralSecurityException
-   * @throws IOException
    */
-  public RSAPublicKey getPublicKey(InputStream input)
-    throws GeneralSecurityException, IOException
-  {
-    X509Certificate		cert;
+  public RSAPublicKey getPublicKey(InputStream input) throws GeneralSecurityException {
 
-    cert = read(input, keyStore.getProvider());
-    return (RSAPublicKey) cert.getPublicKey();
+      X509Certificate cert = read(input, keyStore.getProvider());
+      return (RSAPublicKey) cert.getPublicKey();
   }
 
   public RSAPublicKey getPublicKey(BigInteger publicExponent, BigInteger modulus)
@@ -169,7 +151,7 @@ public class KeyStoreManager {
             return null;
       }
   }
-  
+
   /**
    * Writes the given certificate into the key store.
    * @param alias the certificate alias
@@ -192,7 +174,7 @@ public class KeyStoreManager {
   {
     keyStore.store(output, password);
   }
-  
+
   /**
    * Returns the certificates contained in the key store.
    * @return the certificates contained in the key store.
@@ -208,29 +190,21 @@ public class KeyStoreManager {
    *         the key of the map is the certificate alias
    * @throws KeyStoreException
    */
-  public Map<String, X509Certificate> read(KeyStore keyStore)
-    throws KeyStoreException
-  {
-    Map<String, X509Certificate>	certificates;
-    Enumeration<String> 		enumeration;
-
-    certificates = new HashMap<String, X509Certificate>();
-    enumeration = keyStore.aliases();
-    while (enumeration.hasMoreElements()) {
-      String		alias;
-
-      alias = enumeration.nextElement();
-      certificates.put(alias, (X509Certificate)keyStore.getCertificate(alias));
-    }
-
-    return certificates;
+  public Map<String, X509Certificate> read(KeyStore keyStore) throws KeyStoreException {
+      Map<String, X509Certificate> certificates = new HashMap<>();
+      Enumeration<String> enumeration = keyStore.aliases();
+      while (enumeration.hasMoreElements()) {
+          String alias = enumeration.nextElement();
+          certificates.put(alias, (X509Certificate) keyStore.getCertificate(alias));
+      }
+      return certificates;
   }
 
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
 
-  private KeyStore			keyStore;
-  private char[]			password;
-  private Map<String, X509Certificate>	certs;
+    private KeyStore keyStore;
+    private char[] password;
+    private Map<String, X509Certificate> certs;
 }
