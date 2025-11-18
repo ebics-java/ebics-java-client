@@ -55,15 +55,13 @@ public class CertificateManager {
    * @throws IOException
    */
   public void create() throws GeneralSecurityException, IOException {
-    Calendar		calendar;
+      Calendar calendar = Calendar.getInstance();
+      calendar.add(Calendar.DAY_OF_YEAR, X509Constants.DEFAULT_DURATION);
 
-    calendar = Calendar.getInstance();
-    calendar.add(Calendar.DAY_OF_YEAR, X509Constants.DEFAULT_DURATION);
-
-    createA005Certificate(new Date(calendar.getTimeInMillis()));
-    createX002Certificate(new Date(calendar.getTimeInMillis()));
-    createE002Certificate(new Date(calendar.getTimeInMillis()));
-    setUserCertificates();
+      createA005Certificate(new Date(calendar.getTimeInMillis()));
+      createX002Certificate(new Date(calendar.getTimeInMillis()));
+      createE002Certificate(new Date(calendar.getTimeInMillis()));
+      setUserCertificates();
   }
 
   /**
@@ -86,19 +84,18 @@ public class CertificateManager {
    * @throws IOException
    */
   public void createA005Certificate(Date end) throws GeneralSecurityException, IOException {
-    KeyPair			keypair;
+      KeyPair keypair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE);
+      a005Certificate = generator.generateA005Certificate(keypair, user.getDN(), new Date(), end);
+      a005PrivateKey = keypair.getPrivate();
+  }
 
-    keypair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE);
-    a005Certificate = generator.generateA005Certificate(keypair,
-	                                                user.getDN(),
-	                                                new Date(),
-	                                                end);
-    a005PrivateKey = keypair.getPrivate();
+  X509Certificate getA005Certificate() {
+      return a005Certificate;
   }
 
   /**
    * Creates the authentication certificate.
-   * @param end the expiration date of a the certificate.
+   * @param end the expiration date of a certificate.
    * @throws GeneralSecurityException
    * @throws IOException
    */

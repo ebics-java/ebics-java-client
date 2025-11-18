@@ -35,6 +35,7 @@ import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
@@ -151,7 +152,6 @@ public class X509Generator {
     X509V3CertificateGenerator		generator;
     BigInteger				serial;
     X509Certificate			certificate;
-    ASN1EncodableVector			vector;
 
     serial = BigInteger.valueOf(generateSerial());
     generator = new X509V3CertificateGenerator();
@@ -174,10 +174,10 @@ public class X509Generator {
 	                                             getPublic(),
 	                                             issuer,
 	                                             serial));
-    vector = new ASN1EncodableVector();
-    vector.add(KeyPurposeId.id_kp_emailProtection);
 
-    generator.addExtension(X509Extensions.ExtendedKeyUsage, false, new ExtendedKeyUsage(new DERSequence(vector)));
+    var purposeIds = new KeyPurposeId[] { KeyPurposeId.id_kp_emailProtection };
+
+      generator.addExtension(X509Extensions.ExtendedKeyUsage, false, new ExtendedKeyUsage(purposeIds));
 
     switch (keyusage) {
     case X509Constants.SIGNATURE_KEY_USAGE:
@@ -208,23 +208,14 @@ public class X509Generator {
    * @param issuer the certificate issuer
    * @param serial the certificate serial number
    * @return the authority key identifier of the public key
-   * @throws IOException
    */
   private AuthorityKeyIdentifier getAuthorityKeyIdentifier(PublicKey publicKey,
                                                            String issuer,
-                                                           BigInteger serial)
-    throws IOException
-  {
-    InputStream			input;
-    SubjectPublicKeyInfo	keyInfo;
-    ASN1EncodableVector 	vector;
-
-    input = new ByteArrayInputStream(publicKey.getEncoded());
-    keyInfo = new SubjectPublicKeyInfo((ASN1Sequence)new ASN1InputStream(input).readObject());
-    vector = new ASN1EncodableVector();
-    vector.add(new GeneralName(new X509Name(issuer)));
-
-    return new AuthorityKeyIdentifier(keyInfo, new GeneralNames(new DERSequence(vector)), serial);
+                                                           BigInteger serial) {
+      SubjectPublicKeyInfo keyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
+      X500Name issuerName = new X500Name(issuer);
+      GeneralNames generalNames = new GeneralNames(new GeneralName(issuerName));
+      return new AuthorityKeyIdentifier(keyInfo, generalNames, serial);
   }
 
   /**
@@ -237,27 +228,19 @@ public class X509Generator {
   private SubjectKeyIdentifier getSubjectKeyIdentifier(PublicKey publicKey)
     throws IOException
   {
-    InputStream			input;
-    SubjectPublicKeyInfo	keyInfo;
-
-    input = new ByteArrayInputStream(publicKey.getEncoded());
-    keyInfo = new SubjectPublicKeyInfo((ASN1Sequence)new ASN1InputStream(input).readObject());
-
-    return new SubjectKeyIdentifier(keyInfo);
+      SubjectPublicKeyInfo keyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
+      return new SubjectKeyIdentifier(keyInfo.getEncoded());
   }
 
   /**
-   * Generates a random serial number
+   * Generates a serial number from current timestamp
    *
    * @return the serial number
    */
   private long generateSerial() {
-    Date		now;
-
-    now = new Date();
-    String sNow = sdfSerial.format(now);
-
-    return Long.valueOf(sNow).longValue();
+      Date now = new Date();
+      String sNow = sdfSerial.format(now);
+      return Long.parseLong(sNow);
   }
 
   // --------------------------------------------------------------------
