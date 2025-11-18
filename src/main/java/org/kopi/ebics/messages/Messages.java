@@ -65,11 +65,7 @@ public class Messages {
    * @return the corresponding key value
    */
   public String getString(String key) {
-    try {
       return resourceBundle.getString(key);
-    } catch (MissingResourceException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   private static ResourceBundle getBundle(String bundleName, Locale locale) {

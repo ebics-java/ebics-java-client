@@ -22,6 +22,7 @@ package org.kopi.ebics.exception;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.MissingResourceException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -160,6 +161,7 @@ public class ReturnCode implements Serializable {
   public static final ReturnCode	EBICS_X509_CERTIFICATE_NOT_VALID_YET = create("091209", "EBICS_X509_CERTIFICATE_NOT_VALID_YET");
   public static final ReturnCode	EBICS_MAX_TRANSACTIONS_EXCEEDED = create("091119", "EBICS_MAX_TRANSACTIONS_EXCEEDED");
   public static final ReturnCode	EBICS_SIGNATURE_VERIFICATION_FAILED = create("091301", "EBICS_SIGNATURE_VERIFICATION_FAILED");
+  public static final ReturnCode	EBICS_INVALID_ORDER_DATA_FORMAT = create("090004", "EBICS_INVALID_ORDER_DATA_FORMAT");
   public static final ReturnCode	EBICS_NO_DOWNLOAD_DATA_AVAILABLE = create("090005", "EBICS_NO_DOWNLOAD_DATA_AVAILABLE");
   public static final ReturnCode    EBICS_ORDERID_ALREADY_EXISTS = create("091115", "EBICS_ORDERID_ALREADY_EXISTS");
   public static final ReturnCode EBICS_AUTHORISATION_ORDER_TYPE_FAILED = create("090003", "EBICS_AUTHORISATION_ORDER_TYPE_FAILED");
@@ -167,9 +169,11 @@ public class ReturnCode implements Serializable {
 
 
     private static ReturnCode create(String code, String symbolicName) {
-        String text = messages.getString(code);
-        if (text == null) {
-            throw new NullPointerException("No text for code: " + code);
+        String text;
+        try {
+            text = messages.getString(code);
+        } catch (MissingResourceException e) {
+            text = symbolicName;
         }
         ReturnCode returnCode = new ReturnCode(code, symbolicName, text);
         ReturnCode prev = returnCodes.put(code, returnCode);
