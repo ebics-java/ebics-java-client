@@ -146,7 +146,7 @@ class CertificateManagerTest {
 
         assertNotNull(cert);
 
-        System.out.println(cert);
+        //System.out.println(cert);
 
         assertEquals(3, cert.getVersion(), "Certificate version must be 3 (V3).");
         String expectedDN = "CN=test-dn";
