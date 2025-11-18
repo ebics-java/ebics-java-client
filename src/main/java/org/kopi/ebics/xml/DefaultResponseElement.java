@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.impl.schema.DocumentFactory;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.ReturnCode;
 import org.kopi.ebics.interfaces.ContentFactory;
@@ -49,17 +50,21 @@ public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
 
   /**
    * Parses the content of a <code>ContentFactory</code>
+   *
    * @param factory the content factory
+   * @return the parsed document
    * @throws EbicsException parse error
    */
-  protected void parse(ContentFactory factory) throws EbicsException {
-    try {
-      document = XmlObject.Factory.parse(factory.getContent());
-    } catch (XmlException | IOException e) {
-      throw new EbicsException(e.getMessage());
-    }
+  protected <T extends XmlObject> T parse(ContentFactory factory,
+      DocumentFactory<T> documentFactory) throws EbicsException {
+      try {
+          var doc = documentFactory.parse(factory.getContent());
+          this.document = doc;
+          return doc;
+      } catch (XmlException | IOException e) {
+          throw new EbicsException(e.getMessage());
+      }
   }
-
   /**
    * Reports the return code to the user.
    * @throws EbicsException request fails.

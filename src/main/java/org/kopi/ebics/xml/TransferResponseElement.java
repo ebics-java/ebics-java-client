@@ -45,13 +45,10 @@ public class TransferResponseElement extends DefaultResponseElement {
 
   @Override
   public void build() throws EbicsException {
-    String			code;
-    String			text;
-
-    parse(factory);
-    response = ((EbicsResponseDocument)document).getEbicsResponse();
-    code = response.getHeader().getMutable().getReturnCode();
-    text = response.getHeader().getMutable().getReportText();
+    var doc = parse(factory, EbicsResponseDocument.Factory);
+    response = doc.getEbicsResponse();
+    String code = response.getHeader().getMutable().getReturnCode();
+    String text = response.getHeader().getMutable().getReportText();
     returnCode = ReturnCode.toReturnCode(code, text);
     report();
   }

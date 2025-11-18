@@ -77,7 +77,7 @@ public class HPBResponseOrderDataElement extends DefaultResponseElement {
 
   @Override
   public void build() throws EbicsException {
-    parse(factory);
+    parse(factory, HPBResponseOrderDataDocument.Factory);
     response = ((HPBResponseOrderDataDocument)document).getHPBResponseOrderData();
   }
 

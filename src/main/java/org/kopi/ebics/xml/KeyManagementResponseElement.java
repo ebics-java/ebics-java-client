@@ -58,20 +58,16 @@ public class KeyManagementResponseElement extends DefaultResponseElement {
    * Returns the order data of the response.
    * @return the order data.
    */
-  @SuppressWarnings("deprecation")
   public byte[] getOrderData() {
-    return response.getBody().getDataTransfer().getOrderData().byteArrayValue();
+    return response.getBody().getDataTransfer().getOrderData().getByteArrayValue();
   }
 
   @Override
   public void build() throws EbicsException {
-    String			code;
-    String			text;
-
-    parse(factory);
-    response = ((EbicsKeyManagementResponseDocument)document).getEbicsKeyManagementResponse();
-    code = response.getHeader().getMutable().getReturnCode();
-    text = response.getHeader().getMutable().getReportText();
+    var doc = parse(factory, EbicsKeyManagementResponseDocument.Factory);
+    response = doc.getEbicsKeyManagementResponse();
+    String code = response.getHeader().getMutable().getReturnCode();
+    String text = response.getHeader().getMutable().getReportText();
     returnCode = ReturnCode.toReturnCode(code, text);
     report();
   }

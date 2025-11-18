@@ -45,16 +45,12 @@ public class ReceiptResponseElement extends DefaultResponseElement {
 
   @Override
   public void build() throws EbicsException {
-    String			code;
-    String			text;
-    EbicsResponse		response;
-
-    parse(factory);
-    response = ((EbicsResponseDocument)document).getEbicsResponse();
-    code = response.getHeader().getMutable().getReturnCode();
-    text = response.getHeader().getMutable().getReportText();
-    returnCode = ReturnCode.toReturnCode(code, text);
-    report();
+      var doc = parse(factory, EbicsResponseDocument.Factory);
+      var response = doc.getEbicsResponse();
+      String code = response.getHeader().getMutable().getReturnCode();
+      String text = response.getHeader().getMutable().getReportText();
+      returnCode = ReturnCode.toReturnCode(code, text);
+      report();
   }
 
   @Override

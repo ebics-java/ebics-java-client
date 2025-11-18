@@ -49,17 +49,17 @@ public class InitializationResponseElement extends DefaultResponseElement {
     this.orderType = orderType;
   }
 
-  @Override
-  public void build() throws EbicsException {
-    parse(factory);
-    response = ((EbicsResponseDocument)document).getEbicsResponse();
-    String code = response.getHeader().getMutable().getReturnCode();
-    String text = response.getHeader().getMutable().getReportText();
-    returnCode = ReturnCode.toReturnCode(code, text);
-    checkReturnCode(returnCode);
-    processBodyReturnCode();
-    transactionId = response.getHeader().getStatic().getTransactionID();
-  }
+    @Override
+    public void build() throws EbicsException {
+        var doc = parse(factory, EbicsResponseDocument.Factory);
+        response = doc.getEbicsResponse();
+        String code = response.getHeader().getMutable().getReturnCode();
+        String text = response.getHeader().getMutable().getReportText();
+        returnCode = ReturnCode.toReturnCode(code, text);
+        checkReturnCode(returnCode);
+        processBodyReturnCode();
+        transactionId = response.getHeader().getStatic().getTransactionID();
+    }
 
   protected void processBodyReturnCode() throws EbicsException {
       String bodyRetCode = response.getBody().getReturnCode().getStringValue();
