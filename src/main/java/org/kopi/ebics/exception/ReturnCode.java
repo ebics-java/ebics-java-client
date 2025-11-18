@@ -24,10 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.kopi.ebics.messages.Messages;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Representation of EBICS return codes.
@@ -38,7 +37,7 @@ import org.kopi.ebics.messages.Messages;
  *
  */
 public class ReturnCode implements Serializable {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger log = LoggerFactory.getLogger(ReturnCode.class);
   /**
    * Constructs a new <code>ReturnCode</code> with a given
    * standard code, symbolic name and text
@@ -103,7 +102,7 @@ public class ReturnCode implements Serializable {
       if (returnCode != null) {
           return returnCode;
       }
-      logger.warn("Unknown return code: {}, text: {}", code, text);
+      log.warn("Unknown return code: {}, text: {}", code, text);
       return new ReturnCode(code, text, text);
   }
 

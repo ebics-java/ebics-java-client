@@ -24,8 +24,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.ContentFactory;
 import org.kopi.ebics.interfaces.EbicsOrderType;
@@ -47,7 +45,8 @@ import org.kopi.ebics.xml.ReceiptResponseElement;
 import org.kopi.ebics.xml.TransferResponseElement;
 import org.kopi.ebics.xml.UploadInitializationRequestElement;
 import org.kopi.ebics.xml.UploadTransferRequestElement;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handling of file transfers.
@@ -80,7 +79,7 @@ import org.kopi.ebics.xml.UploadTransferRequestElement;
  *
  */
 public class FileTransfer {
-    private static final Logger logger = LogManager.getLogger(EbicsClient.class);
+    private static final Logger log = LoggerFactory.getLogger(FileTransfer.class);
   /**
    * Constructs a new FileTransfer session
    * @param session the user session
@@ -148,7 +147,7 @@ public class FileTransfer {
     int					httpCode;
 
     Messages messages = new Messages(Constants.APPLICATION_BUNDLE_NAME);
-    logger.info(messages.getString("upload.segment", segmentNumber));
+    log.info(messages.getString("upload.segment", segmentNumber));
     uploader = new UploadTransferRequestElement(session,
 	                                   orderType,
 	                                   segmentNumber,
