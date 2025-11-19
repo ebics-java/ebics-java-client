@@ -48,23 +48,21 @@ public class INIRequestElement extends DefaultEbicsRootElement {
     return "INIRequest.xml";
   }
 
-  @Override
-  public void build() throws EbicsException {
-    SignaturePubKeyOrderDataElement		signaturePubKey;
+    @Override
+    public void build() throws EbicsException {
+        var signaturePubKey = new SignaturePubKeyOrderDataElement(session);
+        signaturePubKey.build();
+        unsecuredRequest = new UnsecuredRequestElement(session, OrderType.INI,
+            orderId == null ? session.getUser().getPartner().nextOrderId() : orderId,
+            Utils.zip(signaturePubKey.prettyPrint()));
+        unsecuredRequest.build();
+        unsecuredRequest.addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
+        unsecuredRequest.setSaveSuggestedPrefixes("urn:org:ebics:H005", "");
 
-    signaturePubKey = new SignaturePubKeyOrderDataElement(session);
-    signaturePubKey.build();
-    unsecuredRequest = new UnsecuredRequestElement(session,
-	                                           OrderType.INI,
-	                                           orderId == null ? session.getUser().getPartner().nextOrderId() : orderId,
-	                                           Utils.zip(signaturePubKey.prettyPrint()));
-    unsecuredRequest.build();
-  }
+    }
 
   @Override
   public byte[] toByteArray() {
-    setSaveSuggestedPrefixes("http://www.ebics.org/H003", "");
-
     return unsecuredRequest.toByteArray();
   }
 

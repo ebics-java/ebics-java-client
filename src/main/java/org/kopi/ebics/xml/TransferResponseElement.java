@@ -22,8 +22,8 @@ package org.kopi.ebics.xml;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.ReturnCode;
 import org.kopi.ebics.interfaces.ContentFactory;
-import org.kopi.ebics.schema.h003.EbicsResponseDocument;
-import org.kopi.ebics.schema.h003.EbicsResponseDocument.EbicsResponse;
+import org.kopi.ebics.schema.h005.EbicsResponseDocument;
+import org.kopi.ebics.schema.h005.EbicsResponseDocument.EbicsResponse;
 
 /**
  * The <code>TransferResponseElement</code> is the common element

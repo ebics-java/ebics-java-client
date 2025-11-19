@@ -51,23 +51,21 @@ public class HIARequestElement extends DefaultEbicsRootElement {
 
   @Override
   public void build() throws EbicsException {
-    HIARequestOrderDataElement		requestOrderData;
 
-    requestOrderData = new HIARequestOrderDataElement(session);
-    requestOrderData.build();
-    unsecuredRequest = new UnsecuredRequestElement(session,
-	                                           OrderType.HIA,
-	                                           orderId == null ? session.getUser().getPartner().nextOrderId() : orderId,
-	                                           Utils.zip(requestOrderData.prettyPrint()));
-    unsecuredRequest.build();
+      var requestOrderData = new HIARequestOrderDataElement(session);
+      requestOrderData.build();
+      unsecuredRequest = new UnsecuredRequestElement(session, OrderType.HIA,
+          orderId == null ? session.getUser().getPartner().nextOrderId() : orderId,
+          Utils.zip(requestOrderData.prettyPrint()));
+      unsecuredRequest.setSaveSuggestedPrefixes("urn:org:ebics:H005", "");
+      unsecuredRequest.build();
   }
 
-  @Override
-  public byte[] toByteArray() {
-    setSaveSuggestedPrefixes("http://www.ebics.org/H003", "");
+    @Override
+    public byte[] toByteArray() {
 
-    return unsecuredRequest.toByteArray();
-  }
+        return unsecuredRequest.toByteArray();
+    }
 
   @Override
   public void validate() throws EbicsException {

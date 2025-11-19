@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:esig="http://www.ebics.org/S001" xmlns:ebics="http://www.ebics.org/H003" targetNamespace="http://www.ebics.org/H003" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+<!-- edited with XMLSpy v2017 sp2 (http://www.altova.com) by EBICS Working Group (July 3rd 2017) - Compared to the status of March 27th 2017 only the element group standardOrderParams was reinserted (as used in schema version H004) and several annotations in English added -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:esig="http://www.ebics.org/S002" xmlns:ebics="urn:org:ebics:H005" targetNamespace="urn:org:ebics:H005" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
 	<annotation>
-		<documentation xml:lang="de">ebics_orders.xsd enthält auftragsbezogene Referenzelemente und auftragsbezogene Typdefinitionen für EBICS.</documentation>
-		<documentation xml:lang="en">ebics_orders.xsd contains order-based reference elements and order-based type definitions for EBICS.</documentation>
+		<documentation xml:lang="en">ebics_orders_H005.xsd contains order-based reference elements and order-based type definitions for EBICS.</documentation>
+		<documentation xml:lang="de">ebics_orders_H005.xsd enthält auftragsbezogene Referenzelemente und auftragsbezogene Typdefinitionen für EBICS.</documentation>
 	</annotation>
-	<import namespace="http://www.ebics.org/S001" schemaLocation="ebics_signature.xsd"/>
-	<include schemaLocation="ebics_types.xsd"/>
-	<!--Es folgen die Elementdefinitionen für neue EBICS-Auftragsarten (Hxx). Die XML-Klartext-Struktur wird im EBICS-Auftragsdatenkontext binär interpretiert.-->
+	<import namespace="http://www.ebics.org/S002" schemaLocation="ebics_signature_S002.xsd"/>
+	<include schemaLocation="ebics_types_H005.xsd"/>
+	<!--Element definitions for the new EBICS order types (Hxx) - Binary interpretation of the XML clear text structure in the context.-->
 	<element name="EBICSOrderData" abstract="true">
 		<annotation>
 			<documentation xml:lang="de">XML-Klartext-Auftragsdaten für neue EBICS-Auftragsarten.</documentation>
@@ -37,10 +38,10 @@
 			<documentation xml:lang="en">Order data for order type HIA (request: initialise user's keys for authentication and encryption).</documentation>
 		</annotation>
 	</element>
-	<element name="HSARequestOrderData" type="ebics:HSARequestOrderDataType" substitutionGroup="ebics:EBICSOrderData">
+	<element name="H3KRequestOrderData" type="ebics:H3KRequestOrderDataType">
 		<annotation>
-			<documentation xml:lang="de">Auftragsdaten für Auftragsart HSA (Anfrage: Initialisierung der Teilnehmerschlüssel für Authentifikation und Verschlüsselung, bankfachlich signiert mit Signaturschlüssel aus FTAM).</documentation>
-			<documentation xml:lang="en">Order data for order type HSA (request: initialise the user's keys for authentication and encryption; this request is signed using the user's FTAM signature key).</documentation>
+			<documentation xml:lang="en">Order data for order type H3K (request: initialise all three user's keys).</documentation>
+			<documentation xml:lang="de">Auftragsdaten für Auftragsart H3K (Anfrage: Initialisierung aller drei Teilnehmerschlüssel).</documentation>
 		</annotation>
 	</element>
 	<element name="HKDResponseOrderData" type="ebics:HKDResponseOrderDataType" substitutionGroup="ebics:EBICSOrderData">
@@ -134,7 +135,7 @@
 			<documentation xml:lang="en">Order data for order type HVZ (response: receive summary of orders currently stored in the distributed signature processing unit with additional information).</documentation>
 		</annotation>
 	</element>
-	<!--Es folgen die Elementdefinitionen für die EU. Die XML-Klartext-Struktur wird im EBICS-Signaturdatenkontext binär interpretiert.-->
+	<!--Element definitions for the ES. Binary interpreation of the XML clear text structure within the signature context.-->
 	<element name="EBICSSignatureData" abstract="true">
 		<annotation>
 			<documentation xml:lang="de">XML-Strukturen für bankfachliche Elektronische Unterschriften (EUs).</documentation>
@@ -147,7 +148,7 @@
 			<documentation xml:lang="en">contains the digital signatures.</documentation>
 		</annotation>
 	</element>
-	<!--Es folgen die Elementdefinitionen für zusätzliche Auftragsparameter. Die XML-Klartext-Struktur wird in die Headerdaten eingebettet.-->
+	<!--Element definitions for additional order parameters. XML clear text is embedded in the header data.-->
 	<element name="OrderParams" abstract="true">
 		<annotation>
 			<documentation xml:lang="de">zusätzliche Auftragsparameter, die zur Ausführung des Auftrags notwendig sind.</documentation>
@@ -190,31 +191,13 @@
 			<documentation xml:lang="en">additional order parameters for order type HVZ.</documentation>
 		</annotation>
 	</element>
-	<element name="FULOrderParams" type="ebics:FULOrderParamsType" substitutionGroup="ebics:OrderParams">
-		<annotation>
-			<documentation xml:lang="de">zusätzliche Auftragsparameter für Auftragsart FUL.</documentation>
-			<documentation xml:lang="en">additional order parameters for order type FUL.</documentation>
-		</annotation>
-	</element>
-	<element name="FDLOrderParams" type="ebics:FDLOrderParamsType" substitutionGroup="ebics:OrderParams">
-		<annotation>
-			<documentation xml:lang="de">zusätzliche Auftragsparameter für Auftragsart FDL.</documentation>
-			<documentation xml:lang="en">additional order parameters for order type FDL.</documentation>
-		</annotation>
-	</element>
 	<element name="StandardOrderParams" type="ebics:StandardOrderParamsType" substitutionGroup="ebics:OrderParams">
 		<annotation>
 			<documentation xml:lang="de">zusätzliche Auftragsparameter für Standard-Auftragsarten.</documentation>
 			<documentation xml:lang="en">additional order parameters for standard order types.</documentation>
 		</annotation>
 	</element>
-	<element name="GenericOrderParams" type="ebics:GenericOrderParamsType" substitutionGroup="ebics:OrderParams">
-		<annotation>
-			<documentation xml:lang="de">zusätzliche Auftragsparameter für beliebige Auftragsarten.</documentation>
-			<documentation xml:lang="en">additional order parameters for generic order types.</documentation>
-		</annotation>
-	</element>
-	<!--Es folgen Elementgruppen- und Strukturdefinitionen.-->
+	<!--Element groups and structural information.-->
 	<group name="HVRequestStructure">
 		<annotation>
 			<documentation xml:lang="de">Standard-Requeststruktur für HVx-Aufträge (HVD, HVT, HVE, HVS).</documentation>
@@ -231,10 +214,10 @@
 					<documentation xml:lang="en">Customer ID of the presenter of the selected order.</documentation>
 				</annotation>
 			</element>
-			<element name="OrderType" type="ebics:OrderTBaseType">
+			<element name="Service" type="ebics:RestrictedServiceType">
 				<annotation>
-					<documentation xml:lang="de">Auftragsart des ausgewählten Auftrags.</documentation>
-					<documentation xml:lang="en">Order type of the selected order.</documentation>
+					<documentation xml:lang="de">BTF Service Parameter struktur im Falle von BTU/BTD</documentation>
+					<documentation xml:lang="en">Identification of the file format in the case of FUL/FDL</documentation>
 				</annotation>
 			</element>
 			<element name="OrderID" type="ebics:OrderIDType">
@@ -283,7 +266,7 @@
 		</attribute>
 		<anyAttribute namespace="##targetNamespace" processContents="strict"/>
 	</attributeGroup>
-	<!--Es folgen Typdefinitionen für auftragsbezogene komplexe Typen.-->
+	<!--Type definitions and order-related complex types.-->
 	<complexType name="BankSignatureDataSigBookType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für Signaturdaten des Kreditinstituts beim EU-Transfer.</documentation>
@@ -316,11 +299,13 @@
 			<element name="DataDigest" type="ebics:DataDigestType" minOccurs="0" maxOccurs="unbounded">
 				<annotation>
 					<documentation xml:lang="de">Hashwert der zu übertragenden Auftragsdatendatei für die Vorabprüfung.</documentation>
+					<documentation xml:lang="en">Hashvalue of the transmitted order data for the prevalidation.</documentation>
 				</annotation>
 			</element>
 			<element name="AccountAuthorisation" type="ebics:PreValidationAccountAuthType" minOccurs="0" maxOccurs="unbounded">
 				<annotation>
 					<documentation xml:lang="de">Kontoangabe zur Kontoberechtigung für diesen Zahlungsverkehrsauftrag bei der Vorabprüfung.</documentation>
+					<documentation xml:lang="en">Account information for authorisation checks for the payment order within the prevalidation.</documentation>
 				</annotation>
 			</element>
 			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
@@ -329,6 +314,7 @@
 	<complexType name="PreValidationAccountAuthType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für Kontenberechtigungsdaten zur Vorabprüfung.</documentation>
+			<documentation xml:lang="en">Data type for the account authorisation data for the prevalidation.</documentation>
 		</annotation>
 		<complexContent>
 			<extension base="ebics:AccountType">
@@ -346,6 +332,7 @@
 	<complexType name="DataTransferRequestType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für den Transfer von Auftragsdaten (Anfrage).</documentation>
+			<documentation xml:lang="en">Data type for the transfer of order data (request).</documentation>
 		</annotation>
 		<sequence>
 			<choice>
@@ -355,10 +342,12 @@
 				<sequence>
 					<annotation>
 						<documentation xml:lang="de">Initialisierungsphase: Transfer der Signaturdaten (EUs) und des Transaktionsschlüssels.</documentation>
+						<documentation xml:lang="en">Inituialisation phase: Transfer of signatur data (ESs) and transaktion key.</documentation>
 					</annotation>
 					<element name="DataEncryptionInfo">
 						<annotation>
 							<documentation xml:lang="de">Information zur Verschlüsselung der Signatur- und Auftragsdaten.</documentation>
+							<documentation xml:lang="en">Information regarding the encryption of signature and order data.</documentation>
 						</annotation>
 						<complexType>
 							<complexContent>
@@ -371,6 +360,7 @@
 					<element name="SignatureData">
 						<annotation>
 							<documentation xml:lang="de">enthält Signaturdaten (EUs).</documentation>
+							<documentation xml:lang="en">contains signature data (ESs).</documentation>
 						</annotation>
 						<complexType>
 							<simpleContent>
@@ -380,14 +370,27 @@
 							</simpleContent>
 						</complexType>
 					</element>
+					<element name="DataDigest" type="ebics:DataDigestType">
+						<annotation>
+							<documentation xml:lang="de">Hashwert der Auftragsdaten.</documentation>
+							<documentation xml:lang="de">Hashvalue of the order data.</documentation>
+						</annotation>
+					</element>
+					<element name="AdditionalOrderInfo" type="ebics:String255Type" minOccurs="0">
+						<annotation>
+							<documentation xml:lang="de">Additional Information about the order (unstructured, up to 255 characters).</documentation>
+						</annotation>
+					</element>
 				</sequence>
 				<sequence>
 					<annotation>
 						<documentation xml:lang="de">Transferphase: Transfer von Auftragsdaten.</documentation>
+						<documentation xml:lang="en">Transferphase: Transfer of order data.</documentation>
 					</annotation>
 					<element name="OrderData">
 						<annotation>
 							<documentation xml:lang="de">enthält Auftragsdaten.</documentation>
+							<documentation xml:lang="en">contains order data.</documentation>
 						</annotation>
 						<complexType>
 							<simpleContent>
@@ -410,10 +413,12 @@
 			<sequence minOccurs="0">
 				<annotation>
 					<documentation xml:lang="de">Transfer des Sitzungsschlüssels und (optional) der Signaturdaten (EUs); nur in der Initialisierungsphase anzugeben.</documentation>
+					<documentation xml:lang="en">Transfer of the session key and (optional) signature data (ESs); to be specified only in the initialisation phase.</documentation>
 				</annotation>
 				<element name="DataEncryptionInfo">
 					<annotation>
 						<documentation xml:lang="de">Information zur Verschlüsselung der Signatur- und Auftragsdaten.</documentation>
+						<documentation xml:lang="en">Information regarding the encryption of signature and order data.</documentation>
 					</annotation>
 					<complexType>
 						<complexContent>
@@ -426,6 +431,7 @@
 				<element name="SignatureData" minOccurs="0" maxOccurs="0">
 					<annotation>
 						<documentation xml:lang="de">enthält Signaturdaten (EUs).</documentation>
+						<documentation xml:lang="en">contains signature data (ESs).</documentation>
 					</annotation>
 					<complexType>
 						<simpleContent>
@@ -439,6 +445,7 @@
 			<element name="OrderData">
 				<annotation>
 					<documentation xml:lang="de">enthält Auftragsdaten.</documentation>
+					<documentation xml:lang="en">contains order data.</documentation>
 				</annotation>
 				<complexType>
 					<simpleContent>
@@ -454,11 +461,13 @@
 	<complexType name="TransferReceiptRequestType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für den Transfer von Transferquittungen.</documentation>
+			<documentation xml:lang="en">Data type for the transfer of transfer receipts.</documentation>
 		</annotation>
 		<sequence>
 			<element name="ReceiptCode" type="ebics:ReceiptCodeType">
 				<annotation>
 					<documentation xml:lang="de">Quittierungscode für Auftragsdatentransfer.</documentation>
+					<documentation xml:lang="en">Receipt code fpr transfer of order data.</documentation>
 				</annotation>
 			</element>
 			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
@@ -472,6 +481,7 @@
 			<element name="ReturnCodeReceipt" type="ebics:ReturnCodeType">
 				<annotation>
 					<documentation xml:lang="de">Antwortcode für den vorangegangenen Transfer.</documentation>
+					<documentation xml:lang="en">response code for the foregoing transfer.</documentation>
 				</annotation>
 			</element>
 			<element name="TimestampBankParameter" type="ebics:TimestampType" minOccurs="0">
@@ -485,11 +495,13 @@
 	<complexType name="HAAResponseOrderDataType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für Auftragsdaten für Auftragsart HAA (Antwort: abrufbare Auftragsarten abholen).</documentation>
+			<documentation xml:lang="en">Data type for order data of order type HAA (Response: Download of available order data).</documentation>
 		</annotation>
 		<sequence>
-			<element name="OrderTypes" type="ebics:OrderTListType">
+			<element name="Service" type="ebics:RestrictedServiceType" minOccurs="0" maxOccurs="unbounded">
 				<annotation>
 					<documentation xml:lang="de">Liste von Auftragsarten, für die Daten bereit stehen.</documentation>
+					<documentation xml:lang="en">List of order types for which data are available.</documentation>
 				</annotation>
 			</element>
 			<any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
@@ -498,26 +510,31 @@
 	<complexType name="HCARequestOrderDataType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für Auftragsdaten für Auftragsart HCA (Anfrage: Änderung der Teilnehmerschlüssel für Authentifikation und Verschlüsselung).</documentation>
+			<documentation xml:lang="en">Data type for order data regarding order type HCA (Request: Update of Subscriber's key for authentication and encryption).</documentation>
 		</annotation>
 		<sequence>
 			<element name="AuthenticationPubKeyInfo" type="ebics:AuthenticationPubKeyInfoType">
 				<annotation>
 					<documentation xml:lang="de">öffentlicher Authentifikationsschlüssel.</documentation>
+					<documentation xml:lang="en">public key for authentication.</documentation>
 				</annotation>
 			</element>
 			<element name="EncryptionPubKeyInfo" type="ebics:EncryptionPubKeyInfoType">
 				<annotation>
 					<documentation xml:lang="de">öffentlicher Verschlüsselungsschlüssel.</documentation>
+					<documentation xml:lang="en">public key for encryption.</documentation>
 				</annotation>
 			</element>
 			<element name="PartnerID" type="ebics:PartnerIDType">
 				<annotation>
 					<documentation xml:lang="de">Kunden-ID.</documentation>
+					<documentation xml:lang="en">Partner-ID.</documentation>
 				</annotation>
 			</element>
 			<element name="UserID" type="ebics:UserIDType">
 				<annotation>
 					<documentation xml:lang="de">Teilnehmer-ID.</documentation>
+					<documentation xml:lang="en">User-ID.</documentation>
 				</annotation>
 			</element>
 			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
@@ -526,27 +543,32 @@
 	<complexType name="HCSRequestOrderDataType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für Auftragsdaten für Auftragsart HCS (Anfrage: Schlüsselwechsel aller Schlüssel).</documentation>
+			<documentation xml:lang="en">Data type for order data for order type HCS (Request: Update of all keys).</documentation>
 		</annotation>
 		<sequence>
 			<element name="AuthenticationPubKeyInfo" type="ebics:AuthenticationPubKeyInfoType">
 				<annotation>
 					<documentation xml:lang="de">öffentlicher Authentifikationsschlüssel.</documentation>
+					<documentation xml:lang="en">public key for authentication.</documentation>
 				</annotation>
 			</element>
 			<element name="EncryptionPubKeyInfo" type="ebics:EncryptionPubKeyInfoType">
 				<annotation>
 					<documentation xml:lang="de">öffentlicher Verschlüsselungsschlüssel.</documentation>
+					<documentation xml:lang="en">public key for encryption.</documentation>
 				</annotation>
 			</element>
 			<element ref="esig:SignaturePubKeyInfo"/>
 			<element name="PartnerID" type="ebics:PartnerIDType">
 				<annotation>
 					<documentation xml:lang="de">Kunden-ID.</documentation>
+					<documentation xml:lang="en">Partner-ID.</documentation>
 				</annotation>
 			</element>
 			<element name="UserID" type="ebics:UserIDType">
 				<annotation>
 					<documentation xml:lang="de">Teilnehmer-ID.</documentation>
+					<documentation xml:lang="en">User-ID.</documentation>
 				</annotation>
 			</element>
 			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
@@ -555,57 +577,72 @@
 	<complexType name="HIARequestOrderDataType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für Auftragsdaten für Auftragsart HIA (Anfrage: Initialisierung der Teilnehmerschlüssel für Authentifikation und Verschlüsselung).</documentation>
+			<documentation xml:lang="en">Data type for order data for order type HIA (Request: Initialisation of subcriber keys for authentication and encryption).</documentation>
 		</annotation>
 		<sequence>
 			<element name="AuthenticationPubKeyInfo" type="ebics:AuthenticationPubKeyInfoType">
 				<annotation>
 					<documentation xml:lang="de">öffentlicher Authentifikationsschlüssel.</documentation>
+					<documentation xml:lang="en">public key for authentication.</documentation>
 				</annotation>
 			</element>
 			<element name="EncryptionPubKeyInfo" type="ebics:EncryptionPubKeyInfoType">
 				<annotation>
 					<documentation xml:lang="de">öffentlicher Verschlüsselungsschlüssel.</documentation>
+					<documentation xml:lang="en">public key for encryption.</documentation>
 				</annotation>
 			</element>
 			<element name="PartnerID" type="ebics:PartnerIDType">
 				<annotation>
 					<documentation xml:lang="de">Kunden-ID.</documentation>
+					<documentation xml:lang="en">Partner-ID.</documentation>
 				</annotation>
 			</element>
 			<element name="UserID" type="ebics:UserIDType">
 				<annotation>
 					<documentation xml:lang="de">Teilnehmer-ID.</documentation>
+					<documentation xml:lang="en">User-ID.</documentation>
 				</annotation>
 			</element>
 			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</sequence>
 	</complexType>
-	<complexType name="HSARequestOrderDataType">
+	<complexType name="H3KRequestOrderDataType">
 		<annotation>
-			<documentation xml:lang="de">Datentyp für Auftragsdaten für Auftragsart HSA (Anfrage: Initialisierung der Teilnehmerschlüssel für Authentifikation und Verschlüsselung, bankfachlich signiert mit FTAM-Schlüssel).</documentation>
+			<documentation xml:lang="de">Datentyp für Auftragsdaten für Auftragsart H3K (Anfrage: Initialisierung aller drei Teilnehmerschlüssel).</documentation>
+			<documentation xml:lang="en">Order type for order data H3K (request: initialise all three user's keys).</documentation>
 		</annotation>
 		<sequence>
-			<element name="AuthenticationPubKeyInfo" type="ebics:AuthenticationPubKeyInfoType">
+			<element name="SignatureCertificateInfo" type="ebics:SignatureCertificateInfoType">
 				<annotation>
-					<documentation xml:lang="de">öffentlicher Authentifikationsschlüssel.</documentation>
+					<documentation xml:lang="en">Key for electronic Signature</documentation>
+					<documentation xml:lang="de">Signaturschlüssel.</documentation>
 				</annotation>
 			</element>
-			<element name="EncryptionPubKeyInfo" type="ebics:EncryptionPubKeyInfoType">
+			<element name="AuthenticationCertificateInfo" type="ebics:AuthenticationCertificateInfoType">
 				<annotation>
-					<documentation xml:lang="de">öffentlicher Verschlüsselungsschlüssel.</documentation>
+					<documentation xml:lang="en">Authentication key</documentation>
+					<documentation xml:lang="de">Authentifikationsschlüssel.</documentation>
+				</annotation>
+			</element>
+			<element name="EncryptionCertificateInfo" type="ebics:EncryptionCertificateInfoType">
+				<annotation>
+					<documentation xml:lang="en">Encryption key</documentation>
+					<documentation xml:lang="de">Verschlüsselungsschlüssel.</documentation>
 				</annotation>
 			</element>
 			<element name="PartnerID" type="ebics:PartnerIDType">
 				<annotation>
+					<documentation xml:lang="en">PartnerID.</documentation>
 					<documentation xml:lang="de">Kunden-ID.</documentation>
 				</annotation>
 			</element>
 			<element name="UserID" type="ebics:UserIDType">
 				<annotation>
+					<documentation xml:lang="en">UserID.</documentation>
 					<documentation xml:lang="de">Teilnehmer-ID.</documentation>
 				</annotation>
 			</element>
-			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</sequence>
 	</complexType>
 	<complexType name="HKDResponseOrderDataType">
@@ -632,26 +669,31 @@
 	<complexType name="HPBResponseOrderDataType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für Auftragsdaten für Auftragsart HPB (Antwort: Transfer der Bankschlüssel).</documentation>
+			<documentation xml:lang="en">Data type for order data for order type HPB (Response: Transfer of bank keys).</documentation>
 		</annotation>
 		<sequence>
 			<element name="AuthenticationPubKeyInfo" type="ebics:AuthenticationPubKeyInfoType">
 				<annotation>
 					<documentation xml:lang="de">öffentlicher Authentifikationsschlüssel.</documentation>
+					<documentation xml:lang="en">public authentication key</documentation>
 				</annotation>
 			</element>
 			<element name="EncryptionPubKeyInfo" type="ebics:EncryptionPubKeyInfoType">
 				<annotation>
 					<documentation xml:lang="de">öffentlicher Verschlüsselungsschlüssel.</documentation>
+					<documentation xml:lang="en">public encryption key</documentation>
 				</annotation>
 			</element>
 			<element ref="esig:SignaturePubKeyInfo" minOccurs="0" maxOccurs="0">
 				<annotation>
 					<documentation xml:lang="de">öffentlicher EU-Signaturschlüssel.</documentation>
+					<documentation xml:lang="en">public ES key.</documentation>
 				</annotation>
 			</element>
 			<element name="HostID" type="ebics:HostIDType">
 				<annotation>
 					<documentation xml:lang="de">Banksystem-ID.</documentation>
+					<documentation xml:lang="en">Host-ID.</documentation>
 				</annotation>
 			</element>
 			<any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
@@ -660,16 +702,19 @@
 	<complexType name="HPDResponseOrderDataType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für Auftragsdaten für Auftragsart HPD (Antwort: Bankparameter abholen).</documentation>
+			<documentation xml:lang="en">Data type for order data for order type HPD (Response: Download bank parameters).</documentation>
 		</annotation>
 		<sequence>
 			<element name="AccessParams" type="ebics:HPDAccessParamsType">
 				<annotation>
 					<documentation xml:lang="de">Zugangsparameter.</documentation>
+					<documentation xml:lang="en">Access Parameter.</documentation>
 				</annotation>
 			</element>
 			<element name="ProtocolParams" type="ebics:HPDProtocolParamsType">
 				<annotation>
 					<documentation xml:lang="de">Protokollparameter.</documentation>
+					<documentation xml:lang="en">Protocol Parameter.</documentation>
 				</annotation>
 			</element>
 		</sequence>
@@ -677,11 +722,13 @@
 	<complexType name="HPDAccessParamsType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für HPD-Zugangsparameter.</documentation>
+			<documentation xml:lang="en">data type for HPD Access Parameter.</documentation>
 		</annotation>
 		<sequence>
 			<element name="URL" maxOccurs="unbounded">
 				<annotation>
 					<documentation xml:lang="de">institutsspezifische IP-Adresse/URL.</documentation>
+					<documentation xml:lang="en">individual IP-address/URL of the bank.</documentation>
 				</annotation>
 				<complexType>
 					<simpleContent>
@@ -689,6 +736,7 @@
 							<attribute name="valid_from" type="ebics:TimestampType">
 								<annotation>
 									<documentation xml:lang="de">Gültigkeitsbeginn für die angegebene URL/IP.</documentation>
+									<documentation xml:lang="en">Valid-From-Date of the URL/IP.</documentation>
 								</annotation>
 							</attribute>
 						</extension>
@@ -698,6 +746,7 @@
 			<element name="Institute">
 				<annotation>
 					<documentation xml:lang="de">Institutsbezeichnung.</documentation>
+					<documentation xml:lang="en">Name of the bank.</documentation>
 				</annotation>
 				<simpleType>
 					<restriction base="normalizedString">
@@ -747,21 +796,6 @@
 					<attributeGroup ref="ebics:OptSupportFlag"/>
 				</complexType>
 			</element>
-			<element name="X509Data" minOccurs="0">
-				<annotation>
-					<documentation xml:lang="de">Parameter zur X.509-Funktionalität.</documentation>
-					<documentation xml:lang="en">Parameter denoting the X.509 functionality.</documentation>
-				</annotation>
-				<complexType>
-					<attributeGroup ref="ebics:OptSupportFlag"/>
-					<attribute name="persistent" type="boolean" use="optional" default="false">
-						<annotation>
-							<documentation xml:lang="de">Sind die X.509-Daten der Teilnehmer serverseitig persistent gespeichert?</documentation>
-							<documentation xml:lang="en">Will the user's X.509 data be stored persistently on server side?</documentation>
-						</annotation>
-					</attribute>
-				</complexType>
-			</element>
 			<element name="ClientDataDownload" minOccurs="0">
 				<annotation>
 					<documentation xml:lang="de">Parameter zum Download von Kunden- und Teilnehmerdaten (Auftragsarten HKD/HTD).</documentation>
@@ -786,11 +820,13 @@
 	<complexType name="HPDVersionType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für HPD-Versionsinformationen.</documentation>
+			<documentation xml:lang="en">Data type for HPD version information.</documentation>
 		</annotation>
 		<sequence>
 			<element name="Protocol">
 				<annotation>
 					<documentation xml:lang="de">unterstützte EBICS-Protokollversionen (H...).</documentation>
+					<documentation xml:lang="en">supported EBICS protocol versions. (H...).</documentation>
 				</annotation>
 				<simpleType>
 					<list itemType="ebics:ProtocolVersionType"/>
@@ -799,6 +835,7 @@
 			<element name="Authentication">
 				<annotation>
 					<documentation xml:lang="de">unterstützte Versionen der Authentifikation (X...).</documentation>
+					<documentation xml:lang="en">supported version for authentication (X...).</documentation>
 				</annotation>
 				<simpleType>
 					<list itemType="ebics:AuthenticationVersionType"/>
@@ -807,6 +844,7 @@
 			<element name="Encryption">
 				<annotation>
 					<documentation xml:lang="de">unterstützte Versionen der Verschlüsselung (E...).</documentation>
+					<documentation xml:lang="en">supported version for encryption (E...).</documentation>
 				</annotation>
 				<simpleType>
 					<list itemType="ebics:EncryptionVersionType"/>
@@ -815,6 +853,7 @@
 			<element name="Signature">
 				<annotation>
 					<documentation xml:lang="de">unterstützte EU-Versionen (A...).</documentation>
+					<documentation xml:lang="en">supported version for ES (A...).</documentation>
 				</annotation>
 				<simpleType>
 					<list itemType="esig:SignatureVersionType"/>
@@ -826,6 +865,7 @@
 	<complexType name="HTDReponseOrderDataType">
 		<annotation>
 			<documentation>Datentyp für Auftragsdaten für Auftragsart HTD (Antwort: Kunden- und Teilnehmerdaten des Teilnehmers abholen).</documentation>
+			<documentation xml:lang="en">Data type for order data for order type HTD (Response: Download partner- and user data).</documentation>
 		</annotation>
 		<sequence>
 			<element name="PartnerInfo" type="ebics:PartnerInfoType">
@@ -846,6 +886,7 @@
 	<complexType name="HVDResponseOrderDataType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für Auftragsdaten für Auftragsart HVD (Antwort: VEU-Status abrufen).</documentation>
+			<documentation xml:lang="en">Data type for order data for order type HVD (Response: EDS-status).</documentation>
 		</annotation>
 		<sequence>
 			<element name="DataDigest" type="ebics:DataDigestType">
@@ -896,6 +937,7 @@
 	<complexType name="HVDOrderParamsType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für zusätzliche Auftragsparameter für Auftragsart HVD.</documentation>
+			<documentation xml:lang="en">Data type for additional order parameters for order type HVD.</documentation>
 		</annotation>
 		<sequence>
 			<group ref="ebics:HVRequestStructure"/>
@@ -905,6 +947,7 @@
 	<complexType name="HVEOrderParamsType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für zusätzliche Auftragsparameter für Auftragsart HVE.</documentation>
+			<documentation xml:lang="en">Data type for additional order parameters for order type HVE.</documentation>
 		</annotation>
 		<sequence>
 			<group ref="ebics:HVRequestStructure"/>
@@ -914,6 +957,7 @@
 	<complexType name="HVSOrderParamsType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für zusätzliche Auftragsparameter für Auftragsart HVS.</documentation>
+			<documentation xml:lang="en">Data type for additional order parameters for order type HVS.</documentation>
 		</annotation>
 		<sequence>
 			<group ref="ebics:HVRequestStructure"/>
@@ -923,11 +967,13 @@
 	<complexType name="HVSRequestOrderDataType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für Auftragsdaten für Auftragsart HVS (Anfrage: VEU-Storno).</documentation>
+			<documentation xml:lang="en">Data type for order data for order type HVS (request: EDS cancellation).</documentation>
 		</annotation>
 		<sequence>
 			<element name="CancelledDataDigest" type="ebics:DataDigestType">
 				<annotation>
 					<documentation xml:lang="de">Hashwert der Auftragsdaten des stornierten Auftrags.</documentation>
+					<documentation xml:lang="en">Hash value of order data of cancelled order.</documentation>
 				</annotation>
 			</element>
 			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
@@ -936,6 +982,7 @@
 	<complexType name="HVTResponseOrderDataType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für Antwort mit Einzelauftraginfos für Auftragsart HVT (Antwort VEU-Transaktionsdetails abrufen mit completeOrderData="false").</documentation>
+			<documentation xml:lang="en">Data type for a response containing information about single transactions for order type HVT (response: EDS transaction details with completeOrderData="false").</documentation>
 		</annotation>
 		<sequence>
 			<element name="NumOrderInfos" type="ebics:NumOrderInfosType">
@@ -964,22 +1011,20 @@
 	</complexType>
 	<complexType name="HVTOrderInfoType">
 		<annotation>
-			<documentation xml:lang="de">Datentyp für HVT-Auftragsinformationen.</documentation>
+			<documentation xml:lang="de">//MODIFIED - Replaced Element OrderFormat with MsgName// Datentyp für HVT-Auftragsinformationen.</documentation>
 		</annotation>
 		<sequence>
-			<element name="OrderFormat" type="ebics:OrderFormatType" minOccurs="0">
-				<annotation>
-					<documentation xml:lang="de">Auftragsformat (z.B. DTAZV).</documentation>
-				</annotation>
-			</element>
+			<element name="MsgName" type="ebics:MessageType" minOccurs="0"/>
 			<element name="AccountInfo" type="ebics:HVTAccountInfoType" minOccurs="2" maxOccurs="3">
 				<annotation>
 					<documentation xml:lang="de">kontobezogene Details des Auftrags (Auftraggeber, Empfänger etc.).</documentation>
+					<documentation xml:lang="en">account related details of the order (ordering party, receiver etc.).</documentation>
 				</annotation>
 			</element>
 			<element name="ExecutionDate" minOccurs="0">
 				<annotation>
 					<documentation xml:lang="de">Ausführungsdatum.</documentation>
+					<documentation xml:lang="en">Execution date.</documentation>
 				</annotation>
 				<complexType>
 					<simpleContent>
@@ -990,6 +1035,7 @@
 			<element name="Amount">
 				<annotation>
 					<documentation xml:lang="de">Betrag.</documentation>
+					<documentation xml:lang="en">Amount.</documentation>
 				</annotation>
 				<complexType>
 					<simpleContent>
@@ -997,11 +1043,13 @@
 							<attribute name="isCredit" type="boolean" use="optional">
 								<annotation>
 									<documentation xml:lang="de">Gutschrift (isCredit = "true") oder Lastschrift (isCredit = "false")?</documentation>
+									<documentation xml:lang="en">Credit (isCredit = "true") or debit (isCredit = "false")?</documentation>
 								</annotation>
 							</attribute>
 							<attribute name="Currency" type="ebics:CurrencyBaseType" use="optional">
 								<annotation>
 									<documentation xml:lang="de">Währungscode.</documentation>
+									<documentation xml:lang="en">Currency code.</documentation>
 								</annotation>
 							</attribute>
 						</extension>
@@ -1011,6 +1059,7 @@
 			<element name="Description" minOccurs="0" maxOccurs="4">
 				<annotation>
 					<documentation xml:lang="de">Textfeld zur weiteren Beschreibung der Transaktion (Verwendungszweck, Auftragsdetails, Kommentar).</documentation>
+					<documentation xml:lang="en">text field for additional descriptions regarding the transaction (remittance information, order details, annotations).</documentation>
 				</annotation>
 				<complexType>
 					<simpleContent>
@@ -1018,22 +1067,26 @@
 							<attribute name="Type" use="required">
 								<annotation>
 									<documentation xml:lang="de">Beschreibungstyp.</documentation>
+									<documentation xml:lang="en">Description type.</documentation>
 								</annotation>
 								<simpleType>
 									<restriction base="token">
 										<enumeration value="Purpose">
 											<annotation>
 												<documentation xml:lang="de">Verwendungszweck</documentation>
+												<documentation xml:lang="en">remittance information.</documentation>
 											</annotation>
 										</enumeration>
 										<enumeration value="Details">
 											<annotation>
 												<documentation xml:lang="de">Auftragsdetails</documentation>
+												<documentation xml:lang="en">Order details.</documentation>
 											</annotation>
 										</enumeration>
 										<enumeration value="Comment">
 											<annotation>
 												<documentation xml:lang="de">Kommentar</documentation>
+												<documentation xml:lang="en">Annotation.</documentation>
 											</annotation>
 										</enumeration>
 									</restriction>
@@ -1049,17 +1102,18 @@
 	<complexType name="HVTOrderFlagsType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für HVT-Auftragsflags.</documentation>
+			<documentation xml:lang="en">Data type for HVT order flags.</documentation>
 		</annotation>
-		<attribute name="completeOrderData" type="boolean" use="optional" default="false">
+		<attribute name="completeOrderData" type="boolean" use="required">
 			<annotation>
-				<documentation xml:lang="de">Sollen die Transaktionsdetails als Einzelauftragsinfos (completeOrderData=false) oder als komplette Originaldaten (completeOrderData=true) übertragen werden?</documentation>
-				<documentation xml:lang="en">Are the transaction details so be transmitted as particular order content information requested for display matters or in complete order data file form?</documentation>
+				<documentation xml:lang="de">Sollen die Transaktionsdetails als Einzelauftragsinfos (completeOrderData=false) oder als komplette Originaldaten (completeOrderData=true) übertragen werden? (Vorschlag für Default=false)</documentation>
+				<documentation xml:lang="en">Are the transaction details so be transmitted as particular order content information requested for display matters or in complete order data file form? (Proposal for Default=false)</documentation>
 			</annotation>
 		</attribute>
-		<attribute name="fetchLimit" use="optional" default="100">
+		<attribute name="fetchLimit" use="required">
 			<annotation>
-				<documentation xml:lang="de">Limit für die zu liefernden Transaktionsdetails, bei completeOrderData=false maximale Anzahl zu liefernder Einzelauftragsinfos, 0 für unbegrenzt.</documentation>
-				<documentation xml:lang="en">Limit for the transaction details to be transmitted; if completeOrderData=false, maximum number of details of a particular order; 0 for unlimited number of details.</documentation>
+				<documentation xml:lang="de">Limit für die zu liefernden Transaktionsdetails, bei completeOrderData=false maximale Anzahl zu liefernder Einzelauftragsinfos, 0 für unbegrenzt (Vorschlag für Default=100).</documentation>
+				<documentation xml:lang="en">Limit for the transaction details to be transmitted; if completeOrderData=false, maximum number of details of a particular order; 0 for unlimited number of details (Proposal for Default=100).</documentation>
 			</annotation>
 			<simpleType>
 				<restriction base="nonNegativeInteger">
@@ -1067,10 +1121,10 @@
 				</restriction>
 			</simpleType>
 		</attribute>
-		<attribute name="fetchOffset" use="optional" default="0">
+		<attribute name="fetchOffset" use="required">
 			<annotation>
-				<documentation xml:lang="de">Offset vom Anfang der Originalauftragsdatei für die zu liefernden Transaktionsdetails, bei completeOrderData=false bezogen auf laufende Nummer des Einzelauftrags.</documentation>
-				<documentation xml:lang="en">Offset position in the original order file which marks the starting point for the transaction details to be transmitted; applies to the sequential number of a particular order if completeOrderData=false.</documentation>
+				<documentation xml:lang="de">Offset vom Anfang der Originalauftragsdatei für die zu liefernden Transaktionsdetails, bei completeOrderData=false bezogen auf laufende Nummer des Einzelauftrags (Vorschlag für Default=0).</documentation>
+				<documentation xml:lang="en">Offset position in the original order file which marks the starting point for the transaction details to be transmitted; applies to the sequential number of a particular order if completeOrderData=false (Proposal for Default=0).</documentation>
 			</annotation>
 			<simpleType>
 				<restriction base="nonNegativeInteger">
@@ -1110,6 +1164,7 @@
 	<complexType name="HVUResponseOrderDataType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für Auftragsdaten für Auftragsart HVU (Antwort: VEU-Übersicht abholen).</documentation>
+			<documentation xml:lang="en">Data type for order data for order type HVU (Response: Download EDS overview).</documentation>
 		</annotation>
 		<sequence>
 			<annotation>
@@ -1126,9 +1181,10 @@
 	<complexType name="HVUOrderDetailsType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für HVU-Auftragsdetails.</documentation>
+			<documentation xml:lang="en">Data type for HVU order details.</documentation>
 		</annotation>
 		<sequence>
-			<element name="OrderType" type="ebics:OrderTBaseType">
+			<element name="Service" type="ebics:RestrictedServiceType">
 				<annotation>
 					<documentation xml:lang="de">Auftragsart lt. DFÜ-Abkommen des ausgewählten Auftrags.</documentation>
 					<documentation xml:lang="en">Type of the order.</documentation>
@@ -1137,26 +1193,37 @@
 			<element name="OrderID" type="ebics:OrderIDType">
 				<annotation>
 					<documentation xml:lang="de">Auftragsnummer lt. DFÜ-Abkommen des ausgewählten Auftrags.</documentation>
+					<documentation xml:lang="en">Order number.</documentation>
 				</annotation>
 			</element>
 			<element name="OrderDataSize" type="positiveInteger">
 				<annotation>
 					<documentation xml:lang="de">Größe der unkomprimierten Auftragsdaten in Bytes.</documentation>
+					<documentation xml:lang="en">Order data size in bytes.</documentation>
 				</annotation>
 			</element>
 			<element name="SigningInfo" type="ebics:HVUSigningInfoType">
 				<annotation>
 					<documentation xml:lang="de">Informationen zu den Unterschriftsmodalitäten.</documentation>
+					<documentation xml:lang="en">Signing information.</documentation>
 				</annotation>
 			</element>
 			<element name="SignerInfo" type="ebics:SignerInfoType" minOccurs="0" maxOccurs="unbounded">
 				<annotation>
 					<documentation xml:lang="de">Informationen zu den bisherigen Unterzeichnern.</documentation>
+					<documentation xml:lang="en">Information regarding the signer.</documentation>
 				</annotation>
 			</element>
 			<element name="OriginatorInfo" type="ebics:HVUOriginatorInfoType">
 				<annotation>
 					<documentation xml:lang="de">Informationen zum Einreicher.</documentation>
+					<documentation xml:lang="en">Information regarding the originator.</documentation>
+				</annotation>
+			</element>
+			<element name="AdditionalOrderInfo" type="ebics:String255Type" minOccurs="0">
+				<annotation>
+					<documentation xml:lang="de">Additional Information about the order (unstructured, up to 255 characters).</documentation>
+					<documentation xml:lang="en">Additional Information about the order (unstructured, up to 255 characters).</documentation>
 				</annotation>
 			</element>
 			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
@@ -1165,9 +1232,10 @@
 	<complexType name="HVUOrderParamsType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für zusätzliche Auftragsparameter für Auftragsart HVU.</documentation>
+			<documentation xml:lang="en">Data type for additional order parameters for order type HVU.</documentation>
 		</annotation>
 		<sequence>
-			<element name="OrderTypes" type="ebics:OrderTListType" minOccurs="0">
+			<element name="ServiceFilter" type="ebics:ServiceType" minOccurs="0" maxOccurs="unbounded">
 				<annotation>
 					<documentation xml:lang="de">Liste von Auftragsarten, für die zur Unterschrift vorliegende Aufträge abgerufen werden sollen; falls nicht angegeben, werden sämtliche für den Teilnehmer unterschriftsfähigen Aufträge abgerufen.</documentation>
 				</annotation>
@@ -1178,9 +1246,10 @@
 	<complexType name="HVZOrderParamsType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für zusätzliche Auftragsparameter für Auftragsart HVZ.</documentation>
+			<documentation xml:lang="en">Data type for additional order parameters for order type HVZ.</documentation>
 		</annotation>
 		<sequence>
-			<element name="OrderTypes" type="ebics:OrderTListType" minOccurs="0">
+			<element name="ServiceFilter" type="ebics:ServiceType" minOccurs="0" maxOccurs="unbounded">
 				<annotation>
 					<documentation xml:lang="de">Liste von Auftragsarten, für die zur Unterschrift vorliegende Aufträge abgerufen werden sollen; falls nicht angegeben, werden sämtliche für den Teilnehmer unterschriftsfähigen Aufträge abgerufen.</documentation>
 					<documentation xml:lang="de">List of order types that the orders ready to be signed by the requesting user should match; if not specified, a list of all orders ready to be signed by the requesting user is returned.</documentation>
@@ -1260,9 +1329,9 @@
 			<documentation xml:lang="de">Datentyp für HVZ-Auftragsdetails.</documentation>
 		</annotation>
 		<sequence>
-			<element name="OrderType" type="ebics:OrderTBaseType">
+			<element name="Service" type="ebics:RestrictedServiceType">
 				<annotation>
-					<documentation xml:lang="de">Auftragsart lt. DFÜ-Abkommen des ausgewählten Auftrags.</documentation>
+					<documentation xml:lang="de">BTF Service Parameter-Struktur des ausgewählten Auftrags.</documentation>
 					<documentation xml:lang="en">Type of the order.</documentation>
 				</annotation>
 			</element>
@@ -1320,6 +1389,11 @@
 					<documentation xml:lang="en">Information regarding the originator of the order.</documentation>
 				</annotation>
 			</element>
+			<element name="AdditionalOrderInfo" type="ebics:String255Type" minOccurs="0">
+				<annotation>
+					<documentation xml:lang="de">Additional Information about the order (unstructured, up to 255 characters).</documentation>
+				</annotation>
+			</element>
 			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</sequence>
 	</complexType>
@@ -1340,9 +1414,17 @@
 					<documentation xml:lang="de">Summe der Beträge über alle logische Dateien entsprechend Dateianzeige.</documentation>
 					<documentation xml:lang="en">Total transaction amount for all logical files (from dispay file).</documentation>
 				</annotation>
-				<simpleType>
-					<restriction base="ebics:AmountValueType"/>
-				</simpleType>
+				<complexType>
+					<simpleContent>
+						<extension base="ebics:AmountValueType">
+							<attribute name="isCredit" type="boolean" use="optional">
+								<annotation>
+									<documentation xml:lang="de">Nur Gutschriften (isCredit = "true") oder nur Lastschriften (isCredit = "false")? Sonst keine Nutzung des Elements.</documentation>
+								</annotation>
+							</attribute>
+						</extension>
+					</simpleContent>
+				</complexType>
 			</element>
 			<element name="Currency" type="ebics:CurrencyBaseType" minOccurs="0">
 				<annotation>
@@ -1408,7 +1490,7 @@
 											</complexType>
 										</element>
 									</choice>
-									<choice maxOccurs="2">
+									<choice minOccurs="0" maxOccurs="2">
 										<element name="BankCode">
 											<annotation>
 												<documentation xml:lang="de">Bankleitzahl (deutsches Format oder international als SWIFT-BIC).</documentation>
@@ -1501,10 +1583,16 @@
 			<documentation xml:lang="de">Datentyp für VEU-Berechtigungsinformationen des Teilnehmers (HKD, HTD).</documentation>
 		</annotation>
 		<sequence>
-			<element name="OrderTypes" type="ebics:OrderTListType">
+			<element name="AdminOrderType" type="ebics:OrderTBaseType">
 				<annotation>
 					<documentation xml:lang="de">Liste von Auftragsarten, für die die Berechtigung des Teilnehmers gültig ist.</documentation>
 					<documentation xml:lang="en">List of order types which the user's permission belongs to.</documentation>
+				</annotation>
+			</element>
+			<element name="Service" type="ebics:RestrictedServiceType" minOccurs="0">
+				<annotation>
+					<documentation xml:lang="de">BTF Service Parameter struktur im Falle von BTU/BTD</documentation>
+					<documentation xml:lang="en">Identification of the file format in the case of FUL/FDL</documentation>
 				</annotation>
 			</element>
 			<element name="AccountID" type="ebics:AccountIDType" minOccurs="0">
@@ -1556,9 +1644,9 @@
 					<complexContent>
 						<extension base="ebics:AccountType">
 							<sequence>
-								<element name="UsageOrderTypes" type="ebics:OrderTListType" minOccurs="0">
+								<element name="UsageOrderTypes" type="ebics:UsageOrderType" minOccurs="0">
 									<annotation>
-										<documentation xml:lang="de">Liste der Auftragsartenbeschränkungen; falls nicht angegeben, gibt es keine Auftragsartenbeschränkungen; falls Liste leer, ist das Konto für keine Auftragsart freigegeben.</documentation>
+										<documentation xml:lang="de">//MODIFIED//Liste der Auftragsartenbeschränkungen; falls nicht angegeben, gibt es keine Auftragsartenbeschränkungen; falls das Element ohne Service-Element geliefert wird, ist das Konto für keine Auftragsart freigegeben.</documentation>
 										<documentation xml:lang="en">List containing the order types which contain this account is restricted to; if omitted, the account is unrestricted; if the list is empty the account is blocked for any order type.</documentation>
 									</annotation>
 								</element>
@@ -1680,19 +1768,15 @@
 			<documentation xml:lang="en">Data type for user permissions with regard to distributed signatures (order types HKD, HTD).</documentation>
 		</annotation>
 		<sequence>
-			<element name="OrderType" type="ebics:OrderTBaseType">
+			<element name="AdminOrderType" type="ebics:OrderTBaseType">
 				<annotation>
-					<documentation xml:lang="de">Auftragsart.</documentation>
+					<documentation xml:lang="de">Administrative EBICS Auftragsart.</documentation>
 				</annotation>
 			</element>
-			<element name="TransferType" type="ebics:TransferType">
+			<element name="Service" type="ebics:RestrictedServiceType" minOccurs="0">
 				<annotation>
-					<documentation xml:lang="de">Transfertyp (Upload/Download).</documentation>
-				</annotation>
-			</element>
-			<element name="OrderFormat" type="ebics:OrderFormatType" minOccurs="0">
-				<annotation>
-					<documentation xml:lang="de">Auftragsformat (z.B. DTAZV).</documentation>
+					<documentation xml:lang="de">BTF Service Parameter struktur im Falle von BTU/BTD</documentation>
+					<documentation xml:lang="en">Identification of the file format in the case of FUL/FDL</documentation>
 				</annotation>
 			</element>
 			<element name="Description" type="ebics:OrderDescriptionType">
@@ -1734,62 +1818,6 @@
 			</element>
 		</sequence>
 	</complexType>
-	<complexType name="GenericOrderParamsType">
-		<annotation>
-			<documentation xml:lang="de">Datentyp für zusätzliche Auftragsparameter für beliebige Auftragsarten.</documentation>
-		</annotation>
-		<sequence>
-			<element ref="ebics:Parameter" minOccurs="0" maxOccurs="unbounded"/>
-		</sequence>
-	</complexType>
-	<complexType name="FULOrderParamsType">
-		<annotation>
-			<documentation xml:lang="de">Datentyp für zusätzliche Auftragsparameter für Auftragsart FUL.</documentation>
-		</annotation>
-		<sequence>
-			<element ref="ebics:Parameter" minOccurs="0" maxOccurs="unbounded"/>
-			<element name="FileFormat" type="ebics:FileFormatType">
-				<annotation>
-					<documentation xml:lang="de">Bezeichnung des Dateiformats</documentation>
-					<documentation xml:lang="en">Name of data format</documentation>
-				</annotation>
-			</element>
-		</sequence>
-	</complexType>
-	<complexType name="FDLOrderParamsType">
-		<annotation>
-			<documentation xml:lang="de">Datentyp für zusätzliche Auftragsparameter für Auftragsart FDL.</documentation>
-		</annotation>
-		<sequence>
-			<element name="DateRange" minOccurs="0">
-				<annotation>
-					<documentation xml:lang="de">Datumsbereich (von-bis).</documentation>
-					<documentation xml:lang="en">Range of date (from-to).</documentation>
-				</annotation>
-				<complexType>
-					<sequence>
-						<element name="Start" type="ebics:DateType">
-							<annotation>
-								<documentation xml:lang="de">Startdatum (inkl.).</documentation>
-							</annotation>
-						</element>
-						<element name="End" type="ebics:DateType">
-							<annotation>
-								<documentation xml:lang="de">Enddatum (inkl.).</documentation>
-							</annotation>
-						</element>
-					</sequence>
-				</complexType>
-			</element>
-			<element ref="ebics:Parameter" minOccurs="0" maxOccurs="unbounded"/>
-			<element name="FileFormat" type="ebics:FileFormatType">
-				<annotation>
-					<documentation xml:lang="de">Bezeichnung des Dateiformats</documentation>
-					<documentation xml:lang="en">Name of data format</documentation>
-				</annotation>
-			</element>
-		</sequence>
-	</complexType>
 	<attributeGroup name="VersionAttrGroup">
 		<annotation>
 			<documentation xml:lang="de">Attribute zur EBICS-Protokollversion und -revision.</documentation>
@@ -1797,8 +1825,8 @@
 		</annotation>
 		<attribute name="Version" type="ebics:ProtocolVersionType" use="required">
 			<annotation>
-				<documentation xml:lang="de">Version des EBICS-Protokolls (z.B. "H003").</documentation>
-				<documentation xml:lang="en">Version of the EBICS protocol (e.g. "H003").</documentation>
+				<documentation xml:lang="de">Version des EBICS-Protokolls (z.B. "H00x").</documentation>
+				<documentation xml:lang="en">Version of the EBICS protocol (e.g. "H00x").</documentation>
 			</annotation>
 		</attribute>
 		<attribute name="Revision" type="ebics:ProtocolRevisionType" use="optional">
@@ -1808,4 +1836,259 @@
 			</annotation>
 		</attribute>
 	</attributeGroup>
+	<!--Following ComplexTypes are used for BTF-->
+	<element name="BTDOrderParams" type="ebics:BTDParamsType" substitutionGroup="ebics:OrderParams">
+		<annotation>
+			<documentation>zusätzliche Auftragsparameter für Auftragsart BTD.</documentation>
+			<documentation xml:lang="en">additional order parameters for order type BTD.</documentation>
+		</annotation>
+	</element>
+	<element name="BTUOrderParams" type="ebics:BTUParamsType" substitutionGroup="ebics:OrderParams">
+		<annotation>
+			<documentation>zusätzliche Auftragsparameter für Auftragsart BTU.</documentation>
+			<documentation xml:lang="en">additional order parameters for order type BTU.</documentation>
+		</annotation>
+	</element>
+	<complexType name="BTDParamsType">
+		<annotation>
+			<documentation>Datentyp für BTF Download Parameter</documentation>
+		</annotation>
+		<complexContent>
+			<restriction base="ebics:BTFParamsTyp">
+				<sequence>
+					<element name="Service" type="ebics:RestrictedServiceType">
+						<annotation>
+							<documentation>Service name - target system for the further processing of the order</documentation>
+						</annotation>
+					</element>
+					<element name="DateRange" type="ebics:DateRangeType" minOccurs="0"/>
+					<element ref="ebics:Parameter" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+				<attribute name="fileName" type="ebics:FileNameStringType" use="prohibited">
+					<annotation>
+						<documentation>The file name on the client It can be transmitted optionally</documentation>
+					</annotation>
+				</attribute>
+			</restriction>
+		</complexContent>
+	</complexType>
+	<complexType name="BTUParamsType">
+		<annotation>
+			<documentation>Datentyp für BTF Upload Parameter</documentation>
+		</annotation>
+		<complexContent>
+			<restriction base="ebics:BTFParamsTyp">
+				<sequence>
+					<element name="Service" type="ebics:RestrictedServiceType">
+						<annotation>
+							<documentation>Service name - target system for the further processing of the order</documentation>
+						</annotation>
+					</element>
+					<element name="SignatureFlag" type="ebics:SignatureFlagType" minOccurs="0">
+						<annotation>
+							<documentation>If not present the order doesn't contain any ES and shall be authorised outside EBICS
+If present the order shall be autorised within EBICS: 
+1. If the attribute VEU is also present the sender desires spooling into the VEU - hence in this case the order is not rejected in the case of not sufficient number of ES
+2. If the attribute is not present all necessary ES must be inside the order (else: rejection of the order)  </documentation>
+						</annotation>
+					</element>
+					<element ref="ebics:Parameter" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+				<attribute name="fileName" type="ebics:FileNameStringType">
+					<annotation>
+						<documentation>The file name on the client It can be transmitted optionally</documentation>
+					</annotation>
+				</attribute>
+			</restriction>
+		</complexContent>
+	</complexType>
+	<complexType name="BTFParamsTyp" abstract="true">
+		<annotation>
+			<documentation>Abstract Type containing all BTF params structures</documentation>
+		</annotation>
+		<sequence>
+			<element name="Service" type="ebics:RestrictedServiceType">
+				<annotation>
+					<documentation>Service name - target system for the further processing of the order</documentation>
+				</annotation>
+			</element>
+			<element name="SignatureFlag" type="ebics:SignatureFlagType" minOccurs="0">
+				<annotation>
+					<documentation>If not present the order doesn't contain any ES and shall be authorised outside EBICS
+If present the order shall be autorised within EBICS: 
+1. If the attribute VEU is also present the sender desires spooling into the VEU - hence in this case the order is not rejected in the case of not sufficient number of ES
+2. If the attribute is not present all necessary ES must be inside the order (else: rejection of the order)  </documentation>
+				</annotation>
+			</element>
+			<element name="DateRange" type="ebics:DateRangeType" minOccurs="0"/>
+			<element ref="ebics:Parameter" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+		<attribute name="fileName" type="ebics:FileNameStringType">
+			<annotation>
+				<documentation>The file name on the client It can be transmitted optionally</documentation>
+			</annotation>
+		</attribute>
+	</complexType>
+	<complexType name="DateRangeType">
+		<annotation>
+			<documentation>Datentyp für die Angabe eines (Berichts-) Zeitraums</documentation>
+		</annotation>
+		<sequence>
+			<element name="Start" type="ebics:DateType"/>
+			<element name="End" type="ebics:DateType"/>
+		</sequence>
+	</complexType>
+	<complexType name="FlagAttribType">
+		<annotation>
+			<documentation>Basis-Datentyp für Kennzeichen mit optionalem Attribut</documentation>
+		</annotation>
+		<anyAttribute/>
+	</complexType>
+	<complexType name="MessageType">
+		<annotation>
+			<documentation>Datentyp für Meldungstyp-String mit optionalen Attributen</documentation>
+		</annotation>
+		<simpleContent>
+			<extension base="ebics:MessageNameStringType">
+				<attribute name="variant" type="ebics:NumStringType" use="optional">
+					<annotation>
+						<documentation>Variant number of the message type (usable for ISO20022 messages)</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="version" type="ebics:NumStringType" use="optional">
+					<annotation>
+						<documentation>Version number of the message type  (usable for ISO20022 messages)</documentation>
+					</annotation>
+				</attribute>
+				<attribute name="format" use="optional">
+					<annotation>
+						<documentation>Encoding format of the message (e.g. XML, ASN1, JSON, PDF)</documentation>
+					</annotation>
+					<simpleType>
+						<restriction base="ebics:CodeStringType">
+							<maxLength value="4"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<complexType name="ServiceType">
+		<annotation>
+			<documentation>Basisdatentyp für BTF-Service Parameter Set</documentation>
+		</annotation>
+		<sequence>
+			<element name="ServiceName" type="ebics:ServiceNameStringType" minOccurs="0">
+				<annotation>
+					<documentation>Service Code name: External list specified and maintained by EBICS. Basis is the "SWIFT-list" for the field "description" (SCT, DCT, XCT, SDD, DDD, STM, REP...) plus additional codes needed for further services </documentation>
+				</annotation>
+			</element>
+			<element name="Scope" type="ebics:ScopeStringType" minOccurs="0">
+				<annotation>
+					<documentation>Specifies whose rules have to be taken into account for the service. This means which market / comminity has defined the rules. 
+If the element is absent a global definition for the service is assumed.
+External list specified and maintained by EBICS. In addition the following codes may be used:
+2-character ISO country code or a 3-character issuer code (defined by EBICS)</documentation>
+				</annotation>
+			</element>
+			<element name="ServiceOption" type="ebics:ServiceOptionStringType" minOccurs="0">
+				<annotation>
+					<documentation>Service Option Code
+Additional option for the service (also depends on used scope)</documentation>
+				</annotation>
+			</element>
+			<element name="Container" type="ebics:ContainerFlagType" minOccurs="0">
+				<annotation>
+					<documentation>Container flag. If present, data is provided/requested in a container format specified in the attribute of the flag</documentation>
+				</annotation>
+			</element>
+			<element name="MsgName" type="ebics:MessageType" minOccurs="0">
+				<annotation>
+					<documentation>Name of the message, e.g. pain.001 or mt101 National message names (issued by DK, CFONB or SIC are also allowed)</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="RestrictedServiceType">
+		<annotation>
+			<documentation>Type is arestriction of the generic ServiceType, defining the mandatory elements</documentation>
+		</annotation>
+		<complexContent>
+			<restriction base="ebics:ServiceType">
+				<sequence>
+					<element name="ServiceName" type="ebics:ServiceNameStringType">
+						<annotation>
+							<documentation>Service Code name: External list specified and maintained by EBICS. Basis is the "SWIFT-list" for the field "description" (SCT, DCT, XCT, SDD, DDD, STM, REP...) plus additional codes needed for further services </documentation>
+						</annotation>
+					</element>
+					<element name="Scope" type="ebics:ScopeStringType" minOccurs="0">
+						<annotation>
+							<documentation>Specifies whose rules have to be taken into account for the service. This means which market / comminity has defined the rules. 
+If the element is absent a global definition for the service is assumed.
+External list specified and maintained by EBICS.
+In addition the following codes may be used:        
+2-character ISO country code or a 3-character issuer code (defined by EBICS)</documentation>
+						</annotation>
+					</element>
+					<element name="ServiceOption" type="ebics:ServiceOptionStringType" minOccurs="0">
+						<annotation>
+							<documentation>Service Option Code
+		Additional option for the service (also depends on used scope)</documentation>
+						</annotation>
+					</element>
+					<element name="Container" type="ebics:ContainerFlagType" minOccurs="0">
+						<annotation>
+							<documentation>Container flag. If present, data is provided/requested in a container format specified in the attribute of the flag</documentation>
+						</annotation>
+					</element>
+					<element name="MsgName" type="ebics:MessageType">
+						<annotation>
+							<documentation>Name of the message, e.g. pain.001 or mt101 National message names (issued by DK, CFONB or SIC are also allowed)</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</restriction>
+		</complexContent>
+	</complexType>
+	<complexType name="ContainerFlagType">
+		<annotation>
+			<documentation>Container flag. If present, data is provided/requested in a container format specified in the attribute of the flag</documentation>
+		</annotation>
+		<complexContent>
+			<restriction base="ebics:FlagAttribType">
+				<attribute name="containerType" type="ebics:ContainerStringType" use="required">
+					<annotation>
+						<documentation>Specifies the container type  - External Codelist defined by EBICS (starting values: XML, ZIP, SVC)</documentation>
+					</annotation>
+				</attribute>
+			</restriction>
+		</complexContent>
+	</complexType>
+	<complexType name="SignatureFlagType">
+		<annotation>
+			<documentation>Datentyp für BTF Signatur-Flag (ersetzt Orderkennzeichen)</documentation>
+		</annotation>
+		<complexContent>
+			<restriction base="ebics:FlagAttribType">
+				<attribute name="requestEDS" type="boolean" use="optional">
+					<annotation>
+						<documentation>If present the sender desires spooling into EBICS distributed signature queue, only "true" is allowed</documentation>
+					</annotation>
+				</attribute>
+			</restriction>
+		</complexContent>
+	</complexType>
+	<complexType name="UsageOrderType">
+		<annotation>
+			<documentation>Datentyp zur Kennzeichnung von Auftragsartenbeschränkungen</documentation>
+		</annotation>
+		<sequence>
+			<element name="Service" type="ebics:RestrictedServiceType" minOccurs="0" maxOccurs="unbounded">
+				<annotation>
+					<documentation>Service Parameter-Sets von nicht unterstützten BTF-Auftragsarten</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<!--END BTF-->
 </schema>

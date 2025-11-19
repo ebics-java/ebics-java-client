@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ebics="http://www.ebics.org/H003" targetNamespace="http://www.ebics.org/H003" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+<!-- edited with XMLSpy v2016 sp1 (x64) (http://www.altova.com) by EBICS Working Group - October 2016 -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ebics="urn:org:ebics:H005" targetNamespace="urn:org:ebics:H005" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
 	<annotation>
-		<documentation xml:lang="de">ebics_response.xsd ist das EBICS-Protokollschema für Antwortnachrichten.</documentation>
-		<documentation xml:lang="en">ebics_response.xsd is the appropriate EBICS protocol schema for standard responses.</documentation>
+		<documentation xml:lang="de">ebics_response_H005.xsd ist das EBICS-Protokollschema für Antwortnachrichten.</documentation>
+		<documentation xml:lang="en">ebics_response_H005.xsd is the appropriate EBICS protocol schema for standard responses.</documentation>
 	</annotation>
 	<import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd">
 		<annotation>
 			<documentation xml:lang="de">XML-Signature.</documentation>
 		</annotation>
 	</import>
-	<include schemaLocation="ebics_types.xsd"/>
-	<include schemaLocation="ebics_orders.xsd"/>
+	<include schemaLocation="ebics_types_H005.xsd"/>
+	<include schemaLocation="ebics_orders_H005.xsd"/>
 	<element name="ebicsResponse">
 		<annotation>
 			<documentation xml:lang="de">Electronic Banking Internet Communication Standard des Zentralen Kreditausschusses (ZKA): Multibankfähige Schnittstelle zur internetbasierten Kommunikation.</documentation>
@@ -96,7 +97,7 @@
 	</element>
 	<complexType name="ResponseStaticHeaderType">
 		<annotation>
-			<documentation xml:lang="de">Datentyp für den statischen EBICS-Header.</documentation>
+			<documentation xml:lang="de">//TODO - Modify anotation TransactionID// Datentyp für den statischen EBICS-Header.</documentation>
 			<documentation xml:lang="en">Data type for the static EBICS header.</documentation>
 		</annotation>
 		<sequence>
@@ -134,7 +135,7 @@
 				<complexType>
 					<simpleContent>
 						<extension base="ebics:SegmentNumberType">
-							<attribute name="lastSegment" type="boolean" use="optional" default="false">
+							<attribute name="lastSegment" type="boolean" use="required">
 								<annotation>
 									<documentation xml:lang="de">Ist dies das letzte Segment der Übertragung?</documentation>
 								</annotation>
@@ -142,6 +143,11 @@
 						</extension>
 					</simpleContent>
 				</complexType>
+			</element>
+			<element name="OrderID" type="ebics:OrderIDType" minOccurs="0">
+				<annotation>
+					<documentation xml:lang="de">Auftragsnummer von Sendeaufträgen gemäß DFÜ-Abkommen.</documentation>
+				</annotation>
 			</element>
 			<element name="ReturnCode" type="ebics:ReturnCodeType">
 				<annotation>

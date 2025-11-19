@@ -55,7 +55,7 @@ public class EbicsSocketFactory extends SSLSocketFactory {
    * key store and trust store information
    * @param keystore the key store
    * @param keystoreType the key store type
-   * @param keystrorePass the key store password
+   * @param keystorePass the key store password
    * @param truststore the trust store
    * @param truststoreType the trust store type
    * @param truststorePass the trust store password
@@ -64,7 +64,7 @@ public class EbicsSocketFactory extends SSLSocketFactory {
    */
   public EbicsSocketFactory(byte[] keystore,
                             String keystoreType,
-                            char[] keystrorePass,
+                            char[] keystorePass,
                             byte[] truststore,
                             String truststoreType,
                             char[] truststorePass)
@@ -72,7 +72,7 @@ public class EbicsSocketFactory extends SSLSocketFactory {
   {
     this.context = getSSLContext(keystore,
 	                         keystoreType,
-	                         keystrorePass,
+	                         keystorePass,
 	                         truststore,
 	                         truststoreType,
 	                         truststorePass);
@@ -136,8 +136,7 @@ public class EbicsSocketFactory extends SSLSocketFactory {
     } catch (IOException e) {
       throw e;
     } catch (Exception e) {
-      e.printStackTrace();
-      throw new IOException("Exception trying to load keystore " + type + ": " + e);
+        throw new IOException("Exception trying to load keystore " + type + ": " + e, e);
     }
   }
 

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:esig="http://www.ebics.org/S001" targetNamespace="http://www.ebics.org/S001" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+<!-- edited with XMLSpy v2016 sp1 (x64) (http://www.altova.com) by EBICS Working Group - October 2016 -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:esig="http://www.ebics.org/S002" targetNamespace="http://www.ebics.org/S002" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
 	<import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
 	<annotation>
-		<documentation xml:lang="de">ebics_signature enthält Typdefinitionen für elektronische Unterschriften der Versionen A004, A005, A006 und folgende.</documentation>
+		<documentation xml:lang="de">ebics_signature enthält Typdefinitionen für elektronische Unterschriften der Versionen A005, A006 und folgende.</documentation>
 		<documentation xml:lang="en">ebics_EU contains type definitions for electronic signatures: versions A005, A006 and et sqq.</documentation>
 	</annotation>
 	<!-- Elementdefinitionen für die EU. Die XML-Klartext-Struktur wird im EBICS-Signaturdatenkontext binär interpretiert.-->
@@ -24,32 +25,12 @@
 			<documentation xml:lang="en">Data type for digital signature data transferred using EBICS.</documentation>
 		</annotation>
 		<sequence>
-			<choice maxOccurs="unbounded">
-				<element name="OrderSignature">
-					<annotation>
-						<documentation xml:lang="de">bankfachliche Elektronische Unterschrift oder Transportunterschrift (Binärformat).</documentation>
-						<documentation xml:lang="en">Digital signature (either autorising an order or applied for transportation), binary format.</documentation>
-					</annotation>
-					<complexType>
-						<simpleContent>
-							<extension base="esig:OrderSignatureType">
-								<attribute name="PartnerID" use="required">
-									<annotation>
-										<documentation xml:lang="de">Kunden-ID des Unterzeichners.</documentation>
-										<documentation xml:lang="en">Customer ID of the signer.</documentation>
-									</annotation>
-								</attribute>
-							</extension>
-						</simpleContent>
-					</complexType>
-				</element>
-				<element name="OrderSignatureData" type="esig:OrderSignatureDataType">
-					<annotation>
-						<documentation xml:lang="de">bankfachliche Elektronische Unterschrift oder Transportunterschrift (strukturiertes Format).</documentation>
-						<documentation xml:lang="en">Digital signature (either autorising an order or applied for transportation), structured format.</documentation>
-					</annotation>
-				</element>
-			</choice>
+			<element name="OrderSignatureData" type="esig:OrderSignatureDataType" maxOccurs="unbounded">
+				<annotation>
+					<documentation xml:lang="de">bankfachliche Elektronische Unterschrift oder Transportunterschrift (strukturiertes Format).</documentation>
+					<documentation xml:lang="en">Digital signature (either autorising an order or applied for transportation), structured format.</documentation>
+				</annotation>
+			</element>
 			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</sequence>
 	</complexType>
@@ -183,28 +164,7 @@
 			<documentation xml:lang="de">Datentyp für die Darstellung eines öffentlichen RSA-Schlüssels als Exponent-Modulus-Kombination oder als X509-Zertifikat.</documentation>
 		</annotation>
 		<sequence>
-			<sequence>
-				<element ref="ds:X509Data" minOccurs="0"/>
-				<element name="PubKeyValue" type="esig:PubKeyValueType">
-					<annotation>
-						<documentation xml:lang="de">Darstellung als Exponent-Modulus-Kombination.</documentation>
-					</annotation>
-				</element>
-			</sequence>
-			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
-		</sequence>
-	</complexType>
-	<complexType name="PubKeyValueType">
-		<annotation>
-			<documentation xml:lang="de">Datentyp für die Exponent-Modulus-Darstellung eines öffentlichen RSA-Schlüssels.</documentation>
-		</annotation>
-		<sequence>
-			<element ref="ds:RSAKeyValue"/>
-			<element name="TimeStamp" type="esig:TimestampType" minOccurs="0">
-				<annotation>
-					<documentation xml:lang="de">Zeitpunkt der Generierung des Schlüssels.</documentation>
-				</annotation>
-			</element>
+			<element ref="ds:X509Data"/>
 			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</sequence>
 	</complexType>

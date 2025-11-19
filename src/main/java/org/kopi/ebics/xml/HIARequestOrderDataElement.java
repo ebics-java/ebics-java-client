@@ -21,14 +21,14 @@ package org.kopi.ebics.xml;
 import java.util.Calendar;
 
 import org.kopi.ebics.exception.EbicsException;
-import org.kopi.ebics.schema.h003.AuthenticationPubKeyInfoType;
-import org.kopi.ebics.schema.h003.EncryptionPubKeyInfoType;
-import org.kopi.ebics.schema.h003.HIARequestOrderDataType;
-import org.kopi.ebics.schema.h003.PubKeyValueType;
+import org.kopi.ebics.schema.h005.AuthenticationPubKeyInfoType;
+import org.kopi.ebics.schema.h005.EncryptionPubKeyInfoType;
+import org.kopi.ebics.schema.h005.HIARequestOrderDataType;
+import org.kopi.ebics.schema.h005.PubKeyInfoType;
+import org.kopi.ebics.schema.xmldsig.KeyValueType;
 import org.kopi.ebics.schema.xmldsig.RSAKeyValueType;
 import org.kopi.ebics.schema.xmldsig.X509DataType;
 import org.kopi.ebics.session.EbicsSession;
-
 
 /**
  * The <code>HIARequestOrderDataElement</code> is the element that contains
@@ -40,69 +40,51 @@ import org.kopi.ebics.session.EbicsSession;
  */
 public class HIARequestOrderDataElement extends DefaultEbicsRootElement {
 
-  /**
-   * Constructs a new HIA Request Order Data element
-   * @param session the current ebics session
-   */
-  public HIARequestOrderDataElement(EbicsSession session) {
-    super(session);
-  }
+    /**
+     * Constructs a new HIA Request Order Data element
+     *
+     * @param session the current ebics session
+     */
+    public HIARequestOrderDataElement(EbicsSession session) {
+        super(session);
+    }
 
-  @Override
-  public void build() throws EbicsException {
-    HIARequestOrderDataType		request;
-    AuthenticationPubKeyInfoType 	authenticationPubKeyInfo;
-    EncryptionPubKeyInfoType 		encryptionPubKeyInfo;
-    PubKeyValueType		 	encryptionPubKeyValue;
-    X509DataType 			encryptionX509Data;
-    RSAKeyValueType 			encryptionRsaKeyValue;
-    PubKeyValueType		 	authPubKeyValue;
-    X509DataType 			authX509Data;
-    RSAKeyValueType 			AuthRsaKeyValue;
+    @Override
+    public void build() throws EbicsException {
+        X509DataType encryptionX509Data = EbicsXmlFactory.createX509DataType(
+            session.getUser().getDN(), session.getUser().getE002Certificate());
 
-    encryptionX509Data = null;
-    if (session.getUser().getPartner().getBank().useCertificate())
-        encryptionX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
-	                                                    session.getUser().getE002Certificate());
-    encryptionRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getE002PublicKey().getPublicExponent().toByteArray(),
-	                                                          session.getUser().getE002PublicKey().getModulus().toByteArray());
-    encryptionPubKeyValue = EbicsXmlFactory.createH003PubKeyValueType(encryptionRsaKeyValue, Calendar.getInstance());
-    encryptionPubKeyInfo = EbicsXmlFactory.createEncryptionPubKeyInfoType(session.getConfiguration().getEncryptionVersion(),
-	                                                                  encryptionPubKeyValue,
-	                                                                  encryptionX509Data);
-    authX509Data = null;
-    if (session.getUser().getPartner().getBank().useCertificate())
-        authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
-	                                              session.getUser().getX002Certificate());
-    AuthRsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getX002PublicKey().getPublicExponent().toByteArray(),
-							    session.getUser().getX002PublicKey().getModulus().toByteArray());
-    authPubKeyValue = EbicsXmlFactory.createH003PubKeyValueType(AuthRsaKeyValue, Calendar.getInstance());
-    authenticationPubKeyInfo = EbicsXmlFactory.createAuthenticationPubKeyInfoType(session.getConfiguration().getAuthenticationVersion(),
-	                                                                          authPubKeyValue,
-	                                                                          authX509Data);
-    request = EbicsXmlFactory.createHIARequestOrderDataType(authenticationPubKeyInfo,
-	                                                    encryptionPubKeyInfo,
-	                                                    session.getUser().getPartner().getPartnerId(),
-	                                                    session.getUser().getUserId());
-    document = EbicsXmlFactory.createHIARequestOrderDataDocument(request);
-  }
+        X509DataType authX509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
+            session.getUser().getX002Certificate());
 
-  @Override
-  public String getName() {
-    return "HIARequestOrderData.xml";
-  }
 
-  @Override
-  public byte[] toByteArray() {
-    addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
-    setSaveSuggestedPrefixes("http://www.ebics.org/S001", "");
+        var encryptionPubKeyInfo = EbicsXmlFactory.createEncryptionPubKeyInfoType(session.getConfiguration().getEncryptionVersion(),
+            encryptionX509Data);
+        AuthenticationPubKeyInfoType authenticationPubKeyInfo = EbicsXmlFactory.createAuthenticationPubKeyInfoType(
+            session.getConfiguration().getAuthenticationVersion(), authX509Data);
 
-    return super.toByteArray();
-  }
+        HIARequestOrderDataType request = EbicsXmlFactory.createHIARequestOrderDataType(
+            authenticationPubKeyInfo, encryptionPubKeyInfo,
+            session.getUser().getPartner().getPartnerId(), session.getUser().getUserId());
+        document = EbicsXmlFactory.createHIARequestOrderDataDocument(request);
+    }
 
-  // --------------------------------------------------------------------
-  // DATA MEMBERS
-  // --------------------------------------------------------------------
+    @Override
+    public String getName() {
+        return "HIARequestOrderData.xml";
+    }
 
-  private static final long 		serialVersionUID = -7333250823464659004L;
+    @Override
+    public byte[] toByteArray() {
+        addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
+        setSaveSuggestedPrefixes("urn:org:ebics:H005", "");
+
+        return super.toByteArray();
+    }
+
+    // --------------------------------------------------------------------
+    // DATA MEMBERS
+    // --------------------------------------------------------------------
+
+    private static final long serialVersionUID = -7333250823464659004L;
 }

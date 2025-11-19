@@ -25,14 +25,14 @@ import java.security.NoSuchProviderException;
 import java.util.Calendar;
 
 import org.kopi.ebics.exception.EbicsException;
-import org.kopi.ebics.schema.h003.EbicsNoPubKeyDigestsRequestDocument;
-import org.kopi.ebics.schema.h003.EmptyMutableHeaderType;
-import org.kopi.ebics.schema.h003.NoPubKeyDigestsRequestStaticHeaderType;
-import org.kopi.ebics.schema.h003.OrderDetailsType;
-import org.kopi.ebics.schema.h003.ProductElementType;
-import org.kopi.ebics.schema.h003.EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest;
-import org.kopi.ebics.schema.h003.EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest.Body;
-import org.kopi.ebics.schema.h003.EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest.Header;
+import org.kopi.ebics.schema.h005.EbicsNoPubKeyDigestsRequestDocument;
+import org.kopi.ebics.schema.h005.EmptyMutableHeaderType;
+import org.kopi.ebics.schema.h005.NoPubKeyDigestsRequestStaticHeaderType;
+import org.kopi.ebics.schema.h005.OrderDetailsType;
+import org.kopi.ebics.schema.h005.ProductElementType;
+import org.kopi.ebics.schema.h005.EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest;
+import org.kopi.ebics.schema.h005.EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest.Body;
+import org.kopi.ebics.schema.h005.EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest.Header;
 import org.kopi.ebics.schema.xmldsig.SignatureType;
 import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.session.OrderType;
@@ -65,16 +65,14 @@ public class NoPubKeyDigestsRequestElement extends DefaultEbicsRootElement {
 
     try {
       return MessageDigest.getInstance("SHA-256", "BC").digest(Utils.canonize(toByteArray()));
-    } catch (NoSuchAlgorithmException e) {
-      throw new EbicsException(e.getMessage());
-    } catch (NoSuchProviderException e) {
+    } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
       throw new EbicsException(e.getMessage());
     }
   }
 
   /**
    * Sets the authentication signature of the <code>NoPubKeyDigestsRequestElement</code>
-   * @param authSignature the the authentication signature.
+   * @param authSignature the authentication signature.
    */
   public void setAuthSignature(SignatureType authSignature) {
     ((EbicsNoPubKeyDigestsRequestDocument)document).getEbicsNoPubKeyDigestsRequest().setAuthSignature(authSignature);
@@ -99,7 +97,7 @@ public class NoPubKeyDigestsRequestElement extends DefaultEbicsRootElement {
     OrderDetailsType 				orderDetails;
 
     product = EbicsXmlFactory.creatProductElementType(session.getProduct().getLanguage(), session.getProduct().getName());
-    orderDetails = EbicsXmlFactory.createOrderDetailsType("DZHNN", null, OrderType.HPB.getCode());
+    orderDetails = EbicsXmlFactory.createOrderDetailsType(OrderType.HPB.getCode());
     xstatic = EbicsXmlFactory.createNoPubKeyDigestsRequestStaticHeaderType(session.getBankID(),
 	                                                                   Utils.generateNonce(),
 	                                                                   Calendar.getInstance(),

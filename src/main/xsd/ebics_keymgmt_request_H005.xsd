@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ebics="http://www.ebics.org/H003" targetNamespace="http://www.ebics.org/H003" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+<!-- edited with XMLSpy v2016 sp1 (x64) (http://www.altova.com) by EBICS Working Group - October 2016 -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ebics="urn:org:ebics:H005" targetNamespace="urn:org:ebics:H005" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
 	<annotation>
-		<documentation xml:lang="de">ebics_keymgmt_request.xsd ist das EBICS-Protokollschema für Schlüsselmanagement-Anfragen (HIA, HPB, HSA, INI).</documentation>
+		<documentation xml:lang="de">ebics_keymgmt_request_H005.xsd ist das EBICS-Protokollschema für Schlüsselmanagement-Anfragen (HIA, HPB, HSA, INI).</documentation>
 	</annotation>
 	<import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd">
 		<annotation>
 			<documentation xml:lang="de">XML-Signature.</documentation>
 		</annotation>
 	</import>
-	<include schemaLocation="ebics_types.xsd"/>
-	<include schemaLocation="ebics_orders.xsd"/>
+	<include schemaLocation="ebics_types_H005.xsd"/>
+	<include schemaLocation="ebics_orders_H005.xsd"/>
 	<complexType name="StaticHeaderBaseType" abstract="true">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für den statischen EBICS-Header (allgemein).</documentation>
@@ -68,19 +69,9 @@
 			<documentation xml:lang="de">Datentyp für OrderDetails im statischen EBICS-Header (allgemein).</documentation>
 		</annotation>
 		<sequence>
-			<element name="OrderType" type="ebics:OrderTBaseType">
+			<element name="AdminOrderType" type="ebics:OrderTBaseType">
 				<annotation>
 					<documentation xml:lang="de">Auftragsart.</documentation>
-				</annotation>
-			</element>
-			<element name="OrderID" type="ebics:OrderIDType" minOccurs="0">
-				<annotation>
-					<documentation xml:lang="de">Auftragsnummer von Sendeaufträgen gemäß DFÜ-Abkommen.</documentation>
-				</annotation>
-			</element>
-			<element name="OrderAttribute" type="ebics:OrderAttributeBaseType">
-				<annotation>
-					<documentation xml:lang="de">Auftragsattribut.</documentation>
 				</annotation>
 			</element>
 		</sequence>
@@ -177,7 +168,7 @@
 	</element>
 	<complexType name="UnsecuredRequestStaticHeaderType">
 		<annotation>
-			<documentation xml:lang="de">Datentyp für den statischen EBICS-Header bei ungesicherten Sendeauftragsarten (Aufträge HIA und INI): kein Nonce, kein Timestamp, keine EU-Datei, keine X001 Authentifizierung, keine Verschlüsselung, keine Digests der öffentlichen Bankschlüssel, Nutzdaten komprimiert, Auftragsattribut DZNNN</documentation>
+			<documentation xml:lang="de">Datentyp für den statischen EBICS-Header bei ungesicherten Sendeauftragsarten (Aufträge HIA und INI): kein Nonce, kein Timestamp, keine EU-Datei, keine X001 Authentifizierung, keine Verschlüsselung, keine Digests der öffentlichen Bankschlüssel, Nutzdaten komprimiert</documentation>
 		</annotation>
 		<complexContent>
 			<restriction base="ebics:StaticHeaderBaseType">
@@ -239,19 +230,9 @@
 		<complexContent>
 			<restriction base="ebics:OrderDetailsType">
 				<sequence>
-					<element name="OrderType" type="ebics:OrderTBaseType">
+					<element name="AdminOrderType" type="ebics:OrderTBaseType">
 						<annotation>
 							<documentation xml:lang="de">Auftragsart.</documentation>
-						</annotation>
-					</element>
-					<element name="OrderID" type="ebics:OrderIDType">
-						<annotation>
-							<documentation xml:lang="de">Auftragsnummer von Sendeaufträgen gemäß DFÜ-Abkommen.</documentation>
-						</annotation>
-					</element>
-					<element name="OrderAttribute" type="ebics:OrderAttributeBaseType" fixed="DZNNN">
-						<annotation>
-							<documentation xml:lang="de">Auftragsattribut: DZNNN.</documentation>
 						</annotation>
 					</element>
 				</sequence>
@@ -369,25 +350,14 @@
 	</complexType>
 	<complexType name="NoPubKeyDigestsReqOrderDetailsType">
 		<annotation>
-			<documentation xml:lang="de">Datentyp für OrderDetails im statischen EBICS-Header von ebicsNoPubKeyDigestsRequest.</documentation>
+			<documentation xml:lang="de"> Datentyp für OrderDetails im statischen EBICS-Header von ebicsNoPubKeyDigestsRequest.</documentation>
 		</annotation>
 		<complexContent>
 			<restriction base="ebics:OrderDetailsType">
 				<sequence>
-					<element name="OrderType" type="ebics:OrderTBaseType">
+					<element name="AdminOrderType" type="ebics:OrderTBaseType">
 						<annotation>
 							<documentation xml:lang="de">Auftragsart.</documentation>
-						</annotation>
-					</element>
-					<!-- OrderId for HPB is optional in original schema -->
-					<element name="OrderID" type="ebics:OrderIDType" minOccurs="0">
-						<annotation>
-							<documentation xml:lang="de">Auftragsnummer von Sendeaufträgen gemaess DFÜ-Abkommen.</documentation>
-						</annotation>
-					</element>
-					<element name="OrderAttribute" type="ebics:OrderAttributeBaseType" fixed="DZHNN">
-						<annotation>
-							<documentation xml:lang="de">Auftragsattribut: DZHNN.</documentation>
 						</annotation>
 					</element>
 				</sequence>
@@ -396,23 +366,27 @@
 	</complexType>
 	<element name="ebicsUnsignedRequest">
 		<annotation>
-			<documentation>Anfragestruktur für Sendeaufträge mit EU-Datei und Nutzdaten aber ohne Authentifizierungssignatur und Digests der Bankschlüssel (Auftrag HSA Authentifikations- und Verschlüsselungsschlüssel senden, signiert mit FTAM-Schlüssel).</documentation>
+			<documentation xml:lang="en">The structure for uploads contains order data and the ESs, but without an authentication signature and data digest of bank keys.</documentation>
+			<documentation>Anfragestruktur für Sendeaufträge mit EU-Datei und Nutzdaten aber ohne Authentifizierungssignatur und Digests der Bankschlüssel.</documentation>
 		</annotation>
 		<complexType>
 			<sequence>
 				<element name="header">
 					<annotation>
+						<documentation xml:lang="en">Contains technical transaction data.</documentation>
 						<documentation xml:lang="de">enthält die technischen Transaktionsdaten.</documentation>
 					</annotation>
 					<complexType>
 						<sequence>
 							<element name="static" type="ebics:UnsignedRequestStaticHeaderType">
 								<annotation>
+									<documentation xml:lang="en">Contains all fixed header entries.</documentation>
 									<documentation xml:lang="de">enhält alle festen Headereinträge.</documentation>
 								</annotation>
 							</element>
 							<element name="mutable" type="ebics:EmptyMutableHeaderType">
 								<annotation>
+									<documentation xml:lang="en">Contains all mutable header entries.</documentation>
 									<documentation xml:lang="de">enthält alle variablen Headereinträge.</documentation>
 								</annotation>
 							</element>
@@ -422,6 +396,7 @@
 				</element>
 				<element name="body">
 					<annotation>
+						<documentation xml:lang="en">Contains the order data and the ESs.</documentation>
 						<documentation xml:lang="de">enthält die Auftragsdaten und EUs.</documentation>
 					</annotation>
 					<complexType>
@@ -431,12 +406,14 @@
 							</annotation>
 							<element name="DataTransfer">
 								<annotation>
+									<documentation xml:lang="en">Transfer of order data and the ESs.</documentation>
 									<documentation xml:lang="de">Transfer von Auftragsdaten und EUs.</documentation>
 								</annotation>
 								<complexType>
 									<sequence>
 										<element name="SignatureData">
 											<annotation>
+												<documentation xml:lang="en">Contains the ESs.</documentation>
 												<documentation xml:lang="de">enthält Signaturdaten (EUs).</documentation>
 											</annotation>
 											<complexType>
@@ -449,6 +426,7 @@
 										</element>
 										<element name="OrderData">
 											<annotation>
+												<documentation xml:lang="en">Contains the order data</documentation>
 												<documentation xml:lang="de">enthält Auftragsdaten.</documentation>
 											</annotation>
 											<complexType>
@@ -533,19 +511,9 @@
 		<complexContent>
 			<restriction base="ebics:OrderDetailsType">
 				<sequence>
-					<element name="OrderType" type="ebics:OrderTBaseType">
+					<element name="AdminOrderType" type="ebics:OrderTBaseType">
 						<annotation>
 							<documentation xml:lang="de">Auftragsart.</documentation>
-						</annotation>
-					</element>
-					<element name="OrderID" type="ebics:OrderIDType">
-						<annotation>
-							<documentation xml:lang="de">Auftragsnummer von Sendeaufträgen gemäß DFÜ-Abkommen.</documentation>
-						</annotation>
-					</element>
-					<element name="OrderAttribute" type="ebics:OrderAttributeBaseType" fixed="OZNNN">
-						<annotation>
-							<documentation xml:lang="de">Auftragsattribut: OZNNN.</documentation>
 						</annotation>
 					</element>
 				</sequence>

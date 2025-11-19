@@ -19,11 +19,17 @@
 
 package org.kopi.ebics.xml;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.impl.schema.DocumentFactory;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.ReturnCode;
 import org.kopi.ebics.interfaces.ContentFactory;
-import org.kopi.ebics.schema.h003.EbicsKeyManagementResponseDocument;
-import org.kopi.ebics.schema.h003.EbicsKeyManagementResponseDocument.EbicsKeyManagementResponse;
+import org.kopi.ebics.schema.h005.EbicsKeyManagementResponseDocument;
+import org.kopi.ebics.schema.h005.EbicsKeyManagementResponseDocument.EbicsKeyManagementResponse;
 
 /**
  * The <code>KeyManagementResponseElement</code> is the common element
@@ -72,7 +78,17 @@ public class KeyManagementResponseElement extends DefaultResponseElement {
     report();
   }
 
-  // --------------------------------------------------------------------
+    @Override
+    public void report() throws EbicsException {
+        super.report();
+        // there is a response code also in the body which needs to be checked
+        var bodyReturnCode = response.getBody().getReturnCode().getStringValue();
+        var code = ReturnCode.toReturnCode(bodyReturnCode, "Code " + bodyReturnCode);
+        checkReturnCode(code);
+    }
+
+
+    // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
 

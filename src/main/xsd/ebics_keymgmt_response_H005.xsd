@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ebics="http://www.ebics.org/H003" targetNamespace="http://www.ebics.org/H003" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+<!-- edited with XMLSpy v2016 sp1 (x64) (http://www.altova.com) by EBICS Working Group - October 2016 -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ebics="urn:org:ebics:H005" targetNamespace="urn:org:ebics:H005" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
 	<annotation>
-		<documentation xml:lang="de">ebics_keymgmt_response.xsd ist das EBICS-Protokollschema für Schlüsselmanagement-Antwortnachrichten (HIA, HPB, HSA, INI).</documentation>
+		<documentation xml:lang="de">ebics_keymgmt_response_H005.xsd ist das EBICS-Protokollschema für Schlüsselmanagement-Antwortnachrichten (HIA, HPB, HSA, INI).</documentation>
 	</annotation>
 	<import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd">
 		<annotation>
 			<documentation xml:lang="de">XML-Signature.</documentation>
 		</annotation>
 	</import>
-	<include schemaLocation="ebics_types.xsd"/>
-	<include schemaLocation="ebics_orders.xsd"/>
+	<include schemaLocation="ebics_types_H005.xsd"/>
+	<include schemaLocation="ebics_orders_H005.xsd"/>
 	<element name="ebicsKeyManagementResponse">
 		<annotation>
 			<documentation xml:lang="de">Electronic Banking Internet Communication Standard des Zentralen Kreditausschusses (ZKA): Multibankfähige Schnittstelle zur internetbasierten Kommunikation.</documentation>
@@ -115,6 +116,11 @@
 			<documentation xml:lang="de">Datentyp für den variablen EBICS-Header.</documentation>
 		</annotation>
 		<sequence>
+			<element name="OrderID" type="ebics:OrderIDType" minOccurs="0">
+				<annotation>
+					<documentation xml:lang="de">Auftragsnummer von Sendeaufträgen gemäß DFÜ-Abkommen (used for all key management order types except download order type HPB).</documentation>
+				</annotation>
+			</element>
 			<element name="ReturnCode" type="ebics:ReturnCodeType">
 				<annotation>
 					<documentation xml:lang="de">Rückmeldung des Ausführungsstatus mit einer eindeutigen Fehlernummer.</documentation>

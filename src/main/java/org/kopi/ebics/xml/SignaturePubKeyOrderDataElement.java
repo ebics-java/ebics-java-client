@@ -21,10 +21,10 @@ package org.kopi.ebics.xml;
 
 import java.util.Calendar;
 
+import org.ebics.s002.SignaturePubKeyInfoType;
+import org.ebics.s002.SignaturePubKeyOrderDataType;
 import org.kopi.ebics.exception.EbicsException;
-import org.kopi.ebics.schema.s001.PubKeyValueType;
-import org.kopi.ebics.schema.s001.SignaturePubKeyInfoType;
-import org.kopi.ebics.schema.s001.SignaturePubKeyOrderDataType;
+
 import org.kopi.ebics.schema.xmldsig.RSAKeyValueType;
 import org.kopi.ebics.schema.xmldsig.X509DataType;
 import org.kopi.ebics.session.EbicsSession;
@@ -47,29 +47,23 @@ public class SignaturePubKeyOrderDataElement extends DefaultEbicsRootElement {
     super(session);
   }
 
-  @Override
-  public void build() throws EbicsException {
-    SignaturePubKeyInfoType		signaturePubKeyInfo;
-    X509DataType 			x509Data;
-    RSAKeyValueType 			rsaKeyValue;
-    PubKeyValueType 			pubKeyValue;
-    SignaturePubKeyOrderDataType	signaturePubKeyOrderData;
+    @Override
+    public void build() throws EbicsException {
+        X509DataType x509Data  = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
+                session.getUser().getA005Certificate());
 
-    x509Data = null;
-    if (session.getUser().getPartner().getBank().useCertificate())
-        x509Data = EbicsXmlFactory.createX509DataType(session.getUser().getDN(),
-	                                          session.getUser().getA005Certificate());
-    rsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(session.getUser().getA005PublicKey().getPublicExponent().toByteArray(),
-	                                                session.getUser().getA005PublicKey().getModulus().toByteArray());
-    pubKeyValue = EbicsXmlFactory.createPubKeyValueType(rsaKeyValue, Calendar.getInstance());
-    signaturePubKeyInfo = EbicsXmlFactory.createSignaturePubKeyInfoType(x509Data,
-	                                                                pubKeyValue,
-	                                                                session.getConfiguration().getSignatureVersion());
-    signaturePubKeyOrderData = EbicsXmlFactory.createSignaturePubKeyOrderData(signaturePubKeyInfo,
-									      session.getUser().getPartner().getPartnerId(),
-									      session.getUser().getUserId());
-    document = EbicsXmlFactory.createSignaturePubKeyOrderDataDocument(signaturePubKeyOrderData);
-  }
+        var rsaKeyValue = EbicsXmlFactory.createRSAKeyValueType(
+            session.getUser().getA005PublicKey().getPublicExponent().toByteArray(),
+            session.getUser().getA005PublicKey().getModulus().toByteArray());
+        //var pubKeyValue = EbicsXmlFactory.createPubKeyValueType(rsaKeyValue, Calendar.getInstance());
+        var signaturePubKeyInfo = EbicsXmlFactory.createSignaturePubKeyInfoType(x509Data, null,
+            //         pubKeyValue,
+            session.getConfiguration().getSignatureVersion());
+        var signaturePubKeyOrderData = EbicsXmlFactory.createSignaturePubKeyOrderData(
+            signaturePubKeyInfo, session.getUser().getPartner().getPartnerId(),
+            session.getUser().getUserId());
+        document = EbicsXmlFactory.createSignaturePubKeyOrderDataDocument(signaturePubKeyOrderData);
+    }
 
   @Override
   public String getName() {
@@ -79,7 +73,7 @@ public class SignaturePubKeyOrderDataElement extends DefaultEbicsRootElement {
   @Override
   public byte[] toByteArray() {
     addNamespaceDecl("ds", "http://www.w3.org/2000/09/xmldsig#");
-    setSaveSuggestedPrefixes("http://www.ebics.org/S001", "");
+    setSaveSuggestedPrefixes("http://www.ebics.org/S002", "");
 
     return super.toByteArray();
   }

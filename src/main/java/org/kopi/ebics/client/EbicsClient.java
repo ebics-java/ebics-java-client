@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URL;
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +52,6 @@ import org.kopi.ebics.interfaces.LetterManager;
 import org.kopi.ebics.interfaces.PasswordCallback;
 import org.kopi.ebics.io.IOUtils;
 import org.kopi.ebics.messages.Messages;
-import org.kopi.ebics.schema.h003.OrderAttributeType;
 import org.kopi.ebics.session.DefaultConfiguration;
 import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.session.OrderType;
@@ -73,10 +71,6 @@ public class EbicsClient {
         return new File(System.getProperty("user.home"), "ebics" + File.separator + "client");
     }
 
-    static {
-        // this is for the logging config
-        System.setProperty("ebicsBasePath", getRootDir().getAbsolutePath());
-    }
     private static final Logger log = LoggerFactory.getLogger(EbicsClient.class);
 
     private final Configuration configuration;
@@ -230,7 +224,7 @@ public class EbicsClient {
         throws GeneralSecurityException, IOException, EbicsException {
         user.getPartner().getBank().setUseCertificate(useCertificates);
         LetterManager letterManager = configuration.getLetterManager();
-        List<InitLetter> letters = Arrays.asList(letterManager.createA005Letter(user),
+        List<InitLetter> letters = List.of(letterManager.createA005Letter(user),
             letterManager.createE002Letter(user), letterManager.createX002Letter(user));
 
         File directory = configuration.getLettersDirectory(user);
@@ -390,7 +384,6 @@ public class EbicsClient {
      */
     public void sendFile(File file, User user, Product product, EbicsOrderType orderType) throws Exception {
         EbicsSession session = createSession(user, product);
-        OrderAttributeType.Enum orderAttribute = OrderAttributeType.OZHNN;
 
         FileTransfer transferManager = new FileTransfer(session);
 
@@ -398,7 +391,7 @@ public class EbicsClient {
             configuration.getTransferTraceDirectory(user));
 
         try {
-            transferManager.sendFile(IOUtils.getFileContent(file), orderType, orderAttribute);
+            transferManager.sendFile(IOUtils.getFileContent(file), orderType);
         } catch (IOException | EbicsException e) {
             log
                 .error(messages.getString("upload.file.error", file.getAbsolutePath()), e);
@@ -411,7 +404,7 @@ public class EbicsClient {
     }
 
     public void fetchFile(File file, User user, Product product, EbicsOrderType orderType,
-        boolean isTest, Date start, Date end) throws IOException, EbicsException {
+        boolean isTest) throws IOException, EbicsException {
         FileTransfer transferManager;
         EbicsSession session = createSession(user, product);
         session.addSessionParam("FORMAT", "pain.xxx.cfonb160.dct");
@@ -424,7 +417,7 @@ public class EbicsClient {
             configuration.getTransferTraceDirectory(user));
 
         try {
-            transferManager.fetchFile(orderType, start, end, file);
+            transferManager.fetchFile(orderType, file);
         } catch (NoDownloadDataAvailableException e) {
             // don't log this exception as an error, caller can decide how to handle
             throw e;
@@ -436,7 +429,7 @@ public class EbicsClient {
 
     public void fetchFile(File file, EbicsOrderType orderType, Date start, Date end) throws IOException,
         EbicsException {
-        fetchFile(file, defaultUser, defaultProduct, orderType, false, start, end);
+        fetchFile(file, defaultUser, defaultProduct, orderType, false);
     }
 
     /**
@@ -657,7 +650,7 @@ public class EbicsClient {
         for (EbicsOrderType type : fetchFileOrders) {
             if (hasOption(cmd, type)) {
                 client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
-                    client.defaultProduct, type, false, null, null);
+                    client.defaultProduct, type, false);
                 break;
             }
         }

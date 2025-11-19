@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:esig="http://www.ebics.org/S001" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ebics="http://www.ebics.org/H003" targetNamespace="http://www.ebics.org/H003" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
-	<import namespace="http://www.ebics.org/S001" schemaLocation="ebics_signature.xsd"/>
+<!-- edited with XMLSpy v2017 sp1 (x64) (http://www.altova.com) by EBICS Working Group - March 2017 -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:esig="http://www.ebics.org/S002" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ebics="urn:org:ebics:H005" targetNamespace="urn:org:ebics:H005" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	<import namespace="http://www.ebics.org/S002" schemaLocation="ebics_signature_S002.xsd"/>
 	<import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
 	<annotation>
-		<documentation xml:lang="de">ebics_types.xsd enthält einfache Typdefinitionen für EBICS.</documentation>
+		<documentation xml:lang="de">ebics_types_H005.xsd enthält einfache Typdefinitionen für EBICS.</documentation>
 	</annotation>
 	<simpleType name="ProtocolVersionType">
 		<annotation>
@@ -967,536 +968,6 @@
 			<pattern value="[A-Z0-9]{3}"/>
 		</restriction>
 	</simpleType>
-	<simpleType name="OrderTListType">
-		<annotation>
-			<documentation xml:lang="de">Listentyp für allgemeine Auftragsarten.</documentation>
-		</annotation>
-		<list itemType="ebics:OrderTBaseType"/>
-	</simpleType>
-	<simpleType name="OrderTType">
-		<annotation>
-			<documentation xml:lang="de">Datentyp für zulässige Auftragsarten im EBICS-Kontext.</documentation>
-		</annotation>
-		<restriction base="ebics:OrderTBaseType">
-			<length value="3"/>
-			<enumeration value="HSA">
-				<annotation>
-					<documentation xml:lang="de">Senden der Public Keys für Authentifikation und Verschlüsselung, bankfachlich signiert mit FTAM-Signaturschlüssel</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HIA">
-				<annotation>
-					<documentation xml:lang="de">Senden der Public Keys zur Authentifikation und zur Verschlüsselung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HPB">
-				<annotation>
-					<documentation xml:lang="de">Abholen der Public Keys der Bank</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HCA">
-				<annotation>
-					<documentation xml:lang="de">Ändern der Public Keys zur Authentifikation und zur Verschlüsselung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HPD">
-				<annotation>
-					<documentation xml:lang="de">Abholen Bankparameter für internetbasierten Standard</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HVU">
-				<annotation>
-					<documentation xml:lang="de">Abholen VEU Übersicht</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HVD">
-				<annotation>
-					<documentation xml:lang="de">Abholen VEU Auftragsdaten (Daten-trägerbegleitzettel)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HVT">
-				<annotation>
-					<documentation xml:lang="de">Abholen VEU Auftragsdaten ( Transakti-onsdetails gemäß Parametervorgabe)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HVE">
-				<annotation>
-					<documentation xml:lang="de">Senden EU zu bestehendem VEU-Auftrag</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HVS">
-				<annotation>
-					<documentation xml:lang="de">Senden Stornierung für bestehenden VEU-Auftrag</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HKD">
-				<annotation>
-					<documentation xml:lang="de">Abholen Konfigurationsdaten des Teilnehmers</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HAA">
-				<annotation>
-					<documentation xml:lang="de">Abholen Übersicht zu abrufbaren Aufträgen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HVU">
-				<annotation>
-					<documentation xml:lang="de">VEU-Übersicht abholen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HVD">
-				<annotation>
-					<documentation xml:lang="de">VEU-Status abrufen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HVT">
-				<annotation>
-					<documentation xml:lang="de">VEU-Transaktion-Details abrufen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HVE">
-				<annotation>
-					<documentation xml:lang="de">EU hinzufügen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HVS">
-				<annotation>
-					<documentation xml:lang="de">VEU-Stornierung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="AAE">
-				<annotation>
-					<documentation xml:lang="de">Senden Importakkreditiv Änderung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="AEA">
-				<annotation>
-					<documentation xml:lang="de">Senden Exportakkreditive</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="AIA">
-				<annotation>
-					<documentation xml:lang="de">Senden Import-Akkreditive Avisierung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="AKA">
-				<annotation>
-					<documentation xml:lang="de">Abholen Import-Akkreditive</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="AWV">
-				<annotation>
-					<documentation xml:lang="de">AWV-Meldung senden</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="AZM">
-				<annotation>
-					<documentation xml:lang="de">AZV im Magnetbandformat senden (Satzlänge variabel)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="AZV">
-				<annotation>
-					<documentation xml:lang="de">AZV im Diskettenformat senden</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="AZ2">
-				<annotation>
-					<documentation xml:lang="de">AZV im Magnetbandformat senden (Satzlängenfeld 2 Bytes)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="AZ4">
-				<annotation>
-					<documentation xml:lang="de">AZV im Magnetbandformat senden (Satzlängenfeld 4 Bytes)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="DDG">
-				<annotation>
-					<documentation xml:lang="de">Abholen Devisenhandelsbestätigung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="DHB">
-				<annotation>
-					<documentation xml:lang="de">Senden Devisenhandelsbestätigung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="DTE">
-				<annotation>
-					<documentation xml:lang="de">Eilauftrag (IZV im DTAUS0-Format) senden</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="DTI">
-				<annotation>
-					<documentation xml:lang="de">IZV-Datei abholen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="DTM">
-				<annotation>
-					<documentation xml:lang="de">MCV-Datei abholen (Format analog MCV)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="DTV">
-				<annotation>
-					<documentation xml:lang="de">Zahlungsverkehrsdateien von Service-Rechenzentren senden</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="DT2">
-				<annotation>
-					<documentation xml:lang="de">MC2-Datei abholen (Format analog MC2)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="DT4">
-				<annotation>
-					<documentation xml:lang="de">MC4-Datei abholen (Format analog MC4)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="EAB">
-				<annotation>
-					<documentation xml:lang="de">Exportakkreditive abholen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="ECS">
-				<annotation>
-					<documentation xml:lang="de">Senden electronic-cash Lastschriftdatei</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="EDC">
-				<annotation>
-					<documentation xml:lang="de">Senden Maestro-Lastschriftdatei</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="EEA">
-				<annotation>
-					<documentation xml:lang="de">EDIFACT abholen ASCII</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="EEZ">
-				<annotation>
-					<documentation xml:lang="de">EDIFACT abholen EBCDIC</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="EIB">
-				<annotation>
-					<documentation xml:lang="de">Ausführungsanzeige (Exportinkasso) Bank an Kunde abholen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="EIK">
-				<annotation>
-					<documentation xml:lang="de">Senden Exportinkassi</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="ESA">
-				<annotation>
-					<documentation xml:lang="de">EDIFACT senden ASCII</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="ESM">
-				<annotation>
-					<documentation xml:lang="de">EU-Standardüberweisung (Zahlungsart 13) im Magnetbandformat (Satzlängenfeld 4 Bytes)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="ESR">
-				<annotation>
-					<documentation xml:lang="de">Einreichung von EDIFACT-Lastschriften</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="ESZ">
-				<annotation>
-					<documentation xml:lang="de">EDIFACT senden EBCDIC</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="ESU">
-				<annotation>
-					<documentation xml:lang="de">EU-Standardüberweisung (Zahlungsart 13)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="EUE">
-				<annotation>
-					<documentation xml:lang="de">Taggleiche grenzüberschreitende Euro-Eilzahlung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="GAB">
-				<annotation>
-					<documentation xml:lang="de">Abholen Garantien</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="GAK">
-				<annotation>
-					<documentation xml:lang="de">Senden Garantien</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="GKT">
-				<annotation>
-					<documentation xml:lang="de">GeldKarte-Umsatz senden (Datenaufbau gemäß GeldKarte-Spezifikation)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="IDD">
-				<annotation>
-					<documentation xml:lang="de">Internationale Lastschriften</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="IIB">
-				<annotation>
-					<documentation xml:lang="de">Abholen Importinkassi</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="IIK">
-				<annotation>
-					<documentation xml:lang="de">Senden Importinkassi</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="INT">
-				<annotation>
-					<documentation xml:lang="de">Internationaler Zahlungsverkehr</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="IZG">
-				<annotation>
-					<documentation xml:lang="de">Inlandszahlungsverkehrsauftrag senden (nur Gutschriften)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="IZL">
-				<annotation>
-					<documentation xml:lang="de">Inlandszahlungsverkehrsauftrag senden (nur Lastschriften)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="IZV">
-				<annotation>
-					<documentation xml:lang="de">Inlandszahlungsverkehrsauftrag senden</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="MAO">
-				<annotation>
-					<documentation xml:lang="de">Abholen Magnetband-Datei aus optischer Beleglesung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="MCV">
-				<annotation>
-					<documentation xml:lang="de">Senden IZV-Magnetbandformat (Satzlängenfeld 4 Bytes)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="MC2">
-				<annotation>
-					<documentation xml:lang="de">Senden IZV-Magnetbandformat (Satzlängenfeld 2 Bytes)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="MC4">
-				<annotation>
-					<documentation xml:lang="de">Senden IZV-Magnetbandformat (Satzlänge variabel)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="POZ">
-				<annotation>
-					<documentation xml:lang="de">Senden POZ-Datei</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="RDT">
-				<annotation>
-					<documentation xml:lang="de">Rücklastschrift an Kunde</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="RFT">
-				<annotation>
-					<documentation xml:lang="de">Request for Transfer</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="STA">
-				<annotation>
-					<documentation xml:lang="de">Abholen Swift-Tagesauszüge</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="VMK">
-				<annotation>
-					<documentation xml:lang="de">Abholen kurzfristige Vormerkposten</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="WPA">
-				<annotation>
-					<documentation xml:lang="de">Abholen Wertpapierabrechnung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="WPB">
-				<annotation>
-					<documentation xml:lang="de">Abholen Wertpapierausführungsanzeige</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="WPC">
-				<annotation>
-					<documentation xml:lang="de">Abholen Depotaufstellung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="WPD">
-				<annotation>
-					<documentation xml:lang="de">Abholen sonstige WP-Umsätze</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="INI">
-				<annotation>
-					<documentation xml:lang="de">Initialisierung der bankfachlichen EU des Teilnehmers.</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="PTK">
-				<annotation>
-					<documentation xml:lang="de">Abholen Kundenprotokoll</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="PUB">
-				<annotation>
-					<documentation xml:lang="de">Senden Public Key zur Unterschriftenverifizierung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="HCA">
-				<annotation>
-					<documentation xml:lang="de">Änderung der Teilnehmerschlüssel für Authentifikation und Verschlüsselung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="SPR">
-				<annotation>
-					<documentation xml:lang="de">Sperren der Zugangsberechtigung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="VPB">
-				<annotation>
-					<documentation xml:lang="de">Abholen Public Key der Bank zur Verschlüsselung</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="FIN">
-				<annotation>
-					<documentation xml:lang="de">EDIFACT-FINPAY senden</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="IZS">
-				<annotation>
-					<documentation xml:lang="de">Informationen von Zentralstellen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="SSP">
-				<annotation>
-					<documentation xml:lang="de">ec-Karten-Sperrdatei</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="ATA">
-				<annotation>
-					<documentation xml:lang="de">Teilausnutzung Importakkreditiv (Kreditinstitut an Kunde)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="BKA">
-				<annotation>
-					<documentation xml:lang="de">Auftragsart für elektronische Kontoauszüge</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="BZK">
-				<annotation>
-					<documentation xml:lang="de">Barzahlungskarte</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="DKI">
-				<annotation>
-					<documentation xml:lang="de">Devisenkursinformationen abholen (Euro)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="DMI">
-				<annotation>
-					<documentation xml:lang="de">Abholen Devisenmarktinformationen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="DSW">
-				<annotation>
-					<documentation xml:lang="de">Abholen Devisenswapinformationen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="ESG">
-				<annotation>
-					<documentation xml:lang="de">ESG-Datei für Elektronische Zweitunterschrift abholen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="ESP">
-				<annotation>
-					<documentation xml:lang="de">ESP-Datei für Elektronische Zweitunterschrift senden</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="FTB">
-				<annotation>
-					<documentation xml:lang="de">Abholen/Senden beliebige Datei</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="FTD">
-				<annotation>
-					<documentation xml:lang="de">Freie Textdatei senden/abholen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="IBK">
-				<annotation>
-					<documentation xml:lang="de">Abholen Institutsbestätigungsdatei (Komplettbestand)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="IBW">
-				<annotation>
-					<documentation xml:lang="de">Abholen Institutsbestätigungsdatei (Komplettbestand weitere Datei)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="IBU">
-				<annotation>
-					<documentation xml:lang="de">Abholen Institutsbestätigungsdatei (tägliches Update)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="IKK">
-				<annotation>
-					<documentation xml:lang="de">Senden Institutskonten (Komplettbestand begrenzt auf 170 MB)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="IKU">
-				<annotation>
-					<documentation xml:lang="de">Senden Institutskonten (tägliches Update)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="IKW">
-				<annotation>
-					<documentation xml:lang="de">Senden Institutskonten (Komplettbestand weitere Datei)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="KTH">
-				<annotation>
-					<documentation xml:lang="de">KTOHIN: Automatisiertes Verfahren für die Änderung von Kontonummern und Bankleitzahlen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="KTR">
-				<annotation>
-					<documentation xml:lang="de">KTORUECK: Automatisiertes Verfahren für die Änderung von Kontonummern und Bankleitzahlen </documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="KKZ">
-				<annotation>
-					<documentation xml:lang="de">Kontenkonzentration und Saldenausgleich</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="TST">
-				<annotation>
-					<documentation xml:lang="de">Senden/Abholen Testdatei (ASCII)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="UPD">
-				<annotation>
-					<documentation xml:lang="de">Updates abholen</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="C52">
-				<annotation>
-					<documentation xml:lang="de">camt.052 Vormerkposten / Avise (VMK)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="C53">
-				<annotation>
-					<documentation xml:lang="de">camt.053 Tagesauszug (STA)</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="C54">
-				<annotation>
-					<documentation xml:lang="de">Sammelbuchungsinformationen (DTI)</documentation>
-				</annotation>
-			</enumeration>
-
-		</restriction>
-	</simpleType>
 	<simpleType name="OrderIDType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für eine Auftragsnummer lt. DFÜ-Abkommen.</documentation>
@@ -1504,36 +975,6 @@
 		<restriction base="token">
 			<length value="4"/>
 			<pattern value="[A-Z][A-Z0-9]{3}"/>
-		</restriction>
-	</simpleType>
-	<simpleType name="OrderAttributeBaseType">
-		<annotation>
-			<documentation xml:lang="de">Datentyp für ein einzelnes Auftragsattributkennzeichen (Grundtyp).</documentation>
-		</annotation>
-		<restriction base="token">
-			<length value="5"/>
-		</restriction>
-	</simpleType>
-	<simpleType name="OrderAttributeType">
-		<annotation>
-			<documentation xml:lang="de">Datentyp für Auftragsattributkennzeichen gemäß DFÜ-Abkommen.</documentation>
-		</annotation>
-		<restriction base="ebics:OrderAttributeBaseType">
-			<enumeration value="OZHNN">
-				<annotation>
-					<documentation xml:lang="de">Auftragsdaten mit Unterschrift, ZIP-komprimiert, hybrid verschlüsselt</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="UZHNN">
-				<annotation>
-					<documentation xml:lang="de">Unterschrift, ZIP-komprimiert, hybrid verschlüsselt</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="DZHNN">
-				<annotation>
-					<documentation xml:lang="de">Auftragsdaten ohne Unterschrift, ZIP-komprimiert, hybrid verschlüsselt</documentation>
-				</annotation>
-			</enumeration>
 		</restriction>
 	</simpleType>
 	<simpleType name="SecurityMediumType">
@@ -1726,7 +1167,7 @@
 					</complexType>
 				</element>
 			</choice>
-			<choice maxOccurs="2">
+			<choice minOccurs="0" maxOccurs="2">
 				<element name="BankCode">
 					<annotation>
 						<documentation xml:lang="de">Bankleitzahl (deutsches Format und/oder international als SWIFT-BIC).</documentation>
@@ -1938,7 +1379,7 @@
 					</complexType>
 				</element>
 			</choice>
-			<choice maxOccurs="2">
+			<choice minOccurs="0" maxOccurs="2">
 				<element name="BankCode">
 					<annotation>
 						<documentation xml:lang="de">Bankleitzahl (deutsches Format oder international als SWIFT-BIC).</documentation>
@@ -2056,31 +1497,6 @@
 		</annotation>
 		<restriction base="base64Binary"/>
 	</simpleType>
-	<simpleType name="CountryCodeType">
-		<annotation>
-			<documentation xml:lang="de">ISO-Code zur Länderkennzeichnung.</documentation>
-			<documentation xml:lang="en">ISO-Code to identify the country.</documentation>
-		</annotation>
-		<restriction base="token">
-			<length value="2"/>
-			<pattern value="[A-Z]{2,2}"/>
-		</restriction>
-	</simpleType>
-	<complexType name="FileFormatType">
-		<annotation>
-			<documentation xml:lang="de">Datentyp für das Dateiformat.</documentation>
-		</annotation>
-		<simpleContent>
-			<extension base="token">
-				<attribute name="CountryCode" type="ebics:CountryCodeType">
-					<annotation>
-						<documentation xml:lang="de">ISO-Code zur Länderkennzeichnung (EU für Europa)</documentation>
-						<documentation xml:lang="en">ISO-Code to identify the country (EU for Europe)</documentation>
-					</annotation>
-				</attribute>
-			</extension>
-		</simpleContent>
-	</complexType>
 	<simpleType name="AuthorisationLevelType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für Berechtigungsklassen zur Elektronischen Unterschrift.</documentation>
@@ -2130,7 +1546,7 @@
 	<complexType name="DataDigestType">
 		<simpleContent>
 			<extension base="ebics:DigestType">
-				<attribute name="SignatureVersion" type="ebics:SignatureVersionType" use="optional" default="A004">
+				<attribute name="SignatureVersion" type="ebics:SignatureVersionType" use="required">
 					<annotation>
 						<documentation xml:lang="de">Version des Signaturverfahrens.</documentation>
 						<documentation xml:lang="en">Version of the algorithm used for signature creation.</documentation>
@@ -2166,33 +1582,12 @@
 			</extension>
 		</simpleContent>
 	</complexType>
-	<complexType name="PubKeyValueType">
-		<annotation>
-			<documentation xml:lang="de">Datentyp für die Exponent-Modulus-Darstellung eines öffentlichen RSA-Schlüssels.</documentation>
-		</annotation>
-		<sequence>
-			<element ref="ds:RSAKeyValue"/>
-			<element name="TimeStamp" type="ebics:TimestampType" minOccurs="0">
-				<annotation>
-					<documentation xml:lang="de">Zeitpunkt der Generierung des Schlüssels.</documentation>
-				</annotation>
-			</element>
-			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
-		</sequence>
-	</complexType>
 	<complexType name="PubKeyInfoType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für die Darstellung eines öffentlichen RSA-Schlüssels als Exponent-Modulus-Kombination oder als X509-Zertifikat.</documentation>
 		</annotation>
 		<sequence>
-			<sequence>
-				<element ref="ds:X509Data" minOccurs="0"/>
-				<element name="PubKeyValue" type="ebics:PubKeyValueType">
-					<annotation>
-						<documentation xml:lang="de">Darstellung als Exponent-Modulus-Kombination.</documentation>
-					</annotation>
-				</element>
-			</sequence>
+			<element ref="ds:X509Data"/>
 			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</sequence>
 	</complexType>
@@ -2228,6 +1623,70 @@
 			</extension>
 		</complexContent>
 	</complexType>
+	<complexType name="SignatureCertificateInfoType">
+		<annotation>
+			<documentation xml:lang="de">Datentyp für öffentliche bankfachliche Schlüssel.</documentation>
+			<documentation xml:lang="en">Data type for public authorisation (ES) key.</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="ebics:CertificateInfoType">
+				<sequence>
+					<element name="SignatureVersion" type="ebics:SignatureVersionType">
+						<annotation>
+							<documentation xml:lang="de">Version des EU-Signaturverfahrens.</documentation>
+							<documentation xml:lang="en">ES-Version.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="AuthenticationCertificateInfoType">
+		<annotation>
+			<documentation xml:lang="de">Datentyp für öffentlichen Schlüssel zur Authentisierung.</documentation>
+			<documentation xml:lang="en">Data type for public for identification and authentication.</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="ebics:CertificateInfoType">
+				<sequence>
+					<element name="AuthenticationVersion" type="ebics:AuthenticationVersionType">
+						<annotation>
+							<documentation xml:lang="de">Version des Authentifikationsverfahrens.</documentation>
+							<documentation xml:lang="de">Authentication version.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="EncryptionCertificateInfoType">
+		<annotation>
+			<documentation xml:lang="de">Datentyp für öffentlichen Verschlüsselungsschlüssel.</documentation>
+			<documentation xml:lang="en">Data type for encryption key.</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="ebics:CertificateInfoType">
+				<sequence>
+					<element name="EncryptionVersion" type="ebics:EncryptionVersionType">
+						<annotation>
+							<documentation xml:lang="de">Version des Verschlüsselungsverfahrens.</documentation>
+							<documentation xml:lang="en">Encryption Version.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="CertificateInfoType">
+		<annotation>
+			<documentation xml:lang="de">Datentyp für die Zertifikate hinsichtlich der "bank-technical signature for authorisation" (ES).</documentation>
+			<documentation xml:lang="en">Data Type for Certificates for the bank-technical signature for authorisation (ES)</documentation>
+		</annotation>
+		<sequence>
+			<element ref="ds:X509Data"/>
+			<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
 	<simpleType name="ReturnCodeType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für Antwortcodes.</documentation>
@@ -2260,37 +1719,12 @@
 		</annotation>
 		<restriction base="normalizedString"/>
 	</simpleType>
-	<simpleType name="TransferType">
-		<annotation>
-			<documentation>Datentyp für den Transfertyp (Upload/Download).</documentation>
-		</annotation>
-		<restriction base="token">
-			<enumeration value="Upload">
-				<annotation>
-					<documentation xml:lang="de">Auftragsdaten werden bei der Anfrage transferiert.</documentation>
-				</annotation>
-			</enumeration>
-			<enumeration value="Download">
-				<annotation>
-					<documentation xml:lang="de">Auftragsdaten werden bei der Antwort transferiert.</documentation>
-				</annotation>
-			</enumeration>
-		</restriction>
-	</simpleType>
 	<simpleType name="OrderDescriptionType">
 		<annotation>
 			<documentation xml:lang="de">Datentyp für die Beschreibung von Auftragsarten.</documentation>
 		</annotation>
 		<restriction base="normalizedString">
 			<maxLength value="128"/>
-		</restriction>
-	</simpleType>
-	<simpleType name="OrderFormatType">
-		<annotation>
-			<documentation xml:lang="de">Datentyp für das Auftragsformat.</documentation>
-		</annotation>
-		<restriction base="token">
-			<maxLength value="8"/>
 		</restriction>
 	</simpleType>
 	<simpleType name="UserStatusType">
@@ -2303,29 +1737,29 @@
 	</simpleType>
 	<element name="Parameter">
 		<annotation>
-			<documentation xml:lang="de">generische Schlüssel-Wert-Parameter.</documentation>
+			<documentation xml:lang="de">generic parameter</documentation>
 			<documentation xml:lang="en">Generic key value parameters.</documentation>
 		</annotation>
 		<complexType>
 			<sequence>
 				<element name="Name" type="token">
 					<annotation>
-						<documentation xml:lang="de">Name des Parameters.</documentation>
+						<documentation xml:lang="de">name of parameter</documentation>
 						<documentation xml:lang="en">Name of the parameter (= key).</documentation>
 					</annotation>
 				</element>
 				<element name="Value">
 					<annotation>
-						<documentation xml:lang="de">Wert des Parameters.</documentation>
+						<documentation xml:lang="de">value of parameter</documentation>
 						<documentation xml:lang="en">Value of the parameter.</documentation>
 					</annotation>
 					<complexType>
 						<simpleContent>
 							<extension base="anySimpleType">
-								<attribute name="Type" type="NCName" use="optional" default="string">
+								<attribute name="Type" type="NCName" use="required">
 									<annotation>
-										<documentation xml:lang="de">XML-Typ des Parameterwerts (Default=string).</documentation>
-										<documentation xml:lang="en">XML type of the parameter value (default is string).</documentation>
+										<documentation xml:lang="de">XML-Typ des Parameterwerts (Vorschlag für default ist string).</documentation>
+										<documentation xml:lang="en">XML type of the parameter value (Proposal for default is string).</documentation>
 									</annotation>
 								</attribute>
 							</extension>
@@ -2374,4 +1808,78 @@
 			<documentation xml:lang="en">Authentication signature.</documentation>
 		</annotation>
 	</element>
+	<simpleType name="String255Type">
+		<annotation>
+			<documentation xml:lang="de">String up to 255 characters.</documentation>
+		</annotation>
+		<restriction base="normalizedString">
+			<maxLength value="255"/>
+		</restriction>
+	</simpleType>
+	<!--Following types are BTF required type definitions-->
+	<simpleType name="CodeStringType">
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="10"/>
+			<pattern value="[A-Z0-9]*"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="NumStringType">
+		<annotation>
+			<documentation>Type is used for ISO variant and version</documentation>
+		</annotation>
+		<restriction base="string">
+			<minLength value="2"/>
+			<maxLength value="3"/>
+			<pattern value="[0-9]*"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="FileNameStringType">
+		<annotation>
+			<documentation>Type ist used for original file name</documentation>
+		</annotation>
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="256"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="MessageNameStringType">
+		<annotation>
+			<documentation>Type ist used for name or rather kind of Message</documentation>
+		</annotation>
+		<restriction base="token">
+			<minLength value="1"/>
+			<maxLength value="10"/>
+			<pattern value="[a-z\.0-9]*"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="ServiceNameStringType">
+		<annotation>
+			<documentation>Service Code name: External list specified and maintained by EBICS. Basis is the "SWIFT-list" for the field "description" (SCT, DCT, XCT, SDD, DDD, STM, REP...) plus additional codes needed for further services </documentation>
+		</annotation>
+		<restriction base="ebics:CodeStringType">
+			<maxLength value="3"/>
+			<minLength value="3"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="ScopeStringType">
+		<restriction base="ebics:CodeStringType">
+			<maxLength value="3"/>
+			<minLength value="2"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="ServiceOptionStringType">
+		<restriction base="ebics:CodeStringType">
+			<minLength value="3"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="ContainerStringType">
+		<restriction base="ebics:CodeStringType">
+			<maxLength value="3"/>
+			<minLength value="3"/>
+			<enumeration value="SVC"/>
+			<enumeration value="XML"/>
+			<enumeration value="ZIP"/>
+		</restriction>
+	</simpleType>
 </schema>

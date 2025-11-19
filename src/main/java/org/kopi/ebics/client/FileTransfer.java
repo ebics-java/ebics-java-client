@@ -22,7 +22,6 @@ package org.kopi.ebics.client;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Date;
 
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.ContentFactory;
@@ -30,7 +29,6 @@ import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.io.ByteArrayContentFactory;
 import org.kopi.ebics.io.Joiner;
 import org.kopi.ebics.messages.Messages;
-import org.kopi.ebics.schema.h003.OrderAttributeType;
 import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.utils.Constants;
 import org.kopi.ebics.utils.Utils;
@@ -95,12 +93,12 @@ public class FileTransfer {
    * @throws IOException
    * @throws EbicsException
    */
-  public void sendFile(byte[] content, EbicsOrderType orderType, OrderAttributeType.Enum orderAttribute)
+  public void sendFile(byte[] content, EbicsOrderType orderType)
     throws IOException, EbicsException
   {
     HttpRequestSender sender = new HttpRequestSender(session);
     UploadInitializationRequestElement initializer = new UploadInitializationRequestElement(session,
-	                                            orderType, orderAttribute,
+	                                            orderType,
 	                                            content);
     initializer.build();
     initializer.validate();
@@ -129,7 +127,7 @@ public class FileTransfer {
    * @param factory the content factory that contain the segment data.
    * @param segmentNumber the segment number
    * @param lastSegment is it the last segment?
-   * @param transactionId the transaction Id
+   * @param transactionId the transaction id
    * @param orderType the order type
    * @throws IOException
    * @throws EbicsException
@@ -172,23 +170,16 @@ public class FileTransfer {
    * This type of transfer will run until everything is processed.
    * No transaction recovery is possible.
    * @param orderType type of file to fetch
-   * @param start optional begin of fetch term
-   * @param end optional end of fetch term
    * @param outputFile where to put the data
    * @throws IOException communication error
    * @throws EbicsException server generated error
    */
   public void fetchFile(EbicsOrderType orderType,
-                        Date start,
-                        Date end,
                         File outputFile)
     throws IOException, EbicsException
   {
     var sender = new HttpRequestSender(session);
-    var initializer = new DownloadInitializationRequestElement(session,
-	                                            orderType,
-	                                            start,
-	                                            end);
+      var initializer = new DownloadInitializationRequestElement(session, orderType);
     initializer.build();
     initializer.validate();
 

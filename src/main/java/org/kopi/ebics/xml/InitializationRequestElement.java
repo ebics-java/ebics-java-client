@@ -31,7 +31,8 @@ import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsOrderType;
-import org.kopi.ebics.schema.h003.EbicsRequestDocument;
+
+import org.kopi.ebics.schema.h005.EbicsRequestDocument;
 import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.utils.Utils;
 
@@ -51,13 +52,10 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
    * @param session the current ebics session.
    * @param type the initialization type (UPLOAD, DOWNLOAD).
    * @param name the element name.
-   * @throws EbicsException
    */
   public InitializationRequestElement(EbicsSession session,
                                       EbicsOrderType type,
-                                      String name)
-    throws EbicsException
-  {
+                                      String name) {
     super(session);
     this.type = type;
     this.name = name;

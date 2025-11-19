@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE schema
-  PUBLIC "-//W3C//DTD XMLSchema 200102//EN" "http://www.w3.org/2001/XMLSchema.dtd"
+  PUBLIC "-//W3C//DTD XMLSchema 200102//EN" "XMLSchema.dtd"
  [
    <!ATTLIST schema 
      xmlns:ds CDATA #FIXED "http://www.w3.org/2000/09/xmldsig#">
@@ -11,7 +11,7 @@
 
 <!-- Schema for XML Signatures
     http://www.w3.org/2000/09/xmldsig#
-    $Revision: 1.1 $ on $Date: 2006/01/17 07:45:32 $ by $Author: hpl $
+    $Revision: 1.2 $ on $Date: 2006/02/15 16:36:35 $ by $Author: hpl $
 
     Copyright 2001 The Internet Society and W3C (Massachusetts Institute
     of Technology, Institut National de Recherche en Informatique et en
