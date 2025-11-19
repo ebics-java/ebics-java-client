@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.client;
@@ -33,7 +32,6 @@ import org.kopi.ebics.interfaces.Savable;
  * This object is not serializable, but it should be persisted every time it needs to be saved.
  * Persistence is achieved via <code>save(ObjectOutputStream)</code> and the matching constructor.
  *
- * @author Hachani
  *
  */
 public class Partner implements EbicsPartner, Savable {

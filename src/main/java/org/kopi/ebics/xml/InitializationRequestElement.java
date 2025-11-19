@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.xml;
@@ -42,7 +41,6 @@ import org.kopi.ebics.utils.Utils;
  * ebics uploads and downloads requests. The response of this element is
  * then used either to upload or download files from the ebics server.
  *
- * @author Hachani
  *
  */
 public abstract class InitializationRequestElement extends DefaultEbicsRootElement {
@@ -53,7 +51,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
    * @param type the initialization type (UPLOAD, DOWNLOAD).
    * @param name the element name.
    */
-  public InitializationRequestElement(EbicsSession session,
+  protected InitializationRequestElement(EbicsSession session,
                                       EbicsOrderType type,
                                       String name) {
     super(session);
@@ -122,7 +120,7 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
     }
 
     try {
-      return Hex.decodeHex((new String(hex)).toCharArray());
+      return Hex.decodeHex(new String(hex).toCharArray());
     } catch (DecoderException e) {
       throw new EbicsException(e.getMessage());
     }

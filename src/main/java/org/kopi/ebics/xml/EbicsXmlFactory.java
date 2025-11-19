@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.xml;
@@ -89,11 +88,10 @@ import org.kopi.ebics.schema.xmldsig.X509DataType;
  * This factory is based on xmlbeans object generated
  * from EBICS XML schemas.
  *
- * @author hachani
  * @see XmlObject
  *
  */
-public class EbicsXmlFactory {
+public final class EbicsXmlFactory {
 
     /**
      * Creates a new <code>SignedInfoDocument</code> XML object
@@ -661,9 +659,7 @@ public class EbicsXmlFactory {
      * @return the <code>EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest.Body</code> XML object
      */
     public static EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest.Body createDigestsRequestBody() {
-        EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest.Body newBody = EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest.Body.Factory.newInstance();
-
-        return newBody;
+        return EbicsNoPubKeyDigestsRequestDocument.EbicsNoPubKeyDigestsRequest.Body.Factory.newInstance();
     }
 
     /**
@@ -946,9 +942,7 @@ public class EbicsXmlFactory {
      * @return the <code>StandardOrderParamsType</code> XML object
      */
     public static StandardOrderParamsType createStandardOrderParamsType() {
-        StandardOrderParamsType newStandardOrderParamsType = StandardOrderParamsType.Factory.newInstance();
-
-        return newStandardOrderParamsType;
+        return StandardOrderParamsType.Factory.newInstance();
     }
 
     /**
@@ -1115,9 +1109,7 @@ public class EbicsXmlFactory {
      * @return the <code>EbicsRequestDocument.EbicsRequest.Body</code> XML object
      */
     public static EbicsRequestDocument.EbicsRequest.Body createEbicsRequestBody() {
-        EbicsRequestDocument.EbicsRequest.Body newBody = EbicsRequestDocument.EbicsRequest.Body.Factory.newInstance();
-
-        return newBody;
+        return EbicsRequestDocument.EbicsRequest.Body.Factory.newInstance();
     }
 
     /**
@@ -1337,4 +1329,7 @@ public class EbicsXmlFactory {
         pubKeyInfo.setX509Data(encryptionX509Data);
         return pubKeyInfo;
     }
+
+  private EbicsXmlFactory() {
+  }
 }

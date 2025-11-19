@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.xml;
@@ -36,7 +35,6 @@ import org.kopi.ebics.session.EbicsSession;
  * The <code>UnsecuredRequestElement</code> is the common element
  * used for key management requests.
  *
- * @author hachani
  *
  */
 public class UnsecuredRequestElement extends DefaultEbicsRootElement {

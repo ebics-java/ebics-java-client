@@ -1,10 +1,12 @@
 package org.kopi.ebics.certificate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
+import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Calendar;
@@ -12,9 +14,9 @@ import java.util.Date;
 
 import javax.security.auth.x500.X500Principal;
 
+import org.apache.xml.security.Init;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.Test;
-import org.kopi.ebics.client.User;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsPartner;
 import org.kopi.ebics.interfaces.EbicsUser;
@@ -22,8 +24,8 @@ import org.kopi.ebics.interfaces.PasswordCallback;
 
 class CertificateManagerTest {
     static {
-        org.apache.xml.security.Init.init();
-        java.security.Security.addProvider(new BouncyCastleProvider());
+        Init.init();
+        Security.addProvider(new BouncyCastleProvider());
     }
 
     @Test

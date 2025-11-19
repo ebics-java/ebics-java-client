@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.interfaces;
@@ -22,7 +21,6 @@ package org.kopi.ebics.interfaces;
 /**
  * A way to obtain a password.
  *
- * @author Hachani
  *
  */
 public interface PasswordCallback {

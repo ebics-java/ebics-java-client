@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.interfaces;
@@ -31,7 +30,6 @@ import org.kopi.ebics.exception.EbicsException;
  * letter. The INI, HIA and HPB letters should be an implementation
  * of the <code>InitLetter</code>
  *
- * @author Hachani
  *
  */
 public interface InitLetter {

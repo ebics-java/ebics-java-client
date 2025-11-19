@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.xml;
@@ -29,7 +28,6 @@ import org.kopi.ebics.schema.h005.HPBResponseOrderDataType;
  * keys in encrypted mode. The user should decrypt with his encryption
  * key to have the bank public keys.
  *
- * @author hachani
  *
  */
 public class HPBResponseOrderDataElement extends DefaultResponseElement {

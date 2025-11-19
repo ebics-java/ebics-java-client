@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.xml;
@@ -38,6 +37,7 @@ import org.kopi.ebics.schema.h005.StaticHeaderType.BankPubKeyDigests.Authenticat
 import org.kopi.ebics.schema.h005.StaticHeaderType.BankPubKeyDigests.Encryption;
 import org.kopi.ebics.schema.h005.StaticHeaderType.Product;
 import org.kopi.ebics.session.EbicsSession;
+import org.kopi.ebics.session.OrderType;
 import org.kopi.ebics.utils.Utils;
 
 
@@ -45,7 +45,6 @@ import org.kopi.ebics.utils.Utils;
  * The <code>SPRRequestElement</code> is the request element
  * for revoking a subscriber
  *
- * @author Hachani
  *
  */
 public class SPRRequestElement extends InitializationRequestElement {
@@ -55,7 +54,7 @@ public class SPRRequestElement extends InitializationRequestElement {
    * @param session the current ebic session.
    */
   public SPRRequestElement(EbicsSession session) throws EbicsException {
-    super(session, org.kopi.ebics.session.OrderType.SPR, "SPRRequest.xml");
+    super(session, OrderType.SPR, "SPRRequest.xml");
   }
 
   @Override

@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.xml;
@@ -26,7 +25,6 @@ import org.kopi.ebics.session.EbicsSession;
  * The <code>HPBRequestElement</code> is the element to be sent when
  * a HPB request is needed to retrieve the bank public keys
  *
- * @author hachani
  *
  */
 public class HPBRequestElement extends DefaultEbicsRootElement {

@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.letter;
@@ -32,7 +31,6 @@ import org.kopi.ebics.interfaces.EbicsUser;
  * The <code>A005Letter</code> is the initialization letter
  * for the signature certificate
  *
- * @author Hachani
  *
  */
 public class A005Letter extends AbstractInitLetter {

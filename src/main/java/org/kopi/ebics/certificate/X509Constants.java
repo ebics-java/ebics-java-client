@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.certificate;
@@ -22,7 +21,6 @@ package org.kopi.ebics.certificate;
 /**
  * X509 certificate constants
  *
- * @author hachani
  *
  */
 public interface X509Constants {
@@ -30,9 +28,9 @@ public interface X509Constants {
   /**
    * Certificates key usage
    */
-  int			SIGNATURE_KEY_USAGE			= 1;
-  int			AUTHENTICATION_KEY_USAGE		= 2;
-  int			ENCRYPTION_KEY_USAGE			= 3;
+  enum CertificateKeyUsage {
+      SIGNATURE_KEY_USAGE, AUTHENTICATION_KEY_USAGE, ENCRYPTION_KEY_USAGE,
+  }
 
   /**
    * Certificate signature algorithm

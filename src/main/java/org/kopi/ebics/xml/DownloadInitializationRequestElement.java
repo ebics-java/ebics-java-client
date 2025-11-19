@@ -14,13 +14,11 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.xml;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsOrderType;
@@ -42,7 +40,6 @@ import org.kopi.ebics.session.EbicsSession;
  * The <code>DInitializationRequestElement</code> is the common initialization
  * for all ebics downloads.
  *
- * @author Hachani
  *
  */
 public class DownloadInitializationRequestElement extends InitializationRequestElement {

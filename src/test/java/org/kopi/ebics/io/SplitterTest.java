@@ -1,5 +1,6 @@
 package org.kopi.ebics.io;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.Test;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.session.EbicsSession;
@@ -89,7 +90,7 @@ class SplitterTest {
     }
 
     private SecretKey secretKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
 
         final String password = "test";
         int pswdIterations = 65536;

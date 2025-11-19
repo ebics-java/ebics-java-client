@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.client;
@@ -34,7 +33,6 @@ import org.kopi.ebics.interfaces.Savable;
  * This object is serializable to facilitate persisting of the values.
  * Save the object whenever it needs to be saved.
  *
- * @author Hachani
  *
  */
 public class Bank implements EbicsBank, Savable {

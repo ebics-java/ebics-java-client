@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.xml;
@@ -33,7 +32,6 @@ import org.kopi.ebics.interfaces.ContentFactory;
  * The <code>DefaultResponseElement</code> is the common element for
  * all ebics server responses.
  *
- * @author Hachani
  *
  */
 public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
@@ -43,7 +41,7 @@ public abstract class DefaultResponseElement extends DefaultEbicsRootElement {
    * @param factory the content factory containing the response.
    * @param name the element name
    */
-  public DefaultResponseElement(ContentFactory factory, String name) {
+  protected DefaultResponseElement(ContentFactory factory, String name) {
     this.factory = factory;
     this.name = name;
   }

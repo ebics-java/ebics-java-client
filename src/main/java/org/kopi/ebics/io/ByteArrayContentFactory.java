@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.io;
@@ -32,7 +31,6 @@ import org.kopi.ebics.interfaces.ContentFactory;
  * as a <code>ByteArrayInputStream</code>. This object is
  * serializable in a way to recover interrupted file transfers.
  *
- * @author hachani
  *
  */
 public class ByteArrayContentFactory implements ContentFactory {

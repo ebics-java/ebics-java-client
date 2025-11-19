@@ -14,12 +14,10 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.certificate;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
@@ -29,7 +27,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPublicKey;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.utils.Utils;
@@ -37,10 +34,9 @@ import org.kopi.ebics.utils.Utils;
 /**
  * Some key utilities
  *
- * @author hachani
  *
  */
-public class KeyUtil {
+public final class KeyUtil {
 
     private KeyUtil() {
     }

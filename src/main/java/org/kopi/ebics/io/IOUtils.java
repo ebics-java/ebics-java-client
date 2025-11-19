@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.io;
@@ -33,10 +32,9 @@ import org.kopi.ebics.interfaces.ContentFactory;
  * Some IO utilities for EBICS files management.
  * EBICS server
  *
- * @author hachani
  *
  */
-public class IOUtils {
+public final class IOUtils {
 
   /**
    * Creates directories from a given full path.
@@ -88,4 +86,7 @@ public class IOUtils {
         out.close();
         return out.toByteArray();
     }
+
+  private IOUtils() {
+  }
 }

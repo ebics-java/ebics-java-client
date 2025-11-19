@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.xml;
@@ -48,7 +47,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
    * Constructs a new default <code>EbicsRootElement</code>
    * @param session the current ebics session
    */
-  public DefaultEbicsRootElement(EbicsSession session) {
+  protected DefaultEbicsRootElement(EbicsSession session) {
     this.session = session;
     suggestedPrefixes = new HashMap<>();
   }
@@ -56,7 +55,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
   /**
    *  Constructs a new default <code>EbicsRootElement</code>
    */
-  public DefaultEbicsRootElement() {
+  protected DefaultEbicsRootElement() {
     this(null);
   }
 

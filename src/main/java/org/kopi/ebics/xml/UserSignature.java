@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.xml;
@@ -33,7 +32,6 @@ import org.kopi.ebics.interfaces.EbicsUser;
  * element. The user data is signed with the user signature
  * key sent in the INI request to the EBICS bank server
  *
- * @author hachani
  *
  */
 public class UserSignature extends DefaultEbicsRootElement {
@@ -74,7 +72,7 @@ public class UserSignature extends DefaultEbicsRootElement {
                                                                       user.getPartner().getPartnerId(),
                                                                       user.getUserId(),
                                                                       signature);
-    userSignatureData = EbicsXmlFactory.createUserSignatureDataSigBookType(new OrderSignatureDataType[] {orderSignatureData});
+    userSignatureData = EbicsXmlFactory.createUserSignatureDataSigBookType(new OrderSignatureDataType[]{orderSignatureData});
     document = EbicsXmlFactory.createUserSignatureDataDocument(userSignatureData);
   }
 

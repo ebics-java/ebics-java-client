@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.client;
@@ -27,7 +26,6 @@ import java.io.Serializable;
  * <code>FileTransfer.nextChunk(TransferState)</code>
  * in this or a future session.
  *
- * @author Hachani
  *
  */
 public class TransferState implements Serializable {
@@ -42,7 +40,7 @@ public class TransferState implements Serializable {
    * @return the next segment number to be transferred.
    */
   public int next() {
-    segmentNumber ++;
+    segmentNumber++;
 
     if (segmentNumber == numSegments) {
       lastSegment = true;

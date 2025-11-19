@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.letter;
@@ -23,7 +22,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
@@ -45,7 +43,7 @@ public abstract class AbstractInitLetter implements InitLetter {
    * Constructs a new initialization letter.
    * @param locale the application locale
    */
-  public AbstractInitLetter(Locale locale) {
+  protected AbstractInitLetter(Locale locale) {
     this.locale = locale;
     this.messages = new Messages(BUNDLE_NAME, locale);
   }
@@ -166,7 +164,6 @@ public abstract class AbstractInitLetter implements InitLetter {
    * The <code>Letter</code> object is the common template
    * for all initialization letter.
    *
-   * @author Hachani
    *
    */
   class Letter {
@@ -219,8 +216,9 @@ public abstract class AbstractInitLetter implements InitLetter {
       writer = new PrintWriter(out, true);
       buildTitle();
       buildHeader();
-      if (certificate != null)
-          buildCertificate(certTitle, certificate);
+      if (certificate != null) {
+        buildCertificate(certTitle, certificate);
+      }
       buildHash(hashTitle, hash);
       buildFooter();
       writer.close();

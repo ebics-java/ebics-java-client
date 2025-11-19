@@ -13,20 +13,14 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.xml;
-
-import java.util.Calendar;
 
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.schema.h005.AuthenticationPubKeyInfoType;
 import org.kopi.ebics.schema.h005.EncryptionPubKeyInfoType;
 import org.kopi.ebics.schema.h005.HIARequestOrderDataType;
-import org.kopi.ebics.schema.h005.PubKeyInfoType;
-import org.kopi.ebics.schema.xmldsig.KeyValueType;
-import org.kopi.ebics.schema.xmldsig.RSAKeyValueType;
 import org.kopi.ebics.schema.xmldsig.X509DataType;
 import org.kopi.ebics.session.EbicsSession;
 
@@ -35,7 +29,6 @@ import org.kopi.ebics.session.EbicsSession;
  * X002 and E002 keys information needed for a HIA request in order to send
  * the authentication and encryption user keys to the bank server.
  *
- * @author hachani
  *
  */
 public class HIARequestOrderDataElement extends DefaultEbicsRootElement {

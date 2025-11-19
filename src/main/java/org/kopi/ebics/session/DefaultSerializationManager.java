@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.session;
@@ -29,7 +28,6 @@ import java.io.ObjectOutputStream;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.Savable;
 import org.kopi.ebics.interfaces.SerializationManager;
-import org.kopi.ebics.io.IOUtils;
 
 
 /**
@@ -37,7 +35,6 @@ import org.kopi.ebics.io.IOUtils;
  * The serialization process aims to save object on the user disk
  * using a separated file for each object to serialize.
  *
- * @author hachani
  *
  */
 public class DefaultSerializationManager implements SerializationManager {

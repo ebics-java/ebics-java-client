@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.letter;
@@ -33,7 +32,6 @@ import org.kopi.ebics.interfaces.LetterManager;
  * The <code>DefaultLetterManager</code> is a simple way
  * to manage initialization letters.
  *
- * @author Hachani
  *
  */
 public class DefaultLetterManager implements LetterManager {

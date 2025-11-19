@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.client;
@@ -26,6 +25,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.security.Security;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +40,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.help.HelpFormatter;
+import org.apache.xml.security.Init;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.NoDownloadDataAvailableException;
@@ -83,8 +84,8 @@ public class EbicsClient {
     private User defaultUser;
 
     static {
-        org.apache.xml.security.Init.init();
-        java.security.Security.addProvider(new BouncyCastleProvider());
+        Init.init();
+        Security.addProvider(new BouncyCastleProvider());
     }
 
     /**
@@ -513,7 +514,7 @@ public class EbicsClient {
         if (line.hasOption("help")) {
             HelpFormatter formatter = HelpFormatter.builder().get();
             System.out.println();
-            formatter.printHelp(EbicsClient.class.getSimpleName(), "",options, "", true);
+            formatter.printHelp(EbicsClient.class.getSimpleName(), "", options, "", true);
             System.out.println();
             System.exit(0);
         }
@@ -591,7 +592,7 @@ public class EbicsClient {
         addOption(options, OrderType.HPB, "Send HPB request");
         options.addOption(null, "letters", false, "Create INI Letters");
         options.addOption(null, "create", false, "Create and initialize EBICS user");
-        addOption(options, OrderType.STA,"Fetch STA file (MT940 file)");
+        addOption(options, OrderType.STA, "Fetch STA file (MT940 file)");
         addOption(options, OrderType.VMK, "Fetch VMK file (MT942 file)");
         addOption(options, OrderType.C52, "Fetch camt.052 file");
         addOption(options, OrderType.C53, "Fetch camt.053 file");

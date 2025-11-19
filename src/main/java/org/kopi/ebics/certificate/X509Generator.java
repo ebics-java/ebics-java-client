@@ -14,14 +14,11 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.certificate;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
@@ -31,10 +28,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
@@ -46,16 +39,15 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509Extensions;
-import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
+import org.kopi.ebics.certificate.X509Constants.CertificateKeyUsage;
 import org.kopi.ebics.utils.Utils;
 
 /**
  * An X509 certificate generator for EBICS protocol.
  * Generated certificates are self signed certificates.
  *
- * @author hachani
  *
  */
 @SuppressWarnings("deprecation")
@@ -81,7 +73,7 @@ public class X509Generator {
 	            issuer,
 	            notBefore,
 	            notAfter,
-	            X509Constants.SIGNATURE_KEY_USAGE);
+                CertificateKeyUsage.SIGNATURE_KEY_USAGE);
   }
 
   /**
@@ -104,7 +96,7 @@ public class X509Generator {
                     issuer,
                     notBefore,
                     notAfter,
-                    X509Constants.AUTHENTICATION_KEY_USAGE);
+                    CertificateKeyUsage.AUTHENTICATION_KEY_USAGE);
   }
 
   /**
@@ -127,7 +119,7 @@ public class X509Generator {
                     issuer,
                     notBefore,
                     notAfter,
-                    X509Constants.ENCRYPTION_KEY_USAGE);
+                    CertificateKeyUsage.ENCRYPTION_KEY_USAGE);
   }
 
   /**
@@ -146,7 +138,7 @@ public class X509Generator {
                                   String issuer,
       				  Date notBefore,
       				  Date notAfter,
-      				  int keyusage)
+      CertificateKeyUsage keyusage)
     throws GeneralSecurityException, IOException
   {
     X509V3CertificateGenerator		generator;
@@ -154,6 +146,7 @@ public class X509Generator {
     X509Certificate			certificate;
 
     serial = BigInteger.valueOf(generateSerial());
+
     generator = new X509V3CertificateGenerator();
     generator.setSerialNumber(serial);
     generator.setIssuerDN(new X509Principal(issuer));
@@ -180,13 +173,13 @@ public class X509Generator {
       generator.addExtension(X509Extensions.ExtendedKeyUsage, false, new ExtendedKeyUsage(purposeIds));
 
     switch (keyusage) {
-    case X509Constants.SIGNATURE_KEY_USAGE:
+    case SIGNATURE_KEY_USAGE:
       generator.addExtension(X509Extensions.KeyUsage, false, new KeyUsage(KeyUsage.nonRepudiation));
       break;
-    case X509Constants.AUTHENTICATION_KEY_USAGE:
+    case AUTHENTICATION_KEY_USAGE:
       generator.addExtension(X509Extensions.KeyUsage, false, new KeyUsage(KeyUsage.digitalSignature));
       break;
-    case X509Constants.ENCRYPTION_KEY_USAGE:
+    case ENCRYPTION_KEY_USAGE:
       generator.addExtension(X509Extensions.KeyUsage, false, new KeyUsage(KeyUsage.keyAgreement));
       break;
     default:

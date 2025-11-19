@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.client;
@@ -48,7 +47,6 @@ import org.kopi.ebics.xml.SPRResponseElement;
  * Then wait until the bank activated your keys.
  * If you are migrating from FTAM. Just send HPB, your EBICS account should be usable without delay.
  *
- * @author Hachani
  *
  */
 public class KeyManagement {

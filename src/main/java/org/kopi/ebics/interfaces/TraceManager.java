@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.interfaces;
@@ -28,7 +27,6 @@ import org.kopi.ebics.exception.EbicsException;
  * requests and responses from the EBICS bank server.
  * This can be done using the <code>trace(EbicsRootElement)</code>
  *
- * @author hachani
  *
  */
 public interface TraceManager {

@@ -14,16 +14,10 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.xml;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.impl.schema.DocumentFactory;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.ReturnCode;
@@ -37,7 +31,6 @@ import org.kopi.ebics.schema.h005.EbicsKeyManagementResponseDocument.EbicsKeyMan
  * returned code from the ebics server and throw an exception if it is
  * not an EBICS_OK code.
  *
- * @author hachani
  *
  */
 public class KeyManagementResponseElement extends DefaultResponseElement {

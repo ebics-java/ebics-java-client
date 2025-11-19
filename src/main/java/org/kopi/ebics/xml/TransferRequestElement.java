@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.xml;
@@ -34,7 +33,6 @@ import org.kopi.ebics.utils.Utils;
  * The <code>TransferRequestElement</code> is the common root element
  * for all ebics transfer for the bank server.
  *
- * @author Hachani
  *
  */
 public abstract class TransferRequestElement extends DefaultEbicsRootElement {
@@ -48,7 +46,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
    * @param lastSegment is it the last segment?
    * @param transactionId the transaction ID
    */
-  public TransferRequestElement(EbicsSession session,
+  protected TransferRequestElement(EbicsSession session,
                                 String name,
                                 EbicsOrderType type,
                                 int segmentNumber,

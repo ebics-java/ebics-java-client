@@ -14,7 +14,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id$
  */
 
 package org.kopi.ebics.xml;
@@ -48,7 +47,6 @@ import org.kopi.ebics.utils.Utils;
  * The <code>UInitializationRequestElement</code> is the common initialization
  * element for all ebics file uploads.
  *
- * @author Hachani
  *
  */
 public class UploadInitializationRequestElement extends InitializationRequestElement {
