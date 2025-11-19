@@ -7,7 +7,7 @@ You can use the `EbicsClient` as command line tool or use it from your Java appl
 
 Features:
 
-- EBICS 2.5 (EBICS 3.0 coming soon)
+- EBICS 3.0
 - Support for French, German and Swiss banks
 - Command line client to do the setup, initialization and to download files from the bank
 - Tested extensively with [ZKB](https://zkb.ch)
@@ -28,7 +28,7 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.ebics-java:ebics-java-client:1.3'
+    implementation 'com.github.ebics-java:ebics-java-client:2.0.0'
 }
 ```
 Maven
@@ -43,7 +43,7 @@ Maven
 <dependency>
     <groupId>com.github.ebics-java</groupId>
     <artifactId>ebics-java-client</artifactId>
-    <version>1.3</version>
+    <version>2.0.0</version>
 </dependency>
 ```
  
