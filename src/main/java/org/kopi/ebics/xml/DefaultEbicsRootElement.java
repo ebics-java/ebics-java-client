@@ -50,7 +50,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
    */
   public DefaultEbicsRootElement(EbicsSession session) {
     this.session = session;
-    suggestedPrefixes = new HashMap<String, String>();
+    suggestedPrefixes = new HashMap<>();
   }
 
   /**
@@ -65,7 +65,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
    * @param uri the namespace URI
    * @param prefix the namespace URI prefix
    */
-  protected static void setSaveSuggestedPrefixes(String uri, String prefix) {
+  protected void setSaveSuggestedPrefixes(String uri, String prefix) {
     suggestedPrefixes.put(uri, prefix);
   }
 
@@ -96,18 +96,17 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
                                    String prefix,
                                    String value)
   {
-    XmlCursor 			cursor;
 
-    cursor = document.newCursor();
-    while (cursor.hasNextToken()) {
-      if (cursor.isStart()) {
-	cursor.toNextToken();
-	cursor.insertAttributeWithValue(new QName(namespaceURI, localPart, prefix), value);
-	break;
-      } else {
-	cursor.toNextToken();
+      XmlCursor cursor = document.newCursor();
+      while (cursor.hasNextToken()) {
+          if (cursor.isStart()) {
+              cursor.toNextToken();
+              cursor.insertAttributeWithValue(new QName(namespaceURI, localPart, prefix), value);
+              break;
+          } else {
+              cursor.toNextToken();
+          }
       }
-    }
   }
 
   /**
@@ -161,14 +160,14 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 
   @Override
   public void validate() throws EbicsException {
-    ArrayList<XmlError> validationMessages = new ArrayList<XmlError>();
+    ArrayList<XmlError> validationMessages = new ArrayList<>();
     boolean isValid = document.validate(new XmlOptions().setErrorListener(validationMessages));
 
     if (!isValid) {
       Iterator<XmlError> iter = validationMessages.iterator();
       StringBuilder message = new StringBuilder();
       while (iter.hasNext()) {
-        if (!message.toString().equals("")) {
+        if (!message.toString().isEmpty()) {
           message.append(";");
         }
         message.append(iter.next().getMessage());
@@ -203,6 +202,6 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 
   protected XmlObject			document;
   protected EbicsSession 		session;
-  private static Map<String, String> 	suggestedPrefixes;
+  private final Map<String, String> 	suggestedPrefixes;
   private static final long 		serialVersionUID = -3928957097145095177L;
 }
