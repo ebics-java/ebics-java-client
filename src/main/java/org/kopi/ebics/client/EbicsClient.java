@@ -372,7 +372,7 @@ public class EbicsClient {
         try {
             keyManager.lockAccess();
         } catch (Exception e) {
-            log.error(messages.getString("spr.send.error", userId), e);
+            log.error(messages.getString("spr.send.error", userId));
             throw e;
         }
 
@@ -383,7 +383,7 @@ public class EbicsClient {
      * Sends a file to the ebics bank server
      * @throws Exception
      */
-    public void sendFile(File file, User user, Product product, EbicsOrderType orderType) throws Exception {
+    public void sendFile(File file, User user, Product product, EbicsOrderType orderType, EbicsUploadParams params) throws Exception {
         EbicsSession session = createSession(user, product);
 
         FileTransfer transferManager = new FileTransfer(session);
@@ -392,16 +392,28 @@ public class EbicsClient {
             configuration.getTransferTraceDirectory(user));
 
         try {
-            transferManager.sendFile(IOUtils.getFileContent(file), orderType);
+            transferManager.sendFile(IOUtils.getFileContent(file), orderType, params);
         } catch (IOException | EbicsException e) {
             log
-                .error(messages.getString("upload.file.error", file.getAbsolutePath()), e);
+                .error(messages.getString("upload.file.error", file.getAbsolutePath()));
             throw e;
         }
     }
 
+    public void sendFile(File file, EbicsOrderType orderType, EbicsUploadParams params) throws Exception {
+        sendFile(file, defaultUser, defaultProduct, orderType, params);
+    }
+
     public void sendFile(File file, EbicsOrderType orderType) throws Exception {
-        sendFile(file, defaultUser, defaultProduct, orderType);
+        EbicsUploadParams params;
+        if (orderType == OrderType.XE2) {
+            var orderParams = new EbicsUploadParams.OrderParams("MCT", "CH", null, "pain.001",
+                "03", true);
+            params = new EbicsUploadParams(null, orderParams);
+        } else {
+            params = new EbicsUploadParams(defaultUser.getPartner().nextOrderId(), null);
+        }
+        sendFile(file, defaultUser, defaultProduct, orderType, params);
     }
 
     public void fetchFile(File file, User user, Product product, EbicsOrderType orderType,
@@ -660,8 +672,7 @@ public class EbicsClient {
             OrderType.XE2, OrderType.CCT);
         for (EbicsOrderType type : sendFileOrders) {
             if (hasOption(cmd, type)) {
-                client.sendFile(new File(inputFileValue), client.defaultUser,
-                    client.defaultProduct, type);
+                client.sendFile(new File(inputFileValue), type);
                 break;
             }
         }

@@ -91,13 +91,11 @@ public class FileTransfer {
    * @throws IOException
    * @throws EbicsException
    */
-  public void sendFile(byte[] content, EbicsOrderType orderType)
+  public void sendFile(byte[] content, EbicsOrderType orderType, EbicsUploadParams params)
     throws IOException, EbicsException
   {
     HttpRequestSender sender = new HttpRequestSender(session);
-    UploadInitializationRequestElement initializer = new UploadInitializationRequestElement(session,
-	                                            orderType,
-	                                            content);
+    var initializer = new UploadInitializationRequestElement(session, orderType, params, content);
     initializer.build();
     initializer.validate();
     session.getConfiguration().getTraceManager().trace(initializer.getUserSignature());

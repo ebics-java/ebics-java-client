@@ -26,6 +26,7 @@ import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest;
 import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Body;
 import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Header;
 import org.kopi.ebics.schema.h005.MutableHeaderType;
+import org.kopi.ebics.schema.h005.StandardOrderParamsDocument;
 import org.kopi.ebics.schema.h005.StandardOrderParamsType;
 import org.kopi.ebics.schema.h005.StaticHeaderOrderDetailsType;
 import org.kopi.ebics.schema.h005.StaticHeaderType;
@@ -85,7 +86,8 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
       //FIXME Some banks cannot handle OrderID element in download process. Add parameter in configuration!!!
       orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(null,//session.getUser().getPartner().nextOrderId(),
             type,
-	                                                                standardOrderParamsType);
+	                                                                standardOrderParamsType,
+          StandardOrderParamsDocument.type);
 
     xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(),
                                                      nonce,

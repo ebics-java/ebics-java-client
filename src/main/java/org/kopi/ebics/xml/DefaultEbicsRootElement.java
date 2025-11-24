@@ -23,9 +23,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -83,6 +85,10 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
       }
   }
 
+    public String toPrettyString() {
+        return new String(prettyPrint(), StandardCharsets.UTF_8);
+    }
+
   /**
    * Inserts a schema location to the current ebics root element.
    * @param namespaceURI the name space URI
@@ -96,14 +102,16 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
                                    String value)
   {
 
-      XmlCursor cursor = document.newCursor();
-      while (cursor.hasNextToken()) {
-          if (cursor.isStart()) {
-              cursor.toNextToken();
-              cursor.insertAttributeWithValue(new QName(namespaceURI, localPart, prefix), value);
-              break;
-          } else {
-              cursor.toNextToken();
+      try (XmlCursor cursor = document.newCursor()) {
+          while (cursor.hasNextToken()) {
+              if (cursor.isStart()) {
+                  cursor.toNextToken();
+                  cursor.insertAttributeWithValue(new QName(namespaceURI, localPart, prefix),
+                      value);
+                  break;
+              } else {
+                  cursor.toNextToken();
+              }
           }
       }
   }
@@ -143,23 +151,22 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 
   @Override
   public void addNamespaceDecl(String prefix, String uri) {
-    XmlCursor 			cursor;
-
-    cursor = document.newCursor();
-    while (cursor.hasNextToken()) {
-      if (cursor.isStart()) {
-	cursor.toNextToken();
-	cursor.insertNamespace(prefix, uri);
-	break;
-      } else {
-	cursor.toNextToken();
+      try (XmlCursor cursor = document.newCursor()) {
+          while (cursor.hasNextToken()) {
+              if (cursor.isStart()) {
+                  cursor.toNextToken();
+                  cursor.insertNamespace(prefix, uri);
+                  break;
+              } else {
+                  cursor.toNextToken();
+              }
+          }
       }
-    }
   }
 
   @Override
   public void validate() throws EbicsException {
-    ArrayList<XmlError> validationMessages = new ArrayList<>();
+    List<XmlError> validationMessages = new ArrayList<>();
     boolean isValid = document.validate(new XmlOptions().setErrorListener(validationMessages));
 
     if (!isValid) {
@@ -172,22 +179,21 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
         message.append(iter.next().getMessage());
       }
 
-      throw new EbicsException(message.toString());
+        throw new EbicsException(
+            "Invalid " + this.getClass().getSimpleName() + ": " + message);
     }
   }
 
   @Override
   public void save(OutputStream out) throws EbicsException {
-    try {
-      byte[]		element;
-
-      element = prettyPrint();
-      out.write(element);
-      out.flush();
-      out.close();
-    } catch (IOException e) {
-      throw new EbicsException(e.getMessage());
-    }
+      try {
+          byte[] element = prettyPrint();
+          out.write(element);
+          out.flush();
+          out.close();
+      } catch (IOException e) {
+          throw new EbicsException(e.getMessage());
+      }
   }
 
   @Override

@@ -62,16 +62,16 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
     keySpec = new SecretKeySpec(key, "EAS");
   }
 
-  @Override
-  public void build() throws EbicsException {
-    SignedInfo			signedInfo;
-
-    buildInitialization();
-    signedInfo = new SignedInfo(session.getUser(), getDigest());
-    signedInfo.build();
-    ((EbicsRequestDocument)document).getEbicsRequest().setAuthSignature(signedInfo.getSignatureType());
-    ((EbicsRequestDocument)document).getEbicsRequest().getAuthSignature().setSignatureValue(EbicsXmlFactory.createSignatureValueType(signedInfo.sign(toByteArray())));
-  }
+    @Override
+    public void build() throws EbicsException {
+        buildInitialization();
+        SignedInfo signedInfo = new SignedInfo(session.getUser(), getDigest());
+        signedInfo.build();
+        var ebicsRequest = ((EbicsRequestDocument) document).getEbicsRequest();
+        ebicsRequest.setAuthSignature(signedInfo.getSignatureType());
+        ebicsRequest.getAuthSignature().setSignatureValue(
+            EbicsXmlFactory.createSignatureValueType(signedInfo.sign(toByteArray())));
+    }
 
   @Override
   public String getName() {
