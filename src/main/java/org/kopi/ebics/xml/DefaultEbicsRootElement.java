@@ -23,9 +23,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -82,6 +84,10 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
           throw new RuntimeException("Failed to canonicalize XML", e);
       }
   }
+
+    public String toPrettyString() {
+        return new String(prettyPrint(), StandardCharsets.UTF_8);
+    }
 
   /**
    * Inserts a schema location to the current ebics root element.
@@ -159,7 +165,7 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 
   @Override
   public void validate() throws EbicsException {
-    ArrayList<XmlError> validationMessages = new ArrayList<>();
+    List<XmlError> validationMessages = new ArrayList<>();
     boolean isValid = document.validate(new XmlOptions().setErrorListener(validationMessages));
 
     if (!isValid) {
@@ -172,7 +178,8 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
         message.append(iter.next().getMessage());
       }
 
-      throw new EbicsException(message.toString());
+        throw new EbicsException(
+            "Invalid " + this.getClass().getSimpleName() + ": " + message);
     }
   }
 

@@ -33,6 +33,9 @@ import org.ebics.s002.SignaturePubKeyOrderDataType;
 import org.ebics.s002.UserSignatureDataDocument;
 import org.ebics.s002.UserSignatureDataSigBookType;
 import org.kopi.ebics.schema.h005.AuthenticationPubKeyInfoType;
+import org.kopi.ebics.schema.h005.BTUOrderParamsDocument;
+import org.kopi.ebics.schema.h005.BTUParamsType;
+import org.kopi.ebics.schema.h005.DataDigestType;
 import org.kopi.ebics.schema.h005.DataEncryptionInfoType.EncryptionPubKeyDigest;
 import org.kopi.ebics.schema.h005.DataTransferRequestType;
 import org.kopi.ebics.schema.h005.DataTransferRequestType.DataEncryptionInfo;
@@ -51,6 +54,7 @@ import org.kopi.ebics.schema.h005.EmptyMutableHeaderType;
 import org.kopi.ebics.schema.h005.EncryptionPubKeyInfoType;
 import org.kopi.ebics.schema.h005.HIARequestOrderDataDocument;
 import org.kopi.ebics.schema.h005.HIARequestOrderDataType;
+import org.kopi.ebics.schema.h005.MessageType;
 import org.kopi.ebics.schema.h005.MutableHeaderType;
 import org.kopi.ebics.schema.h005.MutableHeaderType.SegmentNumber;
 import org.kopi.ebics.schema.h005.NoPubKeyDigestsRequestStaticHeaderType;
@@ -784,19 +788,19 @@ public final class EbicsXmlFactory {
         int numSegments, String partnerId, StaticHeaderType.Product product, String securityMedium,
         String userId, Calendar timestamp, StaticHeaderOrderDetailsType orderDetails,
         StaticHeaderType.BankPubKeyDigests bankPubKeyDigests) {
-        StaticHeaderType newStaticHeaderType = StaticHeaderType.Factory.newInstance();
-        newStaticHeaderType.setHostID(hostId);
-        newStaticHeaderType.setNonce(nonce);
-        newStaticHeaderType.setNumSegments(numSegments);
-        newStaticHeaderType.setPartnerID(partnerId);
-        newStaticHeaderType.setProduct(product);
-        newStaticHeaderType.setSecurityMedium(securityMedium);
-        newStaticHeaderType.setUserID(userId);
-        newStaticHeaderType.setTimestamp(timestamp);
-        newStaticHeaderType.setOrderDetails(orderDetails);
-        newStaticHeaderType.setBankPubKeyDigests(bankPubKeyDigests);
+        StaticHeaderType header = StaticHeaderType.Factory.newInstance();
+        header.setHostID(hostId);
+        header.setNonce(nonce);
+        header.setNumSegments(numSegments);
+        header.setPartnerID(partnerId);
+        header.setProduct(product);
+        header.setSecurityMedium(securityMedium);
+        header.setUserID(userId);
+        header.setTimestamp(timestamp);
+        header.setOrderDetails(orderDetails);
+        header.setBankPubKeyDigests(bankPubKeyDigests);
 
-        return newStaticHeaderType;
+        return header;
     }
 
     /**
@@ -881,17 +885,33 @@ public final class EbicsXmlFactory {
 
     public static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
         StaticHeaderOrderDetailsType.AdminOrderType orderType,
-        StandardOrderParamsType orderParams) {
+        XmlObject orderParams, SchemaType orderParamsType) {
 
         StaticHeaderOrderDetailsType type = StaticHeaderOrderDetailsType.Factory.newInstance();
         if (orderId != null) {
             type.setOrderID(orderId);
         }
-
-        type.setOrderParams(orderParams);
-        var newInstance = StandardOrderParamsDocument.type.getDocumentElementName();
-        qualifySubstitutionGroup(type.getOrderParams(), newInstance, null);
         type.setAdminOrderType(orderType);
+        type.setOrderParams(orderParams);
+        qualifySubstitutionGroup(type.getOrderParams(), orderParamsType.getDocumentElementName(), null);
+        return type;
+    }
+
+    public static BTUParamsType createBTUParams(String serviceName, String scope, String option,
+        String messageName, String messageVersion) {
+        var type = BTUParamsType.Factory.newInstance();
+        var service = type.addNewService();
+        service.setServiceName(serviceName);
+        service.setScope(scope);
+        if (option != null) {
+            service.setServiceOption(option);
+        }
+        var msgType = MessageType.Factory.newInstance();
+
+        msgType.setStringValue(messageName);
+        //msgType.setFormat(messageName);
+        msgType.setVersion(messageVersion);
+        service.setMsgName(msgType);
         return type;
     }
 
@@ -1134,10 +1154,16 @@ public final class EbicsXmlFactory {
      * @return the <code>DataTransferRequestType</code> XML object
      */
     public static DataTransferRequestType createDataTransferRequestType(
-        DataEncryptionInfo dataEncryptionInfo, SignatureData signatureData) {
+        DataEncryptionInfo dataEncryptionInfo, SignatureData signatureData, String digestValue) {
         DataTransferRequestType newDataTransferRequestType = DataTransferRequestType.Factory.newInstance();
         newDataTransferRequestType.setDataEncryptionInfo(dataEncryptionInfo);
         newDataTransferRequestType.setSignatureData(signatureData);
+        if (digestValue != null) {
+            var digest = DataDigestType.Factory.newInstance();
+            digest.setSignatureVersion("A005");
+            digest.setStringValue(digestValue);
+            newDataTransferRequestType.setDataDigest(digest);
+        }
 
         return newDataTransferRequestType;
     }

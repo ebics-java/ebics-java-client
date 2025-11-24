@@ -87,9 +87,7 @@ public abstract class TransferRequestElement extends DefaultEbicsRootElement {
 
     try {
       return MessageDigest.getInstance("SHA-256", "BC").digest(Utils.canonize(toByteArray()));
-    } catch (NoSuchAlgorithmException e) {
-      throw new EbicsException(e.getMessage());
-    } catch (NoSuchProviderException e) {
+    } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
       throw new EbicsException(e.getMessage());
     }
   }

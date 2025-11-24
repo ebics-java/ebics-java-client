@@ -29,6 +29,7 @@ import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest;
 import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Body;
 import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Header;
 import org.kopi.ebics.schema.h005.MutableHeaderType;
+import org.kopi.ebics.schema.h005.StandardOrderParamsDocument;
 import org.kopi.ebics.schema.h005.StandardOrderParamsType;
 import org.kopi.ebics.schema.h005.StaticHeaderOrderDetailsType;
 import org.kopi.ebics.schema.h005.StaticHeaderType;
@@ -53,7 +54,7 @@ public class SPRRequestElement extends InitializationRequestElement {
    * Constructs a new SPR request element.
    * @param session the current ebic session.
    */
-  public SPRRequestElement(EbicsSession session) throws EbicsException {
+  public SPRRequestElement(EbicsSession session) {
     super(session, OrderType.SPR, "SPRRequest.xml");
   }
 
@@ -97,7 +98,8 @@ public class SPRRequestElement extends InitializationRequestElement {
       type.setStringValue(this.getType());
 
       orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(session.getUser().getPartner().nextOrderId(), type,
-	                                                              standardOrderParamsType);
+	                                                              standardOrderParamsType,
+          StandardOrderParamsDocument.type);
     xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(),
 	                                             nonce,
 	                                             0,
@@ -116,7 +118,7 @@ public class SPRRequestElement extends InitializationRequestElement {
     dataEncryptionInfo = EbicsXmlFactory.createDataEncryptionInfo(true,
 	                                                          encryptionPubKeyDigest,
 	                                                          generateTransactionKey());
-    dataTransfer = EbicsXmlFactory.createDataTransferRequestType(dataEncryptionInfo, signatureData);
+    dataTransfer = EbicsXmlFactory.createDataTransferRequestType(dataEncryptionInfo, signatureData, null);
     body = EbicsXmlFactory.createEbicsRequestBody(dataTransfer);
     request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(),
 	                                         session.getConfiguration().getVersion(),
