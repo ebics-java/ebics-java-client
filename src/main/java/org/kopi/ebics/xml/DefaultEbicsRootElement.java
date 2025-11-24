@@ -102,14 +102,16 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
                                    String value)
   {
 
-      XmlCursor cursor = document.newCursor();
-      while (cursor.hasNextToken()) {
-          if (cursor.isStart()) {
-              cursor.toNextToken();
-              cursor.insertAttributeWithValue(new QName(namespaceURI, localPart, prefix), value);
-              break;
-          } else {
-              cursor.toNextToken();
+      try (XmlCursor cursor = document.newCursor()) {
+          while (cursor.hasNextToken()) {
+              if (cursor.isStart()) {
+                  cursor.toNextToken();
+                  cursor.insertAttributeWithValue(new QName(namespaceURI, localPart, prefix),
+                      value);
+                  break;
+              } else {
+                  cursor.toNextToken();
+              }
           }
       }
   }
@@ -149,18 +151,17 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 
   @Override
   public void addNamespaceDecl(String prefix, String uri) {
-    XmlCursor 			cursor;
-
-    cursor = document.newCursor();
-    while (cursor.hasNextToken()) {
-      if (cursor.isStart()) {
-	cursor.toNextToken();
-	cursor.insertNamespace(prefix, uri);
-	break;
-      } else {
-	cursor.toNextToken();
+      try (XmlCursor cursor = document.newCursor()) {
+          while (cursor.hasNextToken()) {
+              if (cursor.isStart()) {
+                  cursor.toNextToken();
+                  cursor.insertNamespace(prefix, uri);
+                  break;
+              } else {
+                  cursor.toNextToken();
+              }
+          }
       }
-    }
   }
 
   @Override
@@ -185,16 +186,14 @@ public abstract class DefaultEbicsRootElement implements EbicsRootElement {
 
   @Override
   public void save(OutputStream out) throws EbicsException {
-    try {
-      byte[]		element;
-
-      element = prettyPrint();
-      out.write(element);
-      out.flush();
-      out.close();
-    } catch (IOException e) {
-      throw new EbicsException(e.getMessage());
-    }
+      try {
+          byte[] element = prettyPrint();
+          out.write(element);
+          out.flush();
+          out.close();
+      } catch (IOException e) {
+          throw new EbicsException(e.getMessage());
+      }
   }
 
   @Override
