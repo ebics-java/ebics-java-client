@@ -63,6 +63,7 @@ import org.kopi.ebics.schema.h005.ParameterDocument.Parameter;
 import org.kopi.ebics.schema.h005.ParameterDocument.Parameter.Value;
 import org.kopi.ebics.schema.h005.ProductElementType;
 import org.kopi.ebics.schema.h005.PubKeyInfoType;
+import org.kopi.ebics.schema.h005.SignatureFlagType;
 import org.kopi.ebics.schema.h005.StandardOrderParamsDocument;
 import org.kopi.ebics.schema.h005.StandardOrderParamsType;
 import org.kopi.ebics.schema.h005.StaticHeaderOrderDetailsType;
@@ -898,7 +899,7 @@ public final class EbicsXmlFactory {
     }
 
     public static BTUParamsType createBTUParams(String serviceName, String scope, String option,
-        String messageName, String messageVersion) {
+        String messageName, String messageVersion, boolean signatureFlag) {
         var type = BTUParamsType.Factory.newInstance();
         var service = type.addNewService();
         service.setServiceName(serviceName);
@@ -912,6 +913,10 @@ public final class EbicsXmlFactory {
         //msgType.setFormat(messageName);
         msgType.setVersion(messageVersion);
         service.setMsgName(msgType);
+        if (signatureFlag) {
+            var flag = type.addNewSignatureFlag();
+            flag.setRequestEDS(true);
+        }
         return type;
     }
 

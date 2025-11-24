@@ -408,7 +408,7 @@ public class EbicsClient {
         EbicsUploadParams params;
         if (orderType == OrderType.XE2) {
             var orderParams = new EbicsUploadParams.OrderParams("MCT", "CH", null, "pain.001",
-                "03");
+                "03", true);
             params = new EbicsUploadParams(null, orderParams);
         } else {
             params = new EbicsUploadParams(defaultUser.getPartner().nextOrderId(), null);
