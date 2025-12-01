@@ -1,0 +1,7 @@
+/target/
+.idea
+*.iml
+/client/
+*.key
+*.pub
+nb-configuration.xml
