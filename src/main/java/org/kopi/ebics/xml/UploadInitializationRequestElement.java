@@ -26,7 +26,7 @@ import java.util.Calendar;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.xmlbeans.XmlObject;
-import org.kopi.ebics.client.EbicsUploadParams;
+import org.kopi.ebics.client.EbicsParams;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.ContentFactory;
 import org.kopi.ebics.interfaces.EbicsOrderType;
@@ -54,7 +54,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
    * @param userData the user data to be uploaded
  */
     public UploadInitializationRequestElement(EbicsSession session, EbicsOrderType orderType,
-        EbicsUploadParams params,
+        EbicsParams params,
         byte[] userData) {
         super(session, orderType, generateName(orderType));
         setSaveSuggestedPrefixes("urn:org:ebics:H005", "");
@@ -85,7 +85,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
             decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
         var bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
 
-        String nextOrderId = uploadParams.orderId();
+        String nextOrderId = uploadParams.getOrderId();
 
         var type = StaticHeaderOrderDetailsType.AdminOrderType.Factory.newInstance();
         type.setStringValue(this.getType());
@@ -93,10 +93,10 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
         var orderParamsType = (XmlObject) EbicsXmlFactory.createStandardOrderParamsType();
         var orderParamsSchema = StandardOrderParamsType.type;
 
-        if (uploadParams.orderParams() != null) {
-            var p = uploadParams.orderParams();
-            orderParamsType = EbicsXmlFactory.createBTUParams(p.serviceName(), p.scope(),
-                p.option(), p.messageName(), p.messageVersion(), p.signatureFlag());
+        if (uploadParams.getOrderParams() != null) {
+            var p = uploadParams.getOrderParams();
+            orderParamsType = EbicsXmlFactory.createBTUParams(p.getServiceName(), p.getScope(),
+                p.getOption(), p.getMessageName(), p.getMessageVersion(), p.isSignatureFlag());
             orderParamsSchema = BTUOrderParamsDocument.type;
         }
 
@@ -160,7 +160,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
   // --------------------------------------------------------------------
   // DATA MEMBERS
   // --------------------------------------------------------------------
-  private final EbicsUploadParams uploadParams;
+  private final EbicsParams uploadParams;
   private final byte[] userData;
   private UserSignature			userSignature;
   private final Splitter splitter;
