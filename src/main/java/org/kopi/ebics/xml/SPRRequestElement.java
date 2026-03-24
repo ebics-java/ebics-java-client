@@ -118,7 +118,8 @@ public class SPRRequestElement extends InitializationRequestElement {
     dataEncryptionInfo = EbicsXmlFactory.createDataEncryptionInfo(true,
 	                                                          encryptionPubKeyDigest,
 	                                                          generateTransactionKey());
-    dataTransfer = EbicsXmlFactory.createDataTransferRequestType(dataEncryptionInfo, signatureData, null);
+    dataTransfer = EbicsXmlFactory.createDataTransferRequestType(dataEncryptionInfo, signatureData, null,
+                                                                session.getConfiguration().getSignatureVersion());
     body = EbicsXmlFactory.createEbicsRequestBody(dataTransfer);
     request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(),
 	                                         session.getConfiguration().getVersion(),

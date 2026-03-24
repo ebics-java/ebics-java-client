@@ -138,7 +138,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
             throw new EbicsException(e);
         }
         var dataTransfer = EbicsXmlFactory.createDataTransferRequestType(dataEncryptionInfo,
-            signatureData, digest);
+            signatureData, digest, session.getConfiguration().getSignatureVersion());
         var body = EbicsXmlFactory.createEbicsRequestBody(dataTransfer);
         var request = EbicsXmlFactory.createEbicsRequest(session.getConfiguration().getRevision(),
             session.getConfiguration().getVersion(), header, body);

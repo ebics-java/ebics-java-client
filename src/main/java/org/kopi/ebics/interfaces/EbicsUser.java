@@ -154,13 +154,26 @@ public interface EbicsUser {
   byte[] authenticate(byte[] digest) throws GeneralSecurityException;
 
   /**
-   * Signs the given digest with the private A005 key.
+   * Signs the given digest with the private signature key using A005 (PKCS1-v1_5).
    * @param digest
    * @return the signature
    * @throws IOException
-   * @throws GeneralSecurityException 
+   * @throws GeneralSecurityException
    */
   byte[] sign(byte[] digest) throws IOException, GeneralSecurityException;
+
+  /**
+   * Signs the given digest with the private signature key using the specified version.
+   * A005 uses EMSA-PKCS1-v1_5 with SHA-256, A006 uses EMSA-PSS with SHA-256.
+   * @param digest the data to sign
+   * @param signatureVersion the signature version (A005 or A006)
+   * @return the signature
+   * @throws IOException
+   * @throws GeneralSecurityException
+   */
+  default byte[] sign(byte[] digest, String signatureVersion) throws IOException, GeneralSecurityException {
+    return sign(digest);
+  }
 
   /**
    * Uses the E001 key to decrypt the given secret key.

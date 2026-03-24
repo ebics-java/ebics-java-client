@@ -61,7 +61,7 @@ public class UserSignature extends DefaultEbicsRootElement {
     byte[]				signature;
 
     try {
-      signature = user.sign(toSign);
+      signature = user.sign(toSign, signatureVersion);
     } catch (IOException e) {
       throw new EbicsException(e.getMessage());
     } catch (GeneralSecurityException e) {

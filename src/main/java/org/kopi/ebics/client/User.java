@@ -35,6 +35,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.kopi.ebics.certificate.CertificateManager;
+import org.kopi.ebics.certificate.SignatureVersion;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsPartner;
 import org.kopi.ebics.interfaces.EbicsUser;
@@ -511,8 +512,12 @@ public class User implements EbicsUser, Savable {
    */
   @Override
   public byte[] sign(byte[] digest) throws GeneralSecurityException {
-    Signature signature = Signature.getInstance("SHA256WithRSA", BouncyCastleProvider.PROVIDER_NAME);
-    signature.initSign(a005PrivateKey);
+    return sign(digest, SignatureVersion.A005.getVersion());
+  }
+
+  @Override
+  public byte[] sign(byte[] digest, String signatureVersion) throws GeneralSecurityException {
+    Signature signature = SignatureVersion.lookup(signatureVersion).createSignature(a005PrivateKey);
     signature.update(removeOSSpecificChars(digest));
     return signature.sign();
   }

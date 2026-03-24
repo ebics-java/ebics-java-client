@@ -1159,18 +1159,28 @@ public final class EbicsXmlFactory {
      * @return the <code>DataTransferRequestType</code> XML object
      */
     public static DataTransferRequestType createDataTransferRequestType(
-        DataEncryptionInfo dataEncryptionInfo, SignatureData signatureData, String digestValue) {
+        DataEncryptionInfo dataEncryptionInfo, SignatureData signatureData, String digestValue,
+        String signatureVersion) {
         DataTransferRequestType newDataTransferRequestType = DataTransferRequestType.Factory.newInstance();
         newDataTransferRequestType.setDataEncryptionInfo(dataEncryptionInfo);
         newDataTransferRequestType.setSignatureData(signatureData);
         if (digestValue != null) {
             var digest = DataDigestType.Factory.newInstance();
-            digest.setSignatureVersion("A005");
+            digest.setSignatureVersion(signatureVersion);
             digest.setStringValue(digestValue);
             newDataTransferRequestType.setDataDigest(digest);
         }
 
         return newDataTransferRequestType;
+    }
+
+    /**
+     * @deprecated Use {@link #createDataTransferRequestType(DataEncryptionInfo, SignatureData, String, String)} instead.
+     */
+    @Deprecated
+    public static DataTransferRequestType createDataTransferRequestType(
+        DataEncryptionInfo dataEncryptionInfo, SignatureData signatureData, String digestValue) {
+        return createDataTransferRequestType(dataEncryptionInfo, signatureData, digestValue, "A005");
     }
 
     /**

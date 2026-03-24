@@ -54,7 +54,7 @@ import org.kopi.ebics.utils.Utils;
 public class X509Generator {
 
   /**
-   * Generates the signature certificate for the EBICS protocol
+   * Generates the signature certificate for the EBICS protocol using the default A005 algorithm.
    * @param keypair the key pair
    * @param issuer the certificate issuer
    * @param notBefore the begin validity date
@@ -73,7 +73,34 @@ public class X509Generator {
 	            issuer,
 	            notBefore,
 	            notAfter,
-                CertificateKeyUsage.SIGNATURE_KEY_USAGE);
+                CertificateKeyUsage.SIGNATURE_KEY_USAGE,
+                X509Constants.SIGNATURE_ALGORITHM);
+  }
+
+  /**
+   * Generates the signature certificate for the EBICS protocol using the specified signature version.
+   * @param keypair the key pair
+   * @param issuer the certificate issuer
+   * @param notBefore the begin validity date
+   * @param notAfter the end validity date
+   * @param signatureVersion the EBICS signature version (A005 or A006)
+   * @return the signature certificate
+   * @throws GeneralSecurityException
+   * @throws IOException
+   */
+  public X509Certificate generateSignatureCertificate(KeyPair keypair,
+                                                      String issuer,
+                                                      Date notBefore,
+                                                      Date notAfter,
+                                                      String signatureVersion)
+    throws GeneralSecurityException, IOException
+  {
+    return generate(keypair,
+                    issuer,
+                    notBefore,
+                    notAfter,
+                    CertificateKeyUsage.SIGNATURE_KEY_USAGE,
+                    SignatureVersion.lookup(signatureVersion).getCertificateSignatureAlgorithm());
   }
 
   /**
@@ -96,7 +123,8 @@ public class X509Generator {
                     issuer,
                     notBefore,
                     notAfter,
-                    CertificateKeyUsage.AUTHENTICATION_KEY_USAGE);
+                    CertificateKeyUsage.AUTHENTICATION_KEY_USAGE,
+                    X509Constants.SIGNATURE_ALGORITHM);
   }
 
   /**
@@ -119,12 +147,13 @@ public class X509Generator {
                     issuer,
                     notBefore,
                     notAfter,
-                    CertificateKeyUsage.ENCRYPTION_KEY_USAGE);
+                    CertificateKeyUsage.ENCRYPTION_KEY_USAGE,
+                    X509Constants.SIGNATURE_ALGORITHM);
   }
 
   /**
    * Returns an <code>X509Certificate</code> from a given
-   * <code>KeyPair</code> and limit dates validations
+   * <code>KeyPair</code> and limit dates validations, using the default signature algorithm.
    * @param keypair the given key pair
    * @param issuer the certificate issuer
    * @param notBefore the begin validity date
@@ -141,6 +170,30 @@ public class X509Generator {
       CertificateKeyUsage keyusage)
     throws GeneralSecurityException, IOException
   {
+    return generate(keypair, issuer, notBefore, notAfter, keyusage, X509Constants.SIGNATURE_ALGORITHM);
+  }
+
+  /**
+   * Returns an <code>X509Certificate</code> from a given
+   * <code>KeyPair</code> and limit dates validations
+   * @param keypair the given key pair
+   * @param issuer the certificate issuer
+   * @param notBefore the begin validity date
+   * @param notAfter the end validity date
+   * @param keyusage the certificate key usage
+   * @param signatureAlgorithm the certificate signature algorithm
+   * @return the X509 certificate
+   * @throws GeneralSecurityException
+   * @throws IOException
+   */
+  public X509Certificate generate(KeyPair keypair,
+                                  String issuer,
+      				  Date notBefore,
+      				  Date notAfter,
+      CertificateKeyUsage keyusage,
+      String signatureAlgorithm)
+    throws GeneralSecurityException, IOException
+  {
     X509V3CertificateGenerator		generator;
     BigInteger				serial;
     X509Certificate			certificate;
@@ -154,7 +207,7 @@ public class X509Generator {
     generator.setNotAfter(notAfter);
     generator.setSubjectDN(new X509Principal(issuer));
     generator.setPublicKey(keypair.getPublic());
-    generator.setSignatureAlgorithm(X509Constants.SIGNATURE_ALGORITHM);
+    generator.setSignatureAlgorithm(signatureAlgorithm);
     generator.addExtension(X509Extensions.BasicConstraints,
 	                   false,
 	                   new BasicConstraints(true));

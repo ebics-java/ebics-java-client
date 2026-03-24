@@ -44,19 +44,31 @@ public class CertificateManager {
 
   public CertificateManager(EbicsUser user) {
     this.user = user;
+    this.signatureVersion = SignatureVersion.A005.getVersion();
     generator = new X509Generator();
   }
 
   /**
-   * Creates the certificates for the user
+   * Creates the certificates for the user using the default A005 signature version.
    * @throws GeneralSecurityException
    * @throws IOException
    */
   public void create() throws GeneralSecurityException, IOException {
+      create(SignatureVersion.A005.getVersion());
+  }
+
+  /**
+   * Creates the certificates for the user using the specified signature version.
+   * @param signatureVersion the EBICS signature version (A005 or A006)
+   * @throws GeneralSecurityException
+   * @throws IOException
+   */
+  public void create(String signatureVersion) throws GeneralSecurityException, IOException {
+      this.signatureVersion = signatureVersion;
       Calendar calendar = Calendar.getInstance();
       calendar.add(Calendar.DAY_OF_YEAR, X509Constants.DEFAULT_DURATION);
 
-      createA005Certificate(new Date(calendar.getTimeInMillis()));
+      createSignatureCertificate(new Date(calendar.getTimeInMillis()), signatureVersion);
       createX002Certificate(new Date(calendar.getTimeInMillis()));
       createE002Certificate(new Date(calendar.getTimeInMillis()));
       setUserCertificates();
@@ -76,7 +88,7 @@ public class CertificateManager {
   }
 
   /**
-   * Creates the signature certificate.
+   * Creates the signature certificate using the default A005 algorithm.
    * @param end the expiration date of a the certificate.
    * @throws GeneralSecurityException
    * @throws IOException
@@ -87,7 +99,24 @@ public class CertificateManager {
       a005PrivateKey = keypair.getPrivate();
   }
 
+  /**
+   * Creates the signature certificate using the specified signature version.
+   * @param end the expiration date of the certificate.
+   * @param signatureVersion the EBICS signature version (A005 or A006)
+   * @throws GeneralSecurityException
+   * @throws IOException
+   */
+  public void createSignatureCertificate(Date end, String signatureVersion) throws GeneralSecurityException, IOException {
+      KeyPair keypair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE);
+      a005Certificate = generator.generateSignatureCertificate(keypair, user.getDN(), new Date(), end, signatureVersion);
+      a005PrivateKey = keypair.getPrivate();
+  }
+
   X509Certificate getA005Certificate() {
+      return a005Certificate;
+  }
+
+  X509Certificate getSignatureCertificate() {
       return a005Certificate;
   }
 
@@ -144,16 +173,31 @@ public class CertificateManager {
   public void load(File path, PasswordCallback pwdCallBack)
     throws GeneralSecurityException, IOException
   {
+    load(path, pwdCallBack, SignatureVersion.A005.getVersion());
+  }
+
+  /**
+   * Loads user certificates from a given key store using the specified signature version alias.
+   * @param path the key store path
+   * @param pwdCallBack the password call back
+   * @param signatureVersion the EBICS signature version (A005 or A006) used as the keystore alias
+   * @throws GeneralSecurityException
+   * @throws IOException
+   */
+  public void load(File path, PasswordCallback pwdCallBack, String signatureVersion)
+    throws GeneralSecurityException, IOException
+  {
+    this.signatureVersion = signatureVersion;
     KeyStoreManager		loader;
 
     loader = new KeyStoreManager();
 
     loader.load(path, pwdCallBack.getPassword());
-    a005Certificate = loader.getCertificate(user.getUserId() + "-A005");
+    a005Certificate = loader.getCertificate(user.getUserId() + "-" + signatureVersion);
     x002Certificate = loader.getCertificate(user.getUserId() + "-X002");
     e002Certificate = loader.getCertificate(user.getUserId() + "-E002");
 
-    a005PrivateKey = loader.getPrivateKey(user.getUserId() + "-A005");
+    a005PrivateKey = loader.getPrivateKey(user.getUserId() + "-" + signatureVersion);
     x002PrivateKey = loader.getPrivateKey(user.getUserId() + "-X002");
     e002PrivateKey = loader.getPrivateKey(user.getUserId() + "-E002");
     setUserCertificates();
@@ -191,7 +235,7 @@ public class CertificateManager {
 
     keystore = KeyStore.getInstance("PKCS12", new BouncyCastleProvider());
     keystore.load(null, null);
-    keystore.setKeyEntry(user.getUserId() + "-A005",
+    keystore.setKeyEntry(user.getUserId() + "-" + signatureVersion,
 	                 a005PrivateKey,
 	                 password,
 	                 new X509Certificate[] {a005Certificate});
@@ -212,6 +256,7 @@ public class CertificateManager {
 
   private final X509Generator					generator;
   private final EbicsUser					user;
+  private String					signatureVersion;
 
   private X509Certificate				a005Certificate;
   private X509Certificate				e002Certificate;
