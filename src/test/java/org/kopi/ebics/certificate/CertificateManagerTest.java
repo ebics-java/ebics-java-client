@@ -2,6 +2,7 @@ package org.kopi.ebics.certificate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -9,6 +10,7 @@ import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -30,7 +32,69 @@ class CertificateManagerTest {
 
     @Test
     void createA005Certificate() throws GeneralSecurityException, IOException {
-        var user = new EbicsUser() {
+        var user = testUser();
+        var manager = new CertificateManager(user);
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, X509Constants.DEFAULT_DURATION);
+
+        manager.createA005Certificate(new Date(calendar.getTimeInMillis()));
+
+        var cert = manager.getA005Certificate();
+
+        assertNotNull(cert);
+
+        //System.out.println(cert);
+
+        assertEquals(3, cert.getVersion(), "Certificate version must be 3 (V3).");
+        String expectedDN = "CN=test-dn";
+        assertEquals(expectedDN, cert.getIssuerX500Principal().getName(X500Principal.RFC2253));
+        assertEquals(expectedDN, cert.getSubjectX500Principal().getName(X500Principal.RFC2253));
+        assertEquals("SHA256WITHRSA", cert.getSigAlgName());
+    }
+
+    @Test
+    void createUsesConfiguredKeyLength() throws Exception {
+        String previousKeyLength = System.getProperty("ebics.key.length");
+        System.setProperty("ebics.key.length", "3072");
+        try {
+            var manager = new CertificateManager(testUser());
+            manager.create();
+            var cert = manager.getA005Certificate();
+            assertNotNull(cert);
+            assertEquals(3072, ((RSAPublicKey) cert.getPublicKey()).getModulus().bitLength());
+        } finally {
+            if (previousKeyLength == null) {
+                System.clearProperty("ebics.key.length");
+            } else {
+                System.setProperty("ebics.key.length", previousKeyLength);
+            }
+        }
+    }
+
+    @Test
+    void createUsesConfiguredCertificateValidityYears() throws Exception {
+        String previousValidityYears = System.getProperty("ebics.cert.validity.years");
+        System.setProperty("ebics.cert.validity.years", "2");
+        try {
+            var manager = new CertificateManager(testUser());
+            manager.create();
+            var cert = manager.getA005Certificate();
+            assertNotNull(cert);
+            long validDays = ChronoUnit.DAYS.between(
+                cert.getNotBefore().toInstant(),
+                cert.getNotAfter().toInstant());
+            assertTrue(validDays >= 730 && validDays <= 732);
+        } finally {
+            if (previousValidityYears == null) {
+                System.clearProperty("ebics.cert.validity.years");
+            } else {
+                System.setProperty("ebics.cert.validity.years", previousValidityYears);
+            }
+        }
+    }
+
+    private EbicsUser testUser() {
+        return new EbicsUser() {
             @Override
             public RSAPublicKey getA005PublicKey() {
                 return null;
@@ -136,24 +200,6 @@ class CertificateManagerTest {
                 throws GeneralSecurityException, IOException, EbicsException {
                 return new byte[0];
             }
-
         };
-        var manager = new CertificateManager(user);
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_YEAR, X509Constants.DEFAULT_DURATION);
-
-        manager.createA005Certificate(new Date(calendar.getTimeInMillis()));
-
-        var cert = manager.getA005Certificate();
-
-        assertNotNull(cert);
-
-        //System.out.println(cert);
-
-        assertEquals(3, cert.getVersion(), "Certificate version must be 3 (V3).");
-        String expectedDN = "CN=test-dn";
-        assertEquals(expectedDN, cert.getIssuerX500Principal().getName(X500Principal.RFC2253));
-        assertEquals(expectedDN, cert.getSubjectX500Principal().getName(X500Principal.RFC2253));
-        assertEquals("SHA256WITHRSA", cert.getSigAlgName());
     }
 }
