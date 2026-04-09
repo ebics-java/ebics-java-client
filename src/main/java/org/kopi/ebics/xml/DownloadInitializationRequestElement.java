@@ -22,6 +22,8 @@ import java.util.Calendar;
 
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsOrderType;
+import org.kopi.ebics.io.Splitter;
+import org.kopi.ebics.client.EbicsParams;
 import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest;
 import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Body;
 import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Header;
@@ -45,14 +47,31 @@ import org.kopi.ebics.session.EbicsSession;
  */
 public class DownloadInitializationRequestElement extends InitializationRequestElement {
 
-  /**
+    
+      /**
    * Constructs a new <code>DInitializationRequestElement</code> for downloads initializations.
    * @param session the current ebics session
    * @param type the download order type (FDL, HTD, HPD)
    */
-  public DownloadInitializationRequestElement(EbicsSession session,
-                                       EbicsOrderType type) {
+  public DownloadInitializationRequestElement(EbicsSession session, EbicsOrderType type) {
     super(session, type, generateName(type));
+    setSaveSuggestedPrefixes("urn:org:ebics:H005", "");
+  }
+    
+
+  
+  /**
+   * Constructs a new <code>DInitializationRequestElement</code> for downloads initializations.
+   * @param session the current ebics session
+   * @param type the download order type (FDL, HTD, HPD)
+   * @param params
+   */
+  public DownloadInitializationRequestElement(EbicsSession session,
+                                       EbicsOrderType type, EbicsParams params) {
+      
+    super(session, type, generateName(type));
+      setSaveSuggestedPrefixes("urn:org:ebics:H005", "");
+        this.downloadParams = params;
   }
 
   @Override
@@ -107,5 +126,12 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
   }
 
+    // --------------------------------------------------------------------
+  // DATA MEMBERS
+  // --------------------------------------------------------------------
+  private EbicsParams downloadParams = null;
+  private UserSignature			userSignature;
+  private Splitter splitter;
   private static final long 			serialVersionUID = 3776072549761880272L;
+  
 }

@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.kopi.ebics.exception.EbicsException;
+import org.kopi.ebics.exception.NoDownloadDataAvailableException;
 import org.kopi.ebics.interfaces.ContentFactory;
 import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.io.ByteArrayContentFactory;
@@ -91,7 +92,7 @@ public class FileTransfer {
    * @throws IOException
    * @throws EbicsException
    */
-  public void sendFile(byte[] content, EbicsOrderType orderType, EbicsUploadParams params)
+  public void sendFile(byte[] content, EbicsOrderType orderType, EbicsParams params)
     throws IOException, EbicsException
   {
     HttpRequestSender sender = new HttpRequestSender(session);
@@ -167,22 +168,56 @@ public class FileTransfer {
    * No transaction recovery is possible.
    * @param orderType type of file to fetch
    * @param outputFile where to put the data
+   * @param params where to put the data
    * @throws IOException communication error
    * @throws EbicsException server generated error
+   * @throws NoDownloadDataAvailableException server generated error
    */
   public void fetchFile(EbicsOrderType orderType,
-                        File outputFile)
-    throws IOException, EbicsException
+                        File outputFile, EbicsParams params)
+    throws IOException, NoDownloadDataAvailableException, EbicsException
   {
+      
+      
+  
+      
+      /*
+      
+        HttpRequestSender sender = new HttpRequestSender(session);
+    var initializer = new DownloadInitializationRequestElement(session, orderType, params);
+    initializer.build();
+    initializer.validate();
+    session.getConfiguration().getTraceManager().trace(initializer.getUserSignature());
+    session.getConfiguration().getTraceManager().trace(initializer);
+    int httpCode = sender.send(new ByteArrayContentFactory(initializer.prettyPrint()));
+
+    Utils.checkHttpCode(httpCode);
+    InitializationResponseElement response = new InitializationResponseElement(sender.getResponseBody(),
+	                                         orderType,
+	                                         DefaultEbicsRootElement.generateName(orderType));
+    response.build();
+    session.getConfiguration().getTraceManager().trace(response);
+
+    TransferState state = new TransferState(initializer.getSegmentNumber(), response.getTransactionId());
+    
+    
+    */
+    
+      
+      // original ci-dessous
+      
+      
     var sender = new HttpRequestSender(session);
-      var initializer = new DownloadInitializationRequestElement(session, orderType);
+    var initializer = new DownloadInitializationRequestElement(session, orderType, params);
     initializer.build();
     initializer.validate();
 
     session.getConfiguration().getTraceManager().trace(initializer);
     var request = initializer.prettyPrint();
-    var httpCode = sender.send(new ByteArrayContentFactory(request));
+    int httpCode = sender.send(new ByteArrayContentFactory(initializer.prettyPrint()));
+
     Utils.checkHttpCode(httpCode);
+  
     var response = new DownloadInitializationResponseElement(sender.getResponseBody(),
 	                                          orderType,
 	                                          DefaultEbicsRootElement.generateName(orderType));
@@ -236,7 +271,7 @@ public class FileTransfer {
                         boolean lastSegment,
                         byte[] transactionId,
                         Joiner joiner)
-    throws IOException, EbicsException
+    throws IOException, EbicsException,NoDownloadDataAvailableException
   {
     DownloadTransferRequestElement		downloader;
     HttpRequestSender			sender;

@@ -15,7 +15,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
  */
-
 package org.kopi.ebics.client;
 
 import java.io.File;
@@ -40,6 +39,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.help.HelpFormatter;
+import org.apache.http.MethodNotSupportedException;
 import org.apache.xml.security.Init;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.kopi.ebics.exception.EbicsException;
@@ -68,6 +68,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class EbicsClient {
+
     private static File getRootDir() {
         return new File(System.getProperty("user.home"), "ebics" + File.separator + "client");
     }
@@ -91,8 +92,7 @@ public class EbicsClient {
     /**
      * Constructs a new ebics client application
      *
-     * @param configuration
-     *            the application configuration
+     * @param configuration the application configuration
      * @param properties
      */
     public EbicsClient(Configuration configuration, ConfigProperties properties) {
@@ -113,12 +113,11 @@ public class EbicsClient {
     /**
      * Creates the user necessary directories
      *
-     * @param user
-     *            the concerned user
+     * @param user the concerned user
      */
     public void createUserDirectories(EbicsUser user) {
         log.info(
-            messages.getString("user.create.directories", user.getUserId()));
+                messages.getString("user.create.directories", user.getUserId()));
         IOUtils.createDirectories(configuration.getUserDirectory(user));
         IOUtils.createDirectories(configuration.getTransferTraceDirectory(user));
         IOUtils.createDirectories(configuration.getKeystoreDirectory(user));
@@ -129,14 +128,10 @@ public class EbicsClient {
      * Creates a new EBICS bank with the data you should have obtained from the
      * bank.
      *
-     * @param url
-     *            the bank URL
-     * @param name
-     *            the bank name
-     * @param hostId
-     *            the bank host ID
-     * @param useCertificate
-     *            does the bank use certificates ?
+     * @param url the bank URL
+     * @param name the bank name
+     * @param hostId the bank host ID
+     * @param useCertificate does the bank use certificates ?
      * @return the created ebics bank
      */
     private Bank createBank(URL url, String name, String hostId, boolean useCertificate) {
@@ -148,10 +143,8 @@ public class EbicsClient {
     /**
      * Creates a new ebics partner
      *
-     * @param bank
-     *            the bank
-     * @param partnerId
-     *            the partner ID
+     * @param bank the bank
+     * @param partnerId the partner ID
      */
     private Partner createPartner(EbicsBank bank, String partnerId) {
         Partner partner = new Partner(bank, partnerId);
@@ -162,45 +155,33 @@ public class EbicsClient {
     /**
      * Creates a new ebics user and generates its certificates.
      *
-     * @param url
-     *            the bank url
-     * @param bankName
-     *            the bank name
-     * @param hostId
-     *            the bank host ID
-     * @param partnerId
-     *            the partner ID
-     * @param userId
-     *            UserId as obtained from the bank.
-     * @param name
-     *            the user name,
-     * @param email
-     *            the user email
-     * @param country
-     *            the user country
-     * @param organization
-     *            the user organization or company
-     * @param useCertificates
-     *            does the bank use certificates ?
-     * @param saveCertificates
-     *            save generated certificates?
-     * @param passwordCallback
-     *            a callback-handler that supplies us with the password. This
-     *            parameter can be null, in this case no password is used.
+     * @param url the bank url
+     * @param bankName the bank name
+     * @param hostId the bank host ID
+     * @param partnerId the partner ID
+     * @param userId UserId as obtained from the bank.
+     * @param name the user name,
+     * @param email the user email
+     * @param country the user country
+     * @param organization the user organization or company
+     * @param useCertificates does the bank use certificates ?
+     * @param saveCertificates save generated certificates?
+     * @param passwordCallback a callback-handler that supplies us with the
+     * password. This parameter can be null, in this case no password is used.
      * @return Ebics <code>User</code>
      * @throws Exception
      */
     public User createUser(URL url, String bankName, String hostId, String partnerId,
-        String userId, String name, String email, String country, String organization,
-        boolean useCertificates, boolean saveCertificates, PasswordCallback passwordCallback)
-        throws Exception {
+            String userId, String name, String email, String country, String organization,
+            boolean useCertificates, boolean saveCertificates, PasswordCallback passwordCallback)
+            throws Exception {
         log.info(messages.getString("user.create.info", userId));
 
         Bank bank = createBank(url, bankName, hostId, useCertificates);
         Partner partner = createPartner(bank, partnerId);
         try {
             User user = new User(partner, userId, name, email, country, organization,
-                passwordCallback);
+                    passwordCallback);
             createUserDirectories(user);
             if (saveCertificates) {
                 user.saveUserCertificates(configuration.getKeystoreDirectory(user));
@@ -222,11 +203,11 @@ public class EbicsClient {
     }
 
     private void createLetters(EbicsUser user, boolean useCertificates)
-        throws GeneralSecurityException, IOException, EbicsException {
+            throws GeneralSecurityException, IOException, EbicsException {
         user.getPartner().getBank().setUseCertificate(useCertificates);
         LetterManager letterManager = configuration.getLetterManager();
         List<InitLetter> letters = List.of(letterManager.createA005Letter(user),
-            letterManager.createE002Letter(user), letterManager.createX002Letter(user));
+                letterManager.createE002Letter(user), letterManager.createX002Letter(user));
 
         File directory = configuration.getLettersDirectory(user);
         for (InitLetter letter : letters) {
@@ -240,7 +221,7 @@ public class EbicsClient {
      * Loads a user knowing its ID
      */
     public User loadUser(String hostId, String partnerId, String userId,
-        PasswordCallback passwordCallback) throws Exception {
+            PasswordCallback passwordCallback) throws Exception {
         log.info(messages.getString("user.load.info", userId));
 
         try {
@@ -248,15 +229,15 @@ public class EbicsClient {
             Partner partner;
             User user;
             try (ObjectInputStream input = configuration.getSerializationManager().deserialize(
-                hostId)) {
+                    hostId)) {
                 bank = (Bank) input.readObject();
             }
             try (ObjectInputStream input = configuration.getSerializationManager().deserialize(
-                "partner-" + partnerId)) {
+                    "partner-" + partnerId)) {
                 partner = new Partner(bank, input);
             }
             try (ObjectInputStream input = configuration.getSerializationManager().deserialize(
-                "user-" + userId)) {
+                    "user-" + userId)) {
                 user = new User(partner, input, passwordCallback);
             }
             users.put(userId, user);
@@ -286,7 +267,7 @@ public class EbicsClient {
         EbicsSession session = createSession(user, product);
         KeyManagement keyManager = new KeyManagement(session);
         configuration.getTraceManager().setTraceDirectory(
-            configuration.getTransferTraceDirectory(user));
+                configuration.getTransferTraceDirectory(user));
         try {
             keyManager.sendINI(null);
             user.setInitialized(true);
@@ -300,10 +281,8 @@ public class EbicsClient {
     /**
      * Sends a HIA request to the ebics server.
      *
-     * @param user
-     *            the user ID.
-     * @param product
-     *            the application product.
+     * @param user the user ID.
+     * @param product the application product.
      */
     public void sendHIARequest(User user, Product product) throws Exception {
         String userId = user.getUserId();
@@ -316,7 +295,7 @@ public class EbicsClient {
         EbicsSession session = createSession(user, product);
         KeyManagement keyManager = new KeyManagement(session);
         configuration.getTraceManager().setTraceDirectory(
-            configuration.getTransferTraceDirectory(user));
+                configuration.getTransferTraceDirectory(user));
         try {
             keyManager.sendHIA(null);
             user.setInitializedHIA(true);
@@ -338,7 +317,7 @@ public class EbicsClient {
         KeyManagement keyManager = new KeyManagement(session);
 
         configuration.getTraceManager().setTraceDirectory(
-            configuration.getTransferTraceDirectory(user));
+                configuration.getTransferTraceDirectory(user));
 
         try {
             keyManager.sendHPB();
@@ -352,10 +331,8 @@ public class EbicsClient {
     /**
      * Sends the SPR order to the bank.
      *
-     * @param user
-     *            the user ID
-     * @param product
-     *            the session product
+     * @param user the user ID
+     * @param product the session product
      * @throws Exception
      */
     public void revokeSubscriber(User user, Product product) throws Exception {
@@ -367,7 +344,7 @@ public class EbicsClient {
         KeyManagement keyManager = new KeyManagement(session);
 
         configuration.getTraceManager().setTraceDirectory(
-            configuration.getTransferTraceDirectory(user));
+                configuration.getTransferTraceDirectory(user));
 
         try {
             keyManager.lockAccess();
@@ -381,56 +358,69 @@ public class EbicsClient {
 
     /**
      * Sends a file to the ebics bank server
+     *
      * @throws Exception
      */
-    public void sendFile(File file, User user, Product product, EbicsOrderType orderType, EbicsUploadParams params) throws Exception {
+    public void sendFile(File file, User user, Product product, EbicsOrderType orderType, EbicsParams params) throws Exception {
         EbicsSession session = createSession(user, product);
 
         FileTransfer transferManager = new FileTransfer(session);
 
         configuration.getTraceManager().setTraceDirectory(
-            configuration.getTransferTraceDirectory(user));
+                configuration.getTransferTraceDirectory(user));
 
         try {
             transferManager.sendFile(IOUtils.getFileContent(file), orderType, params);
-        } catch (IOException | EbicsException e) {
-            log
-                .error(messages.getString("upload.file.error", file.getAbsolutePath()));
+        } catch (EbicsException e) {
+            log.error(messages.getString("upload.file.error", file.getAbsolutePath()));
             throw e;
         }
     }
 
-    public void sendFile(File file, EbicsOrderType orderType, EbicsUploadParams params) throws Exception {
+    public void sendFile(File file, EbicsOrderType orderType, EbicsParams params) throws Exception {
         sendFile(file, defaultUser, defaultProduct, orderType, params);
     }
 
-    public void sendFile(File file, EbicsOrderType orderType) throws Exception {
-        EbicsUploadParams params;
-        if (orderType == OrderType.XE2) {
-            var orderParams = new EbicsUploadParams.OrderParams("MCT", "CH", null, "pain.001",
-                "03", true);
-            params = new EbicsUploadParams(null, orderParams);
-        } else {
-            params = new EbicsUploadParams(defaultUser.getPartner().nextOrderId(), null);
+    public void sendFileV3(File file, EbicsOrderType orderType) throws Exception {
+        EbicsParams params;
+
+        switch (orderType.getCode()) {
+            case "XE2":
+                var orderParams = new EbicsParams.OrderParams("MCT", "CH", null, "pain.001",
+                        "03", true);
+                params = new EbicsParams(null, orderParams);
+                break;
+            default:
+                throw new UnsupportedOperationException(orderType.getCode() + " not yet implemented");
         }
+
+        sendFile(file, defaultUser, defaultProduct, orderType, params);
+
+    }
+
+    public void sendFileV2(File file, EbicsOrderType orderType) throws Exception {
+
+        EbicsParams params = new EbicsParams(defaultUser.getPartner().nextOrderId(), null);
+
         sendFile(file, defaultUser, defaultProduct, orderType, params);
     }
 
-    public void fetchFile(File file, User user, Product product, EbicsOrderType orderType,
-        boolean isTest) throws IOException, EbicsException {
+    public void fetchFile(File file, User user, Product product, EbicsOrderType orderType, EbicsParams params,
+            boolean isTest) throws IOException, EbicsException, NoDownloadDataAvailableException {
+
         FileTransfer transferManager;
         EbicsSession session = createSession(user, product);
-        session.addSessionParam("FORMAT", "pain.xxx.cfonb160.dct");
+
         if (isTest) {
             session.addSessionParam("TEST", "true");
         }
         transferManager = new FileTransfer(session);
 
         configuration.getTraceManager().setTraceDirectory(
-            configuration.getTransferTraceDirectory(user));
+                configuration.getTransferTraceDirectory(user));
 
         try {
-            transferManager.fetchFile(orderType, file);
+            transferManager.fetchFile(orderType, file, params);
         } catch (NoDownloadDataAvailableException e) {
             // don't log this exception as an error, caller can decide how to handle
             throw e;
@@ -440,9 +430,51 @@ public class EbicsClient {
         }
     }
 
-    public void fetchFile(File file, EbicsOrderType orderType, Date start, Date end) throws IOException,
-        EbicsException {
-        fetchFile(file, defaultUser, defaultProduct, orderType, false);
+    public void fetchFileV3(File file, User user, Product product, EbicsOrderType orderType,
+            boolean isTest) throws IOException, EbicsException {
+
+        EbicsParams params;
+
+        switch (orderType.getCode()) {
+
+            case "ZQR":
+                var orderParams = new EbicsParams.OrderParams("REP", "CH", "XQRR", "camt.054", "04", true);
+                params = new EbicsParams(orderType.getCode(), orderParams);
+                break;
+            case "Z54":
+                orderParams = new EbicsParams.OrderParams("REP", "CH", "", "camt.054", "08", false);
+                params = new EbicsParams(orderType.getCode(), orderParams);
+                break;
+            case "ZS2":
+                orderParams = new EbicsParams.OrderParams("REP", "CH", "XDCI", "camt.054", "04", true);
+                params = new EbicsParams(orderType.getCode(), orderParams);
+                break;
+            case "XTD":
+                orderParams = new EbicsParams.OrderParams("OTH", "BIL", "CH004TPE", "", "", true);
+                params = new EbicsParams(orderType.getCode(), orderParams);
+                break;
+            default:
+                throw new UnsupportedOperationException(orderType.getCode() + " not yet implemented");
+        }
+
+        fetchFile(file, user, product, orderType, params, isTest);
+
+    }
+
+    public void fetchFileV2(File file, User user, Product product, EbicsOrderType orderType, boolean isTest) throws IOException,
+            EbicsException {
+
+        EbicsParams params = new EbicsParams(defaultUser.getPartner().nextOrderId(), null);
+
+        fetchFile(file, user, product, orderType, params, false);
+    }
+
+    public void fetchFileV2(File file, EbicsOrderType orderType, Date start, Date end) throws IOException,
+            EbicsException {
+
+        EbicsParams params = new EbicsParams(defaultUser.getPartner().nextOrderId(), null);
+
+        fetchFile(file, defaultUser, defaultProduct, orderType, params, false);
     }
 
     /**
@@ -453,7 +485,7 @@ public class EbicsClient {
             for (User user : users.values()) {
                 if (user.needsSave()) {
                     log
-                        .info(messages.getString("app.quit.users", user.getUserId()));
+                            .info(messages.getString("app.quit.users", user.getUserId()));
                     configuration.getSerializationManager().serialize(user);
                 }
             }
@@ -461,7 +493,7 @@ public class EbicsClient {
             for (Partner partner : partners.values()) {
                 if (partner.needsSave()) {
                     log
-                        .info(messages.getString("app.quit.partners", partner.getPartnerId()));
+                            .info(messages.getString("app.quit.partners", partner.getPartnerId()));
                     configuration.getSerializationManager().serialize(partner);
                 }
             }
@@ -469,7 +501,7 @@ public class EbicsClient {
             for (Bank bank : banks.values()) {
                 if (bank.needsSave()) {
                     log
-                        .info(messages.getString("app.quit.banks", bank.getHostId()));
+                            .info(messages.getString("app.quit.banks", bank.getHostId()));
                     configuration.getSerializationManager().serialize(bank);
                 }
             }
@@ -486,6 +518,7 @@ public class EbicsClient {
     }
 
     public static class ConfigProperties {
+
         Properties properties = new Properties();
 
         public ConfigProperties(File file) throws IOException {
@@ -502,7 +535,7 @@ public class EbicsClient {
     }
 
     private User createUser(ConfigProperties properties, PasswordCallback pwdHandler)
-        throws Exception {
+            throws Exception {
         String userId = properties.get("userId");
         String partnerId = properties.get("partnerId");
         String bankUrl = properties.get("bank.url");
@@ -515,11 +548,11 @@ public class EbicsClient {
         boolean useCertificates = false;
         boolean saveCertificates = true;
         return createUser(new URL(bankUrl), bankName, hostId, partnerId, userId, userName, userEmail,
-            userCountry, userOrg, useCertificates, saveCertificates, pwdHandler);
+                userCountry, userOrg, useCertificates, saveCertificates, pwdHandler);
     }
 
     private static CommandLine parseArguments(Options options, String[] args)
-        throws ParseException, IOException {
+            throws ParseException, IOException {
         CommandLineParser parser = new DefaultParser();
         options.addOption(null, "help", false, "Print this help text");
         CommandLine line = parser.parse(options, args);
@@ -542,7 +575,7 @@ public class EbicsClient {
         final Locale locale = new Locale(language, country);
 
         DefaultConfiguration configuration = new DefaultConfiguration(rootDir,
-            properties.properties) {
+                properties.properties) {
 
             @Override
             public Locale getLocale() {
@@ -620,12 +653,15 @@ public class EbicsClient {
         addOption(options, OrderType.XCT, "Send XCT file (any format)");
         addOption(options, OrderType.XE2, "Send XE2 file (any format)");
         addOption(options, OrderType.CCT, "Send CCT file (any format)");
+        addOption(options, OrderType.ZS2, "Fetch Camt.054 file 008 version (ZIP)");
+        addOption(options, OrderType.XTD, "Fetch test files Postfinance (ZIP)");
+        addOption(options, OrderType.ZQR, "Fetch test files Postfinance (ZIP)");
+        addOption(options, OrderType.Z54, "Fetch test files Postfinance (ZIP)");
 
         options.addOption(null, "skip_order", true, "Skip a number of order ids");
 
         options.addOption("o", "output", true, "output file");
         options.addOption("i", "input", true, "input file");
-
 
         CommandLine cmd = parseArguments(options, args);
 
@@ -656,30 +692,53 @@ public class EbicsClient {
         String outputFileValue = cmd.getOptionValue("o");
         String inputFileValue = cmd.getOptionValue("i");
 
+        //Ebics 2.X
         var fetchFileOrders = List.of(OrderType.STA, OrderType.VMK,
-            OrderType.C52, OrderType.C53, OrderType.C54,
-            OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
+                OrderType.C52, OrderType.C53, OrderType.C54,
+                OrderType.ZDF, OrderType.ZB6, OrderType.PTK, OrderType.HAC, OrderType.Z01);
 
         for (EbicsOrderType type : fetchFileOrders) {
             if (hasOption(cmd, type)) {
-                client.fetchFile(getOutputFile(outputFileValue), client.defaultUser,
-                    client.defaultProduct, type, false);
+                client.fetchFileV2(getOutputFile(outputFileValue), client.defaultUser,
+                        client.defaultProduct, type, false);
                 break;
             }
         }
 
-        var sendFileOrders = List.of(OrderType.XKD, OrderType.FUL, OrderType.XCT,
-            OrderType.XE2, OrderType.CCT);
+        //Ebics 3.X
+        try {
+            fetchFileOrders = List.of(OrderType.ZS2, OrderType.XTD, OrderType.ZQR, OrderType.Z54);
+
+            for (EbicsOrderType type : fetchFileOrders) {
+
+                if (hasOption(cmd, type)) {
+                    client.fetchFileV3(getOutputFile(outputFileValue), client.defaultUser,
+                            client.defaultProduct, type, false);
+                    break;
+                }
+            }
+        } catch (NoDownloadDataAvailableException nda) {
+            System.out.println(nda.getMessage());
+        }
+        var sendFileOrders = List.of(OrderType.XKD, OrderType.FUL, OrderType.XCT, OrderType.CCT);
         for (EbicsOrderType type : sendFileOrders) {
             if (hasOption(cmd, type)) {
-                client.sendFile(new File(inputFileValue), type);
+                client.sendFileV2(new File(inputFileValue), type);
+                break;
+            }
+        }
+
+        sendFileOrders = List.of(OrderType.XE2);
+        for (EbicsOrderType type : sendFileOrders) {
+            if (hasOption(cmd, type)) {
+                client.sendFileV3(new File(inputFileValue), type);
                 break;
             }
         }
 
         if (cmd.hasOption("skip_order")) {
             int count = Integer.parseInt(cmd.getOptionValue("skip_order"));
-            while(count-- > 0) {
+            while (count-- > 0) {
                 client.defaultUser.getPartner().nextOrderId();
             }
         }

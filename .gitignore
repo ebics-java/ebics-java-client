@@ -2,3 +2,6 @@
 .idea
 *.iml
 /client/
+nb-configuration.xml
+*.pub
+*.key
