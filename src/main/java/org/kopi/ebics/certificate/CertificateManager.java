@@ -42,6 +42,11 @@ import org.kopi.ebics.interfaces.PasswordCallback;
  */
 public class CertificateManager {
 
+  private static final String KEY_LENGTH_PROPERTY = "ebics.key.length";
+  private static final String CERTIFICATE_VALIDITY_YEARS_PROPERTY = "ebics.cert.validity.years";
+  private static final int DEFAULT_KEY_LENGTH = X509Constants.EBICS_KEY_SIZE;
+  private static final int DEFAULT_CERTIFICATE_VALIDITY_YEARS = X509Constants.DEFAULT_DURATION / 365;
+
   public CertificateManager(EbicsUser user) {
     this.user = user;
     generator = new X509Generator();
@@ -54,7 +59,7 @@ public class CertificateManager {
    */
   public void create() throws GeneralSecurityException, IOException {
       Calendar calendar = Calendar.getInstance();
-      calendar.add(Calendar.DAY_OF_YEAR, X509Constants.DEFAULT_DURATION);
+      calendar.add(Calendar.YEAR, resolveCertificateValidityYears());
 
       createA005Certificate(new Date(calendar.getTimeInMillis()));
       createX002Certificate(new Date(calendar.getTimeInMillis()));
@@ -82,7 +87,7 @@ public class CertificateManager {
    * @throws IOException
    */
   public void createA005Certificate(Date end) throws GeneralSecurityException, IOException {
-      KeyPair keypair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE);
+      KeyPair keypair = KeyUtil.makeKeyPair(resolveKeyLength());
       a005Certificate = generator.generateA005Certificate(keypair, user.getDN(), new Date(), end);
       a005PrivateKey = keypair.getPrivate();
   }
@@ -100,7 +105,7 @@ public class CertificateManager {
   public void createX002Certificate(Date end) throws GeneralSecurityException, IOException {
     KeyPair			keypair;
 
-    keypair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE);
+    keypair = KeyUtil.makeKeyPair(resolveKeyLength());
     x002Certificate = generator.generateX002Certificate(keypair,
 	                                                user.getDN(),
 	                                                new Date(),
@@ -117,7 +122,7 @@ public class CertificateManager {
   public void createE002Certificate(Date end) throws GeneralSecurityException, IOException {
     KeyPair			keypair;
 
-    keypair = KeyUtil.makeKeyPair(X509Constants.EBICS_KEY_SIZE);
+    keypair = KeyUtil.makeKeyPair(resolveKeyLength());
     e002Certificate = generator.generateE002Certificate(keypair,
 	                                                user.getDN(),
 	                                                new Date(),
@@ -220,4 +225,20 @@ public class CertificateManager {
   private PrivateKey					a005PrivateKey;
   private PrivateKey					x002PrivateKey;
   private PrivateKey					e002PrivateKey;
+
+  private int resolveKeyLength() {
+      Integer configuredKeyLength = Integer.getInteger(KEY_LENGTH_PROPERTY);
+      if (configuredKeyLength == null || configuredKeyLength <= 0) {
+          return DEFAULT_KEY_LENGTH;
+      }
+      return configuredKeyLength;
+  }
+
+  private int resolveCertificateValidityYears() {
+      Integer configuredYears = Integer.getInteger(CERTIFICATE_VALIDITY_YEARS_PROPERTY);
+      if (configuredYears == null || configuredYears <= 0) {
+          return DEFAULT_CERTIFICATE_VALIDITY_YEARS;
+      }
+      return configuredYears;
+  }
 }
