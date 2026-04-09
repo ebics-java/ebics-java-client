@@ -16,6 +16,22 @@ How to get started:
 
 https://github.com/ebics-java/ebics-java-client/wiki/EBICS-Client-HowTo
 
+Parameterized launcher (without `ebics.txt`):
+
+```
+export EBICS_PASSWORD='changeit'
+export EBICS_USER_ID='USER123'
+export EBICS_PARTNER_ID='PARTNER123'
+export EBICS_HOST_ID='HOST123'
+export EBICS_BANK_URL='https://bank.example/ebics'
+
+mvn exec:java \
+  -Dexec.mainClass=org.kopi.ebics.client.ParameterizedEbicsClientLauncher \
+  -Dexec.args="--create --ini --hia --hpb"
+```
+
+This mode is useful for containerized or ephemeral environments where `ebics.txt` should not be persisted.
+
 You can build it directly from the source with maven or use the releases from [JitPack](https://jitpack.io/#ebics-java/ebics-java-client/).
 
 Gradle:
@@ -47,4 +63,3 @@ Maven
 </dependency>
 ```
  
-
