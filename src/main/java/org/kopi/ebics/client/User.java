@@ -88,6 +88,79 @@ public class User implements EbicsUser, Savable {
   }
 
   /**
+   * First-time constructor that installs externally supplied key material
+   * instead of generating fresh RSA key pairs in-process.
+   *
+   * <p>Use this constructor when the A005/X002/E002 private keys live in an
+   * HSM, a smartcard, or any other PKCS#11 token and must not be materialised
+   * on the JVM heap. The supplied {@link ExternalKeyProvider} is consulted
+   * once for all three roles; the library will not call
+   * {@code KeyUtil.makeKeyPair(...)} for the same user, so there is no
+   * heap-resident duplicate of the on-token key.
+   *
+   * <p>The library does not write a PKCS#12 file for an externally-keyed user
+   * (the private keys may not be exportable). Callers that need to persist a
+   * record of the public certificates should serialise the certificate bytes
+   * separately.
+   *
+   * @param partner customer in whose name we operate.
+   * @param userId UserId as obtained from the bank.
+   * @param name the user name.
+   * @param email the user email.
+   * @param country the user country.
+   * @param organization the user organization or company.
+   * @param passwordCallback a callback-handler that supplies us with the
+   *                         password. This parameter can be null, in which
+   *                         case no password is used.
+   * @param externalKeys the externally-managed key material for A005/X002/E002.
+   *                     Must not be null; each role method must return a
+   *                     non-null {@link ExternalKeyProvider.KeyMaterial}.
+   * @throws IllegalArgumentException if {@code externalKeys} is null or any of
+   *                                  its role accessors return null.
+   * @since 2.1.0
+   */
+  public User(EbicsPartner partner,
+              String userId,
+              String name,
+              String email,
+              String country,
+              String organization,
+              PasswordCallback passwordCallback,
+              ExternalKeyProvider externalKeys)
+  {
+    if (externalKeys == null) {
+      throw new IllegalArgumentException("externalKeys must not be null");
+    }
+    ExternalKeyProvider.KeyMaterial a005 = externalKeys.a005();
+    ExternalKeyProvider.KeyMaterial x002 = externalKeys.x002();
+    ExternalKeyProvider.KeyMaterial e002 = externalKeys.e002();
+    if (a005 == null) {
+      throw new IllegalArgumentException("externalKeys.a005() returned null");
+    }
+    if (x002 == null) {
+      throw new IllegalArgumentException("externalKeys.x002() returned null");
+    }
+    if (e002 == null) {
+      throw new IllegalArgumentException("externalKeys.e002() returned null");
+    }
+
+    this.partner = partner;
+    this.userId = userId;
+    this.name = name;
+    this.dn = makeDN(name, email, country, organization);
+    this.passwordCallback = passwordCallback;
+
+    this.a005PrivateKey = a005.privateKey();
+    this.a005Certificate = a005.certificate();
+    this.x002PrivateKey = x002.privateKey();
+    this.x002Certificate = x002.certificate();
+    this.e002PrivateKey = e002.privateKey();
+    this.e002Certificate = e002.certificate();
+
+    needSave = true;
+  }
+
+  /**
    * Reconstructs a persisted EBICS user.
    *
    * @param partner the customer in whose name we operate.
