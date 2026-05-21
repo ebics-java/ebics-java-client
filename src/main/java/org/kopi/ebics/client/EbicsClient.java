@@ -221,6 +221,58 @@ public class EbicsClient {
         }
     }
 
+    /**
+     * Creates a new EBICS user whose A005/X002/E002 key material is supplied
+     * externally (HSM, smartcard, or any PKCS#11 token). The library will
+     * neither call {@code KeyUtil.makeKeyPair(...)} nor write a PKCS#12 file
+     * for this user &mdash; both would conflict with the no-heap-key contract
+     * that motivates external key custody.
+     *
+     * <p>Bank, partner, and user are persisted via the configured
+     * {@link org.kopi.ebics.interfaces.SerializationManager} just like the
+     * heap-key overload. The INI/HIA letters are also produced (they only
+     * need the public-key bytes that the supplied X.509 certificates expose).
+     *
+     * @param externalKeys the externally-managed key material. Must not be
+     *                     null; each role accessor must return a non-null
+     *                     {@link ExternalKeyProvider.KeyMaterial}.
+     * @return the created {@link User}.
+     * @throws IllegalArgumentException if {@code externalKeys} is null or
+     *                                  partial.
+     * @since 2.1.0
+     */
+    public User createUser(URL url, String bankName, String hostId, String partnerId,
+        String userId, String name, String email, String country, String organization,
+        boolean useCertificates, PasswordCallback passwordCallback,
+        ExternalKeyProvider externalKeys)
+        throws Exception {
+        if (externalKeys == null) {
+            throw new IllegalArgumentException("externalKeys must not be null");
+        }
+        log.info(messages.getString("user.create.info", userId));
+
+        Bank bank = createBank(url, bankName, hostId, useCertificates);
+        Partner partner = createPartner(bank, partnerId);
+        try {
+            User user = new User(partner, userId, name, email, country, organization,
+                passwordCallback, externalKeys);
+            createUserDirectories(user);
+            configuration.getSerializationManager().serialize(bank);
+            configuration.getSerializationManager().serialize(partner);
+            configuration.getSerializationManager().serialize(user);
+            createLetters(user, useCertificates);
+            users.put(userId, user);
+            partners.put(partner.getPartnerId(), partner);
+            banks.put(bank.getHostId(), bank);
+
+            log.info(messages.getString("user.create.success", userId));
+            return user;
+        } catch (Exception e) {
+            log.error(messages.getString("user.create.error"), e);
+            throw e;
+        }
+    }
+
     private void createLetters(EbicsUser user, boolean useCertificates)
         throws GeneralSecurityException, IOException, EbicsException {
         user.getPartner().getBank().setUseCertificate(useCertificates);
