@@ -45,29 +45,19 @@ public class E002Letter extends AbstractInitLetter {
 
     @Override
     public void create(EbicsUser user) throws GeneralSecurityException, IOException, EbicsException {
-        if (user.getPartner().getBank().useCertificate()) {
-            build(user.getPartner().getBank().getHostId(),
-                    user.getPartner().getBank().getName(),
-                    user.getUserId(),
-                    user.getName(),
-                    user.getPartner().getPartnerId(),
-                    getString("HIALetter.e002.version"),
-                    getString("HIALetter.e002.certificate"),
-                    Base64.encodeBase64(user.getE002Certificate(), true),
-                    getString("HIALetter.e002.digest"),
-                    getHash(user.getE002Certificate()));
-        } else {
-            build(user.getPartner().getBank().getHostId(),
-                    user.getPartner().getBank().getName(),
-                    user.getUserId(),
-                    user.getName(),
-                    user.getPartner().getPartnerId(),
-                    getString("HIALetter.e002.version"),
-                    getString("HIALetter.e002.certificate"),
-                    null,
-                    getString("HIALetter.e002.digest"),
-                    getHash(user.getE002PublicKey()));
-        }
+        // EBICS 3.0 (H005): the HIA letter must carry the SHA-256 hash of the
+        // DER-encoded encryption certificate (spec ch. 4.4.1.2.3), matching the
+        // X.509 certificate transmitted in the HIA request.
+        build(user.getPartner().getBank().getHostId(),
+                user.getPartner().getBank().getName(),
+                user.getUserId(),
+                user.getName(),
+                user.getPartner().getPartnerId(),
+                getString("HIALetter.e002.version"),
+                getString("HIALetter.e002.certificate"),
+                Base64.encodeBase64(user.getE002Certificate(), true),
+                getString("HIALetter.e002.digest"),
+                getHash(user.getE002Certificate()));
     }
 
   @Override

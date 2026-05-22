@@ -135,12 +135,10 @@ public class EbicsClient {
      *            the bank name
      * @param hostId
      *            the bank host ID
-     * @param useCertificate
-     *            does the bank use certificates ?
      * @return the created ebics bank
      */
-    private Bank createBank(URL url, String name, String hostId, boolean useCertificate) {
-        Bank bank = new Bank(url, name, hostId, useCertificate);
+    private Bank createBank(URL url, String name, String hostId) {
+        Bank bank = new Bank(url, name, hostId);
         banks.put(hostId, bank);
         return bank;
     }
@@ -180,8 +178,6 @@ public class EbicsClient {
      *            the user country
      * @param organization
      *            the user organization or company
-     * @param useCertificates
-     *            does the bank use certificates ?
      * @param saveCertificates
      *            save generated certificates?
      * @param passwordCallback
@@ -192,11 +188,11 @@ public class EbicsClient {
      */
     public User createUser(URL url, String bankName, String hostId, String partnerId,
         String userId, String name, String email, String country, String organization,
-        boolean useCertificates, boolean saveCertificates, PasswordCallback passwordCallback)
+        boolean saveCertificates, PasswordCallback passwordCallback)
         throws Exception {
         log.info(messages.getString("user.create.info", userId));
 
-        Bank bank = createBank(url, bankName, hostId, useCertificates);
+        Bank bank = createBank(url, bankName, hostId);
         Partner partner = createPartner(bank, partnerId);
         try {
             User user = new User(partner, userId, name, email, country, organization,
@@ -208,7 +204,7 @@ public class EbicsClient {
             configuration.getSerializationManager().serialize(bank);
             configuration.getSerializationManager().serialize(partner);
             configuration.getSerializationManager().serialize(user);
-            createLetters(user, useCertificates);
+            createLetters(user);
             users.put(userId, user);
             partners.put(partner.getPartnerId(), partner);
             banks.put(bank.getHostId(), bank);
@@ -221,9 +217,8 @@ public class EbicsClient {
         }
     }
 
-    private void createLetters(EbicsUser user, boolean useCertificates)
+    private void createLetters(EbicsUser user)
         throws GeneralSecurityException, IOException, EbicsException {
-        user.getPartner().getBank().setUseCertificate(useCertificates);
         LetterManager letterManager = configuration.getLetterManager();
         List<InitLetter> letters = List.of(letterManager.createA005Letter(user),
             letterManager.createE002Letter(user), letterManager.createX002Letter(user));
@@ -512,10 +507,9 @@ public class EbicsClient {
         String userEmail = properties.get("user.email");
         String userCountry = properties.get("user.country");
         String userOrg = properties.get("user.org");
-        boolean useCertificates = false;
         boolean saveCertificates = true;
         return createUser(new URL(bankUrl), bankName, hostId, partnerId, userId, userName, userEmail,
-            userCountry, userOrg, useCertificates, saveCertificates, pwdHandler);
+            userCountry, userOrg, saveCertificates, pwdHandler);
     }
 
     private static CommandLine parseArguments(Options options, String[] args)
@@ -640,7 +634,7 @@ public class EbicsClient {
         }
 
         if (cmd.hasOption("letters")) {
-            client.createLetters(client.defaultUser, false);
+            client.createLetters(client.defaultUser);
         }
 
         if (hasOption(cmd, OrderType.INI)) {

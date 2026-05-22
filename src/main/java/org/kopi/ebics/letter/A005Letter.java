@@ -45,29 +45,19 @@ public class A005Letter extends AbstractInitLetter {
 
     @Override
     public void create(EbicsUser user) throws GeneralSecurityException, IOException, EbicsException {
-        if (user.getPartner().getBank().useCertificate()) {
-            build(user.getPartner().getBank().getHostId(),
-                    user.getPartner().getBank().getName(),
-                    user.getUserId(),
-                    user.getName(),
-                    user.getPartner().getPartnerId(),
-                    getString("INILetter.version"),
-                    getString("INILetter.certificate"),
-                    Base64.encodeBase64(user.getA005Certificate(), true),
-                    getString("INILetter.digest"),
-                    getHash(user.getA005Certificate()));
-        } else {
-            build(user.getPartner().getBank().getHostId(),
-                    user.getPartner().getBank().getName(),
-                    user.getUserId(),
-                    user.getName(),
-                    user.getPartner().getPartnerId(),
-                    getString("INILetter.version"),
-                    getString("INILetter.certificate"),
-                    null,
-                    getString("INILetter.digest"),
-                    getHash(user.getA005PublicKey()));
-        }
+        // EBICS 3.0 (H005): the INI letter must carry the SHA-256 hash of the
+        // DER-encoded signature certificate (spec ch. 4.4.1.2.3), matching the
+        // X.509 certificate transmitted in the INI request.
+        build(user.getPartner().getBank().getHostId(),
+                user.getPartner().getBank().getName(),
+                user.getUserId(),
+                user.getName(),
+                user.getPartner().getPartnerId(),
+                getString("INILetter.version"),
+                getString("INILetter.certificate"),
+                Base64.encodeBase64(user.getA005Certificate(), true),
+                getString("INILetter.digest"),
+                getHash(user.getA005Certificate()));
     }
 
   @Override

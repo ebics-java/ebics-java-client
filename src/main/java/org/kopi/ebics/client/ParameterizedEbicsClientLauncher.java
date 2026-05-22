@@ -99,7 +99,6 @@ public final class ParameterizedEbicsClientLauncher {
                 env("EBICS_USER_EMAIL", userId + "@example.invalid"),
                 env("EBICS_USER_COUNTRY", countryCode),
                 env("EBICS_USER_ORGANIZATION", "EBICS"),
-                resolveUseCertificate(),
                 true,
                 passwordCallback
             );
@@ -222,15 +221,6 @@ public final class ParameterizedEbicsClientLauncher {
         properties.setProperty("languageCode", languageCode);
         properties.setProperty("countryCode", countryCode);
         return properties;
-    }
-
-    private static boolean resolveUseCertificate() {
-        String explicit = normalize(System.getenv("EBICS_USE_CERTIFICATE"));
-        if (explicit != null) {
-            return "true".equalsIgnoreCase(explicit);
-        }
-        String signatureVersion = env("EBICS_SIGNATURE_VERSION", "A005");
-        return "A006".equalsIgnoreCase(signatureVersion);
     }
 
     private static void ensureLoadedUserMatchesConfiguredEndpoint(
