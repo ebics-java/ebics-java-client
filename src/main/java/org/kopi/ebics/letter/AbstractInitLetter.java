@@ -26,10 +26,11 @@ import java.io.Writer;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
+import java.util.HexFormat;
 import java.util.Locale;
 
-import org.apache.commons.codec.binary.Hex;
 import org.kopi.ebics.interfaces.InitLetter;
 import org.kopi.ebics.messages.Messages;
 
@@ -103,9 +104,27 @@ public abstract class AbstractInitLetter implements InitLetter {
    * @throws GeneralSecurityException
    */
   protected byte[] getHash(byte[] certificate) throws GeneralSecurityException {
-    String hash256 = new String(
-        Hex.encodeHex(MessageDigest.getInstance("SHA-256").digest(certificate), false));
+    String hash256 = HexFormat.of().withUpperCase().formatHex(
+        MessageDigest.getInstance("SHA-256").digest(certificate));
     return format(hash256).getBytes();
+  }
+
+  /**
+   * Encodes {@code data} as MIME Base64 (76-character lines separated by CRLF)
+   * with a trailing CRLF, matching the historical commons-codec
+   * {@code Base64.encodeBase64(data, true)} byte-for-byte so PEM-style blocks
+   * in the letter keep the {@code -----END CERTIFICATE-----} marker on its own line.
+   */
+  protected static byte[] chunkedBase64(byte[] data) {
+    byte[] encoded = Base64.getMimeEncoder().encode(data);
+    if (encoded.length == 0) {
+      return encoded;
+    }
+    byte[] result = new byte[encoded.length + 2];
+    System.arraycopy(encoded, 0, result, 0, encoded.length);
+    result[encoded.length] = '\r';
+    result[encoded.length + 1] = '\n';
+    return result;
   }
 
   /**

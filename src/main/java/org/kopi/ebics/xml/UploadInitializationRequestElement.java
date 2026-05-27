@@ -22,9 +22,9 @@ package org.kopi.ebics.xml;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.Base64;
 import java.util.Calendar;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.xmlbeans.XmlObject;
 import org.kopi.ebics.client.EbicsUploadParams;
 import org.kopi.ebics.exception.EbicsException;
@@ -133,7 +133,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
         String digest;
         try {
             // TODO: check if this is correct
-            digest = Base64.encodeBase64String(MessageDigest.getInstance("SHA-256", "BC").digest(this.userData));
+            digest = Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256", "BC").digest(this.userData));
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new EbicsException(e);
         }

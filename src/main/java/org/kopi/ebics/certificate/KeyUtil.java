@@ -26,8 +26,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPublicKey;
+import java.util.HexFormat;
 
-import org.apache.commons.codec.binary.Hex;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.utils.Utils;
 
@@ -80,8 +80,8 @@ public final class KeyUtil {
     String			hash;
     byte[]			digest;
 
-    exponent = Hex.encodeHexString(publicKey.getPublicExponent().toByteArray());
-    modulus =  Hex.encodeHexString(removeFirstByte(publicKey.getModulus().toByteArray()));
+    exponent = HexFormat.of().formatHex(publicKey.getPublicExponent().toByteArray());
+    modulus =  HexFormat.of().formatHex(removeFirstByte(publicKey.getModulus().toByteArray()));
     hash = exponent + " " + modulus;
 
     if (hash.charAt(0) == '0') {
@@ -95,7 +95,7 @@ public final class KeyUtil {
       throw new EbicsException(e.getMessage());
     }
 
-      return new String(Hex.encodeHex(digest, false)).getBytes();
+      return HexFormat.of().withUpperCase().formatHex(digest).getBytes(StandardCharsets.US_ASCII);
   }
 
   /**

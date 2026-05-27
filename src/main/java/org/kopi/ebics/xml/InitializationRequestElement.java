@@ -21,12 +21,11 @@ package org.kopi.ebics.xml;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.HexFormat;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsOrderType;
@@ -120,8 +119,8 @@ public abstract class InitializationRequestElement extends DefaultEbicsRootEleme
     }
 
     try {
-      return Hex.decodeHex(new String(hex).toCharArray());
-    } catch (DecoderException e) {
+      return HexFormat.of().parseHex(new String(hex));
+    } catch (IllegalArgumentException e) {
       throw new EbicsException(e.getMessage());
     }
   }

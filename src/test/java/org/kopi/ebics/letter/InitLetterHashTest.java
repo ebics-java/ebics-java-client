@@ -6,9 +6,9 @@ import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.Security;
+import java.util.HexFormat;
 import java.util.Locale;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.xml.security.Init;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.Test;
@@ -52,8 +52,8 @@ class InitLetterHashTest {
         // lines; strip whitespace so we can match the contiguous hex digest.
         String despaced = out.toString().replaceAll("\\s", "").toUpperCase(Locale.ROOT);
 
-        String expected = Hex.encodeHexString(
-            MessageDigest.getInstance("SHA-256").digest(der)).toUpperCase(Locale.ROOT);
+        String expected = HexFormat.of().withUpperCase().formatHex(
+            MessageDigest.getInstance("SHA-256").digest(der));
 
         assertTrue(despaced.contains(expected),
             letter.getClass().getSimpleName()
