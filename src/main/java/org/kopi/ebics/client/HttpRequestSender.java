@@ -19,23 +19,16 @@
 package org.kopi.ebics.client;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.Authenticator;
+import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
+import java.net.ProxySelector;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.EntityBuilder;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.ProxyAuthenticationStrategy;
-import org.apache.http.util.EntityUtils;
 import org.kopi.ebics.interfaces.Configuration;
 import org.kopi.ebics.interfaces.ContentFactory;
 import org.kopi.ebics.io.ByteArrayContentFactory;
@@ -48,9 +41,12 @@ import org.kopi.ebics.session.EbicsSession;
  */
 public class HttpRequestSender {
 
+    private static final Duration TIMEOUT = Duration.ofSeconds(300);
+    private static final String CONTENT_TYPE = "text/xml; charset=ISO-8859-1";
+
     private final EbicsSession session;
     private ContentFactory response;
-    private final CloseableHttpClient httpClient;
+    private final HttpClient httpClient;
 
     /**
      * Constructs a new <code>HttpRequestSender</code> with a given ebics
@@ -63,32 +59,31 @@ public class HttpRequestSender {
         this.httpClient = createClient();
     }
 
-    private CloseableHttpClient createClient() {
-        RequestConfig.Builder configBuilder = RequestConfig.copy(RequestConfig.DEFAULT)
-            .setSocketTimeout(300_000).setConnectTimeout(300_000);
+    private HttpClient createClient() {
+        HttpClient.Builder builder = HttpClient.newBuilder().connectTimeout(TIMEOUT);
         Configuration conf = session.getConfiguration();
         String proxyHost = conf.getProperty("http.proxy.host");
-        CredentialsProvider credsProvider = null;
 
         if (proxyHost != null && !proxyHost.isEmpty()) {
             int proxyPort = Integer.parseInt(conf.getProperty("http.proxy.port").trim());
-            HttpHost proxy = new HttpHost(proxyHost.trim(), proxyPort);
-            configBuilder.setProxy(proxy);
+            builder.proxy(ProxySelector.of(new InetSocketAddress(proxyHost.trim(), proxyPort)));
 
             String user = conf.getProperty("http.proxy.user");
             if (user != null && !user.isEmpty()) {
-                user = user.trim();
+                String trimmedUser = user.trim();
                 String pwd = conf.getProperty("http.proxy.password").trim();
-                credsProvider = new BasicCredentialsProvider();
-                credsProvider.setCredentials(new AuthScope(proxyHost, proxyPort),
-                    new UsernamePasswordCredentials(user, pwd));
+                builder.authenticator(new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        // Only answer proxy challenges — never leak proxy
+                        // credentials to a server-side 401.
+                        if (getRequestorType() != RequestorType.PROXY) {
+                            return null;
+                        }
+                        return new PasswordAuthentication(trimmedUser, pwd.toCharArray());
+                    }
+                });
             }
-        }
-        HttpClientBuilder builder = HttpClientBuilder.create()
-            .setDefaultRequestConfig(configBuilder.build());
-        if (credsProvider != null) {
-            builder.setDefaultCredentialsProvider(credsProvider);
-            builder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
         }
         return builder.build();
     }
@@ -102,19 +97,28 @@ public class HttpRequestSender {
      * @return the HTTP return code
      */
     public final int send(ContentFactory request) throws IOException {
-        InputStream input = request.getContent();
-        HttpPost method = new HttpPost(
-            session.getUser().getPartner().getBank().getURL().toString());
+        URI uri = URI.create(session.getUser().getPartner().getBank().getURL().toString());
+        HttpRequest httpRequest = HttpRequest.newBuilder(uri)
+            .timeout(TIMEOUT)
+            .header("Content-Type", CONTENT_TYPE)
+            .POST(HttpRequest.BodyPublishers.ofInputStream(() -> {
+                try {
+                    return request.getContent();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }))
+            .build();
 
-        HttpEntity requestEntity = EntityBuilder.create().setStream(input).build();
-        method.setEntity(requestEntity);
-        method.setHeader(HttpHeaders.CONTENT_TYPE, "text/xml; charset=ISO-8859-1");
-
-        try (CloseableHttpResponse response = httpClient.execute(method)) {
-            this.response = new ByteArrayContentFactory(
-                EntityUtils.toByteArray(response.getEntity()));
-            return response.getStatusLine().getStatusCode();
+        HttpResponse<byte[]> httpResponse;
+        try {
+            httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofByteArray());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException("HTTP request interrupted", e);
         }
+        this.response = new ByteArrayContentFactory(httpResponse.body());
+        return httpResponse.statusCode();
     }
 
     /**
