@@ -32,34 +32,59 @@ mvn exec:java \
 
 This mode is useful for containerized or ephemeral environments where `ebics.txt` should not be persisted.
 
-You can build it directly from the source with maven or use the releases from [JitPack](https://jitpack.io/#ebics-java/ebics-java-client/).
+The library is published to [Maven Central](https://central.sonatype.com/artifact/io.github.ebics-java/ebics-java-client).
+
+Maven:
+```
+<dependency>
+    <groupId>io.github.ebics-java</groupId>
+    <artifactId>ebics-java-client</artifactId>
+    <version>2.1.0</version>
+</dependency>
+```
 
 Gradle:
 ```
-allprojects {
-  repositories {
-    ...
-    maven { url 'https://jitpack.io' }
-  }
-}
-
 dependencies {
-    implementation 'com.github.ebics-java:ebics-java-client:2.0.0'
+    implementation 'io.github.ebics-java:ebics-java-client:2.1.0'
 }
 ```
-Maven
+
+You can also build it directly from the source with Maven (`./mvnw clean install`).
+See [RELEASING.md](RELEASING.md) for how releases are published to Maven Central.
+
+### Snapshot / unreleased builds via JitPack
+
+To pull in a specific commit or an unreleased version (any tag, branch, or commit hash) before it
+reaches Maven Central, use [JitPack](https://jitpack.io/#ebics-java/ebics-java-client):
+
+Maven:
 ```
 <repositories>
-	<repository>
-	    <id>jitpack.io</id>
-	    <url>https://jitpack.io</url>
-	</repository>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
 </repositories>
 
 <dependency>
     <groupId>com.github.ebics-java</groupId>
     <artifactId>ebics-java-client</artifactId>
-    <version>2.0.0</version>
+    <version>master-SNAPSHOT</version> <!-- or a tag, branch, or commit hash -->
 </dependency>
 ```
- 
+
+Gradle:
+```
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.ebics-java:ebics-java-client:master-SNAPSHOT'
+}
+```
+
+Note that JitPack builds keep the `com.github.ebics-java` group id (derived from the GitHub repo),
+whereas released artifacts on Maven Central use `io.github.ebics-java`.
+

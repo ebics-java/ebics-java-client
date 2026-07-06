@@ -1,12 +1,38 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.kopi</groupId>
-    <artifactId>ebics</artifactId>
+    <groupId>io.github.ebics-java</groupId>
+    <artifactId>ebics-java-client</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.0</version>
-    <name>ebics</name>
+    <version>2.1.0</version>
+    <name>EBICS Java Client</name>
+    <description>EBICS (Electronic Banking Internet Communication Standard) client library for Java.
+        Supports EBICS 3.0 and French, German and Swiss banks, with a command line client for
+        bank setup, key initialization and file download.</description>
     <url>https://github.com/ebics-java/ebics-java-client</url>
+
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License, Version 2.1</name>
+            <url>https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>ebics-java</id>
+            <name>EBICS Java Client contributors</name>
+            <url>https://github.com/ebics-java/ebics-java-client/graphs/contributors</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/ebics-java/ebics-java-client.git</connection>
+        <developerConnection>scm:git:git@github.com:ebics-java/ebics-java-client.git</developerConnection>
+        <url>https://github.com/ebics-java/ebics-java-client</url>
+        <tag>HEAD</tag>
+    </scm>
     <dependencies>
         <dependency>
             <groupId>org.apache.xmlbeans</groupId>
@@ -81,7 +107,13 @@
                     <xmlConfigs>
                         src/main/xsd/config/config.xsdconfig
                     </xmlConfigs>
-
+                    <!--
+                      Pin the generated metadata package and schema-system name to fixed, valid Java
+                      identifiers. Both default to the Maven coordinates, which now contain hyphens
+                      (io.github.ebics-java / ebics-java-client) and would produce an invalid package.
+                    -->
+                    <name>ebics</name>
+                    <repackage>org.kopi.ebics.metadata</repackage>
                 </configuration>
             </plugin>
             <plugin>
@@ -115,4 +147,76 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <!--
+      The `release` profile is only needed to publish to Maven Central. It adds a Javadoc jar,
+      GPG signatures and the Central Portal publishing plugin. A normal build/install
+      (`./mvnw clean install`) does NOT activate it, so the library can be built locally without
+      any signing keys or Central credentials. See scripts/release.sh and RELEASING.md.
+    -->
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.12.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <!-- The XMLBeans-generated sources are not Javadoc-clean; don't fail the release on them. -->
+                            <doclint>none</doclint>
+                            <failOnError>false</failOnError>
+                            <quiet>true</quiet>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.8</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <!--
+                                      Use the built-in BouncyCastle signer: no `gpg` binary or keyring needed.
+                                      The armored private key and its passphrase are read from the environment
+                                      (MAVEN_GPG_KEY / MAVEN_GPG_PASSPHRASE), which scripts/release.sh populates
+                                      from the out-of-repo credentials file.
+                                    -->
+                                    <signer>bc</signer>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.11.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <!-- Credentials come from the <server id="central"> entry in release-settings.xml. -->
+                            <publishingServerId>central</publishingServerId>
+                            <!-- Upload to a staged deployment; publish manually from the Central Portal after review. -->
+                            <autoPublish>false</autoPublish>
+                            <!-- Name the deployment after its coordinates (otherwise it shows as "Deployment"). -->
+                            <deploymentName>${project.groupId}:${project.artifactId}:${project.version}</deploymentName>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

@@ -1,0 +1,22 @@
+# Controls how GitHub groups the auto-generated release notes
+# (used by `gh release create --generate-notes` and the "Generate release notes" button).
+# PRs are bucketed by their labels; anything unlabeled falls under "Other changes".
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: New Features & Enhancements
+      labels:
+        - enhancement
+        - feature
+    - title: Bug Fixes
+      labels:
+        - bug
+        - fix
+    - title: Dependency Updates
+      labels:
+        - dependencies
+    - title: Other Changes
+      labels:
+        - "*"
