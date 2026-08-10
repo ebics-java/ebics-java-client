@@ -413,6 +413,17 @@ public class EbicsClient {
 
     public void fetchFile(File file, User user, Product product, EbicsOrderType orderType,
         boolean isTest) throws IOException, EbicsException {
+        fetchFile(file, user, product, orderType, null, isTest);
+    }
+
+    /**
+     * Downloads a file from the bank.
+     *
+     * @param downloadParams optional EBICS 3.0 service parameters and report period; with a
+     *        service name set the order is sent as a BTD business transaction format order
+     */
+    public void fetchFile(File file, User user, Product product, EbicsOrderType orderType,
+        EbicsDownloadParams downloadParams, boolean isTest) throws IOException, EbicsException {
         FileTransfer transferManager;
         EbicsSession session = createSession(user, product);
         session.addSessionParam("FORMAT", "pain.xxx.cfonb160.dct");
@@ -425,7 +436,7 @@ public class EbicsClient {
             configuration.getTransferTraceDirectory(user));
 
         try {
-            transferManager.fetchFile(orderType, file);
+            transferManager.fetchFile(orderType, downloadParams, file);
         } catch (NoDownloadDataAvailableException e) {
             // don't log this exception as an error, caller can decide how to handle
             throw e;
@@ -437,7 +448,8 @@ public class EbicsClient {
 
     public void fetchFile(File file, EbicsOrderType orderType, Date start, Date end) throws IOException,
         EbicsException {
-        fetchFile(file, defaultUser, defaultProduct, orderType, false);
+        fetchFile(file, defaultUser, defaultProduct, orderType,
+            EbicsDownloadParams.dateRangeOnly(start, end), false);
     }
 
     /**

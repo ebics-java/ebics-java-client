@@ -20,11 +20,18 @@ package org.kopi.ebics.client;
 
 import java.io.File;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import org.kopi.ebics.interfaces.EbicsBank;
+import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.interfaces.EbicsPartner;
 import org.kopi.ebics.interfaces.PasswordCallback;
 import org.kopi.ebics.session.DefaultConfiguration;
@@ -41,8 +48,15 @@ public final class ParameterizedEbicsClientLauncher {
         "--ini",
         "--hia",
         "--hpb",
-        "--help"
+        "--help",
+        "--btd"
     );
+
+    /**
+     * EBICS 3.0 business transaction downloads always use the admin order type {@code BTD}; the
+     * business order is carried by the service parameters instead of the 3-letter code.
+     */
+    private static final EbicsOrderType BTD_ORDER_TYPE = () -> "BTD";
 
     private ParameterizedEbicsClientLauncher() {
     }
@@ -117,6 +131,20 @@ public final class ParameterizedEbicsClientLauncher {
             client.sendHPBRequest(user, product);
         }
 
+        if (parsedArguments.hasFlag("--btd")) {
+            EbicsDownloadParams downloadParams = btdDownloadParams(parsedArguments);
+            client.fetchFile(
+                new File(requireOutputPath(parsedArguments)),
+                user,
+                product,
+                BTD_ORDER_TYPE,
+                downloadParams,
+                Boolean.parseBoolean(env("EBICS_TEST_MODE", "false"))
+            );
+            client.quit();
+            return;
+        }
+
         String orderFlag = parsedArguments.firstOrderFlag();
         if (orderFlag != null) {
             OrderType orderType = OrderType.valueOf(orderFlag.substring(2).toUpperCase(Locale.ROOT));
@@ -129,16 +157,15 @@ public final class ParameterizedEbicsClientLauncher {
                     defaultUploadParams(user, orderType)
                 );
             } else if (parsedArguments.outputPath() != null) {
-                if (parsedArguments.startDate() != null || parsedArguments.endDate() != null) {
-                    System.err.println(
-                        "Date range arguments are ignored in parameterized mode for this order type."
-                    );
-                }
                 client.fetchFile(
                     new File(parsedArguments.outputPath()),
                     user,
                     product,
                     orderType,
+                    EbicsDownloadParams.dateRangeOnly(
+                        parseDate(parsedArguments.startDate(), "--start"),
+                        parseDate(parsedArguments.endDate(), "--end")
+                    ),
                     Boolean.parseBoolean(env("EBICS_TEST_MODE", "false"))
                 );
             }
@@ -149,10 +176,65 @@ public final class ParameterizedEbicsClientLauncher {
 
     private static void printUsage() {
         String usage = "Usage: ParameterizedEbicsClientLauncher [--create] [--ini] [--hia] [--hpb]"
-            + " [--<order>] [-i inputFile] [-o outputFile]\n"
+            + " [--<order>] [-i inputFile] [-o outputFile] [-s start] [-e end]\n"
+            + "EBICS 3.0 download: --btd --service <NAME> --scope <CC> --msg-name <name>"
+            + " --msg-version <vv> --container <XML|ZIP|SVC>"
+            + " [--option <OPT>] [-s YYYY-MM-DD] [-e YYYY-MM-DD] -o <file>\n"
+            + "  e.g. --btd --service EOP --scope CH --msg-name camt.053 --msg-version 08"
+            + " --container ZIP -o statement.zip\n"
             + "Required environment variables: EBICS_PASSWORD, EBICS_USER_ID, EBICS_PARTNER_ID,"
             + " EBICS_HOST_ID, EBICS_BANK_URL";
         System.out.println(usage);
+    }
+
+    /**
+     * Builds the EBICS 3.0 service parameters for {@code --btd}. Fails fast on a missing mandatory
+     * value, so a half-filled order is never sent to the bank.
+     */
+    static EbicsDownloadParams btdDownloadParams(ParsedArguments parsedArguments) {
+        // A half date range would be dropped silently further down, which is exactly how a
+        // catch-up run loses the days it was supposed to fetch.
+        if ((parsedArguments.startDate() == null) != (parsedArguments.endDate() == null)) {
+            throw new IllegalArgumentException(
+                "Options --start and --end must be given together, a single one is ignored"
+                    + " by the bank request");
+        }
+        return new EbicsDownloadParams(
+            requireOption(parsedArguments.serviceName(), "--service"),
+            requireOption(parsedArguments.scope(), "--scope"),
+            parsedArguments.option(),
+            requireOption(parsedArguments.messageName(), "--msg-name"),
+            requireOption(parsedArguments.messageVersion(), "--msg-version"),
+            requireOption(parsedArguments.containerType(), "--container"),
+            parseDate(parsedArguments.startDate(), "--start"),
+            parseDate(parsedArguments.endDate(), "--end")
+        );
+    }
+
+    static String requireOutputPath(ParsedArguments parsedArguments) {
+        return requireOption(parsedArguments.outputPath(), "-o");
+    }
+
+    private static String requireOption(String value, String option) {
+        String normalized = normalize(value);
+        if (normalized == null) {
+            throw new IllegalArgumentException("Missing required option " + option + " for --btd");
+        }
+        return normalized;
+    }
+
+    private static Date parseDate(String value, String option) {
+        String normalized = normalize(value);
+        if (normalized == null) {
+            return null;
+        }
+        try {
+            return Date.from(LocalDate.parse(normalized)
+                .atStartOfDay(ZoneId.systemDefault()).toInstant());
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException(
+                "Option " + option + " expects a date as YYYY-MM-DD but was: " + normalized);
+        }
     }
 
     private static EbicsUploadParams defaultUploadParams(User user, OrderType orderType) {
@@ -290,6 +372,7 @@ public final class ParameterizedEbicsClientLauncher {
 
     static final class ParsedArguments {
         private final Set<String> flags = new LinkedHashSet<>();
+        private final Map<String, String> values;
         private final String inputPath;
         private final String outputPath;
         private final String startDate;
@@ -297,20 +380,33 @@ public final class ParameterizedEbicsClientLauncher {
 
         private ParsedArguments(
             Set<String> flags,
+            Map<String, String> values,
             String inputPath,
             String outputPath,
             String startDate,
             String endDate
         ) {
             this.flags.addAll(flags);
+            this.values = Map.copyOf(values);
             this.inputPath = inputPath;
             this.outputPath = outputPath;
             this.startDate = startDate;
             this.endDate = endDate;
         }
 
+        /** Value options of the EBICS 3.0 service block; each consumes the following argument. */
+        private static final Set<String> VALUE_OPTIONS = Set.of(
+            "--service",
+            "--scope",
+            "--option",
+            "--msg-name",
+            "--msg-version",
+            "--container"
+        );
+
         static ParsedArguments parse(String[] args) {
             Set<String> flags = new LinkedHashSet<>();
+            Map<String, String> values = new LinkedHashMap<>();
             String inputPath = null;
             String outputPath = null;
             String startDate = null;
@@ -337,12 +433,17 @@ public final class ParameterizedEbicsClientLauncher {
                         endDate = requireValue(args, ++index, arg);
                         continue;
                     }
+                    String lowered = arg.toLowerCase(Locale.ROOT);
+                    if (VALUE_OPTIONS.contains(lowered)) {
+                        values.put(lowered, requireValue(args, ++index, arg));
+                        continue;
+                    }
                     if (arg.startsWith("--")) {
-                        flags.add(arg.toLowerCase(Locale.ROOT));
+                        flags.add(lowered);
                     }
                 }
             }
-            return new ParsedArguments(flags, inputPath, outputPath, startDate, endDate);
+            return new ParsedArguments(flags, values, inputPath, outputPath, startDate, endDate);
         }
 
         private static String requireValue(String[] args, int index, String option) {
@@ -392,6 +493,30 @@ public final class ParameterizedEbicsClientLauncher {
 
         String endDate() {
             return endDate;
+        }
+
+        String serviceName() {
+            return values.get("--service");
+        }
+
+        String scope() {
+            return values.get("--scope");
+        }
+
+        String option() {
+            return values.get("--option");
+        }
+
+        String messageName() {
+            return values.get("--msg-name");
+        }
+
+        String messageVersion() {
+            return values.get("--msg-version");
+        }
+
+        String containerType() {
+            return values.get("--container");
         }
     }
 }
