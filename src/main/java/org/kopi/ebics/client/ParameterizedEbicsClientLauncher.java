@@ -68,6 +68,11 @@ public final class ParameterizedEbicsClientLauncher {
             return;
         }
 
+        // Every argument is checked before the first environment read, keystore access or bank
+        // call. INI is one-shot at most banks: aborting on a missing --container after the INI
+        // request has gone out would leave a half-initialised access behind.
+        validateArguments(parsedArguments);
+
         String passphrase = requiredEnv("EBICS_PASSWORD");
         String userId = requiredEnv("EBICS_USER_ID");
         String partnerId = requiredEnv("EBICS_PARTNER_ID");
@@ -162,10 +167,7 @@ public final class ParameterizedEbicsClientLauncher {
                     user,
                     product,
                     orderType,
-                    EbicsDownloadParams.dateRangeOnly(
-                        parseDate(parsedArguments.startDate(), "--start"),
-                        parseDate(parsedArguments.endDate(), "--end")
-                    ),
+                    legacyDownloadParams(parsedArguments),
                     Boolean.parseBoolean(env("EBICS_TEST_MODE", "false"))
                 );
             }
@@ -188,24 +190,49 @@ public final class ParameterizedEbicsClientLauncher {
     }
 
     /**
+     * Rejects every unusable argument combination before the program talks to anyone. Nothing here
+     * touches the network, the filesystem or the environment.
+     */
+    static void validateArguments(ParsedArguments parsedArguments) {
+        if (parsedArguments.hasFlag("--btd")) {
+            btdDownloadParams(parsedArguments);
+            requireOutputPath(parsedArguments);
+        } else {
+            legacyDownloadParams(parsedArguments);
+        }
+    }
+
+    /**
      * Builds the EBICS 3.0 service parameters for {@code --btd}. Fails fast on a missing mandatory
-     * value, so a half-filled order is never sent to the bank.
+     * value, so a half-filled order is never sent to the bank. The date range pair itself is
+     * checked by {@link EbicsDownloadParams}, which covers every other caller too.
      */
     static EbicsDownloadParams btdDownloadParams(ParsedArguments parsedArguments) {
-        // A half date range would be dropped silently further down, which is exactly how a
-        // catch-up run loses the days it was supposed to fetch.
-        if ((parsedArguments.startDate() == null) != (parsedArguments.endDate() == null)) {
-            throw new IllegalArgumentException(
-                "Options --start and --end must be given together, a single one is ignored"
-                    + " by the bank request");
-        }
         return new EbicsDownloadParams(
-            requireOption(parsedArguments.serviceName(), "--service"),
-            requireOption(parsedArguments.scope(), "--scope"),
-            parsedArguments.option(),
+            upperCase(requireOption(parsedArguments.serviceName(), "--service")),
+            upperCase(requireOption(parsedArguments.scope(), "--scope")),
+            upperCase(parsedArguments.option()),
             requireOption(parsedArguments.messageName(), "--msg-name"),
             requireOption(parsedArguments.messageVersion(), "--msg-version"),
-            requireOption(parsedArguments.containerType(), "--container"),
+            upperCase(requireOption(parsedArguments.containerType(), "--container")),
+            parseDate(parsedArguments.startDate(), "--start"),
+            parseDate(parsedArguments.endDate(), "--end")
+        );
+    }
+
+    /**
+     * Service code, scope, service option and container type are EBICS code list values and are
+     * always upper case. Message names like {@code camt.053} are not, and stay untouched.
+     */
+    private static String upperCase(String value) {
+        return value == null ? null : value.toUpperCase(Locale.ROOT);
+    }
+
+    /**
+     * Builds the date-range-only parameters of the legacy (EBICS 2.x) download path.
+     */
+    static EbicsDownloadParams legacyDownloadParams(ParsedArguments parsedArguments) {
+        return EbicsDownloadParams.dateRangeOnly(
             parseDate(parsedArguments.startDate(), "--start"),
             parseDate(parsedArguments.endDate(), "--end")
         );
@@ -223,14 +250,17 @@ public final class ParameterizedEbicsClientLauncher {
         return normalized;
     }
 
-    private static Date parseDate(String value, String option) {
+    /**
+     * Parses a {@code YYYY-MM-DD} argument into a calendar day. No timezone is involved, so the
+     * day the user typed is the day that reaches the bank, wherever the job runs.
+     */
+    private static LocalDate parseDate(String value, String option) {
         String normalized = normalize(value);
         if (normalized == null) {
             return null;
         }
         try {
-            return Date.from(LocalDate.parse(normalized)
-                .atStartOfDay(ZoneId.systemDefault()).toInstant());
+            return LocalDate.parse(normalized);
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException(
                 "Option " + option + " expects a date as YYYY-MM-DD but was: " + normalized);

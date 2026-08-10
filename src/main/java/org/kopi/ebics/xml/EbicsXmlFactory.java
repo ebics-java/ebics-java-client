@@ -18,6 +18,7 @@
 
 package org.kopi.ebics.xml;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
@@ -934,12 +935,15 @@ public final class EbicsXmlFactory {
      * @param messageVersion the message version, e.g. {@code 08}
      * @param containerType  the container type ({@code XML}, {@code ZIP} or {@code SVC});
      *                       may be {@code null}
-     * @param start          the start of the requested report period; may be {@code null}
-     * @param end            the end of the requested report period; may be {@code null}
+     * @param start          the first calendar day of the requested report period; may be
+     *                       {@code null}
+     * @param end            the last calendar day of the requested report period; may be
+     *                       {@code null}
      * @return the <code>BTDParamsType</code> XML object
      */
     public static BTDParamsType createBTDParams(String serviceName, String scope, String option,
-        String messageName, String messageVersion, String containerType, Date start, Date end) {
+        String messageName, String messageVersion, String containerType,
+        LocalDate start, LocalDate end) {
         var type = BTDParamsType.Factory.newInstance();
         var service = type.addNewService();
         service.setServiceName(serviceName);
@@ -972,14 +976,15 @@ public final class EbicsXmlFactory {
     }
 
     /**
-     * Converts a date into an <code>xs:date</code> value without a timezone offset. Passing a
-     * {@link Calendar} instead would make XMLBeans append the local offset (e.g.
-     * {@code 2026-08-10+02:00}), which shifts the reported day for a bank in another timezone.
+     * Converts a calendar day into an <code>xs:date</code> value. No timezone is involved in
+     * either direction: setting a {@link Calendar} would make XMLBeans append the local offset
+     * (e.g. {@code 2026-08-10+02:00}), which shifts the reported day for a bank in another
+     * timezone, and converting through an instant would make the day itself depend on the
+     * machine's zone.
      */
-    private static DateType toXmlDate(Date date) {
+    private static DateType toXmlDate(LocalDate date) {
         var value = DateType.Factory.newInstance();
-        value.setStringValue(
-            date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+        value.setStringValue(date.toString());
         return value;
     }
 
@@ -1034,19 +1039,43 @@ public final class EbicsXmlFactory {
     }
 
     /**
-     * Creates a new <code>DateRange</code> XML object
+     * Creates a new <code>DateRange</code> XML object.
+     *
+     * <p><b>A {@link Date} is an instant, the EBICS date range is a pair of calendar days.</b>
+     * The calendar day is therefore taken in the timezone of the machine running this code: a
+     * {@code Date} at UTC midnight becomes the previous day in any zone west of UTC. Prefer
+     * {@link #createDateRange(LocalDate, LocalDate)} — that overload has no timezone in it.
      *
      * @param start the start range
      * @param end   the end range
      * @return the <code>DateRange</code> XML object
      */
     public static StandardOrderParamsType.DateRange createDateRange(Date start, Date end) {
+        return createDateRange(toLocalDate(start), toLocalDate(end));
+    }
+
+    /**
+     * Creates a new <code>DateRange</code> XML object from two calendar days.
+     *
+     * @param start the first day of the range
+     * @param end   the last day of the range
+     * @return the <code>DateRange</code> XML object
+     */
+    public static StandardOrderParamsType.DateRange createDateRange(LocalDate start, LocalDate end) {
         StandardOrderParamsType.DateRange newDateRange = StandardOrderParamsType.DateRange.Factory.newInstance();
 
         newDateRange.xsetStart(toXmlDate(start));
         newDateRange.xsetEnd(toXmlDate(end));
 
         return newDateRange;
+    }
+
+    /**
+     * Reads the calendar day out of an instant, in the timezone of this machine. Only for the
+     * {@link Date}-based compatibility overloads; anything new should carry a {@link LocalDate}.
+     */
+    public static LocalDate toLocalDate(Date date) {
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
 //    /**
