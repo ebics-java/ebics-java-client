@@ -58,6 +58,7 @@ import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.session.OrderType;
 import org.kopi.ebics.session.Product;
 import org.kopi.ebics.utils.Constants;
+import org.kopi.ebics.xml.EbicsXmlFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -446,10 +447,22 @@ public class EbicsClient {
         }
     }
 
+    /**
+     * Downloads a file for a report period.
+     *
+     * <p><b>A {@link Date} is an instant, the EBICS report period is a pair of calendar days.</b>
+     * The calendar day is therefore read in the timezone of the machine running this code, so a
+     * {@code Date} at UTC midnight becomes the previous day in any zone west of UTC. Prefer
+     * {@link #fetchFile(File, User, Product, EbicsOrderType, EbicsDownloadParams, boolean)} with
+     * {@link java.time.LocalDate} values, which has no timezone in it.
+     */
     public void fetchFile(File file, EbicsOrderType orderType, Date start, Date end) throws IOException,
         EbicsException {
         fetchFile(file, defaultUser, defaultProduct, orderType,
-            EbicsDownloadParams.dateRangeOnly(start, end), false);
+            EbicsDownloadParams.dateRangeOnly(
+                start == null ? null : EbicsXmlFactory.toLocalDate(start),
+                end == null ? null : EbicsXmlFactory.toLocalDate(end)),
+            false);
     }
 
     /**

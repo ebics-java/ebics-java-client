@@ -5,9 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.TimeZone;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlOptions;
 import org.junit.jupiter.api.Test;
@@ -45,12 +44,32 @@ class DownloadInitializationRequestElementTest {
     }
 
     /**
-     * Der Kalendertag wird lokal gebildet, damit die Behauptung in jeder Zeitzone haelt.
-     * Fixe Epoch-Millis wuerden westlich von UTC auf den Vortag rutschen.
+     * I-2: der Kalendertag darf nicht an der Zeitzone des Rechners haengen. Frueher lief er als
+     * {@code Date} durch {@code ZoneId.systemDefault()} und wurde westlich von UTC zum Vortag.
      */
-    private static Date localDate(int year, int month, int day) {
-        return Date.from(LocalDate.of(year, month, day)
-            .atStartOfDay(ZoneId.systemDefault()).toInstant());
+    @Test
+    void keepsTheCalendarDayInAnyMachineTimezone() {
+        var original = TimeZone.getDefault();
+        try {
+            for (String zone : new String[]{
+                "Europe/Zurich", "America/Los_Angeles", "Pacific/Kiritimati", "UTC" }) {
+                TimeZone.setDefault(TimeZone.getTimeZone(zone));
+
+                var params = EbicsXmlFactory.createBTDParams("EOP", "CH", null, "camt.053", "08",
+                    "ZIP", LocalDate.of(2026, 8, 10), LocalDate.of(2026, 8, 11));
+
+                assertTrue(params.xmlText().contains(">2026-08-10<"),
+                    "Der Starttag muss in " + zone + " derselbe sein: " + params.xmlText());
+                assertFalse(params.xmlText().contains("2026-08-09"),
+                    "Tagesversatz in " + zone + ": " + params.xmlText());
+            }
+        } finally {
+            TimeZone.setDefault(original);
+        }
+    }
+
+    private static LocalDate localDate(int year, int month, int day) {
+        return LocalDate.of(year, month, day);
     }
 
     /** Der Auftragsparameter-Block muss gegen das H005-Schema gueltig sein, sonst lehnt die Bank ab. */

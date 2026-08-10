@@ -115,8 +115,8 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
           type.setStringValue(this.getType());
           StandardOrderParamsType standardOrderParamsType =
               EbicsXmlFactory.createStandardOrderParamsType();
-          if (downloadParams != null
-              && downloadParams.startDate() != null && downloadParams.endDate() != null) {
+          // EbicsDownloadParams guarantees the range is either absent or complete.
+          if (downloadParams != null && downloadParams.startDate() != null) {
               standardOrderParamsType.setDateRange(EbicsXmlFactory.createDateRange(
                   downloadParams.startDate(), downloadParams.endDate()));
           }
