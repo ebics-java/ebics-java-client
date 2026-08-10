@@ -18,6 +18,7 @@
 
 package org.kopi.ebics.xml;
 
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -33,8 +34,11 @@ import org.ebics.s002.SignaturePubKeyOrderDataType;
 import org.ebics.s002.UserSignatureDataDocument;
 import org.ebics.s002.UserSignatureDataSigBookType;
 import org.kopi.ebics.schema.h005.AuthenticationPubKeyInfoType;
+import org.kopi.ebics.schema.h005.BTDParamsType;
 import org.kopi.ebics.schema.h005.BTUOrderParamsDocument;
 import org.kopi.ebics.schema.h005.BTUParamsType;
+import org.kopi.ebics.schema.h005.ContainerStringType;
+import org.kopi.ebics.schema.h005.DateType;
 import org.kopi.ebics.schema.h005.DataDigestType;
 import org.kopi.ebics.schema.h005.DataEncryptionInfoType.EncryptionPubKeyDigest;
 import org.kopi.ebics.schema.h005.DataTransferRequestType;
@@ -920,6 +924,65 @@ public final class EbicsXmlFactory {
         return type;
     }
 
+    /**
+     * Creates the order parameters of an EBICS 3.0 (H005) BTD download order.
+     *
+     * @param serviceName    the BTF service code, e.g. {@code EOP}
+     * @param scope          the rule scope, e.g. {@code CH}; may be {@code null}
+     * @param option         the service option; may be {@code null}
+     * @param messageName    the message name, e.g. {@code camt.053}
+     * @param messageVersion the message version, e.g. {@code 08}
+     * @param containerType  the container type ({@code XML}, {@code ZIP} or {@code SVC});
+     *                       may be {@code null}
+     * @param start          the start of the requested report period; may be {@code null}
+     * @param end            the end of the requested report period; may be {@code null}
+     * @return the <code>BTDParamsType</code> XML object
+     */
+    public static BTDParamsType createBTDParams(String serviceName, String scope, String option,
+        String messageName, String messageVersion, String containerType, Date start, Date end) {
+        var type = BTDParamsType.Factory.newInstance();
+        var service = type.addNewService();
+        service.setServiceName(serviceName);
+        if (scope != null) {
+            service.setScope(scope);
+        }
+        if (option != null) {
+            service.setServiceOption(option);
+        }
+        if (containerType != null) {
+            // The container flag lives inside Service (not directly in BTDParamsType) and the
+            // generated setter takes the enum, not a String.
+            var container = ContainerStringType.Enum.forString(containerType);
+            if (container == null) {
+                throw new IllegalArgumentException(
+                    "Unsupported EBICS container type: " + containerType);
+            }
+            service.addNewContainer().setContainerType(container);
+        }
+        var msgType = MessageType.Factory.newInstance();
+        msgType.setStringValue(messageName);
+        msgType.setVersion(messageVersion);
+        service.setMsgName(msgType);
+        if (start != null && end != null) {
+            var range = type.addNewDateRange();
+            range.xsetStart(toXmlDate(start));
+            range.xsetEnd(toXmlDate(end));
+        }
+        return type;
+    }
+
+    /**
+     * Converts a date into an <code>xs:date</code> value without a timezone offset. Passing a
+     * {@link Calendar} instead would make XMLBeans append the local offset (e.g.
+     * {@code 2026-08-10+02:00}), which shifts the reported day for a bank in another timezone.
+     */
+    private static DateType toXmlDate(Date date) {
+        var value = DateType.Factory.newInstance();
+        value.setStringValue(
+            date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+        return value;
+    }
+
 //    private static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
 //        OrderAttributeType.Enum orderAttribute, OrderType orderType, XmlObject orderParams,
 //        QName newInstance) {
@@ -979,13 +1042,9 @@ public final class EbicsXmlFactory {
      */
     public static StandardOrderParamsType.DateRange createDateRange(Date start, Date end) {
         StandardOrderParamsType.DateRange newDateRange = StandardOrderParamsType.DateRange.Factory.newInstance();
-        Calendar startRange = Calendar.getInstance();
-        Calendar endRange = Calendar.getInstance();
 
-        startRange.setTime(start);
-        endRange.setTime(end);
-        newDateRange.setStart(startRange);
-        newDateRange.setEnd(endRange);
+        newDateRange.xsetStart(toXmlDate(start));
+        newDateRange.xsetEnd(toXmlDate(end));
 
         return newDateRange;
     }
