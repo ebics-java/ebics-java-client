@@ -18,6 +18,8 @@
 
 package org.kopi.ebics.xml;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -33,8 +35,11 @@ import org.ebics.s002.SignaturePubKeyOrderDataType;
 import org.ebics.s002.UserSignatureDataDocument;
 import org.ebics.s002.UserSignatureDataSigBookType;
 import org.kopi.ebics.schema.h005.AuthenticationPubKeyInfoType;
+import org.kopi.ebics.schema.h005.BTDParamsType;
 import org.kopi.ebics.schema.h005.BTUOrderParamsDocument;
 import org.kopi.ebics.schema.h005.BTUParamsType;
+import org.kopi.ebics.schema.h005.ContainerStringType;
+import org.kopi.ebics.schema.h005.DateType;
 import org.kopi.ebics.schema.h005.DataDigestType;
 import org.kopi.ebics.schema.h005.DataEncryptionInfoType.EncryptionPubKeyDigest;
 import org.kopi.ebics.schema.h005.DataTransferRequestType;
@@ -920,6 +925,69 @@ public final class EbicsXmlFactory {
         return type;
     }
 
+    /**
+     * Creates the order parameters of an EBICS 3.0 (H005) BTD download order.
+     *
+     * @param serviceName    the BTF service code, e.g. {@code EOP}
+     * @param scope          the rule scope, e.g. {@code CH}; may be {@code null}
+     * @param option         the service option; may be {@code null}
+     * @param messageName    the message name, e.g. {@code camt.053}
+     * @param messageVersion the message version, e.g. {@code 08}
+     * @param containerType  the container type ({@code XML}, {@code ZIP} or {@code SVC});
+     *                       may be {@code null}
+     * @param start          the first calendar day of the requested report period; may be
+     *                       {@code null}
+     * @param end            the last calendar day of the requested report period; may be
+     *                       {@code null}
+     * @return the <code>BTDParamsType</code> XML object
+     */
+    public static BTDParamsType createBTDParams(String serviceName, String scope, String option,
+        String messageName, String messageVersion, String containerType,
+        LocalDate start, LocalDate end) {
+        var type = BTDParamsType.Factory.newInstance();
+        var service = type.addNewService();
+        service.setServiceName(serviceName);
+        if (scope != null) {
+            service.setScope(scope);
+        }
+        if (option != null) {
+            service.setServiceOption(option);
+        }
+        if (containerType != null) {
+            // The container flag lives inside Service (not directly in BTDParamsType) and the
+            // generated setter takes the enum, not a String.
+            var container = ContainerStringType.Enum.forString(containerType);
+            if (container == null) {
+                throw new IllegalArgumentException(
+                    "Unsupported EBICS container type: " + containerType);
+            }
+            service.addNewContainer().setContainerType(container);
+        }
+        var msgType = MessageType.Factory.newInstance();
+        msgType.setStringValue(messageName);
+        msgType.setVersion(messageVersion);
+        service.setMsgName(msgType);
+        if (start != null && end != null) {
+            var range = type.addNewDateRange();
+            range.xsetStart(toXmlDate(start));
+            range.xsetEnd(toXmlDate(end));
+        }
+        return type;
+    }
+
+    /**
+     * Converts a calendar day into an <code>xs:date</code> value. No timezone is involved in
+     * either direction: setting a {@link Calendar} would make XMLBeans append the local offset
+     * (e.g. {@code 2026-08-10+02:00}), which shifts the reported day for a bank in another
+     * timezone, and converting through an instant would make the day itself depend on the
+     * machine's zone.
+     */
+    private static DateType toXmlDate(LocalDate date) {
+        var value = DateType.Factory.newInstance();
+        value.setStringValue(date.toString());
+        return value;
+    }
+
 //    private static StaticHeaderOrderDetailsType createStaticHeaderOrderDetailsType(String orderId,
 //        OrderAttributeType.Enum orderAttribute, OrderType orderType, XmlObject orderParams,
 //        QName newInstance) {
@@ -971,23 +1039,43 @@ public final class EbicsXmlFactory {
     }
 
     /**
-     * Creates a new <code>DateRange</code> XML object
+     * Creates a new <code>DateRange</code> XML object.
+     *
+     * <p><b>A {@link Date} is an instant, the EBICS date range is a pair of calendar days.</b>
+     * The calendar day is therefore taken in the timezone of the machine running this code: a
+     * {@code Date} at UTC midnight becomes the previous day in any zone west of UTC. Prefer
+     * {@link #createDateRange(LocalDate, LocalDate)} — that overload has no timezone in it.
      *
      * @param start the start range
      * @param end   the end range
      * @return the <code>DateRange</code> XML object
      */
     public static StandardOrderParamsType.DateRange createDateRange(Date start, Date end) {
-        StandardOrderParamsType.DateRange newDateRange = StandardOrderParamsType.DateRange.Factory.newInstance();
-        Calendar startRange = Calendar.getInstance();
-        Calendar endRange = Calendar.getInstance();
+        return createDateRange(toLocalDate(start), toLocalDate(end));
+    }
 
-        startRange.setTime(start);
-        endRange.setTime(end);
-        newDateRange.setStart(startRange);
-        newDateRange.setEnd(endRange);
+    /**
+     * Creates a new <code>DateRange</code> XML object from two calendar days.
+     *
+     * @param start the first day of the range
+     * @param end   the last day of the range
+     * @return the <code>DateRange</code> XML object
+     */
+    public static StandardOrderParamsType.DateRange createDateRange(LocalDate start, LocalDate end) {
+        StandardOrderParamsType.DateRange newDateRange = StandardOrderParamsType.DateRange.Factory.newInstance();
+
+        newDateRange.xsetStart(toXmlDate(start));
+        newDateRange.xsetEnd(toXmlDate(end));
 
         return newDateRange;
+    }
+
+    /**
+     * Reads the calendar day out of an instant, in the timezone of this machine. Only for the
+     * {@link Date}-based compatibility overloads; anything new should carry a {@link LocalDate}.
+     */
+    public static LocalDate toLocalDate(Date date) {
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
 //    /**

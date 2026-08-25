@@ -20,8 +20,12 @@ package org.kopi.ebics.xml;
 
 import java.util.Calendar;
 
+import org.apache.xmlbeans.SchemaType;
+import org.apache.xmlbeans.XmlObject;
+import org.kopi.ebics.client.EbicsDownloadParams;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.EbicsOrderType;
+import org.kopi.ebics.schema.h005.BTDOrderParamsDocument;
 import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest;
 import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Body;
 import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Header;
@@ -52,7 +56,21 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
    */
   public DownloadInitializationRequestElement(EbicsSession session,
                                        EbicsOrderType type) {
+    this(session, type, null);
+  }
+
+  /**
+   * Constructs a new <code>DInitializationRequestElement</code> for downloads initializations.
+   * @param session the current ebics session
+   * @param type the download order type (FDL, HTD, HPD)
+   * @param downloadParams optional service parameters; with a service name set the request is
+   *        sent as an EBICS 3.0 BTD order, otherwise the legacy order type is kept
+   */
+  public DownloadInitializationRequestElement(EbicsSession session,
+                                       EbicsOrderType type,
+                                       EbicsDownloadParams downloadParams) {
     super(session, type, generateName(type));
+    this.downloadParams = downloadParams;
   }
 
   @Override
@@ -78,16 +96,39 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
 	                                          decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
     bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
 
-      StandardOrderParamsType standardOrderParamsType = EbicsXmlFactory.createStandardOrderParamsType();
-
       var type = StaticHeaderOrderDetailsType.AdminOrderType.Factory.newInstance();
-      type.setStringValue(this.getType());
+
+      XmlObject orderParamsType;
+      SchemaType orderParamsSchema;
+
+      if (downloadParams != null && downloadParams.isBtd()) {
+          // EBICS 3.0: the business transaction goes into the service block, the admin order
+          // type is always BTD.
+          type.setStringValue("BTD");
+          orderParamsType = EbicsXmlFactory.createBTDParams(
+              downloadParams.serviceName(), downloadParams.scope(), downloadParams.option(),
+              downloadParams.messageName(), downloadParams.messageVersion(),
+              downloadParams.containerType(), downloadParams.startDate(),
+              downloadParams.endDate());
+          orderParamsSchema = BTDOrderParamsDocument.type;
+      } else {
+          type.setStringValue(this.getType());
+          StandardOrderParamsType standardOrderParamsType =
+              EbicsXmlFactory.createStandardOrderParamsType();
+          // EbicsDownloadParams guarantees the range is either absent or complete.
+          if (downloadParams != null && downloadParams.startDate() != null) {
+              standardOrderParamsType.setDateRange(EbicsXmlFactory.createDateRange(
+                  downloadParams.startDate(), downloadParams.endDate()));
+          }
+          orderParamsType = standardOrderParamsType;
+          orderParamsSchema = StandardOrderParamsDocument.type;
+      }
 
       //FIXME Some banks cannot handle OrderID element in download process. Add parameter in configuration!!!
       orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(null,//session.getUser().getPartner().nextOrderId(),
             type,
-	                                                                standardOrderParamsType,
-          StandardOrderParamsDocument.type);
+	                                                                orderParamsType,
+          orderParamsSchema);
 
     xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(),
                                                      nonce,
@@ -107,5 +148,6 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
     document = EbicsXmlFactory.createEbicsRequestDocument(request);
   }
 
+  private final EbicsDownloadParams downloadParams;
   private static final long 			serialVersionUID = 3776072549761880272L;
 }

@@ -58,6 +58,7 @@ import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.session.OrderType;
 import org.kopi.ebics.session.Product;
 import org.kopi.ebics.utils.Constants;
+import org.kopi.ebics.xml.EbicsXmlFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -413,6 +414,17 @@ public class EbicsClient {
 
     public void fetchFile(File file, User user, Product product, EbicsOrderType orderType,
         boolean isTest) throws IOException, EbicsException {
+        fetchFile(file, user, product, orderType, null, isTest);
+    }
+
+    /**
+     * Downloads a file from the bank.
+     *
+     * @param downloadParams optional EBICS 3.0 service parameters and report period; with a
+     *        service name set the order is sent as a BTD business transaction format order
+     */
+    public void fetchFile(File file, User user, Product product, EbicsOrderType orderType,
+        EbicsDownloadParams downloadParams, boolean isTest) throws IOException, EbicsException {
         FileTransfer transferManager;
         EbicsSession session = createSession(user, product);
         session.addSessionParam("FORMAT", "pain.xxx.cfonb160.dct");
@@ -425,7 +437,7 @@ public class EbicsClient {
             configuration.getTransferTraceDirectory(user));
 
         try {
-            transferManager.fetchFile(orderType, file);
+            transferManager.fetchFile(orderType, downloadParams, file);
         } catch (NoDownloadDataAvailableException e) {
             // don't log this exception as an error, caller can decide how to handle
             throw e;
@@ -435,9 +447,22 @@ public class EbicsClient {
         }
     }
 
+    /**
+     * Downloads a file for a report period.
+     *
+     * <p><b>A {@link Date} is an instant, the EBICS report period is a pair of calendar days.</b>
+     * The calendar day is therefore read in the timezone of the machine running this code, so a
+     * {@code Date} at UTC midnight becomes the previous day in any zone west of UTC. Prefer
+     * {@link #fetchFile(File, User, Product, EbicsOrderType, EbicsDownloadParams, boolean)} with
+     * {@link java.time.LocalDate} values, which has no timezone in it.
+     */
     public void fetchFile(File file, EbicsOrderType orderType, Date start, Date end) throws IOException,
         EbicsException {
-        fetchFile(file, defaultUser, defaultProduct, orderType, false);
+        fetchFile(file, defaultUser, defaultProduct, orderType,
+            EbicsDownloadParams.dateRangeOnly(
+                start == null ? null : EbicsXmlFactory.toLocalDate(start),
+                end == null ? null : EbicsXmlFactory.toLocalDate(end)),
+            false);
     }
 
     /**

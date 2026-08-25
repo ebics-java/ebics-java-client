@@ -174,8 +174,26 @@ public class FileTransfer {
                         File outputFile)
     throws IOException, EbicsException
   {
+    fetchFile(orderType, null, outputFile);
+  }
+
+  /**
+   * Fetches a file of the given order type from the bank.
+   * This type of transfer will run until everything is processed.
+   * No transaction recovery is possible.
+   * @param orderType type of file to fetch
+   * @param downloadParams optional EBICS 3.0 service parameters and report period
+   * @param outputFile where to put the data
+   * @throws IOException communication error
+   * @throws EbicsException server generated error
+   */
+  public void fetchFile(EbicsOrderType orderType,
+                        EbicsDownloadParams downloadParams,
+                        File outputFile)
+    throws IOException, EbicsException
+  {
     var sender = new HttpRequestSender(session);
-      var initializer = new DownloadInitializationRequestElement(session, orderType);
+      var initializer = new DownloadInitializationRequestElement(session, orderType, downloadParams);
     initializer.build();
     initializer.validate();
 
