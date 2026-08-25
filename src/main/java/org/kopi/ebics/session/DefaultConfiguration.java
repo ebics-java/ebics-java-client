@@ -58,6 +58,17 @@ public class DefaultConfiguration implements Configuration {
    * @return the property value.
    */
   private String getString(String key) {
+    // Caller-supplied properties win over the values bundled in config.properties.
+    // This constructor takes a Properties object precisely so that an embedder can
+    // configure the client; reading the bundle only made every one of those settings
+    // silently inert. Concretely: ebics.version stayed pinned to the bundled H003
+    // (EBICS 2.4) even when the caller asked for H005 (EBICS 3.0), so every request
+    // went out carrying Version="H003" inside an urn:org:ebics:H005 document.
+    String override = properties == null ? null : properties.getProperty(key);
+    if (override != null) {
+      return override;
+    }
+
     try {
       return bundle.getString(key);
     } catch(MissingResourceException e) {
