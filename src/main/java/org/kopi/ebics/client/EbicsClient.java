@@ -69,7 +69,20 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class EbicsClient {
+    /**
+     * The workspace holding ebics.txt, the user keys and the order numbers.
+     *
+     * <p>Overridable through EBICS_ROOT_DIR, the same variable {@link
+     * ParameterizedEbicsClientLauncher} uses, so that a second access (a test bank, a second
+     * agreement) can be initialized without writing into the workspace of the first one. The keys
+     * are not the only thing at stake: quitting saves the incremented order number, which the bank
+     * counts.
+     */
     private static File getRootDir() {
+        String configured = System.getenv("EBICS_ROOT_DIR");
+        if (configured != null && !configured.isBlank()) {
+            return new File(configured.trim());
+        }
         return new File(System.getProperty("user.home"), "ebics" + File.separator + "client");
     }
 
@@ -415,6 +428,18 @@ public class EbicsClient {
     public void fetchFile(File file, User user, Product product, EbicsOrderType orderType,
         boolean isTest) throws IOException, EbicsException {
         fetchFile(file, user, product, orderType, null, isTest);
+    }
+
+    /**
+     * Downloads a file for the default user, with EBICS 3.0 service parameters.
+     *
+     * <p>The counterpart of {@link #sendFile(File, EbicsOrderType, EbicsUploadParams)}: callers
+     * that use the default user have no other way to reach the BTD path, since the default
+     * product is not exposed.
+     */
+    public void fetchFile(File file, EbicsOrderType orderType, EbicsDownloadParams downloadParams)
+        throws IOException, EbicsException {
+        fetchFile(file, defaultUser, defaultProduct, orderType, downloadParams, false);
     }
 
     /**
