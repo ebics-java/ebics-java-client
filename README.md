@@ -39,14 +39,14 @@ Maven:
 <dependency>
     <groupId>io.github.ebics-java</groupId>
     <artifactId>ebics-java-client</artifactId>
-    <version>2.1.0</version>
+    <version>2.2.0</version>
 </dependency>
 ```
 
 Gradle:
 ```
 dependencies {
-    implementation 'io.github.ebics-java:ebics-java-client:2.1.0'
+    implementation 'io.github.ebics-java:ebics-java-client:2.2.0'
 }
 ```
 

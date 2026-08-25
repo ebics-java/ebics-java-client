@@ -4,7 +4,7 @@
     <groupId>io.github.ebics-java</groupId>
     <artifactId>ebics-java-client</artifactId>
     <packaging>jar</packaging>
-    <version>2.1.0</version>
+    <version>2.2.0</version>
     <name>EBICS Java Client</name>
     <description>EBICS (Electronic Banking Internet Communication Standard) client library for Java.
         Supports EBICS 3.0 and French, German and Swiss banks, with a command line client for
