@@ -213,7 +213,8 @@ public final class ParameterizedEbicsClientLauncher {
             upperCase(requireOption(parsedArguments.scope(), "--scope")),
             upperCase(parsedArguments.option()),
             requireOption(parsedArguments.messageName(), "--msg-name"),
-            requireOption(parsedArguments.messageVersion(), "--msg-version"),
+            // Optional: bank lists like ZKB's result archive (OTH BIL CH004TPE msc) carry no version.
+            normalize(parsedArguments.messageVersion()),
             upperCase(requireOption(parsedArguments.containerType(), "--container")),
             parseDate(parsedArguments.startDate(), "--start"),
             parseDate(parsedArguments.endDate(), "--end")
@@ -276,6 +277,19 @@ public final class ParameterizedEbicsClientLauncher {
                 "pain.001",
                 "03",
                 true
+            );
+            return new EbicsUploadParams(null, orderParams);
+        }
+        if (orderType == OrderType.XTC) {
+            // ZKB test platform: CSV input file for camt simulation (OTH BIL CH004TPS csv).
+            // No message version in the bank's BTF list and no ES on a simulation input.
+            var orderParams = new EbicsUploadParams.OrderParams(
+                "OTH",
+                "BIL",
+                "CH004TPS",
+                "csv",
+                null,
+                false
             );
             return new EbicsUploadParams(null, orderParams);
         }

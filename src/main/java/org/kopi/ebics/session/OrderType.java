@@ -57,6 +57,7 @@ public enum OrderType implements EbicsOrderType {
     XKD,
     XE2,
     XCT,
+    XTC,
     C52,
     C53,
     C54;

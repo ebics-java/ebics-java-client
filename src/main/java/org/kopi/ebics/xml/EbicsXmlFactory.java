@@ -916,7 +916,9 @@ public final class EbicsXmlFactory {
 
         msgType.setStringValue(messageName);
         //msgType.setFormat(messageName);
-        msgType.setVersion(messageVersion);
+        if (messageVersion != null) {
+            msgType.setVersion(messageVersion);
+        }
         service.setMsgName(msgType);
         if (signatureFlag) {
             var flag = type.addNewSignatureFlag();
@@ -965,7 +967,9 @@ public final class EbicsXmlFactory {
         }
         var msgType = MessageType.Factory.newInstance();
         msgType.setStringValue(messageName);
-        msgType.setVersion(messageVersion);
+        if (messageVersion != null) {
+            msgType.setVersion(messageVersion);
+        }
         service.setMsgName(msgType);
         if (start != null && end != null) {
             var range = type.addNewDateRange();
