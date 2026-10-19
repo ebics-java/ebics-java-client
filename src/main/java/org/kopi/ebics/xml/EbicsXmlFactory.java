@@ -916,7 +916,9 @@ public final class EbicsXmlFactory {
 
         msgType.setStringValue(messageName);
         //msgType.setFormat(messageName);
-        msgType.setVersion(messageVersion);
+        if (messageVersion != null) {
+            msgType.setVersion(messageVersion);
+        }
         service.setMsgName(msgType);
         if (signatureFlag) {
             var flag = type.addNewSignatureFlag();
@@ -932,7 +934,8 @@ public final class EbicsXmlFactory {
      * @param scope          the rule scope, e.g. {@code CH}; may be {@code null}
      * @param option         the service option; may be {@code null}
      * @param messageName    the message name, e.g. {@code camt.053}
-     * @param messageVersion the message version, e.g. {@code 08}
+     * @param messageVersion the message version, e.g. {@code 08}; {@code null} for formats
+     *                       without one, such as {@code mt940}
      * @param containerType  the container type ({@code XML}, {@code ZIP} or {@code SVC});
      *                       may be {@code null}
      * @param start          the first calendar day of the requested report period; may be
@@ -965,7 +968,10 @@ public final class EbicsXmlFactory {
         }
         var msgType = MessageType.Factory.newInstance();
         msgType.setStringValue(messageName);
-        msgType.setVersion(messageVersion);
+        // SWIFT formats such as mt940 have no version; an empty attribute would break the schema.
+        if (messageVersion != null) {
+            msgType.setVersion(messageVersion);
+        }
         service.setMsgName(msgType);
         if (start != null && end != null) {
             var range = type.addNewDateRange();

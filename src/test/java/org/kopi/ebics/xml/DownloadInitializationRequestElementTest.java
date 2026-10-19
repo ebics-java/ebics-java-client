@@ -43,6 +43,18 @@ class DownloadInitializationRequestElementTest {
             "DateRange-Ende muss ein reines xs:date ohne Zeitzonen-Offset sein");
     }
 
+    /** SWIFT-Formate wie mt940 haben keine Version; ein leeres Attribut verletzt das Schema. */
+    @Test
+    void omitsTheVersionForMt940() throws Exception {
+        var params = new EbicsDownloadParams("EOP", "CH", null, "mt940", null, null, null, null);
+
+        String xml = stripNamespacePrefixes(TestSessions.buildDownloadInitializationXml(params));
+
+        assertTrue(xml.contains(">mt940<"), "MsgName fehlt");
+        assertFalse(xml.contains("version=\"\""), "leeres version-Attribut");
+        assertFalse(xml.contains("<Container"), "mt940 kommt ohne Container");
+    }
+
     /**
      * I-2: der Kalendertag darf nicht an der Zeitzone des Rechners haengen. Frueher lief er als
      * {@code Date} durch {@code ZoneId.systemDefault()} und wurde westlich von UTC zum Vortag.
