@@ -18,6 +18,7 @@
 
 package org.kopi.ebics.client;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -221,8 +222,10 @@ public class FileTransfer {
 	        joiner);
     }
 
+    ByteArrayOutputStream content = new ByteArrayOutputStream();
+    joiner.writeTo(content, response.getTransactionKey());
     try (FileOutputStream dest = new FileOutputStream(outputFile)) {
-        joiner.writeTo(dest, response.getTransactionKey());
+        content.writeTo(dest);
     }
     var receipt = new ReceiptRequestElement(session,
 	                                state.getTransactionId(),
