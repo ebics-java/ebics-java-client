@@ -142,37 +142,33 @@ public final class Utils {
    * 
    * @param zip the zipped input.
    * @return the uncompressed data.
+   * @throws EbicsException if the input is invalid, incomplete, or requires a preset dictionary.
    */
   public static byte[] unzip(byte[] zip) throws EbicsException {
       Inflater decompressor;
       ByteArrayOutputStream output;
       byte[] buf;
 
-      decompressor = new Inflater();
       output = new ByteArrayOutputStream(zip.length);
-      decompressor.setInput(zip);
       buf = new byte[1024];
-
-      while (!decompressor.finished()) {
-          int count;
-
-          try {
-              count = decompressor.inflate(buf);
-          } catch (DataFormatException e) {
-              throw new EbicsException(e.getMessage());
-          }
-          output.write(buf, 0, count);
-      }
+      decompressor = new Inflater();
 
       try {
-          output.close();
-      } catch (IOException e) {
-          throw new EbicsException(e.getMessage());
+          decompressor.setInput(zip);
+          while (!decompressor.finished()) {
+              int count = decompressor.inflate(buf);
+              if (count == 0 && !decompressor.finished()
+                      && (decompressor.needsInput() || decompressor.needsDictionary())) {
+                  throw new EbicsException("Incomplete compressed data or preset dictionary required");
+              }
+              output.write(buf, 0, count);
+          }
+          return output.toByteArray();
+      } catch (DataFormatException e) {
+          throw new EbicsException("Invalid compressed data", e);
+      } finally {
+          decompressor.end();
       }
-
-      decompressor.end();
-
-      return output.toByteArray();
   }
 
   /**
