@@ -19,8 +19,11 @@
 package org.kopi.ebics.client;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.interfaces.ContentFactory;
@@ -166,8 +169,8 @@ public class FileTransfer {
    * This type of transfer will run until everything is processed.
    * No transaction recovery is possible.
    * @param orderType type of file to fetch
-   * @param outputFile where to put the data
-   * @throws IOException communication error
+   * @param outputFile destination to replace atomically after decoding
+   * @throws IOException communication or file error, including unsupported atomic replacement
    * @throws EbicsException server generated error
    */
   public void fetchFile(EbicsOrderType orderType,
@@ -183,8 +186,8 @@ public class FileTransfer {
    * No transaction recovery is possible.
    * @param orderType type of file to fetch
    * @param downloadParams optional EBICS 3.0 service parameters and report period
-   * @param outputFile where to put the data
-   * @throws IOException communication error
+   * @param outputFile destination to replace atomically after decoding
+   * @throws IOException communication or file error, including unsupported atomic replacement
    * @throws EbicsException server generated error
    */
   public void fetchFile(EbicsOrderType orderType,
@@ -221,8 +224,21 @@ public class FileTransfer {
 	        joiner);
     }
 
-    try (FileOutputStream dest = new FileOutputStream(outputFile)) {
+    Path destination = outputFile.toPath().toAbsolutePath();
+    Path temporary = Files.createTempFile(destination.getParent(), "ebics-download-", ".tmp");
+    try {
+      try (OutputStream dest = Files.newOutputStream(temporary)) {
         joiner.writeTo(dest, response.getTransactionKey());
+      }
+      Files.move(temporary, destination,
+                 StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+    } catch (IOException | EbicsException | RuntimeException failure) {
+      try {
+        Files.deleteIfExists(temporary);
+      } catch (IOException | RuntimeException cleanupFailure) {
+        failure.addSuppressed(cleanupFailure);
+      }
+      throw failure;
     }
     var receipt = new ReceiptRequestElement(session,
 	                                state.getTransactionId(),
