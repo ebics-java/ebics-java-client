@@ -116,9 +116,21 @@ final class StubProxy implements AutoCloseable {
             String value = line.substring(colon + 1).trim();
             headers.put(name.toLowerCase(Locale.ROOT), value);
         }
-        // Body is intentionally not drained: for our assertions only the
-        // request line + headers matter, and HttpClient is happy as long as
-        // it eventually sees a complete response on this connection.
+        // Finish reading the body before responding and closing the socket.
+        if ("chunked".equalsIgnoreCase(headers.get("transfer-encoding"))) {
+            int size;
+            while ((size = Integer.parseInt(readLine(in).split(";", 2)[0], 16)) != 0) {
+                in.skipNBytes(size);
+                if (!readLine(in).isEmpty()) {
+                    throw new IOException("Expected CRLF after request chunk");
+                }
+            }
+            while (!readLine(in).isEmpty()) {
+                // Discard trailers.
+            }
+        } else if (headers.containsKey("content-length")) {
+            in.skipNBytes(Long.parseLong(headers.get("content-length")));
+        }
         return new RecordedRequest(requestLine, headers);
     }
 
